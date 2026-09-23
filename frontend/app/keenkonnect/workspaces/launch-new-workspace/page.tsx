@@ -1,6 +1,7 @@
 // FILE: frontend/app/keenkonnect/workspaces/launch-new-workspace/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ProForm,
   ProFormSelect,
@@ -20,13 +21,14 @@ type LaunchWorkspaceFormValues = {
 };
 
 function Content() {
+  const { t: i18nT } = useLanguage();
   return (
     <Card>
       <Alert
         type="info"
         showIcon
-        message="Workspace creation preview"
-        description="KeenKonnect does not expose a workspace persistence contract in this build. You can inspect the intended configuration model, but launching a workspace is disabled."
+        message={i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.workspaceCreationPreview")}
+        description={i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.keenkonnectDoesNotExposeAWorkspacePersistence")}
         style={{ marginBottom: 16 }}
       />
       <ProForm<LaunchWorkspaceFormValues>
@@ -41,39 +43,39 @@ function Content() {
       >
         <ProFormText
           name="name"
-          label="Nom de l’espace de travail"
-          placeholder="ex. KeenKonnect Quantum Strategy Lab"
+          label={i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.nomDeLEspaceDeTravail")}
+          placeholder={i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.exKeenkonnectQuantumStrategyLab")}
         />
         <ProFormSelect
           name="team"
-          label="Équipe responsable"
-          placeholder="Sélectionnez une équipe"
+          label={i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.equipeResponsable")}
+          placeholder={i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.selectionnezUneEquipe")}
           options={[
-            { label: 'Team Alpha – Strategic Vision', value: 'Team Alpha' },
-            { label: 'Team Beta – Quantum Strategists', value: 'Team Beta' },
-            { label: 'Team Gamma – Innovation Pod', value: 'Team Gamma' },
-            { label: 'Special Guests – Invited Fellows', value: 'Special Guests' },
+            { label: i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.teamAlphaStrategicVision"), value: 'Team Alpha' },
+            { label: i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.teamBetaQuantumStrategists"), value: 'Team Beta' },
+            { label: i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.teamGammaInnovationPod"), value: 'Team Gamma' },
+            { label: i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.specialGuestsInvitedFellows"), value: 'Special Guests' },
           ]}
         />
         <ProFormSelect
           name="tools"
-          label="Outils & environnements inclus"
-          placeholder="Choisissez un ou plusieurs environnements"
+          label={i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.outilsEnvironnementsInclus")}
+          placeholder={i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.choisissezUnOuPlusieursEnvironnements")}
           fieldProps={{ mode: 'multiple' }}
           options={[
-            { label: 'Data Science Notebook', value: 'Data Science Notebook' },
-            { label: 'VR Lab', value: 'VR Lab' },
-            { label: 'Programming Workspace', value: 'Programming Workspace' },
-            { label: 'Design Studio', value: 'Design Studio' },
-            { label: '3D Modeling', value: '3D Modeling' },
-            { label: 'Virtual Whiteboard', value: 'Virtual Whiteboard' },
-            { label: 'Brainstorming Hub', value: 'Brainstorming Hub' },
-            { label: 'Prototyping Area', value: 'Prototyping Area' },
+            { label: i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.dataScienceNotebook"), value: 'Data Science Notebook' },
+            { label: i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.vrLab"), value: 'VR Lab' },
+            { label: i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.programmingWorkspace"), value: 'Programming Workspace' },
+            { label: i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.designStudio"), value: 'Design Studio' },
+            { label: i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.text3dModeling"), value: '3D Modeling' },
+            { label: i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.virtualWhiteboard"), value: 'Virtual Whiteboard' },
+            { label: i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.brainstormingHub"), value: 'Brainstorming Hub' },
+            { label: i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.prototypingArea"), value: 'Prototyping Area' },
           ]}
         />
         <ProFormSwitch
           name="isPublic"
-          label="Espace visible à l’ensemble de KeenKonnect"
+          label={i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.espaceVisibleALEnsembleDeKeenkonnect")}
         />
       </ProForm>
     </Card>
@@ -81,10 +83,11 @@ function Content() {
 }
 
 export default function PageWrapper() {
+  const { t: i18nT } = useLanguage();
   return (
     <KeenPageShell
-      title="Launch a New Workspace"
-      description="Preview the intended workspace configuration model. Persistence remains deferred until a dedicated KeenKonnect workspace contract exists."
+      title={i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.launchANewWorkspace")}
+      description={i18nT("ui.keenkonnect.workspaces.launchNewWorkspace.previewTheIntendedWorkspaceConfigurationModelPersistence")}
     >
       <Suspense fallback={null}>
         <Content />

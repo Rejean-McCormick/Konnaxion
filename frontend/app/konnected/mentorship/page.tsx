@@ -2,6 +2,8 @@
 // app/konnected/mentorship/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   FilterOutlined,
   MessageOutlined,
@@ -111,16 +113,17 @@ const SUBJECT_OPTIONS = [
   'Study skills',
 ];
 
-const LEVEL_OPTIONS: { label: string; value: MentorLevel | 'all' }[] = [
-  { label: 'All levels', value: 'all' },
-  { label: 'Primary', value: 'primary' },
-  { label: 'Secondary', value: 'secondary' },
-  { label: 'Adult / Lifelong learning', value: 'adult' },
-];
+const LEVEL_OPTIONS = (i18nT: TranslateFunction): { label: string; value: MentorLevel | 'all' }[] => ([
+  { label: i18nT("ui.konnected.mentorship.allLevels"), value: 'all' },
+  { label: i18nT("ui.konnected.mentorship.primary"), value: 'primary' },
+  { label: i18nT("ui.konnected.mentorship.secondary"), value: 'secondary' },
+  { label: i18nT("ui.konnected.mentorship.adultLifelongLearning"), value: 'adult' },
+]);
 
 const LANGUAGE_OPTIONS = ['Any', 'English', 'French', 'Spanish', 'Arabic', 'Other'];
 
 export default function KonnectedMentorshipPage() {
+  const { t: i18nT } = useLanguage();
   const [filters, setFilters] = useState<FilterState>({
     subject: 'Any',
     level: 'all',
@@ -208,7 +211,7 @@ export default function KonnectedMentorshipPage() {
 
   const handleSubmitRequest = async (values: MentorshipRequestFormValues) => {
     if (!selectedMentor) {
-      message.error('Choose a mentor before submitting a request.');
+      message.error(i18nT("ui.konnected.mentorship.chooseAMentorBeforeSubmittingARequest"));
       return;
     }
 
@@ -223,11 +226,11 @@ export default function KonnectedMentorshipPage() {
         additional_notes: values.additionalNotes ?? '',
       });
 
-      message.success('Your mentorship request has been recorded.');
+      message.success(i18nT("ui.konnected.mentorship.yourMentorshipRequestHasBeenRecorded"));
       handleCloseRequest();
     } catch (error) {
       console.error('Failed to create mentorship request', error);
-      message.error('Unable to submit the mentorship request.');
+      message.error(i18nT("ui.konnected.mentorship.unableToSubmitTheMentorshipRequest"));
     } finally {
       setSubmittingRequest(false);
     }
@@ -244,25 +247,25 @@ export default function KonnectedMentorshipPage() {
 
   return (
     <KonnectedPageShell
-      title="Mentorship"
-      subtitle="Connect with volunteer mentors and join cross-age learning circles."
+      title={i18nT("ui.konnected.mentorship.mentorship")}
+      subtitle={i18nT("ui.konnected.mentorship.connectWithVolunteerMentorsAndJoinCross")}
       primaryAction={
         <Button icon={<TeamOutlined />} href="#learning-circles">
-          Browse learning circles
+          {i18nT("ui.konnected.mentorship.browseLearningCircles")}
         </Button>
       }
       secondaryActions={
         <Button icon={<FilterOutlined />} onClick={handleResetFilters}>
-          Reset filters
+          {i18nT("ui.konnected.mentorship.resetFilters")}
         </Button>
       }
     >
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={8}>
-          <Card title="Filter mentors" extra={<FilterOutlined />}>
+          <Card title={i18nT("ui.konnected.mentorship.filterMentors")} extra={<FilterOutlined />}>
             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
               <div>
-                <Text strong>Subject focus</Text>
+                <Text strong>{i18nT("ui.konnected.mentorship.subjectFocus")}</Text>
                 <Select
                   style={{ width: '100%', marginTop: 4 }}
                   value={filters.subject}
@@ -282,7 +285,7 @@ export default function KonnectedMentorshipPage() {
               </div>
 
               <div>
-                <Text strong>Level</Text>
+                <Text strong>{i18nT("ui.konnected.mentorship.level")}</Text>
                 <Radio.Group
                   style={{ marginTop: 4 }}
                   value={filters.level}
@@ -293,7 +296,7 @@ export default function KonnectedMentorshipPage() {
                     }))
                   }
                 >
-                  {LEVEL_OPTIONS.map((opt) => (
+                  {LEVEL_OPTIONS(i18nT).map((opt) => (
                     <Radio.Button key={opt.value} value={opt.value}>
                       {opt.label}
                     </Radio.Button>
@@ -302,7 +305,7 @@ export default function KonnectedMentorshipPage() {
               </div>
 
               <div>
-                <Text strong>Language</Text>
+                <Text strong>{i18nT("ui.konnected.mentorship.language")}</Text>
                 <Select
                   style={{ width: '100%', marginTop: 4 }}
                   value={filters.language}
@@ -322,7 +325,7 @@ export default function KonnectedMentorshipPage() {
               </div>
 
               <div>
-                <Text strong>Availability</Text>
+                <Text strong>{i18nT("ui.konnected.mentorship.availability")}</Text>
                 <Radio.Group
                   style={{ marginTop: 4 }}
                   value={filters.availability}
@@ -333,28 +336,23 @@ export default function KonnectedMentorshipPage() {
                     }))
                   }
                 >
-                  <Radio value="available">Currently available</Radio>
-                  <Radio value="all">Show all mentors</Radio>
+                  <Radio value="available">{i18nT("ui.konnected.mentorship.currentlyAvailable")}</Radio>
+                  <Radio value="all">{i18nT("ui.konnected.mentorship.showAllMentors")}</Radio>
                 </Radio.Group>
               </div>
             </Space>
           </Card>
 
-          <Card style={{ marginTop: 16 }} title="How mentorship works">
+          <Card style={{ marginTop: 16 }} title={i18nT("ui.konnected.mentorship.howMentorshipWorks")}>
             <Space direction="vertical" size="small">
               <Paragraph>
-                Mentors are volunteers who support learners with specific goals:
-                homework help, exam preparation, career guidance, or exploring new
-                subjects.
+                {i18nT("ui.konnected.mentorship.mentorsAreVolunteersWhoSupportLearnersWith")}
               </Paragraph>
               <Paragraph>
-                Once your request is accepted, you will be matched with a mentor or
-                invited into a cross-age learning circle with peers and older
-                mentors.
+                {i18nT("ui.konnected.mentorship.onceYourRequestIsAcceptedYouWill")}
               </Paragraph>
               <Paragraph>
-                For youth accounts, guardian approval may be required before live
-                sessions are scheduled.
+                {i18nT("ui.konnected.mentorship.forYouthAccountsGuardianApprovalMayBe")}
               </Paragraph>
             </Space>
           </Card>
@@ -365,12 +363,12 @@ export default function KonnectedMentorshipPage() {
             title={
               <Space>
                 <UserOutlined />
-                <span>Available mentors</span>
+                <span>{i18nT("ui.konnected.mentorship.availableMentors")}</span>
               </Space>
             }
             extra={
               <Text type="secondary">
-                {filteredMentors.length} of {mentors.length} mentors shown
+                {filteredMentors.length} {i18nT("ui.konnected.mentorship.of")} {mentors.length} {i18nT("ui.konnected.mentorship.mentorsShown")}
               </Text>
             }
           >
@@ -388,7 +386,7 @@ export default function KonnectedMentorshipPage() {
               </div>
             ) : filteredMentors.length === 0 ? (
               <Empty
-                description="No mentors match your current filters. Try resetting or broadening your selection."
+                description={i18nT("ui.konnected.mentorship.noMentorsMatchYourCurrentFiltersTry")}
                 style={{ padding: '24px 0' }}
               />
             ) : (
@@ -402,7 +400,7 @@ export default function KonnectedMentorshipPage() {
                       <Space key="rating">
                         <StarFilled style={{ color: '#faad14' }} />
                         <Text>
-                          {mentor.rating.toFixed(1)} · {mentor.sessionsCompleted} sessions
+                          {mentor.rating.toFixed(1)} · {mentor.sessionsCompleted} {i18nT("ui.konnected.mentorship.sessions")}
                         </Text>
                       </Space>,
                       <Button
@@ -412,7 +410,7 @@ export default function KonnectedMentorshipPage() {
                         onClick={() => handleOpenRequest(mentor)}
                         disabled={!mentor.isAvailable}
                       >
-                        {mentor.isAvailable ? 'Request mentorship' : 'Join waitlist'}
+                        {mentor.isAvailable ? i18nT("ui.konnected.mentorship.requestMentorship") : i18nT("ui.konnected.mentorship.joinWaitlist")}
                       </Button>,
                     ]}
                   >
@@ -422,9 +420,9 @@ export default function KonnectedMentorshipPage() {
                         <Space wrap>
                           <Text strong>{mentor.name}</Text>
                           {mentor.isAvailable ? (
-                            <Badge status="success" text="Available" />
+                            <Badge status="success" text={i18nT("ui.konnected.mentorship.available")} />
                           ) : (
-                            <Badge status="default" text="Waitlist" />
+                            <Badge status="default" text={i18nT("ui.konnected.mentorship.waitlist")} />
                           )}
                         </Space>
                       }
@@ -436,12 +434,12 @@ export default function KonnectedMentorshipPage() {
                             ))}
                           </Space>
                           <Text type="secondary">
-                            Speaks: {mentor.languages.join(', ')} · Level:{' '}
+                            {i18nT("ui.konnected.mentorship.speaks")} {mentor.languages.join(', ')} {i18nT("ui.konnected.mentorship.level_890680")}{' '}
                             {mentor.level === 'primary'
-                              ? 'Primary'
+                              ? i18nT("ui.konnected.mentorship.primary")
                               : mentor.level === 'secondary'
-                              ? 'Secondary'
-                              : 'Adult / lifelong'}
+                              ? i18nT("ui.konnected.mentorship.secondary")
+                              : i18nT("ui.konnected.mentorship.adultLifelong")}
                           </Text>
                         </Space>
                       }
@@ -469,39 +467,34 @@ export default function KonnectedMentorshipPage() {
             title={
               <Space>
                 <TeamOutlined />
-                <span>Cross-age learning circles</span>
+                <span>{i18nT("ui.konnected.mentorship.crossAgeLearningCircles")}</span>
               </Space>
             }
           >
             <Space direction="vertical" size="small" style={{ width: '100%' }}>
               <Paragraph>
-                Learning circles are small groups of learners supported by one or more
-                mentors. They meet regularly to work on shared projects, practice
-                languages, or explore a topic together.
+                {i18nT("ui.konnected.mentorship.learningCirclesAreSmallGroupsOfLearners")}
               </Paragraph>
               <Row gutter={[16, 16]}>
                 <Col xs={24} md={12}>
                   <Card size="small" variant="borderless">
-                    <Title level={5}>Project-based circles</Title>
+                    <Title level={5}>{i18nT("ui.konnected.mentorship.projectBasedCircles")}</Title>
                     <Paragraph type="secondary">
-                      Work on a concrete project (science fair, community initiative,
-                      storytelling series) with peers and mentors guiding you through
-                      each step.
+                      {i18nT("ui.konnected.mentorship.workOnAConcreteProjectScienceFair")}
                     </Paragraph>
                   </Card>
                 </Col>
                 <Col xs={24} md={12}>
                   <Card size="small" variant="borderless">
-                    <Title level={5}>Skill-building circles</Title>
+                    <Title level={5}>{i18nT("ui.konnected.mentorship.skillBuildingCircles")}</Title>
                     <Paragraph type="secondary">
-                      Focus on specific skills like reading fluency, math basics, or
-                      digital literacy in a supportive, multi-age group.
+                      {i18nT("ui.konnected.mentorship.focusOnSpecificSkillsLikeReadingFluency")}
                     </Paragraph>
                   </Card>
                 </Col>
               </Row>
               <Button type="primary" icon={<TeamOutlined />}>
-                Express interest in a learning circle
+                {i18nT("ui.konnected.mentorship.expressInterestInALearningCircle")}
               </Button>
             </Space>
           </Card>
@@ -511,8 +504,8 @@ export default function KonnectedMentorshipPage() {
       <Modal
         title={
           selectedMentor
-            ? `Request mentorship with ${selectedMentor.name}`
-            : 'Request mentorship'
+            ? i18nT("ui.konnected.mentorship.requestMentorshipWith", { name: selectedMentor.name })
+            : i18nT("ui.konnected.mentorship.requestMentorship")
         }
         open={requestModalOpen}
         onCancel={handleCloseRequest}
@@ -525,23 +518,23 @@ export default function KonnectedMentorshipPage() {
           onFinish={handleSubmitRequest}
         >
           <Form.Item
-            label="What would you like to work on?"
+            label={i18nT("ui.konnected.mentorship.whatWouldYouLikeToWorkOn")}
             name="learningGoal"
             rules={[
               {
                 required: true,
-                message: 'Please describe your learning goal.',
+                message: i18nT("ui.konnected.mentorship.pleaseDescribeYourLearningGoal"),
               },
             ]}
           >
             <TextArea
               rows={3}
-              placeholder="Example: I need help preparing for my science exam."
+              placeholder={i18nT("ui.konnected.mentorship.exampleINeedHelpPreparingForMy")}
             />
           </Form.Item>
 
-          <Form.Item label="Preferred language" name="preferredLanguage">
-            <Select placeholder="Choose a language (optional)">
+          <Form.Item label={i18nT("ui.konnected.mentorship.preferredLanguage")} name="preferredLanguage">
+            <Select placeholder={i18nT("ui.konnected.mentorship.chooseALanguageOptional")}>
               {LANGUAGE_OPTIONS.filter((l) => l !== 'Any').map((lang) => (
                 <Option key={lang} value={lang}>
                   {lang}
@@ -550,39 +543,39 @@ export default function KonnectedMentorshipPage() {
             </Select>
           </Form.Item>
 
-          <Form.Item label="Age group" name="ageGroup">
-            <Select placeholder="Select your age group">
-              <Option value="primary">Primary (approx. 6–12)</Option>
-              <Option value="secondary">Secondary (approx. 13–18)</Option>
-              <Option value="adult">Adult / Lifelong learner</Option>
+          <Form.Item label={i18nT("ui.konnected.mentorship.ageGroup")} name="ageGroup">
+            <Select placeholder={i18nT("ui.konnected.mentorship.selectYourAgeGroup")}>
+              <Option value="primary">{i18nT("ui.konnected.mentorship.primaryApprox612")}</Option>
+              <Option value="secondary">{i18nT("ui.konnected.mentorship.secondaryApprox1318")}</Option>
+              <Option value="adult">{i18nT("ui.konnected.mentorship.adultLifelongLearner")}</Option>
             </Select>
           </Form.Item>
 
-          <Form.Item label="Preferred contact channel" name="contactChannel">
+          <Form.Item label={i18nT("ui.konnected.mentorship.preferredContactChannel")} name="contactChannel">
             <Radio.Group>
-              <Radio value="messaging">In-app messaging</Radio>
-              <Radio value="video">Video or audio sessions</Radio>
-              <Radio value="either">Either is fine</Radio>
+              <Radio value="messaging">{i18nT("ui.konnected.mentorship.inAppMessaging")}</Radio>
+              <Radio value="video">{i18nT("ui.konnected.mentorship.videoOrAudioSessions")}</Radio>
+              <Radio value="either">{i18nT("ui.konnected.mentorship.eitherIsFine")}</Radio>
             </Radio.Group>
           </Form.Item>
 
-          <Form.Item label="Additional notes (optional)" name="additionalNotes">
+          <Form.Item label={i18nT("ui.konnected.mentorship.additionalNotesOptional")} name="additionalNotes">
             <TextArea
               rows={3}
-              placeholder="Share any constraints (schedule, accessibility needs, guardian contact, etc.)."
+              placeholder={i18nT("ui.konnected.mentorship.shareAnyConstraintsScheduleAccessibilityNeedsGuardian")}
             />
           </Form.Item>
 
           <Form.Item style={{ marginBottom: 0 }}>
             <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-              <Button onClick={handleCloseRequest}>Cancel</Button>
+              <Button onClick={handleCloseRequest}>{i18nT("ui.konnected.mentorship.cancel")}</Button>
               <Button
                 type="primary"
                 htmlType="submit"
                 icon={<MessageOutlined />}
                 loading={submittingRequest}
               >
-                Submit request
+                {i18nT("ui.konnected.mentorship.submitRequest")}
               </Button>
             </Space>
           </Form.Item>

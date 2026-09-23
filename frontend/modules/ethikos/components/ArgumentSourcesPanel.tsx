@@ -1,6 +1,8 @@
 // FILE: frontend/modules/ethikos/components/ArgumentSourcesPanel.tsx
 'use client'
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   LinkOutlined,
   PlusOutlined,
@@ -108,9 +110,9 @@ function sourceDescription(source: SourceRow): string | undefined {
   )
 }
 
-function sourceTypeLabel(value?: string | null): string {
+function sourceTypeLabel(i18nT: TranslateFunction, value?: string | null): string {
   const cleaned = cleanText(value)
-  if (!cleaned) return 'Source'
+  if (!cleaned) return i18nT("ui.ethikos.argumentsourcespanel.source")
 
   return cleaned
     .replace(/[_-]+/g, ' ')
@@ -157,17 +159,20 @@ function hasAttachableContent(payload: CreateArgumentSourcePayload): boolean {
 
 export default function ArgumentSourcesPanel({
   argumentId,
-  title = 'Sources',
+  title: titleProp,
   compact = false,
   canAdd = true,
   refreshKey,
-  emptyText = 'No sources have been attached to this argument yet.',
+  emptyText: emptyTextProp,
   className,
   style,
   onCreated,
   onLoaded,
   onError,
 }: ArgumentSourcesPanelProps): React.ReactElement {
+  const { t: i18nT } = useLanguage();
+  const title = titleProp ?? i18nT("ui.ethikos.argumentsourcespanel.sources");
+  const emptyText = emptyTextProp ?? i18nT("ui.ethikos.argumentsourcespanel.noSourcesHaveBeenAttachedToThis");
   const { message } = App.useApp()
   const [form] = Form.useForm<SourceFormValues>()
 
@@ -196,12 +201,12 @@ export default function ArgumentSourcesPanel({
       onLoaded?.(result)
     } catch (caught) {
       setSources([])
-      setError('Sources could not be loaded.')
+      setError(i18nT("ui.ethikos.argumentsourcespanel.sourcesCouldNotBeLoaded"))
       onError?.(caught)
     } finally {
       setLoading(false)
     }
-  }, [argumentId, onError, onLoaded])
+  }, [argumentId, onError, onLoaded, i18nT])
 
   useEffect(() => {
     void loadSources()
@@ -209,14 +214,14 @@ export default function ArgumentSourcesPanel({
 
   async function handleSubmit(values: SourceFormValues): Promise<void> {
     if (!canUseArgument) {
-      message.warning('Argument id is required before attaching a source.')
+      message.warning(i18nT("ui.ethikos.argumentsourcespanel.argumentIdIsRequiredBeforeAttachingA"))
       return
     }
 
     const payload = buildPayload(values)
 
     if (!hasAttachableContent(payload)) {
-      message.warning('Provide a URL, citation, quote, or note.')
+      message.warning(i18nT("ui.ethikos.argumentsourcespanel.provideAUrlCitationQuoteOrNote"))
       return
     }
 
@@ -234,11 +239,11 @@ export default function ArgumentSourcesPanel({
       form.resetFields()
       setExpanded(false)
       onCreated?.(created)
-      message.success('Source attached.')
+      message.success(i18nT("ui.ethikos.argumentsourcespanel.sourceAttached"))
     } catch (caught) {
-      setError('Source could not be attached.')
+      setError(i18nT("ui.ethikos.argumentsourcespanel.sourceCouldNotBeAttached"))
       onError?.(caught)
-      message.error('Source could not be attached.')
+      message.error(i18nT("ui.ethikos.argumentsourcespanel.sourceCouldNotBeAttached"))
     } finally {
       setSubmitting(false)
     }
@@ -258,7 +263,7 @@ export default function ArgumentSourcesPanel({
       }
       extra={
         <Space size="small">
-          <Tooltip title="Refresh sources">
+          <Tooltip title={i18nT("ui.ethikos.argumentsourcespanel.refreshSources")}>
             <Button
               size="small"
               icon={<ReloadOutlined />}
@@ -276,7 +281,7 @@ export default function ArgumentSourcesPanel({
               disabled={!canUseArgument}
               onClick={() => setExpanded((value) => !value)}
             >
-              {expanded ? 'Cancel' : 'Add'}
+              {expanded ? i18nT("ui.ethikos.argumentsourcespanel.cancel") : i18nT("ui.ethikos.argumentsourcespanel.add")}
             </Button>
           )}
         </Space>
@@ -286,7 +291,7 @@ export default function ArgumentSourcesPanel({
         <Alert
           showIcon
           type="warning"
-          message="Sources are unavailable until an argument is selected."
+          message={i18nT("ui.ethikos.argumentsourcespanel.sourcesAreUnavailableUntilAnArgumentIs")}
           style={{ marginBottom: 12 }}
         />
       )}
@@ -309,7 +314,7 @@ export default function ArgumentSourcesPanel({
         >
           <Form.Item
             name="url"
-            label="Source URL"
+            label={i18nT("ui.ethikos.argumentsourcespanel.sourceUrl")}
             rules={[
               {
                 validator: async (_, value?: string) => {
@@ -326,40 +331,40 @@ export default function ArgumentSourcesPanel({
             />
           </Form.Item>
 
-          <Form.Item name="title" label="Title">
-            <Input allowClear placeholder="Optional source title" />
+          <Form.Item name="title" label={i18nT("ui.ethikos.argumentsourcespanel.title")}>
+            <Input allowClear placeholder={i18nT("ui.ethikos.argumentsourcespanel.optionalSourceTitle")} />
           </Form.Item>
 
-          <Form.Item name="citation_text" label="Citation text">
+          <Form.Item name="citation_text" label={i18nT("ui.ethikos.argumentsourcespanel.citationText")}>
             <Input
               allowClear
-              placeholder="Author, publication, section, case, dataset, etc."
+              placeholder={i18nT("ui.ethikos.argumentsourcespanel.authorPublicationSectionCaseDatasetEtc")}
             />
           </Form.Item>
 
-          <Form.Item name="source_type" label="Source type">
-            <Input allowClear placeholder="article, report, dataset, law..." />
+          <Form.Item name="source_type" label={i18nT("ui.ethikos.argumentsourcespanel.sourceType")}>
+            <Input allowClear placeholder={i18nT("ui.ethikos.argumentsourcespanel.articleReportDatasetLaw")} />
           </Form.Item>
 
-          <Form.Item name="quote" label="Quote or excerpt">
+          <Form.Item name="quote" label={i18nT("ui.ethikos.argumentsourcespanel.quoteOrExcerpt")}>
             <TextArea
               allowClear
               autoSize={{ minRows: 2, maxRows: 5 }}
-              placeholder="Optional quote or excerpt supporting the argument."
+              placeholder={i18nT("ui.ethikos.argumentsourcespanel.optionalQuoteOrExcerptSupportingTheArgument")}
             />
           </Form.Item>
 
-          <Form.Item name="note" label="Note">
+          <Form.Item name="note" label={i18nT("ui.ethikos.argumentsourcespanel.note")}>
             <TextArea
               allowClear
               autoSize={{ minRows: 2, maxRows: 5 }}
-              placeholder="Optional note explaining why this source matters."
+              placeholder={i18nT("ui.ethikos.argumentsourcespanel.optionalNoteExplainingWhyThisSourceMatters")}
             />
           </Form.Item>
 
           <Space>
             <Button htmlType="submit" type="primary" loading={submitting}>
-              Attach source
+              {i18nT("ui.ethikos.argumentsourcespanel.attachSource")}
             </Button>
             <Button
               disabled={submitting}
@@ -368,7 +373,7 @@ export default function ArgumentSourcesPanel({
                 setExpanded(false)
               }}
             >
-              Cancel
+              {i18nT("ui.ethikos.argumentsourcespanel.cancel")}
             </Button>
           </Space>
         </Form>
@@ -407,13 +412,13 @@ export default function ArgumentSourcesPanel({
                   description={
                     <Space direction="vertical" size={4}>
                       <Space size="small" wrap>
-                        <Tag>{sourceTypeLabel(source.source_type)}</Tag>
+                        <Tag>{sourceTypeLabel(i18nT, source.source_type)}</Tag>
                         {createdAt && (
-                          <Text type="secondary">Added {createdAt}</Text>
+                          <Text type="secondary">{i18nT("ui.ethikos.argumentsourcespanel.added")} {createdAt}</Text>
                         )}
                         {source.created_by != null && (
                           <Text type="secondary">
-                            by {String(source.created_by)}
+                            {i18nT("ui.ethikos.argumentsourcespanel.by")} {String(source.created_by)}
                           </Text>
                         )}
                       </Space>

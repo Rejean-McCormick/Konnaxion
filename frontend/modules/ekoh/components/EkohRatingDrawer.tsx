@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { useRequest } from 'ahooks'
 import { Descriptions, Drawer, Empty, Skeleton, Space, Tag, Typography } from 'antd'
 import type { ReactNode } from 'react'
@@ -27,6 +28,7 @@ export default function EkohRatingDrawer({
   children?: (profile: EkohProfile) => ReactNode
   testId?: string
 }): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const { data: profile, loading } = useRequest(
     () => fetchEkohProfile(userId!),
     {
@@ -40,20 +42,20 @@ export default function EkohRatingDrawer({
       open={open}
       onClose={onClose}
       width={580}
-      title={`EkoH ratings · ${fallbackDisplayName ?? profile?.displayName ?? 'Participant'}`}
+      title={i18nT("ui.ekoh.ekohratingdrawer.ekohRatings", { value1: fallbackDisplayName ?? profile?.displayName ?? 'Participant' })}
       data-testid={testId}
     >
       {loading ? (
         <Skeleton active paragraph={{ rows: 10 }} />
       ) : !profile ? (
-        <Empty description="No EkoH profile is available for this participant." />
+        <Empty description={i18nT("ui.ekoh.ekohratingdrawer.noEkohProfileIsAvailableForThis")} />
       ) : (
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           <div>
             <Title level={4} style={{ marginBottom: 4 }}>{profile.displayName}</Title>
             <Space wrap>
-              <Tag>Identity: {profile.confidentialityLevel}</Tag>
-              <Tag>Ratings: {profile.ratingVisibility}</Tag>
+              <Tag>{i18nT("ui.ekoh.ekohratingdrawer.identity")} {profile.confidentialityLevel}</Tag>
+              <Tag>{i18nT("ui.ekoh.ekohratingdrawer.ratings")} {profile.ratingVisibility}</Tag>
             </Space>
           </div>
 
@@ -62,12 +64,12 @@ export default function EkohRatingDrawer({
           {profile.ratingAccess.allowed ? (
             <>
               <Descriptions bordered size="small" column={1}>
-                <Descriptions.Item label="EkoH user ID">{profile.userId}</Descriptions.Item>
-                <Descriptions.Item label="Ethics / reliability modifier">
-                  {profile.ethicsScore == null ? 'Not available' : `${profile.ethicsScore.toFixed(2)}×`}
+                <Descriptions.Item label={i18nT("ui.ekoh.ekohratingdrawer.ekohUserId")}>{profile.userId}</Descriptions.Item>
+                <Descriptions.Item label={i18nT("ui.ekoh.ekohratingdrawer.ethicsReliabilityModifier")}>
+                  {profile.ethicsScore == null ? i18nT("ui.ekoh.ekohratingdrawer.notAvailable") : i18nT("ui.ekoh.ekohratingdrawer.text", { value1: profile.ethicsScore.toFixed(2) })}
                 </Descriptions.Item>
-                <Descriptions.Item label="Access level">
-                  {profile.ratingAccess.level ?? 'ratings'}
+                <Descriptions.Item label={i18nT("ui.ekoh.ekohratingdrawer.accessLevel")}>
+                  {profile.ratingAccess.level ?? i18nT("ui.ekoh.ekohratingdrawer.ratings_7bb083")}
                 </Descriptions.Item>
               </Descriptions>
 
@@ -75,12 +77,12 @@ export default function EkohRatingDrawer({
 
               {profile.ratingAccess.level === 'history' && profile.scoreHistory?.length ? (
                 <div>
-                  <Text strong>Recent rating history</Text>
+                  <Text strong>{i18nT("ui.ekoh.ekohratingdrawer.recentRatingHistory")}</Text>
                   <Space direction="vertical" size={4} style={{ width: '100%', marginTop: 8 }}>
                     {profile.scoreHistory.slice(0, 8).map((item, index) => (
                       <Text key={`${item.domainCode}-${item.changedAt}-${index}`} type="secondary">
                         {item.domainName}: {Math.round(item.oldValue * 100)}% → {Math.round(item.newValue * 100)}%
-                        {item.changeReason ? ` · ${item.changeReason}` : ''}
+                        {item.changeReason ? i18nT("ui.ekoh.ekohratingdrawer.text_57b7a6", { changeReason: item.changeReason }) : ''}
                       </Text>
                     ))}
                   </Space>

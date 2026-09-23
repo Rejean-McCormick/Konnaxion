@@ -2,6 +2,7 @@
 // C:\MyCode\Konnaxionv14\frontend\modules\ethikos\decide\results\page.tsx
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { PageContainer, type ProColumns, ProTable } from '@ant-design/pro-components'
 import { useRequest } from 'ahooks'
 import { Tag } from 'antd'
@@ -20,7 +21,8 @@ type ResultRow = {
 }
 
 export default function ResultsArchive() {
-  usePageTitle('Decide · Results Archive')
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.ethikos.decide.results.decideResultsArchive"))
 
   const { data, loading } = useRequest(fetchDecisionResults)
 
@@ -35,49 +37,49 @@ export default function ResultsArchive() {
 
   const scopeFilters = React.useMemo(
     () => [
-      { text: 'Elite', value: 'Elite' },
-      { text: 'Public', value: 'Public' },
+      { text: i18nT("ui.ethikos.decide.results.elite"), value: 'Elite' },
+      { text: i18nT("ui.ethikos.decide.results.public_dc5eb7"), value: 'Public' },
     ],
-    [],
+    [i18nT],
   )
 
   const columns: ProColumns<ResultRow>[] = [
-    { title: 'Title', dataIndex: 'title', width: 260 },
+    { title: i18nT("ui.ethikos.decide.results.title"), dataIndex: 'title', width: 260 },
     {
-      title: 'Result',
+      title: i18nT("ui.ethikos.decide.results.result"),
       dataIndex: 'passed',
       width: 120,
       render: (_, row) => (
-        <Tag color={row.passed ? 'green' : 'red'}>{row.passed ? 'PASSED' : 'REJECTED'}</Tag>
+        <Tag color={row.passed ? 'green' : 'red'}>{row.passed ? i18nT("ui.ethikos.decide.results.passed") : i18nT("ui.ethikos.decide.results.rejected")}</Tag>
       ),
       // replace invalid `filters: true` with proper options
       filters: [
-        { text: 'Passed', value: true },
-        { text: 'Rejected', value: false },
+        { text: i18nT("ui.ethikos.decide.results.passed_271d60"), value: true },
+        { text: i18nT("ui.ethikos.decide.results.rejected_27eeb7"), value: false },
       ],
       // onFilter receives React.Key | boolean; compare strictly to row.passed
       onFilter: (value, row) => row.passed === (value === true || value === 'true'),
     },
     {
-      title: 'Scope',
+      title: i18nT("ui.ethikos.decide.results.scope"),
       dataIndex: 'scope',
       width: 120,
       filters: scopeFilters,
       onFilter: (value, row) => row.scope === String(value),
       valueEnum: {
-        Elite: { text: 'Elite' },
-        Public: { text: 'Public' },
+        Elite: { text: i18nT("ui.ethikos.decide.results.elite") },
+        Public: { text: i18nT("ui.ethikos.decide.results.public_dc5eb7") },
       },
     },
     {
-      title: 'Region',
+      title: i18nT("ui.ethikos.decide.results.region"),
       dataIndex: 'region',
       width: 140,
       filters: regionFilters,
       onFilter: (value, row) => row.region === String(value),
     },
     // use a valid ProComponents valueType
-    { title: 'Closed', dataIndex: 'closesAt', valueType: 'dateTime' },
+    { title: i18nT("ui.ethikos.decide.results.closed"), dataIndex: 'closesAt', valueType: 'dateTime' },
   ]
 
   return (

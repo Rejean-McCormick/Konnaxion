@@ -8,6 +8,8 @@
  * - Trust services showing `uploadCredential` helper (currently a stub without a real backend).
  */
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ClockCircleOutlined,
   EyeInvisibleOutlined,
@@ -65,8 +67,8 @@ const statusColor: Record<CredentialStatus, string> = {
   Rejected: 'red',
 };
 
-function toTitleFromFilename(name?: string): string {
-  if (!name) return 'Untitled credential';
+function toTitleFromFilename(i18nT: TranslateFunction, name?: string): string {
+  if (!name) return i18nT("ui.ethikos.trust.credentials.untitledCredential");
   return name.replace(/\.[a-zA-Z0-9]+$/, '').replace(/[_\-]+/g, ' ').trim();
 }
 
@@ -114,6 +116,7 @@ async function fetchUserCredentials(): Promise<CredentialRow[]> {
 const { Text, Paragraph } = Typography;
 
 export default function Credentials() {
+  const { t: i18nT } = useLanguage();
   const [done, setDone] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [lastFileName, setLastFileName] = useState<string | undefined>();
@@ -139,15 +142,15 @@ export default function Credentials() {
 
   const summaryTags = (
     <Space wrap>
-      <Tag key="total">Total: {counters.total}</Tag>
+      <Tag key="total">{i18nT("ui.ethikos.trust.credentials.total")} {counters.total}</Tag>
       <Tag color="green" key="v">
-        Verified: {counters.verified}
+        {i18nT("ui.ethikos.trust.credentials.verified")} {counters.verified}
       </Tag>
       <Tag color="gold" key="p">
-        Pending: {counters.pending}
+        {i18nT("ui.ethikos.trust.credentials.pending")} {counters.pending}
       </Tag>
       <Tag color="red" key="r">
-        Rejected: {counters.rejected}
+        {i18nT("ui.ethikos.trust.credentials.rejected")} {counters.rejected}
       </Tag>
     </Space>
   );
@@ -165,13 +168,13 @@ export default function Credentials() {
         file.type === 'image/png';
 
       if (!isAllowedType) {
-        antdMessage.error('Only PDF, JPG or PNG files are allowed.');
+        antdMessage.error(i18nT("ui.ethikos.trust.credentials.onlyPdfJpgOrPngFilesAre"));
         return Upload.LIST_IGNORE;
       }
 
       const isLt5M = file.size / 1024 / 1024 < 5;
       if (!isLt5M) {
-        antdMessage.error('File must be smaller than 5 MB.');
+        antdMessage.error(i18nT("ui.ethikos.trust.credentials.fileMustBeSmallerThan5Mb"));
         return Upload.LIST_IGNORE;
       }
 
@@ -192,7 +195,7 @@ export default function Credentials() {
           // Optimistic insert into the table list as "Pending"
           const optimistic: CredentialRow = {
             id: `tmp-${Date.now()}`,
-            title: toTitleFromFilename(uploadFile.name),
+            title: toTitleFromFilename(i18nT, uploadFile.name),
             issuer: '—',
             issuedAt: new Date().toISOString(),
             status: 'Pending',
@@ -201,14 +204,14 @@ export default function Credentials() {
           mutate([optimistic, ...rows]);
           setDone(true);
           antdMessage.success(
-            'Credential uploaded. It will be reviewed shortly.',
+            i18nT("ui.ethikos.trust.credentials.credentialUploadedItWillBeReviewedShortly"),
           );
         })
         .catch((error: unknown) => {
           const uploadError =
             error instanceof Error ? error : new Error('Credential upload failed');
           onError?.(uploadError);
-          antdMessage.error('Upload failed. Please try again.');
+          antdMessage.error(i18nT("ui.ethikos.trust.credentials.uploadFailedPleaseTryAgain"));
         })
         .finally(() => {
           setUploading(false);
@@ -219,7 +222,7 @@ export default function Credentials() {
   // Table columns
   const columns: ProColumns<CredentialRow>[] = [
     {
-      title: 'Title',
+      title: i18nT("ui.ethikos.trust.credentials.title"),
       dataIndex: 'title',
       ellipsis: true,
       render: (_, row: CredentialRow) => (
@@ -235,36 +238,36 @@ export default function Credentials() {
         </Space>
       ),
     },
-    { title: 'Issuer', dataIndex: 'issuer', width: 220, ellipsis: true },
+    { title: i18nT("ui.ethikos.trust.credentials.issuer"), dataIndex: 'issuer', width: 220, ellipsis: true },
     {
-      title: 'Issued',
+      title: i18nT("ui.ethikos.trust.credentials.issued"),
       dataIndex: 'issuedAt',
       width: 140,
       valueType: 'date',
       renderText: (v) => dayjs(v).format('YYYY-MM-DD'),
     },
     {
-      title: 'Status',
+      title: i18nT("ui.ethikos.trust.credentials.status"),
       dataIndex: 'status',
       width: 120,
       valueEnum: {
-        Verified: { text: 'Verified', status: 'Success' },
-        Pending: { text: 'Pending', status: 'Processing' },
-        Rejected: { text: 'Rejected', status: 'Error' },
+        Verified: { text: i18nT("ui.ethikos.trust.credentials.verified_aed3b8"), status: 'Success' },
+        Pending: { text: i18nT("ui.ethikos.trust.credentials.pending_96f608"), status: 'Processing' },
+        Rejected: { text: i18nT("ui.ethikos.trust.credentials.rejected_27eeb7"), status: 'Error' },
       },
       render: (_, row: CredentialRow) => (
         <Tag color={statusColor[row.status]}>{row.status}</Tag>
       ),
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.ethikos.trust.credentials.actions"),
       width: 260,
       valueType: 'option',
       render: (_, row: CredentialRow) => {
         const canDownload = !!row.url;
         return [
           <Button size="small" key="view" onClick={() => setDetail(row)}>
-            View
+            {i18nT("ui.ethikos.trust.credentials.view")}
           </Button>,
           <Button
             size="small"
@@ -274,37 +277,37 @@ export default function Credentials() {
             target="_blank"
             rel="noreferrer"
           >
-            Download
+            {i18nT("ui.ethikos.trust.credentials.download")}
           </Button>,
           row.status !== 'Rejected' ? (
             <Popconfirm
               key="remove"
-              title="Request removal?"
-              description="A steward will review and remove this credential from your profile."
+              title={i18nT("ui.ethikos.trust.credentials.requestRemoval")}
+              description={i18nT("ui.ethikos.trust.credentials.aStewardWillReviewAndRemoveThis")}
               onConfirm={() => {
-                antdMessage.success('Removal request submitted.');
+                antdMessage.success(i18nT("ui.ethikos.trust.credentials.removalRequestSubmitted"));
               }}
             >
               <Button size="small" danger>
-                Request removal
+                {i18nT("ui.ethikos.trust.credentials.requestRemoval_c0b533")}
               </Button>
             </Popconfirm>
           ) : (
             <Tooltip
               key="resubmit"
-              title="Attach additional documents and re-submit"
+              title={i18nT("ui.ethikos.trust.credentials.attachAdditionalDocumentsAndReSubmit")}
             >
               <Button
                 size="small"
                 type="dashed"
                 onClick={() => {
                   antdMessage.info(
-                    'Re-submit by uploading an updated document below.',
+                    i18nT("ui.ethikos.trust.credentials.reSubmitByUploadingAnUpdatedDocument"),
                   );
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
               >
-                Re-submit
+                {i18nT("ui.ethikos.trust.credentials.reSubmit")}
               </Button>
             </Tooltip>
           ),
@@ -322,16 +325,13 @@ export default function Credentials() {
         message={
           <Space>
             <SafetyCertificateOutlined />
-            <span>Optional but powerful trust signal</span>
-            <Tag color="blue">Beta</Tag>
+            <span>{i18nT("ui.ethikos.trust.credentials.optionalButPowerfulTrustSignal")}</span>
+            <Tag color="blue">{i18nT("ui.ethikos.trust.credentials.beta")}</Tag>
           </Space>
         }
         description={
           <Paragraph style={{ marginTop: 8, marginBottom: 0 }}>
-            Upload real-world credentials (certifications, professional
-            memberships, academic records) that help stewards understand why
-            your voice carries expertise in certain debates. These documents are
-            reviewed manually and do not replace community-based reputation.
+            {i18nT("ui.ethikos.trust.credentials.uploadRealWorldCredentialsCertificationsProfessionalMemberships")}
           </Paragraph>
         }
       />
@@ -339,14 +339,14 @@ export default function Credentials() {
       <ProCard gutter={16} wrap>
         <ProCard
           colSpan={{ xs: 24, lg: 14 }}
-          title="Upload a new credential"
+          title={i18nT("ui.ethikos.trust.credentials.uploadANewCredential")}
           bordered
-          extra={<Tag color="default">Private review only</Tag>}
+          extra={<Tag color="default">{i18nT("ui.ethikos.trust.credentials.privateReviewOnly")}</Tag>}
         >
           {done ? (
             <Result
               status="success"
-              title="Credential received"
+              title={i18nT("ui.ethikos.trust.credentials.credentialReceived")}
               subTitle={
                 <>
                   {lastFileName && (
@@ -356,22 +356,20 @@ export default function Credentials() {
                     </div>
                   )}
                   <Text>
-                    Your document is now queued for human review. If accepted,
-                    it will appear as a verified note in your Ethikos trust
-                    profile.
+                    {i18nT("ui.ethikos.trust.credentials.yourDocumentIsNowQueuedForHuman")}
                   </Text>
                 </>
               }
               extra={
                 <Space wrap>
                   <Button type="primary" onClick={() => setDone(false)}>
-                    Upload another
+                    {i18nT("ui.ethikos.trust.credentials.uploadAnother")}
                   </Button>
                   <Link href="/ethikos/trust/profile">
-                    <Button>View my trust profile</Button>
+                    <Button>{i18nT("ui.ethikos.trust.credentials.viewMyTrustProfile")}</Button>
                   </Link>
                   <Link href="/ethikos/trust/badges">
-                    <Button type="text">See my badges</Button>
+                    <Button type="text">{i18nT("ui.ethikos.trust.credentials.seeMyBadges")}</Button>
                   </Link>
                 </Space>
               }
@@ -383,11 +381,10 @@ export default function Credentials() {
                   <InboxOutlined />
                 </p>
                 <p className="ant-upload-text">
-                  Click or drag a credential file to this area to upload
+                  {i18nT("ui.ethikos.trust.credentials.clickOrDragACredentialFileTo")}
                 </p>
                 <p className="ant-upload-hint">
-                  Supported formats: PDF, JPG, PNG · Max 5 MB · One document at
-                  a time.
+                  {i18nT("ui.ethikos.trust.credentials.supportedFormatsPdfJpgPngMax5")}
                 </p>
               </Upload.Dragger>
 
@@ -399,13 +396,10 @@ export default function Credentials() {
                 style={{ width: '100%' }}
               >
                 <Text type="secondary">
-                  Tip: upload focused evidence rather than full CVs. For
-                  example, a single certification for climate policy is more
-                  helpful than a long résumé.
+                  {i18nT("ui.ethikos.trust.credentials.tipUploadFocusedEvidenceRatherThanFull")}
                 </Text>
                 <Text type="secondary">
-                  You can always complement these documents with activity-based
-                  reputation earned through debates, voting and impact work.
+                  {i18nT("ui.ethikos.trust.credentials.youCanAlwaysComplementTheseDocumentsWith")}
                 </Text>
               </Space>
             </>
@@ -414,7 +408,7 @@ export default function Credentials() {
 
         <ProCard
           colSpan={{ xs: 24, lg: 10 }}
-          title="How credentials fit into Ethikos trust"
+          title={i18nT("ui.ethikos.trust.credentials.howCredentialsFitIntoEthikosTrust")}
           bordered
         >
           <Steps
@@ -423,20 +417,20 @@ export default function Credentials() {
             current={currentStep}
             items={[
               {
-                title: 'Upload',
+                title: i18nT("ui.ethikos.trust.credentials.upload"),
                 description:
-                  'You submit a credential associated with your real-world expertise.',
+                  i18nT("ui.ethikos.trust.credentials.youSubmitACredentialAssociatedWithYour"),
               },
               {
-                title: 'Review',
+                title: i18nT("ui.ethikos.trust.credentials.review"),
                 description:
-                  'Stewards or administrators verify authenticity and relevance for debate topics.',
+                  i18nT("ui.ethikos.trust.credentials.stewardsOrAdministratorsVerifyAuthenticityAndRelevance"),
                 icon: <ClockCircleOutlined />,
               },
               {
-                title: 'Outcome',
+                title: i18nT("ui.ethikos.trust.credentials.outcome"),
                 description:
-                  'If accepted, a note is added to your profile and may influence role assignments.',
+                  i18nT("ui.ethikos.trust.credentials.ifAcceptedANoteIsAddedTo"),
               },
             ]}
           />
@@ -445,7 +439,7 @@ export default function Credentials() {
 
           <List
             size="small"
-            header="Examples of accepted credentials"
+            header={i18nT("ui.ethikos.trust.credentials.examplesOfAcceptedCredentials")}
             dataSource={[
               'Professional licensure (e.g. bar membership, medical board certification).',
               'Academic degrees in fields relevant to debates you join.',
@@ -466,7 +460,7 @@ export default function Credentials() {
             header={
               <Space>
                 <EyeInvisibleOutlined />
-                <span>Privacy and scope</span>
+                <span>{i18nT("ui.ethikos.trust.credentials.privacyAndScope")}</span>
               </Space>
             }
             dataSource={[
@@ -482,7 +476,7 @@ export default function Credentials() {
           />
         </ProCard>
 
-        <ProCard colSpan={24} title="My credentials" ghost>
+        <ProCard colSpan={24} title={i18nT("ui.ethikos.trust.credentials.myCredentials")} ghost>
           <ProTable<CredentialRow>
             rowKey="id"
             loading={loading}
@@ -491,8 +485,8 @@ export default function Credentials() {
             pagination={{ pageSize: 5, showSizeChanger: true }}
             search={false}
             toolBarRender={() => [
-              <Tooltip key="refresh" title="Refresh">
-                <Button onClick={() => refresh()}>Refresh</Button>
+              <Tooltip key="refresh" title={i18nT("ui.ethikos.trust.credentials.refresh")}>
+                <Button onClick={() => refresh()}>{i18nT("ui.ethikos.trust.credentials.refresh")}</Button>
               </Tooltip>,
             ]}
           />
@@ -502,7 +496,7 @@ export default function Credentials() {
       <Drawer
         open={!!detail}
         width={520}
-        title="Credential details"
+        title={i18nT("ui.ethikos.trust.credentials.credentialDetails")}
         onClose={() => setDetail(null)}
       >
         {detail && (
@@ -511,16 +505,16 @@ export default function Credentials() {
             dataSource={detail}
             columns={
               [
-                { title: 'Title', dataIndex: 'title' },
-                { title: 'Issuer', dataIndex: 'issuer' },
+                { title: i18nT("ui.ethikos.trust.credentials.title"), dataIndex: 'title' },
+                { title: i18nT("ui.ethikos.trust.credentials.issuer"), dataIndex: 'issuer' },
                 {
-                  title: 'Issued',
+                  title: i18nT("ui.ethikos.trust.credentials.issued"),
                   dataIndex: 'issuedAt',
                   render: (_: ReactNode, row: CredentialRow) =>
                     dayjs(row.issuedAt).format('YYYY-MM-DD'),
                 },
                 {
-                  title: 'Status',
+                  title: i18nT("ui.ethikos.trust.credentials.status"),
                   dataIndex: 'status',
                   render: (_: ReactNode, row: CredentialRow) => (
                     <Tag color={statusColor[row.status]}>{row.status}</Tag>
@@ -528,18 +522,18 @@ export default function Credentials() {
                 },
                 detail.url
                   ? {
-                      title: 'Document',
+                      title: i18nT("ui.ethikos.trust.credentials.document"),
                       dataIndex: 'url',
                       render: (_: ReactNode, row: CredentialRow) => (
                         <a href={row.url} target="_blank" rel="noreferrer">
-                          Open document
+                          {i18nT("ui.ethikos.trust.credentials.openDocument")}
                         </a>
                       ),
                     }
                   : undefined,
                 detail.notes
                   ? {
-                      title: 'Notes',
+                      title: i18nT("ui.ethikos.trust.credentials.notes"),
                       dataIndex: 'notes',
                     }
                   : undefined,
@@ -553,9 +547,9 @@ export default function Credentials() {
 
   return (
     <EthikosPageShell
-      title="Credentials"
-      sectionLabel="Trust"
-      subtitle="Upload and manage real-world credentials that help stewards understand your expertise in Ethikos debates."
+      title={i18nT("ui.ethikos.trust.credentials.credentials")}
+      sectionLabel={i18nT("ui.ethikos.trust.credentials.trust")}
+      subtitle={i18nT("ui.ethikos.trust.credentials.uploadAndManageRealWorldCredentialsThat")}
       secondaryActions={summaryTags}
     >
       {pageBody}

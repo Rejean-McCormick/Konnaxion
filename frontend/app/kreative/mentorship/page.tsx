@@ -2,6 +2,7 @@
 // app/kreative/mentorship/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   AudioOutlined,
   BookOutlined,
@@ -206,6 +207,7 @@ function mediaTypeIcon(type: ArchiveMediaType): React.ReactNode {
 /* ------------------------------------------------------------------ */
 
 export default function MentorshipPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [disciplineFilter, setDisciplineFilter] = useState<string>('all');
   const [regionFilter, setRegionFilter] = useState<string>('all');
   const [deliveryFilter, setDeliveryFilter] = useState<'all' | 'online' | 'in-person'>('all');
@@ -266,7 +268,7 @@ export default function MentorshipPage(): JSX.Element {
   const handleArchiveSubmit = async (values: ArchiveFormValues) => {
     const upload = archiveFiles[0]?.originFileObj;
     if (!(upload instanceof File)) {
-      messageApi.error('Please attach one media file.');
+      messageApi.error(i18nT("ui.kreative.mentorship.pleaseAttachOneMediaFile"));
       return;
     }
 
@@ -299,7 +301,7 @@ export default function MentorshipPage(): JSX.Element {
       };
 
       setArchiveItems((prev) => [next, ...prev]);
-      messageApi.success('Archive contribution saved.');
+      messageApi.success(i18nT("ui.kreative.mentorship.archiveContributionSaved"));
       archiveForm.resetFields();
       setArchiveFiles([]);
     } catch (error) {
@@ -314,18 +316,18 @@ export default function MentorshipPage(): JSX.Element {
   const secondaryActions = (
     <Space>
       <Button icon={<TeamOutlined />} href="/kreative/collaborative-spaces/find-spaces">
-        Explore spaces
+        {i18nT("ui.kreative.mentorship.exploreSpaces")}
       </Button>
       <Button icon={<BookOutlined />} href="/kreative/creative-hub/explore-ideas">
-        Explore ideas
+        {i18nT("ui.kreative.mentorship.exploreIdeas")}
       </Button>
     </Space>
   );
 
   return (
     <KreativePageShell
-      title="Mentorship & Cultural Archive"
-      subtitle="Connect with mentors and help preserve cultural traditions and endangered practices."
+      title={i18nT("ui.kreative.mentorship.mentorshipCulturalArchive")}
+      subtitle={i18nT("ui.kreative.mentorship.connectWithMentorsAndHelpPreserveCultural")}
       secondaryActions={secondaryActions}
     >
       {messageContextHolder}
@@ -334,26 +336,25 @@ export default function MentorshipPage(): JSX.Element {
         <Col xs={24} lg={10}>
           <Card>
             <Title level={4} style={{ marginBottom: 12 }}>
-              How the mentorship program works
+              {i18nT("ui.kreative.mentorship.howTheMentorshipProgramWorks")}
             </Title>
             <Paragraph type="secondary">
-              This page combines a declared mentor-directory preview with a real persisted cultural-archive contribution flow.
+              {i18nT("ui.kreative.mentorship.thisPageCombinesADeclaredMentorDirectory")}
             </Paragraph>
             <ul style={{ paddingLeft: 20, marginTop: 8, marginBottom: 0 }}>
               <li>
                 <Text>
-                  Browse <Text strong>mentors</Text> by discipline, region, or delivery mode.
+                  {i18nT("ui.kreative.mentorship.browse")} <Text strong>{i18nT("ui.kreative.mentorship.mentors")}</Text> {i18nT("ui.kreative.mentorship.byDisciplineRegionOrDeliveryMode")}
                 </Text>
               </li>
               <li>
                 <Text>
-                  Mentor discovery is preview-only; request delivery is not exposed by the current backend.
+                  {i18nT("ui.kreative.mentorship.mentorDiscoveryIsPreviewOnlyRequestDelivery")}
                 </Text>
               </li>
               <li>
                 <Text>
-                  Use the form below to <Text strong>contribute media</Text> to the archive:
-                  photos, audio, videos, or written descriptions.
+                  {i18nT("ui.kreative.mentorship.useTheFormBelowTo")} <Text strong>{i18nT("ui.kreative.mentorship.contributeMedia")}</Text> {i18nT("ui.kreative.mentorship.toTheArchivePhotosAudioVideosOr")}
                 </Text>
               </li>
             </ul>
@@ -361,27 +362,27 @@ export default function MentorshipPage(): JSX.Element {
               type="info"
               showIcon
               style={{ marginTop: 16 }}
-              message="Archive contributions are persisted through Kreative. Mentor-request delivery remains preview-only until a dedicated contract exists."
+              message={i18nT("ui.kreative.mentorship.archiveContributionsArePersistedThroughKreativeMentor")}
             />
           </Card>
         </Col>
 
         {/* Filters summary */}
         <Col xs={24} lg={14}>
-          <Card title="Find a mentor">
+          <Card title={i18nT("ui.kreative.mentorship.findAMentor")}>
             <Row gutter={[16, 16]}>
               <Col xs={24} md={8}>
                 <Text strong style={{ display: 'block', marginBottom: 4 }}>
-                  Discipline
+                  {i18nT("ui.kreative.mentorship.discipline")}
                 </Text>
                 <Select
                   value={disciplineFilter}
                   onChange={(value) => setDisciplineFilter(value)}
                   style={{ width: '100%' }}
-                  placeholder="All disciplines"
+                  placeholder={i18nT("ui.kreative.mentorship.allDisciplines")}
                   allowClear={false}
                 >
-                  <Option value="all">All disciplines</Option>
+                  <Option value="all">{i18nT("ui.kreative.mentorship.allDisciplines")}</Option>
                   {disciplines.map((d) => (
                     <Option key={d} value={d}>
                       {d}
@@ -391,16 +392,16 @@ export default function MentorshipPage(): JSX.Element {
               </Col>
               <Col xs={24} md={8}>
                 <Text strong style={{ display: 'block', marginBottom: 4 }}>
-                  Region
+                  {i18nT("ui.kreative.mentorship.region")}
                 </Text>
                 <Select
                   value={regionFilter}
                   onChange={(value) => setRegionFilter(value)}
                   style={{ width: '100%' }}
-                  placeholder="All regions"
+                  placeholder={i18nT("ui.kreative.mentorship.allRegions")}
                   allowClear={false}
                 >
-                  <Option value="all">All regions</Option>
+                  <Option value="all">{i18nT("ui.kreative.mentorship.allRegions")}</Option>
                   {regions.map((r) => (
                     <Option key={r} value={r}>
                       {r}
@@ -410,7 +411,7 @@ export default function MentorshipPage(): JSX.Element {
               </Col>
               <Col xs={24} md={8}>
                 <Text strong style={{ display: 'block', marginBottom: 4 }}>
-                  Delivery
+                  {i18nT("ui.kreative.mentorship.delivery")}
                 </Text>
                 <Segmented
                   block
@@ -419,9 +420,9 @@ export default function MentorshipPage(): JSX.Element {
                     setDeliveryFilter(value as 'all' | 'online' | 'in-person')
                   }
                   options={[
-                    { label: 'All', value: 'all' },
-                    { label: 'Online', value: 'online' },
-                    { label: 'In person', value: 'in-person' },
+                    { label: i18nT("ui.kreative.mentorship.all"), value: 'all' },
+                    { label: i18nT("ui.kreative.mentorship.online"), value: 'online' },
+                    { label: i18nT("ui.kreative.mentorship.inPerson"), value: 'in-person' },
                   ]}
                 />
               </Col>
@@ -430,7 +431,7 @@ export default function MentorshipPage(): JSX.Element {
             <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
               <Col span={24}>
                 <Input.Search
-                  placeholder="Search by mentor name, tradition, language…"
+                  placeholder={i18nT("ui.kreative.mentorship.searchByMentorNameTraditionLanguage")}
                   allowClear
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
@@ -443,16 +444,16 @@ export default function MentorshipPage(): JSX.Element {
 
       {/* Mentors list */}
       <Card
-        title="Mentors & opportunities"
+        title={i18nT("ui.kreative.mentorship.mentorsOpportunities")}
         extra={
           <Text type="secondary">
-            Showing <strong>{filteredMentors.length}</strong> of {MENTOR_PREVIEW_DATA.length} mentors
+            {i18nT("ui.kreative.mentorship.showing")} <strong>{filteredMentors.length}</strong> {i18nT("ui.kreative.mentorship.of")} {MENTOR_PREVIEW_DATA.length} {i18nT("ui.kreative.mentorship.mentors")}
           </Text>
         }
         style={{ marginBottom: 32 }}
       >
         {filteredMentors.length === 0 ? (
-          <Empty description="No mentors match your filters yet." />
+          <Empty description={i18nT("ui.kreative.mentorship.noMentorsMatchYourFiltersYet")} />
         ) : (
           <List
             itemLayout="vertical"
@@ -465,17 +466,17 @@ export default function MentorshipPage(): JSX.Element {
                     key="request"
                     type="primary"
                     disabled
-                    title="Mentorship request delivery is not exposed by the backend yet."
+                    title={i18nT("ui.kreative.mentorship.mentorshipRequestDeliveryIsNotExposedBy")}
                   >
-                    Request unavailable
+                    {i18nT("ui.kreative.mentorship.requestUnavailable")}
                   </Button>,
                   <Button
                     key="details"
                     type="link"
                     disabled
-                    title="Mentor profile details are preview-only in this build."
+                    title={i18nT("ui.kreative.mentorship.mentorProfileDetailsArePreviewOnlyIn")}
                   >
-                    Details unavailable
+                    {i18nT("ui.kreative.mentorship.detailsUnavailable")}
                   </Button>,
                 ]}
               >
@@ -493,19 +494,19 @@ export default function MentorshipPage(): JSX.Element {
                         {mentor.availability}
                       </Tag>
                       {mentor.isOnline ? (
-                        <Tag icon={<GlobalOutlined />}>Online sessions</Tag>
+                        <Tag icon={<GlobalOutlined />}>{i18nT("ui.kreative.mentorship.onlineSessions")}</Tag>
                       ) : (
-                        <Tag icon={<EnvironmentOutlined />}>In-person only</Tag>
+                        <Tag icon={<EnvironmentOutlined />}>{i18nT("ui.kreative.mentorship.inPersonOnly")}</Tag>
                       )}
                     </Space>
                   }
                   description={
                     <Space direction="vertical" size={4} style={{ width: '100%' }}>
                       <Text>
-                        <Text strong>Discipline:</Text> {mentor.discipline}
+                        <Text strong>{i18nT("ui.kreative.mentorship.discipline_17b927")}</Text> {mentor.discipline}
                       </Text>
                       <Text>
-                        <Text strong>Tradition:</Text> {mentor.tradition}
+                        <Text strong>{i18nT("ui.kreative.mentorship.tradition")}</Text> {mentor.tradition}
                       </Text>
                       <Space size="small" wrap>
                         <Tag>{mentor.region}</Tag>
@@ -536,12 +537,12 @@ export default function MentorshipPage(): JSX.Element {
         {/* Submission form */}
         <Col xs={24} lg={12}>
           <Card
-            title="Contribute to the Cultural Archive"
-            extra={<Tag color="success">Persisted</Tag>}
+            title={i18nT("ui.kreative.mentorship.contributeToTheCulturalArchive")}
+            extra={<Tag color="success">{i18nT("ui.kreative.mentorship.persisted")}</Tag>}
             style={{ marginBottom: 24 }}
           >
             <Paragraph type="secondary" style={{ marginBottom: 16 }}>
-              Share media documenting a cultural practice, ritual, or art form. Submissions are stored as Kreative tradition entries.
+              {i18nT("ui.kreative.mentorship.shareMediaDocumentingACulturalPracticeRitual")}
             </Paragraph>
 
             <Form<ArchiveFormValues>
@@ -550,68 +551,68 @@ export default function MentorshipPage(): JSX.Element {
               onFinish={handleArchiveSubmit}
             >
               <Form.Item
-                label="Title of the contribution"
+                label={i18nT("ui.kreative.mentorship.titleOfTheContribution")}
                 name="title"
-                rules={[{ required: true, message: 'Please enter a title' }]}
+                rules={[{ required: true, message: i18nT("ui.kreative.mentorship.pleaseEnterATitle") }]}
               >
-                <Input placeholder="e.g., Harvest dance in the northern valley" />
+                <Input placeholder={i18nT("ui.kreative.mentorship.eGHarvestDanceInTheNorthern")} />
               </Form.Item>
 
               <Form.Item
-                label="Tradition or practice"
+                label={i18nT("ui.kreative.mentorship.traditionOrPractice")}
                 name="tradition"
-                rules={[{ required: true, message: 'Please describe the tradition' }]}
+                rules={[{ required: true, message: i18nT("ui.kreative.mentorship.pleaseDescribeTheTradition") }]}
               >
-                <Input placeholder="e.g., Noh Theatre autumn performance" />
+                <Input placeholder={i18nT("ui.kreative.mentorship.eGNohTheatreAutumnPerformance")} />
               </Form.Item>
 
               <Form.Item
-                label="Region / community"
+                label={i18nT("ui.kreative.mentorship.regionCommunity")}
                 name="region"
-                rules={[{ required: true, message: 'Please specify a region or community' }]}
+                rules={[{ required: true, message: i18nT("ui.kreative.mentorship.pleaseSpecifyARegionOrCommunity") }]}
               >
                 <Input
                   prefix={<EnvironmentOutlined />}
-                  placeholder="e.g., Kyoto, Japan / local community name"
+                  placeholder={i18nT("ui.kreative.mentorship.eGKyotoJapanLocalCommunityName")}
                 />
               </Form.Item>
 
               <Form.Item
-                label="Media type"
+                label={i18nT("ui.kreative.mentorship.mediaType")}
                 name="mediaType"
-                rules={[{ required: true, message: 'Please select a media type' }]}
+                rules={[{ required: true, message: i18nT("ui.kreative.mentorship.pleaseSelectAMediaType") }]}
               >
-                <Select placeholder="Choose one">
-                  <Option value="Video">Video</Option>
-                  <Option value="Audio">Audio</Option>
-                  <Option value="Photo">Photo</Option>
-                  <Option value="Text">Text / transcript only</Option>
+                <Select placeholder={i18nT("ui.kreative.mentorship.chooseOne")}>
+                  <Option value="Video">{i18nT("ui.kreative.mentorship.video")}</Option>
+                  <Option value="Audio">{i18nT("ui.kreative.mentorship.audio")}</Option>
+                  <Option value="Photo">{i18nT("ui.kreative.mentorship.photo")}</Option>
+                  <Option value="Text">{i18nT("ui.kreative.mentorship.textTranscriptOnly")}</Option>
                 </Select>
               </Form.Item>
 
               <Form.Item
-                label="Approximate year (optional)"
+                label={i18nT("ui.kreative.mentorship.approximateYearOptional")}
                 name="approximateYear"
-                tooltip="Use a 4-digit year, e.g., 1998"
+                tooltip={i18nT("ui.kreative.mentorship.useA4DigitYearEG")}
               >
-                <Input maxLength={4} placeholder="e.g., 2015" />
+                <Input maxLength={4} placeholder={i18nT("ui.kreative.mentorship.eG2015")} />
               </Form.Item>
 
               <Form.Item
-                label="Description & context"
+                label={i18nT("ui.kreative.mentorship.descriptionContext")}
                 name="description"
                 rules={[
-                  { required: true, message: 'Please provide a short description' },
+                  { required: true, message: i18nT("ui.kreative.mentorship.pleaseProvideAShortDescription") },
                 ]}
               >
                 <TextArea
                   rows={4}
-                  placeholder="Explain when this practice happens, who participates, and why it matters."
+                  placeholder={i18nT("ui.kreative.mentorship.explainWhenThisPracticeHappensWhoParticipates")}
                 />
               </Form.Item>
 
               <Form.Item
-                label="Upload media"
+                label={i18nT("ui.kreative.mentorship.uploadMedia")}
                 name="media"
                 valuePropName="fileList"
                 getValueFromEvent={normalizeArchiveFile}
@@ -632,14 +633,14 @@ export default function MentorshipPage(): JSX.Element {
                   onChange={handleArchiveUploadChange}
                   fileList={archiveFiles}
                 >
-                  <Button icon={<UploadOutlined />}>Select file(s)</Button>
+                  <Button icon={<UploadOutlined />}>{i18nT("ui.kreative.mentorship.selectFileS")}</Button>
                 </Upload>
               </Form.Item>
 
               <Form.Item>
                 <Space>
                   <Button type="primary" htmlType="submit">
-                    Submit contribution
+                    {i18nT("ui.kreative.mentorship.submitContribution")}
                   </Button>
                   <Button
                     onClick={() => {
@@ -647,7 +648,7 @@ export default function MentorshipPage(): JSX.Element {
                       setArchiveFiles([]);
                     }}
                   >
-                    Reset
+                    {i18nT("ui.kreative.mentorship.reset")}
                   </Button>
                 </Space>
               </Form.Item>
@@ -658,16 +659,16 @@ export default function MentorshipPage(): JSX.Element {
         {/* Archive gallery */}
         <Col xs={24} lg={12}>
           <Card
-            title="Archive highlights"
+            title={i18nT("ui.kreative.mentorship.archiveHighlights")}
             extra={
               <Space>
                 <GlobalOutlined />
-                <Text type="secondary">Sample entries (front-end only)</Text>
+                <Text type="secondary">{i18nT("ui.kreative.mentorship.sampleEntriesFrontEndOnly")}</Text>
               </Space>
             }
           >
             {archiveItems.length === 0 ? (
-              <Empty description="No archive items yet." />
+              <Empty description={i18nT("ui.kreative.mentorship.noArchiveItemsYet")} />
             ) : (
               <List
                 itemLayout="vertical"
@@ -698,7 +699,7 @@ export default function MentorshipPage(): JSX.Element {
                           >
                             {item.summary}
                           </Paragraph>
-                          <Text type="secondary">Contributor: {item.contributor}</Text>
+                          <Text type="secondary">{i18nT("ui.kreative.mentorship.contributor")} {item.contributor}</Text>
                         </Space>
                       }
                     />

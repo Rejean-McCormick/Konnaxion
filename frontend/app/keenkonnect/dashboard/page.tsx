@@ -1,6 +1,8 @@
 // FILE: frontend/app/keenkonnect/dashboard/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   AppstoreOutlined,
   ArrowRightOutlined,
@@ -93,32 +95,32 @@ type QuickAction = {
 
 // --- Declared preview data (no AI matching service contract yet) ---
 
-const summaryMetrics: SummaryMetric[] = [
+const summaryMetrics = (i18nT: TranslateFunction): SummaryMetric[] => ([
   {
     key: 'projects',
-    title: 'Active Projects',
+    title: i18nT("ui.keenkonnect.dashboard.activeProjects"),
     value: 7,
-    description: 'Across your ecosystems',
+    description: i18nT("ui.keenkonnect.dashboard.acrossYourEcosystems"),
   },
   {
     key: 'workspaces',
-    title: 'Live Workspaces',
+    title: i18nT("ui.keenkonnect.dashboard.liveWorkspaces"),
     value: 3,
-    description: 'Teams currently collaborating',
+    description: i18nT("ui.keenkonnect.dashboard.teamsCurrentlyCollaborating"),
   },
   {
     key: 'knowledge',
-    title: 'Knowledge Assets',
+    title: i18nT("ui.keenkonnect.dashboard.knowledgeAssets"),
     value: 32,
-    description: 'Docs, methods & playbooks',
+    description: i18nT("ui.keenkonnect.dashboard.docsMethodsPlaybooks"),
   },
   {
     key: 'aiMatches',
-    title: 'New AI Matches',
+    title: i18nT("ui.keenkonnect.dashboard.newAiMatches"),
     value: 4,
-    description: 'Suggested teams to review',
+    description: i18nT("ui.keenkonnect.dashboard.suggestedTeamsToReview"),
   },
-];
+]);
 
 const myProjects: Project[] = [
   {
@@ -253,64 +255,65 @@ const activityTimeline: TimelineEvent[] = [
   },
 ];
 
-const quickActions: QuickAction[] = [
+const quickActions = (i18nT: TranslateFunction): QuickAction[] => ([
   {
     key: 'newProject',
-    title: 'Create project',
-    description: 'Set up a new multi-partner initiative.',
+    title: i18nT("ui.keenkonnect.dashboard.createProject"),
+    description: i18nT("ui.keenkonnect.dashboard.setUpANewMultiPartnerInitiative"),
     href: '/keenkonnect/projects/create-new-project',
     icon: <PlusOutlined />,
   },
   {
     key: 'launchWorkspace',
-    title: 'Launch workspace',
-    description: 'Open a collaboration space for your team.',
+    title: i18nT("ui.keenkonnect.dashboard.launchWorkspace"),
+    description: i18nT("ui.keenkonnect.dashboard.openACollaborationSpaceForYourTeam"),
     href: '/keenkonnect/workspaces/launch-new-workspace',
     icon: <RocketOutlined />,
   },
   {
     key: 'browseRepository',
-    title: 'Browse repository',
-    description: 'Explore blueprints and shared documents.',
+    title: i18nT("ui.keenkonnect.dashboard.browseRepository"),
+    description: i18nT("ui.keenkonnect.dashboard.exploreBlueprintsAndSharedDocuments"),
     href: '/keenkonnect/knowledge/browse-repository',
     icon: <AppstoreOutlined />,
   },
   {
     key: 'uploadDocument',
-    title: 'Upload document',
-    description: 'Add a new asset to the knowledge base.',
+    title: i18nT("ui.keenkonnect.dashboard.uploadDocument"),
+    description: i18nT("ui.keenkonnect.dashboard.addANewAssetToTheKnowledge"),
     href: '/keenkonnect/knowledge/upload-new-document',
     icon: <FileTextOutlined />,
   },
   {
     key: 'sustainabilityDashboard',
-    title: 'Impact dashboard',
-    description: 'Track sustainability metrics across projects.',
+    title: i18nT("ui.keenkonnect.dashboard.impactDashboard"),
+    description: i18nT("ui.keenkonnect.dashboard.trackSustainabilityMetricsAcrossProjects"),
     href: '/keenkonnect/sustainability-impact/sustainability-dashboard',
     icon: <DashboardOutlined />,
   },
   {
     key: 'viewReputation',
-    title: 'View reputation',
-    description: 'See your Ethikos reputation profile.',
+    title: i18nT("ui.keenkonnect.dashboard.viewReputation"),
+    description: i18nT("ui.keenkonnect.dashboard.seeYourEthikosReputationProfile"),
     href: '/keenkonnect/user-reputation/view-reputation-ekoh',
     icon: <CrownOutlined />,
   },
-];
+]);
 
 export default function KeenKonnectDashboard(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   return (
     <KeenPageShell
-      title="KeenKonnect Dashboard"
-      description="Orchestrate projects, workspaces, and knowledge across your ecosystems — and keep an eye on AI matches, impact, and your Ethikos profile."
+      title={i18nT("ui.keenkonnect.dashboard.keenkonnectDashboard")}
+      description={i18nT("ui.keenkonnect.dashboard.orchestrateProjectsWorkspacesAndKnowledgeAcrossYour")}
       toolbar={
         <Space>
           <Link href="/keenkonnect/projects/my-projects">
-            <Button>View projects</Button>
+            <Button>{i18nT("ui.keenkonnect.dashboard.viewProjects")}</Button>
           </Link>
           <Link href="/keenkonnect/ai-team-matching/match-preferences">
             <Button type="primary" icon={<TeamOutlined />}>
-              AI team matching
+              {i18nT("ui.keenkonnect.dashboard.aiTeamMatching")}
             </Button>
           </Link>
         </Space>
@@ -320,12 +323,12 @@ export default function KeenKonnectDashboard(): JSX.Element {
         type="info"
         showIcon
         style={{ marginBottom: 16 }}
-        message="Dashboard preview data"
-        description="Project orchestration routes are live, while dashboard summary cards and AI-match suggestions remain declared preview values until dedicated aggregate contracts are exposed."
+        message={i18nT("ui.keenkonnect.dashboard.dashboardPreviewData")}
+        description={i18nT("ui.keenkonnect.dashboard.projectOrchestrationRoutesAreLiveWhileDashboard")}
       />
       {/* KPI band */}
       <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
-        {summaryMetrics.map((metric) => (
+        {summaryMetrics(i18nT).map((metric) => (
           <StatisticCard
             key={metric.key}
             colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
@@ -344,18 +347,18 @@ export default function KeenKonnectDashboard(): JSX.Element {
         {/* Projects & Workspaces */}
         <ProCard
           colSpan={{ xs: 24, xl: 16 }}
-          title="Projects & Workspaces"
-          subTitle="Where collaboration actually happens"
+          title={i18nT("ui.keenkonnect.dashboard.projectsWorkspaces")}
+          subTitle={i18nT("ui.keenkonnect.dashboard.collaborationSubtitle")}
         >
           <ProCard split="horizontal" ghost>
             {/* My Projects */}
             <ProCard
-              title="My Projects"
+              title={i18nT("ui.keenkonnect.dashboard.myProjects")}
               bordered={false}
               extra={
                 <Link href="/keenkonnect/projects/my-projects">
                   <Space size={4}>
-                    <span>View all</span>
+                    <span>{i18nT("ui.keenkonnect.dashboard.viewAll")}</span>
                     <ArrowRightOutlined />
                   </Space>
                 </Link>
@@ -369,7 +372,7 @@ export default function KeenKonnectDashboard(): JSX.Element {
                     key={project.id}
                     actions={[
                       <Link key="open" href="/keenkonnect/projects/my-projects">
-                        Open
+                        {i18nT("ui.keenkonnect.dashboard.open")}
                       </Link>,
                     ]}
                   >
@@ -404,12 +407,12 @@ export default function KeenKonnectDashboard(): JSX.Element {
 
             {/* Active Workspaces */}
             <ProCard
-              title="Active Workspaces"
+              title={i18nT("ui.keenkonnect.dashboard.activeWorkspaces")}
               bordered={false}
               extra={
                 <Link href="/keenkonnect/workspaces/my-workspaces">
                   <Space size={4}>
-                    <span>View all</span>
+                    <span>{i18nT("ui.keenkonnect.dashboard.viewAll")}</span>
                     <ArrowRightOutlined />
                   </Space>
                 </Link>
@@ -426,7 +429,7 @@ export default function KeenKonnectDashboard(): JSX.Element {
                         key="open"
                         href="/keenkonnect/workspaces/my-workspaces"
                       >
-                        Open
+                        {i18nT("ui.keenkonnect.dashboard.open")}
                       </Link>,
                     ]}
                   >
@@ -439,7 +442,7 @@ export default function KeenKonnectDashboard(): JSX.Element {
                       }
                       description={
                         <Text type="secondary">
-                          {workspace.participants} participants currently active
+                          {workspace.participants} {i18nT("ui.keenkonnect.dashboard.participantsCurrentlyActive")}
                         </Text>
                       }
                     />
@@ -453,16 +456,16 @@ export default function KeenKonnectDashboard(): JSX.Element {
         {/* Today at a Glance */}
         <ProCard
           colSpan={{ xs: 24, xl: 8 }}
-          title="Today at a Glance"
+          title={i18nT("ui.keenkonnect.dashboard.todayAtAGlance")}
           extra={<Badge count={notifications.length} offset={[8, 0]} />}
         >
           {/* My Tasks */}
           <ProCard
-            title="My Tasks"
+            title={i18nT("ui.keenkonnect.dashboard.myTasks")}
             bordered={false}
             size="small"
             subTitle={
-              <Text type="secondary">Focus on impact-critical items</Text>
+              <Text type="secondary">{i18nT("ui.keenkonnect.dashboard.focusOnImpactCriticalItems")}</Text>
             }
           >
             <List
@@ -489,7 +492,7 @@ export default function KeenKonnectDashboard(): JSX.Element {
                     }
                     description={
                       <Text type="secondary">
-                        Due: <strong>{task.due}</strong>
+                        {i18nT("ui.keenkonnect.dashboard.due")} <strong>{task.due}</strong>
                       </Text>
                     }
                   />
@@ -505,7 +508,7 @@ export default function KeenKonnectDashboard(): JSX.Element {
             title={
               <Space>
                 <BellOutlined />
-                <span>Notifications</span>
+                <span>{i18nT("ui.keenkonnect.dashboard.notifications")}</span>
               </Space>
             }
             bordered={false}
@@ -534,12 +537,12 @@ export default function KeenKonnectDashboard(): JSX.Element {
         {/* Knowledge Hub */}
         <ProCard
           colSpan={{ xs: 24, md: 12 }}
-          title="Knowledge Hub"
-          subTitle="Methods, playbooks, and shared assets"
+          title={i18nT("ui.keenkonnect.dashboard.knowledgeHub")}
+          subTitle={i18nT("ui.keenkonnect.dashboard.knowledgeHubSubtitle")}
           extra={
             <Link href="/keenkonnect/knowledge/browse-repository">
               <Space size={4}>
-                <span>Open knowledge hub</span>
+                <span>{i18nT("ui.keenkonnect.dashboard.openKnowledgeHub")}</span>
                 <ArrowRightOutlined />
               </Space>
             </Link>
@@ -553,7 +556,7 @@ export default function KeenKonnectDashboard(): JSX.Element {
                 key={item.id}
                 actions={[
                   <Link key="open" href={item.link}>
-                    View
+                    {i18nT("ui.keenkonnect.dashboard.view")}
                   </Link>,
                 ]}
               >
@@ -572,7 +575,7 @@ export default function KeenKonnectDashboard(): JSX.Element {
                   }
                   description={
                     <Text type="secondary">
-                      Recently used in your workspaces
+                      {i18nT("ui.keenkonnect.dashboard.recentlyUsedInYourWorkspaces")}
                     </Text>
                   }
                 />
@@ -584,8 +587,8 @@ export default function KeenKonnectDashboard(): JSX.Element {
         {/* Recent Activity */}
         <ProCard
           colSpan={{ xs: 24, md: 12 }}
-          title="Recent Activity"
-          subTitle="What changed in your ecosystem"
+          title={i18nT("ui.keenkonnect.dashboard.recentActivity")}
+          subTitle={i18nT("ui.keenkonnect.dashboard.recentActivitySubtitle")}
         >
           <Timeline
             mode="left"
@@ -608,30 +611,29 @@ export default function KeenKonnectDashboard(): JSX.Element {
         {/* AI Team Matching */}
         <ProCard
           colSpan={{ xs: 24, md: 12 }}
-          title="AI Team Matching"
-          subTitle="Smart suggestions for project teams"
+          title={i18nT("ui.keenkonnect.dashboard.aiTeamMatching_d9ae77")}
+          subTitle={i18nT("ui.keenkonnect.dashboard.aiMatchingSubtitle")}
           extra={
             <Space>
               <Link href="/keenkonnect/ai-team-matching/my-matches">
                 <Button type="link" size="small">
-                  View matches
+                  {i18nT("ui.keenkonnect.dashboard.viewMatches")}
                 </Button>
               </Link>
               <Link href="/keenkonnect/ai-team-matching/match-preferences">
                 <Button type="primary" size="small" icon={<TeamOutlined />}>
-                  New matching run
+                  {i18nT("ui.keenkonnect.dashboard.newMatchingRun")}
                 </Button>
               </Link>
             </Space>
           }
         >
           <Paragraph>
-            AI matching analyses expertise, diversity, and collaboration patterns across
-            your ecosystem to propose high-impact teams.
+            {i18nT("ui.keenkonnect.dashboard.aiMatchingAnalysesExpertiseDiversityAndCollaboration")}
           </Paragraph>
           <List
             size="small"
-            header={<Text strong>Highlights</Text>}
+            header={<Text strong>{i18nT("ui.keenkonnect.dashboard.highlights")}</Text>}
             dataSource={[
               '4 new suggested teams for climate resilience projects',
               '2 under-utilised experts flagged for upcoming workspaces',
@@ -648,12 +650,12 @@ export default function KeenKonnectDashboard(): JSX.Element {
         {/* Ethikos Profile & Quick Actions */}
         <ProCard
           colSpan={{ xs: 24, md: 12 }}
-          title="Ethikos Profile & Impact"
-          subTitle="How your orchestration shows up across the network"
+          title={i18nT("ui.keenkonnect.dashboard.ethikosProfileImpact")}
+          subTitle={i18nT("ui.keenkonnect.dashboard.ethikosImpactSubtitle")}
         >
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             <Space align="center">
-              <Badge.Ribbon text="Beta">
+              <Badge.Ribbon text={i18nT("ui.keenkonnect.dashboard.beta")}>
                 <Avatar
                   size={56}
                   style={{ backgroundColor: '#faad14', marginRight: 12 }}
@@ -661,21 +663,21 @@ export default function KeenKonnectDashboard(): JSX.Element {
                 />
               </Badge.Ribbon>
               <div>
-                <Text strong>Ethikos Orchestrator Profile</Text>
+                <Text strong>{i18nT("ui.keenkonnect.dashboard.ethikosOrchestratorProfile")}</Text>
                 <br />
                 <Text type="secondary">
-                  Reputation, trust and ethical alignment — integrated with KeenKonnect.
+                  {i18nT("ui.keenkonnect.dashboard.reputationTrustAndEthicalAlignmentIntegratedWith")}
                 </Text>
               </div>
             </Space>
 
             <div>
-              <Text type="secondary">Profile completeness</Text>
+              <Text type="secondary">{i18nT("ui.keenkonnect.dashboard.profileCompleteness")}</Text>
               <Progress percent={68} size="small" />
             </div>
 
             <div>
-              <Text type="secondary">Impact coverage across SDGs</Text>
+              <Text type="secondary">{i18nT("ui.keenkonnect.dashboard.impactCoverageAcrossSdgs")}</Text>
               <Progress
                 percent={72}
                 size="small"
@@ -687,7 +689,7 @@ export default function KeenKonnectDashboard(): JSX.Element {
             <Divider style={{ margin: '8px 0' }} />
 
             <ProCard
-              title="Quick actions"
+              title={i18nT("ui.keenkonnect.dashboard.quickActions")}
               bordered={false}
               size="small"
               ghost
@@ -695,7 +697,7 @@ export default function KeenKonnectDashboard(): JSX.Element {
             >
               <List
                 grid={{ gutter: 16, xs: 1, sm: 2 }}
-                dataSource={quickActions}
+                dataSource={quickActions(i18nT)}
                 renderItem={(action) => (
                   <List.Item key={action.key}>
                     <Space direction="vertical" size={4} style={{ width: '100%' }}>

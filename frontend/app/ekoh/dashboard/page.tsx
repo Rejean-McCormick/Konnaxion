@@ -1,6 +1,7 @@
 // FILE: frontend/app/ekoh/dashboard/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Alert, Card, Col, Empty, List, Progress, Row, Space, Statistic, Tag, Typography } from 'antd';
 import React from 'react';
 
@@ -15,6 +16,7 @@ function percent(score: number): number {
 }
 
 export default function EkohDashboard(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const { data, isLoading, isError, error } = useReputationEvents();
   const profile = data?.ekohProfile ?? null;
   const expertise = profile?.expertise ?? [];
@@ -22,15 +24,15 @@ export default function EkohDashboard(): JSX.Element {
 
   return (
     <EkohPageShell
-      title="EkoH dashboard"
-      subtitle="Domain-specific expertise and trust context used by declared Smart Vote readings."
+      title={i18nT("ui.ekoh.dashboard.ekohDashboard")}
+      subtitle={i18nT("ui.ekoh.dashboard.domainSpecificExpertiseAndTrustContextUsed")}
     >
       {isError && (
         <Alert
           type="error"
           showIcon
-          message="Unable to load EkoH profile"
-          description={(error as Error | undefined)?.message ?? 'Please try again.'}
+          message={i18nT("ui.ekoh.dashboard.unableToLoadEkohProfile")}
+          description={(error as Error | undefined)?.message ?? i18nT("ui.ekoh.dashboard.pleaseTryAgain")}
           style={{ marginBottom: 16 }}
         />
       )}
@@ -38,21 +40,21 @@ export default function EkohDashboard(): JSX.Element {
       <Alert
         type="info"
         showIcon
-        message="There is no global Smart Vote weight"
-        description="Influence is computed only for a specific question or lens by combining the question's declared domain relevance with this profile. EkoH supplies context; Smart Vote publishes the derived reading."
+        message={i18nT("ui.ekoh.dashboard.thereIsNoGlobalSmartVoteWeight")}
+        description={i18nT("ui.ekoh.dashboard.influenceIsComputedOnlyForASpecific")}
         style={{ marginBottom: 16 }}
       />
 
       <Row gutter={[16, 16]}>
         <Col xs={24} md={6}>
           <Card loading={isLoading}>
-            <Statistic title="Expertise domains" value={expertise.length} />
+            <Statistic title={i18nT("ui.ekoh.dashboard.expertiseDomains")} value={expertise.length} />
           </Card>
         </Col>
         <Col xs={24} md={6}>
           <Card loading={isLoading}>
             <Statistic
-              title="Strongest domain"
+              title={i18nT("ui.ekoh.dashboard.strongestDomain")}
               value={topDomain ? percent(topDomain.weightedScore) : 0}
               suffix={topDomain ? '%' : undefined}
             />
@@ -62,7 +64,7 @@ export default function EkohDashboard(): JSX.Element {
         <Col xs={24} md={6}>
           <Card loading={isLoading}>
             <Statistic
-              title="Ethics / reliability modifier"
+              title={i18nT("ui.ekoh.dashboard.ethicsReliabilityModifier")}
               value={profile?.ethicsScore ?? 1}
               precision={2}
               suffix="×"
@@ -71,12 +73,12 @@ export default function EkohDashboard(): JSX.Element {
         </Col>
         <Col xs={24} md={6}>
           <Card loading={isLoading}>
-            <Statistic title="Visibility" value={profile?.confidentialityLevel ?? 'N/A'} />
+            <Statistic title={i18nT("ui.ekoh.dashboard.visibility")} value={profile?.confidentialityLevel ?? 'N/A'} />
           </Card>
         </Col>
       </Row>
 
-      <Card title="Domain expertise" loading={isLoading} style={{ marginTop: 16 }}>
+      <Card title={i18nT("ui.ekoh.dashboard.domainExpertise")} loading={isLoading} style={{ marginTop: 16 }}>
         {expertise.length ? (
           <List<EkohExpertiseScore>
             dataSource={expertise}
@@ -99,16 +101,16 @@ export default function EkohDashboard(): JSX.Element {
             }}
           />
         ) : (
-          <Empty description="No canonical EkoH expertise profile available" />
+          <Empty description={i18nT("ui.ekoh.dashboard.noCanonicalEkohExpertiseProfileAvailable")} />
         )}
       </Card>
 
-      <Card title="How this profile is used" style={{ marginTop: 16 }}>
+      <Card title={i18nT("ui.ekoh.dashboard.howThisProfileIsUsed")} style={{ marginTop: 16 }}>
         <Paragraph>
-          Each consultation declares which knowledge domains matter and by how much. Smart Vote can then compute an advisory reading from the overlap between those domain weights and each participant's EkoH expertise profile.
+          {i18nT("ui.ekoh.dashboard.eachConsultationDeclaresWhichKnowledgeDomainsMatter")}
         </Paragraph>
         <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-          Expertise outside the relevant domains does not add contextual influence. The democratic baseline remains visible as a separate reading.
+          {i18nT("ui.ekoh.dashboard.expertiseOutsideTheRelevantDomainsDoesNot")}
         </Paragraph>
       </Card>
     </EkohPageShell>

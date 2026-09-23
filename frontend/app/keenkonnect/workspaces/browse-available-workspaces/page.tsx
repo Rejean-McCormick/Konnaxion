@@ -1,6 +1,8 @@
 // FILE: frontend/app/keenkonnect/workspaces/browse-available-workspaces/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   Alert,
   Avatar,
@@ -105,15 +107,16 @@ const PREVIEW_WORKSPACES: Workspace[] = [
   },
 ];
 
-const workspaceTabs = [
-  { key: 'all', label: 'All Workspaces' },
-  { key: 'focus', label: 'Focus Pods' },
-  { key: 'collaboration', label: 'Collaboration Spaces' },
-  { key: 'creative', label: 'Creative Studios' },
-  { key: 'innovation', label: 'Innovation Labs' },
-];
+const workspaceTabs = (i18nT: TranslateFunction) => ([
+  { key: 'all', label: i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.allWorkspaces") },
+  { key: 'focus', label: i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.focusPods") },
+  { key: 'collaboration', label: i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.collaborationSpaces") },
+  { key: 'creative', label: i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.creativeStudios") },
+  { key: 'innovation', label: i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.innovationLabs") },
+]);
 
 export default function BrowseAvailableWorkspaces(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
 
   const [searchText, setSearchText] = useState('');
@@ -154,8 +157,8 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
 
   return (
     <KeenPageShell
-      title="Browse Available Workspaces"
-      description="Discover active collaboration spaces you can join across KeenKonnect."
+      title={i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.browseAvailableWorkspaces")}
+      description={i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.discoverActiveCollaborationSpacesYouCanJoin")}
       toolbar={
         <Button
           type="primary"
@@ -163,22 +166,22 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
             router.push('/keenkonnect/workspaces/launch-new-workspace')
           }
         >
-          Launch New Workspace
+          {i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.launchNewWorkspace")}
         </Button>
       }
     >
       <Alert
         type="info"
         showIcon
-        message="Workspace discovery preview"
-        description="KeenKonnect does not expose a workspace persistence or membership contract in this build. The records below are declared preview data; join/request actions are disabled."
+        message={i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.workspaceDiscoveryPreview")}
+        description={i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.keenkonnectDoesNotExposeAWorkspacePersistence")}
         style={{ marginBottom: 16 }}
       />
       {/* Search & filters */}
       <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
         <Col xs={24} sm={12}>
           <Search
-            placeholder="Search workspaces"
+            placeholder={i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.searchWorkspaces")}
             allowClear
             onSearch={(value) => {
               setSearchText(value);
@@ -195,15 +198,15 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
               setCurrentPage(1);
             }}
             options={[
-              { value: 'All', label: 'All Tools' },
-              { value: 'Data Science Notebook', label: 'Data Science Notebook' },
-              { value: 'VR', label: 'VR' },
-              { value: 'Programming', label: 'Programming' },
-              { value: 'Design Tools', label: 'Design Tools' },
-              { value: '3D Modeling', label: '3D Modeling' },
-              { value: 'Whiteboard', label: 'Whiteboard' },
-              { value: 'Brainstorming', label: 'Brainstorming' },
-              { value: 'Prototyping', label: 'Prototyping' },
+              { value: 'All', label: i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.allTools") },
+              { value: 'Data Science Notebook', label: i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.dataScienceNotebook") },
+              { value: 'VR', label: i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.vr") },
+              { value: 'Programming', label: i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.programming") },
+              { value: 'Design Tools', label: i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.designTools") },
+              { value: '3D Modeling', label: i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.text3dModeling") },
+              { value: 'Whiteboard', label: i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.whiteboard") },
+              { value: 'Brainstorming', label: i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.brainstorming") },
+              { value: 'Prototyping', label: i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.prototyping") },
             ]}
           />
         </Col>
@@ -211,7 +214,7 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
 
       {/* Category tabs */}
       <Tabs
-        items={workspaceTabs}
+        items={workspaceTabs(i18nT)}
         activeKey={activeTab}
         onChange={handleTabChange}
         style={{ marginBottom: 16 }}
@@ -230,10 +233,10 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
               title={workspace.name}
               extra={
                 <Space size="small">
-                  <Text type="secondary">Host: {workspace.owner}</Text>
+                  <Text type="secondary">{i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.host")} {workspace.owner}</Text>
                   <Badge
                     status={workspace.isJoinable ? 'success' : 'warning'}
-                    text={workspace.isJoinable ? 'Joinable' : 'Request only'}
+                    text={workspace.isJoinable ? i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.joinable") : i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.requestOnly")}
                   />
                 </Space>
               }
@@ -242,9 +245,9 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
                   key="join"
                   type="primary"
                   disabled
-                  title="Workspace membership is unavailable until a backend contract exists."
+                  title={i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.workspaceMembershipIsUnavailableUntilABackend")}
                 >
-                  {workspace.isJoinable ? 'Join' : 'Request Access'}
+                  {workspace.isJoinable ? i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.join") : i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.requestAccess")}
                 </Button>,
               ]}
             >
@@ -263,9 +266,9 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
                 <Row justify="space-between" align="middle">
                   <Col>
                     <Space direction="vertical" size={0}>
-                      <Text type="secondary">Currently online</Text>
+                      <Text type="secondary">{i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.currentlyOnline")}</Text>
                       <Tag color="geekblue">
-                        {workspace.currentUsers} users
+                        {workspace.currentUsers} {i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.users")}
                       </Tag>
                     </Space>
                   </Col>
@@ -275,7 +278,7 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
                       size={0}
                       style={{ textAlign: 'right' }}
                     >
-                      <Text type="secondary">Last active</Text>
+                      <Text type="secondary">{i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.lastActive")}</Text>
                       <Text>{workspace.lastActive}</Text>
                     </Space>
                   </Col>
@@ -285,7 +288,7 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
 
                 {/* Avatar.Group showing preview participants */}
                 <Space direction="vertical" size={4}>
-                  <Text type="secondary">Active collaborators</Text>
+                  <Text type="secondary">{i18nT("ui.keenkonnect.workspaces.browseAvailableWorkspaces.activeCollaborators")}</Text>
                   <Avatar.Group max={{ count: 3 }}>
                     {workspace.participants.map((name) => (
                       <Avatar key={name}>

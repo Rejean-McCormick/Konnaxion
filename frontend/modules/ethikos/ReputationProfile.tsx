@@ -2,6 +2,7 @@
 // frontend/modules/ethikos/ReputationProfile.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   CrownOutlined,
   RiseOutlined,
@@ -65,6 +66,7 @@ const ReputationProfileModule: React.FC<ReputationProfileModuleProps> = ({
   error,
   onRetry,
 }) => {
+  const { t: i18nT } = useLanguage();
   const level = profile?.level ?? 'Visitor';
   const score = profile?.score ?? 0;
   const dimensions = profile?.dimensions ?? [];
@@ -97,8 +99,8 @@ const ReputationProfileModule: React.FC<ReputationProfileModuleProps> = ({
   return (
     <PageContainer
       header={{
-        title: 'Reputation & trust profile',
-        subTitle: 'Your standing and contributions in Ethikos.',
+        title: i18nT("ui.ethikos.reputationprofile.reputationTrustProfile"),
+        subTitle: i18nT("ui.ethikos.reputationprofile.yourStandingAndContributionsInEthikos"),
       }}
     >
       {error && (
@@ -106,11 +108,11 @@ const ReputationProfileModule: React.FC<ReputationProfileModuleProps> = ({
           type="error"
           showIcon
           style={{ marginBottom: 16 }}
-          message="Unable to load your trust profile"
+          message={i18nT("ui.ethikos.reputationprofile.unableToLoadYourTrustProfile")}
           description={
             <Space direction="vertical">
               <Text type="secondary">
-                There was a problem loading your profile and badges. You can try again in a moment.
+                {i18nT("ui.ethikos.reputationprofile.thereWasAProblemLoadingYourProfile")}
               </Text>
               {onRetry && (
                 <a
@@ -119,7 +121,7 @@ const ReputationProfileModule: React.FC<ReputationProfileModuleProps> = ({
                     onRetry();
                   }}
                 >
-                  Retry now
+                  {i18nT("ui.ethikos.reputationprofile.retryNow")}
                 </a>
               )}
             </Space>
@@ -146,7 +148,7 @@ const ReputationProfileModule: React.FC<ReputationProfileModuleProps> = ({
             }
             extra={
               <Text type="secondary" style={{ fontSize: 12 }}>
-                Reputation derived from real arguments, stances, and votes.
+                {i18nT("ui.ethikos.reputationprofile.reputationDerivedFromRealArgumentsStancesAnd")}
               </Text>
             }
           >
@@ -156,7 +158,7 @@ const ReputationProfileModule: React.FC<ReputationProfileModuleProps> = ({
               <StatisticCardGroup>
                 <StatisticCard
                   statistic={{
-                    title: 'Reputation score',
+                    title: i18nT("ui.ethikos.reputationprofile.reputationScore"),
                     value: score,
                     suffix: 'pts',
                     prefix: <StarOutlined />,
@@ -164,14 +166,14 @@ const ReputationProfileModule: React.FC<ReputationProfileModuleProps> = ({
                 />
                 <StatisticCard
                   statistic={{
-                    title: 'Dimensions tracked',
+                    title: i18nT("ui.ethikos.reputationprofile.dimensionsTracked"),
                     value: dimensions.length,
                     prefix: <CrownOutlined />,
                   }}
                 />
                 <StatisticCard
                   statistic={{
-                    title: 'Recent signals',
+                    title: i18nT("ui.ethikos.reputationprofile.recentSignals"),
                     value: recent.length,
                     prefix: <RiseOutlined />,
                   }}
@@ -183,10 +185,10 @@ const ReputationProfileModule: React.FC<ReputationProfileModuleProps> = ({
           <ProCard
             bordered
             style={{ marginTop: 16 }}
-            title="Reputation dimensions"
+            title={i18nT("ui.ethikos.reputationprofile.reputationDimensions")}
             extra={
               <Text type="secondary" style={{ fontSize: 12 }}>
-                Each dimension contributes to your overall score.
+                {i18nT("ui.ethikos.reputationprofile.eachDimensionContributesToYourOverallScore")}
               </Text>
             }
           >
@@ -194,8 +196,7 @@ const ReputationProfileModule: React.FC<ReputationProfileModuleProps> = ({
               <Skeleton active paragraph={{ rows: 4 }} />
             ) : dimensions.length === 0 ? (
               <Text type="secondary">
-                No dimensions available yet. Once you start contributing in Ethikos, your reputation
-                will appear here.
+                {i18nT("ui.ethikos.reputationprofile.noDimensionsAvailableYetOnceYouStart")}
               </Text>
             ) : (
               <List
@@ -205,7 +206,7 @@ const ReputationProfileModule: React.FC<ReputationProfileModuleProps> = ({
                     <Space direction="vertical" style={{ width: '100%' }}>
                       <Space>
                         <Text strong>{dim.label}</Text>
-                        <Tag>{dim.weight}% weight</Tag>
+                        <Tag>{dim.weight}{i18nT("ui.ethikos.reputationprofile.weight")}</Tag>
                       </Space>
                       <Progress
                         percent={Math.round(dim.score)}
@@ -223,10 +224,10 @@ const ReputationProfileModule: React.FC<ReputationProfileModuleProps> = ({
         <Col xs={24} lg={8}>
           <ProCard
             bordered
-            title="Badges"
+            title={i18nT("ui.ethikos.reputationprofile.badges")}
             extra={
               <Text type="secondary" style={{ fontSize: 12 }}>
-                Recognition earned in Ethikos.
+                {i18nT("ui.ethikos.reputationprofile.recognitionEarnedInEthikos")}
               </Text>
             }
           >
@@ -234,8 +235,7 @@ const ReputationProfileModule: React.FC<ReputationProfileModuleProps> = ({
               <Skeleton active paragraph={{ rows: 4 }} />
             ) : badges.length === 0 ? (
               <Text type="secondary">
-                You have not earned any badges yet. Participate in debates and voting to unlock
-                them.
+                {i18nT("ui.ethikos.reputationprofile.youHaveNotEarnedAnyBadgesYet")}
               </Text>
             ) : (
               <List
@@ -249,7 +249,7 @@ const ReputationProfileModule: React.FC<ReputationProfileModuleProps> = ({
                         {badge.description}
                       </Text>
                       <Text type="secondary" style={{ fontSize: 11 }}>
-                        Earned on {badge.earnedAt}
+                        {i18nT("ui.ethikos.reputationprofile.earnedOn")} {badge.earnedAt}
                       </Text>
                     </Space>
                   </List.Item>
@@ -263,10 +263,10 @@ const ReputationProfileModule: React.FC<ReputationProfileModuleProps> = ({
       <ProCard
         bordered
         style={{ marginTop: 16 }}
-        title="Reputation timeline"
+        title={i18nT("ui.ethikos.reputationprofile.reputationTimeline")}
         extra={
           <Text type="secondary" style={{ fontSize: 12 }}>
-            Recent signals from arguments, stances, votes, and badges.
+            {i18nT("ui.ethikos.reputationprofile.recentSignalsFromArgumentsStancesVotesAnd")}
           </Text>
         }
       >
@@ -274,7 +274,7 @@ const ReputationProfileModule: React.FC<ReputationProfileModuleProps> = ({
           <Skeleton active paragraph={{ rows: 4 }} />
         ) : timelineItems.length === 0 ? (
           <Text type="secondary">
-            No events yet. As you participate in Ethikos, key events will appear here.
+            {i18nT("ui.ethikos.reputationprofile.noEventsYetAsYouParticipateIn")}
           </Text>
         ) : (
           <Timeline

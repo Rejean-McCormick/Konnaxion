@@ -1,6 +1,7 @@
 // FILE: frontend/app/ethikos/learn/changelog/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ApartmentOutlined,
   CalendarOutlined,
@@ -78,7 +79,8 @@ function entryKey(entry: ChangelogEntry): string {
 }
 
 export default function Changelog(): JSX.Element {
-  usePageTitle('Learn · Changelog');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.ethikos.learn.changelog.learnChangelog"));
 
   const { data, loading, error, refresh } = useRequest<ChangelogResponse, []>(
     fetchChangelog,
@@ -243,17 +245,17 @@ export default function Changelog(): JSX.Element {
     </Space>
   );
 
-  const shellTitle = 'Learn · Changelog';
+  const shellTitle = i18nT("ui.ethikos.learn.changelog.learnChangelog");
   const shellSectionLabel = 'Learn';
   const shellSubtitle =
-    'Versioned changes, fixes and improvements across the Ethikos layer.';
+    i18nT("ui.ethikos.learn.changelog.versionedChangesFixesAndImprovementsAcrossThe");
 
   const compactActions = (
     <Space>
       {lastUpdated && (
         <Badge
           count={
-            <Tooltip title={`Last entry date ${lastUpdated}`}>
+            <Tooltip title={i18nT("ui.ethikos.learn.changelog.lastEntryDate", { lastUpdated: lastUpdated })}>
               <ClockCircleOutlined style={{ color: '#52c41a' }} />
             </Tooltip>
           }
@@ -273,7 +275,7 @@ export default function Changelog(): JSX.Element {
       {lastUpdated && (
         <Badge
           count={
-            <Tooltip title={`Last entry date ${lastUpdated}`}>
+            <Tooltip title={i18nT("ui.ethikos.learn.changelog.lastEntryDate", { lastUpdated: lastUpdated })}>
               <ClockCircleOutlined style={{ color: '#52c41a' }} />
             </Tooltip>
           }
@@ -284,16 +286,16 @@ export default function Changelog(): JSX.Element {
         value={view}
         onChange={(value) => setView(value)}
         options={[
-          { label: 'Timeline', value: 'timeline', icon: <CalendarOutlined /> },
-          { label: 'List', value: 'list', icon: <UnorderedListOutlined /> },
+          { label: i18nT("ui.ethikos.learn.changelog.timeline"), value: 'timeline', icon: <CalendarOutlined /> },
+          { label: i18nT("ui.ethikos.learn.changelog.list"), value: 'list', icon: <UnorderedListOutlined /> },
         ]}
       />
 
-      <Tooltip title="Export JSON">
+      <Tooltip title={i18nT("ui.ethikos.learn.changelog.exportJson")}>
         <Button icon={<DownloadOutlined />} onClick={exportJSON} size="small" />
       </Tooltip>
 
-      <Tooltip title="Copy Markdown">
+      <Tooltip title={i18nT("ui.ethikos.learn.changelog.copyMarkdown")}>
         <Button
           icon={<CopyOutlined />}
           onClick={() => void copyMarkdown()}
@@ -301,7 +303,7 @@ export default function Changelog(): JSX.Element {
         />
       </Tooltip>
 
-      <Tooltip title="Refresh">
+      <Tooltip title={i18nT("ui.ethikos.learn.changelog.refresh")}>
         <Button
           icon={<ReloadOutlined />}
           onClick={() => refresh()}
@@ -334,7 +336,7 @@ export default function Changelog(): JSX.Element {
         secondaryActions={compactActions}
       >
         <PageContainer ghost>
-          <Empty description="Failed to load changelog." />
+          <Empty description={i18nT("ui.ethikos.learn.changelog.failedToLoadChangelog")} />
         </PageContainer>
       </EthikosPageShell>
     );
@@ -350,7 +352,7 @@ export default function Changelog(): JSX.Element {
       >
         <PageContainer ghost>
           <ProCard>
-            <Empty description="No changelog entries match your filters." />
+            <Empty description={i18nT("ui.ethikos.learn.changelog.noChangelogEntriesMatchYourFilters")} />
           </ProCard>
         </PageContainer>
       </EthikosPageShell>
@@ -369,18 +371,18 @@ export default function Changelog(): JSX.Element {
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, md: 8, xl: 6 }}
             statistic={{
-              title: 'Entries',
+              title: i18nT("ui.ethikos.learn.changelog.entries"),
               value: totalEntries,
-              description: <Text type="secondary">After filters</Text>,
+              description: <Text type="secondary">{i18nT("ui.ethikos.learn.changelog.afterFilters")}</Text>,
             }}
           />
 
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, md: 8, xl: 6 }}
             statistic={{
-              title: 'Versions',
+              title: i18nT("ui.ethikos.learn.changelog.versions"),
               value: versionCount,
-              description: <Text type="secondary">In current view</Text>,
+              description: <Text type="secondary">{i18nT("ui.ethikos.learn.changelog.inCurrentView")}</Text>,
             }}
           />
 
@@ -395,7 +397,7 @@ export default function Changelog(): JSX.Element {
                   </Space>
                 ),
                 value: count,
-                description: <Text type="secondary">Entries with tag</Text>,
+                description: <Text type="secondary">{i18nT("ui.ethikos.learn.changelog.entriesWithTag")}</Text>,
               }}
             />
           ))}
@@ -407,15 +409,15 @@ export default function Changelog(): JSX.Element {
             title={
               <Space>
                 <FilterOutlined />
-                <span>Filter</span>
+                <span>{i18nT("ui.ethikos.learn.changelog.filter")}</span>
               </Space>
             }
           >
             <Space direction="vertical" style={{ width: '100%' }} size="large">
               <div>
-                <Text type="secondary">Search</Text>
+                <Text type="secondary">{i18nT("ui.ethikos.learn.changelog.search")}</Text>
                 <Input.Search
-                  placeholder="Version or note text…"
+                  placeholder={i18nT("ui.ethikos.learn.changelog.versionOrNoteText")}
                   allowClear
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
@@ -424,7 +426,7 @@ export default function Changelog(): JSX.Element {
               </div>
 
               <div>
-                <Text type="secondary">Date range</Text>
+                <Text type="secondary">{i18nT("ui.ethikos.learn.changelog.dateRange")}</Text>
                 <div style={{ marginTop: 8 }}>
                   <RangePicker
                     allowEmpty={[true, true]}
@@ -436,11 +438,11 @@ export default function Changelog(): JSX.Element {
               </div>
 
               <div>
-                <Text type="secondary">Tags</Text>
+                <Text type="secondary">{i18nT("ui.ethikos.learn.changelog.tags")}</Text>
                 <div style={{ marginTop: 8 }}>
                   <Space size={[6, 8]} wrap>
                     {allTags.length === 0 ? (
-                      <Text type="secondary">No tags</Text>
+                      <Text type="secondary">{i18nT("ui.ethikos.learn.changelog.noTags")}</Text>
                     ) : (
                       allTags.map((tag) => (
                         <Tag.CheckableTag
@@ -468,7 +470,7 @@ export default function Changelog(): JSX.Element {
               </div>
 
               <div>
-                <Text type="secondary">Versions</Text>
+                <Text type="secondary">{i18nT("ui.ethikos.learn.changelog.versions")}</Text>
                 <Anchor
                   affix={false}
                   items={anchorItems}
@@ -487,7 +489,7 @@ export default function Changelog(): JSX.Element {
                 ) : (
                   <UnorderedListOutlined />
                 )}
-                <span>Changelog entries</span>
+                <span>{i18nT("ui.ethikos.learn.changelog.changelogEntries")}</span>
               </Space>
             }
           >

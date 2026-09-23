@@ -1,6 +1,8 @@
 // FILE: frontend/app/ethikos/trust/badges/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import { PageContainer, ProCard, ProList } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
 import {
@@ -90,9 +92,9 @@ function getBadgeDate(badge: TrustBadge): string | undefined {
   return badge.earnedAt ?? badge.createdAt;
 }
 
-function formatDate(value?: string): string {
+function formatDate(i18nT: TranslateFunction, value?: string): string {
   if (!value) {
-    return 'Not earned yet';
+    return i18nT("ui.ethikos.trust.badges.notEarnedYet");
   }
 
   const date = dayjs(value);
@@ -154,6 +156,7 @@ function badgeProgressValue(badge: TrustBadge): number {
 }
 
 export default function TrustBadgesPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
   const [catalogCategory, setCatalogCategory] =
@@ -247,34 +250,34 @@ export default function TrustBadgesPage(): JSX.Element {
 
   const secondaryActions: ReactNode = (
     <Space wrap>
-      <Tag color="green">{earnedCount} earned</Tag>
-      <Tag color="blue">{progressCount} in progress</Tag>
-      <Tag color="purple">{completionRate}% complete</Tag>
+      <Tag color="green">{earnedCount} {i18nT("ui.ethikos.trust.badges.earned")}</Tag>
+      <Tag color="blue">{progressCount} {i18nT("ui.ethikos.trust.badges.inProgress")}</Tag>
+      <Tag color="purple">{completionRate}{i18nT("ui.ethikos.trust.badges.complete")}</Tag>
     </Space>
   );
 
   return (
     <EthikosPageShell
-      title="Badges"
-      sectionLabel="Trust"
-      subtitle="Track Ethikos trust badges earned through stances, arguments, and voting activity."
+      title={i18nT("ui.ethikos.trust.badges.badges")}
+      sectionLabel={i18nT("ui.ethikos.trust.badges.trust")}
+      subtitle={i18nT("ui.ethikos.trust.badges.trackEthikosTrustBadgesEarnedThroughStances")}
       secondaryActions={secondaryActions}
     >
       <PageContainer ghost loading={loading}>
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           <ProCard gutter={16} wrap>
             <ProCard colSpan={{ xs: 24, md: 8 }}>
-              <Statistic title="Earned badges" value={earnedCount} />
+              <Statistic title={i18nT("ui.ethikos.trust.badges.earnedBadges")} value={earnedCount} />
             </ProCard>
 
             <ProCard colSpan={{ xs: 24, md: 8 }}>
-              <Statistic title="In progress" value={progressCount} />
+              <Statistic title={i18nT("ui.ethikos.trust.badges.inProgress_b6bd42")} value={progressCount} />
             </ProCard>
 
             <ProCard colSpan={{ xs: 24, md: 8 }}>
               <Statistic
                 suffix="%"
-                title="Catalog completion"
+                title={i18nT("ui.ethikos.trust.badges.catalogCompletion")}
                 value={completionRate}
               />
             </ProCard>
@@ -282,7 +285,7 @@ export default function TrustBadgesPage(): JSX.Element {
 
           <ProCard
             bordered
-            title="Your badges"
+            title={i18nT("ui.ethikos.trust.badges.yourBadges")}
             extra={
               <Space wrap>
                 <Select<TimeFilter>
@@ -291,9 +294,9 @@ export default function TrustBadgesPage(): JSX.Element {
                   style={{ width: 130 }}
                   onChange={setTimeFilter}
                   options={[
-                    { label: 'All time', value: 'all' },
-                    { label: 'Last 90 days', value: '90d' },
-                    { label: 'Last year', value: '365d' },
+                    { label: i18nT("ui.ethikos.trust.badges.allTime"), value: 'all' },
+                    { label: i18nT("ui.ethikos.trust.badges.last90Days"), value: '90d' },
+                    { label: i18nT("ui.ethikos.trust.badges.lastYear"), value: '365d' },
                   ]}
                 />
 
@@ -303,8 +306,8 @@ export default function TrustBadgesPage(): JSX.Element {
                   style={{ width: 130 }}
                   onChange={setSortOrder}
                   options={[
-                    { label: 'Newest first', value: 'newest' },
-                    { label: 'Oldest first', value: 'oldest' },
+                    { label: i18nT("ui.ethikos.trust.badges.newestFirst"), value: 'newest' },
+                    { label: i18nT("ui.ethikos.trust.badges.oldestFirst"), value: 'oldest' },
                   ]}
                 />
               </Space>
@@ -312,16 +315,16 @@ export default function TrustBadgesPage(): JSX.Element {
           >
             {error ? (
               <Empty
-                description="Unable to load trust badges."
+                description={i18nT("ui.ethikos.trust.badges.unableToLoadTrustBadges")}
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
               >
                 <Typography.Link onClick={() => refresh()}>
-                  Retry
+                  {i18nT("ui.ethikos.trust.badges.retry")}
                 </Typography.Link>
               </Empty>
             ) : visibleEarnedBadges.length === 0 && !loading ? (
               <Empty
-                description="No earned badges match the current filters."
+                description={i18nT("ui.ethikos.trust.badges.noEarnedBadgesMatchTheCurrentFilters")}
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
               />
             ) : (
@@ -349,7 +352,7 @@ export default function TrustBadgesPage(): JSX.Element {
                       <Space direction="vertical" size={2}>
                         <Text type="secondary">{badge.description}</Text>
                         <Text type="secondary">
-                          Earned {formatDate(getBadgeDate(badge))}
+                          {i18nT("ui.ethikos.trust.badges.earned_257f30")} {formatDate(i18nT, getBadgeDate(badge))}
                         </Text>
                       </Space>
                     ),
@@ -358,7 +361,7 @@ export default function TrustBadgesPage(): JSX.Element {
                     render: (_dom, badge) => (
                       <AntBadge
                         status={badge.earned ? 'success' : 'default'}
-                        text={badge.earned ? 'Earned' : 'Locked'}
+                        text={badge.earned ? i18nT("ui.ethikos.trust.badges.earned_257f30") : i18nT("ui.ethikos.trust.badges.locked")}
                       />
                     ),
                   },
@@ -368,7 +371,7 @@ export default function TrustBadgesPage(): JSX.Element {
                         key="details"
                         onClick={() => setDetail(badge)}
                       >
-                        Details
+                        {i18nT("ui.ethikos.trust.badges.details")}
                       </Typography.Link>,
                     ],
                   },
@@ -379,13 +382,13 @@ export default function TrustBadgesPage(): JSX.Element {
 
           <ProCard
             bordered
-            title="Badge catalog"
+            title={i18nT("ui.ethikos.trust.badges.badgeCatalog")}
             extra={
               <Space wrap>
                 <Input.Search
                   allowClear
                   size="small"
-                  placeholder="Search badges"
+                  placeholder={i18nT("ui.ethikos.trust.badges.searchBadges")}
                   style={{ width: 220 }}
                   value={catalogSearch}
                   onChange={(event) => setCatalogSearch(event.target.value)}
@@ -397,10 +400,10 @@ export default function TrustBadgesPage(): JSX.Element {
                   style={{ width: 140 }}
                   onChange={setCatalogCategory}
                   options={[
-                    { label: 'All categories', value: 'All' },
-                    { label: 'Stances', value: 'Stances' },
-                    { label: 'Arguments', value: 'Arguments' },
-                    { label: 'Voting', value: 'Voting' },
+                    { label: i18nT("ui.ethikos.trust.badges.allCategories"), value: 'All' },
+                    { label: i18nT("ui.ethikos.trust.badges.stances"), value: 'Stances' },
+                    { label: i18nT("ui.ethikos.trust.badges.arguments"), value: 'Arguments' },
+                    { label: i18nT("ui.ethikos.trust.badges.voting"), value: 'Voting' },
                   ]}
                 />
 
@@ -410,9 +413,9 @@ export default function TrustBadgesPage(): JSX.Element {
                   style={{ width: 130 }}
                   onChange={setCatalogShow}
                   options={[
-                    { label: 'All', value: 'all' },
-                    { label: 'Earned', value: 'earned' },
-                    { label: 'Locked', value: 'locked' },
+                    { label: i18nT("ui.ethikos.trust.badges.all"), value: 'all' },
+                    { label: i18nT("ui.ethikos.trust.badges.earned_257f30"), value: 'earned' },
+                    { label: i18nT("ui.ethikos.trust.badges.locked"), value: 'locked' },
                   ]}
                 />
               </Space>
@@ -420,7 +423,7 @@ export default function TrustBadgesPage(): JSX.Element {
           >
             {filteredCatalogRows.length === 0 ? (
               <Empty
-                description="No catalog badges match the current filters."
+                description={i18nT("ui.ethikos.trust.badges.noCatalogBadgesMatchTheCurrentFilters")}
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
               />
             ) : (
@@ -442,9 +445,9 @@ export default function TrustBadgesPage(): JSX.Element {
                           {row.category}
                         </Tag>
                         {row.earned ? (
-                          <Tag color="success">Earned</Tag>
+                          <Tag color="success">{i18nT("ui.ethikos.trust.badges.earned_257f30")}</Tag>
                         ) : (
-                          <Tag>Locked</Tag>
+                          <Tag>{i18nT("ui.ethikos.trust.badges.locked")}</Tag>
                         )}
                       </Space>
                     ),
@@ -469,7 +472,7 @@ export default function TrustBadgesPage(): JSX.Element {
 
                         {row.earned && row.earnedAt && (
                           <Text type="secondary">
-                            Earned {formatDate(row.earnedAt)}
+                            {i18nT("ui.ethikos.trust.badges.earned_257f30")} {formatDate(i18nT, row.earnedAt)}
                           </Text>
                         )}
                       </Space>
@@ -480,27 +483,24 @@ export default function TrustBadgesPage(): JSX.Element {
             )}
           </ProCard>
 
-          <ProCard bordered title="How badges are used">
+          <ProCard bordered title={i18nT("ui.ethikos.trust.badges.howBadgesAreUsed")}>
             <Paragraph type="secondary">
-              Badges are derived from Ethikos participation signals such as
-              stances, arguments, and voting. They are trust context signals and
-              do not replace Ethikos stance values, argument impact votes, or
-              Smart Vote readings.
+              {i18nT("ui.ethikos.trust.badges.badgesAreDerivedFromEthikosParticipationSignals")}
             </Paragraph>
 
             <Divider />
 
             <Space wrap>
-              <Tag color="blue">Stances</Tag>
-              <Tag color="purple">Arguments</Tag>
-              <Tag color="green">Voting</Tag>
+              <Tag color="blue">{i18nT("ui.ethikos.trust.badges.stances")}</Tag>
+              <Tag color="purple">{i18nT("ui.ethikos.trust.badges.arguments")}</Tag>
+              <Tag color="green">{i18nT("ui.ethikos.trust.badges.voting")}</Tag>
             </Space>
           </ProCard>
         </Space>
 
         <Modal
           open={!!detail}
-          title={detail ? getBadgeLabel(detail) : 'Badge details'}
+          title={detail ? getBadgeLabel(detail) : i18nT("ui.ethikos.trust.badges.badgeDetails")}
           footer={null}
           onCancel={() => setDetail(null)}
         >
@@ -511,23 +511,23 @@ export default function TrustBadgesPage(): JSX.Element {
                   {detailMeta?.label ?? badgeCategory(detail.id)}
                 </Tag>
                 {detail.earned ? (
-                  <Tag color="success">Earned</Tag>
+                  <Tag color="success">{i18nT("ui.ethikos.trust.badges.earned_257f30")}</Tag>
                 ) : (
-                  <Tag>Locked</Tag>
+                  <Tag>{i18nT("ui.ethikos.trust.badges.locked")}</Tag>
                 )}
               </Space>
 
               <Paragraph>{detail.description}</Paragraph>
 
               <div>
-                <Text strong>Progress</Text>
+                <Text strong>{i18nT("ui.ethikos.trust.badges.progress")}</Text>
                 <Progress percent={badgeProgressValue(detail)} />
               </div>
 
               <div>
-                <Text strong>Earned date</Text>
+                <Text strong>{i18nT("ui.ethikos.trust.badges.earnedDate")}</Text>
                 <Paragraph type="secondary">
-                  {formatDate(getBadgeDate(detail))}
+                  {formatDate(i18nT, getBadgeDate(detail))}
                 </Paragraph>
               </div>
             </Space>

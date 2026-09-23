@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Alert, Button, Card, Input, Segmented, Space } from 'antd'
 import type { SegmentedValue } from 'antd/es/segmented'
 
@@ -27,18 +28,19 @@ export default function ArgumentComposerCard({
   onSubmit: () => void
   onClearReply: () => void
 }): JSX.Element {
+  const { t: i18nT } = useLanguage();
   return (
-    <Card title="Add to the argument thread">
+    <Card title={i18nT("ui.ethikos.deliberate.topic.argumentcomposercard.addToTheArgumentThread")}>
       <Space direction="vertical" size={12} style={{ width: '100%' }}>
         {replyTarget && (
           <Alert
             type="info"
             showIcon
-            message={`Replying to ${replyTarget.author ?? 'Anonymous'}`}
+            message={i18nT("ui.ethikos.deliberate.topic.argumentcomposercard.replyingTo", { value1: replyTarget.author ?? 'Anonymous' })}
             description={replyTarget.body}
             action={
               <Button size="small" onClick={onClearReply}>
-                Clear
+                {i18nT("ui.ethikos.deliberate.topic.argumentcomposercard.clear")}
               </Button>
             }
           />
@@ -48,8 +50,8 @@ export default function ArgumentComposerCard({
           value={side}
           onChange={onSideChange}
           options={[
-            { label: 'Pro', value: 'pro' },
-            { label: 'Con', value: 'con' },
+            { label: i18nT("ui.ethikos.deliberate.topic.argumentcomposercard.pro"), value: 'pro' },
+            { label: i18nT("ui.ethikos.deliberate.topic.argumentcomposercard.con"), value: 'con' },
           ]}
         />
 
@@ -58,15 +60,15 @@ export default function ArgumentComposerCard({
           value={value}
           onChange={(event) => onValueChange(event.target.value)}
           placeholder={
-            replyTarget ? 'Write a concise reply…' : 'Write a concise argument…'
+            replyTarget ? i18nT("ui.ethikos.deliberate.topic.argumentcomposercard.writeAConciseReply") : i18nT("ui.ethikos.deliberate.topic.argumentcomposercard.writeAConciseArgument")
           }
         />
 
         <Space>
           <Button type="primary" loading={loading} onClick={onSubmit}>
-            {replyTarget ? 'Post reply' : 'Post argument'}
+            {replyTarget ? i18nT("ui.ethikos.deliberate.topic.argumentcomposercard.postReply") : i18nT("ui.ethikos.deliberate.topic.argumentcomposercard.postArgument")}
           </Button>
-          {replyTarget && <Button onClick={onClearReply}>Cancel reply</Button>}
+          {replyTarget && <Button onClick={onClearReply}>{i18nT("ui.ethikos.deliberate.topic.argumentcomposercard.cancelReply")}</Button>}
         </Space>
       </Space>
     </Card>

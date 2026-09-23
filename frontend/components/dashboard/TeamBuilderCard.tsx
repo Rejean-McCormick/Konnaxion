@@ -2,6 +2,7 @@
 // C:\MyCode\Konnaxionv14\frontend\components\dashboard\TeamBuilderCard.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ArrowRightOutlined,
   TeamOutlined,
@@ -30,9 +31,11 @@ export interface TeamBuilderCardProps {
  * Intended to sit alongside other dashboard-components cards.
  */
 const TeamBuilderCard: React.FC<TeamBuilderCardProps> = ({
-  title = 'AI-powered Team Builder',
+  title: titleProp,
   compact = false,
 }) => {
+  const { t: i18nT } = useLanguage();
+  const title = titleProp ?? i18nT("ui.dashboard.teambuildercard.aiPoweredTeamBuilder");
   return (
     <Card
       bordered={false}
@@ -66,23 +69,21 @@ const TeamBuilderCard: React.FC<TeamBuilderCardProps> = ({
               {title}
             </Title>
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Let AI assemble balanced teams from your candidate pool.
+              {i18nT("ui.dashboard.teambuildercard.letAiAssembleBalancedTeamsFromYour")}
             </Text>
           </div>
         </Space>
 
         <Paragraph type="secondary" style={{ marginBottom: 0, fontSize: 13 }}>
-          Configure a builder session, pick candidates, and generate
-          collaboration-ready teams in a few clicks. Ideal for projects,
-          debate panels, learning cohorts, and more.
+          {i18nT("ui.dashboard.teambuildercard.configureABuilderSessionPickCandidatesAnd")}
         </Paragraph>
 
         <Space size={6} wrap>
           <Tag icon={<ThunderboltOutlined />} color="purple">
-            AI-assisted matching
+            {i18nT("ui.dashboard.teambuildercard.aiAssistedMatching")}
           </Tag>
-          <Tag color="blue">Cross-module ready</Tag>
-          <Tag color="default">Transparent criteria</Tag>
+          <Tag color="blue">{i18nT("ui.dashboard.teambuildercard.crossModuleReady")}</Tag>
+          <Tag color="default">{i18nT("ui.dashboard.teambuildercard.transparentCriteria")}</Tag>
         </Space>
 
         <div
@@ -96,7 +97,7 @@ const TeamBuilderCard: React.FC<TeamBuilderCardProps> = ({
         >
           <div>
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Start from scratch or continue an existing session.
+              {i18nT("ui.dashboard.teambuildercard.startFromScratchOrContinueAnExisting")}
             </Text>
           </div>
 
@@ -106,7 +107,7 @@ const TeamBuilderCard: React.FC<TeamBuilderCardProps> = ({
               icon={<ArrowRightOutlined />}
               size={compact ? 'small' : 'middle'}
             >
-              Open Team Builder
+              {i18nT("ui.dashboard.teambuildercard.openTeamBuilder")}
             </Button>
           </Link>
         </div>

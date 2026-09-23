@@ -2,6 +2,7 @@
 // C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\LineChart.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import React from 'react';
 import {
   CartesianGrid,
@@ -39,8 +40,6 @@ export interface LineChartProps {
   yDomain?: [number | 'auto', number | 'auto'];
 }
 
-const DEFAULT_EMPTY_MESSAGE = 'No data available';
-
 const LineChart: React.FC<LineChartProps> = ({
   data,
   height = 300,
@@ -48,9 +47,12 @@ const LineChart: React.FC<LineChartProps> = ({
   stroke = '#8884d8',
   showGrid = true,
   loading = false,
-  emptyMessage = DEFAULT_EMPTY_MESSAGE,
+  emptyMessage,
   yDomain,
 }) => {
+  const { t: i18nT } = useLanguage();
+  const resolvedEmptyMessage = emptyMessage ?? i18nT("ui.dashboardComponents.lineChart.noDataAvailable");
+  const resolvedValueLabel = valueLabel ?? i18nT("ui.dashboardComponents.lineChart.value");
   const safeData = Array.isArray(data) ? data : [];
   const hasData = safeData.length > 0;
 
@@ -80,7 +82,7 @@ const LineChart: React.FC<LineChartProps> = ({
           color: 'var(--ant-color-text-secondary, #999)',
         }}
       >
-        {emptyMessage}
+        {resolvedEmptyMessage}
       </div>
     );
   }
@@ -98,7 +100,7 @@ const LineChart: React.FC<LineChartProps> = ({
           <Tooltip
             formatter={(value: number | string) => [
               value,
-              valueLabel ?? 'Value',
+              resolvedValueLabel,
             ]}
           />
           <Line

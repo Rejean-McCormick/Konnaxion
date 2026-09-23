@@ -1,5 +1,6 @@
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Alert, Button, Form, Input, Select } from 'antd';
 import React from 'react';
 
@@ -15,39 +16,40 @@ type IdeaFormValues = {
 };
 
 export default function CreateNewIdea(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [form] = Form.useForm<IdeaFormValues>();
 
   return (
     <KreativePageShell
-      title="Create New Idea"
-      subtitle="Preview the intended idea-incubator intake model."
+      title={i18nT("ui.kreative.ideaIncubator.createNewIdea.createNewIdea")}
+      subtitle={i18nT("ui.kreative.ideaIncubator.createNewIdea.previewTheIntendedIdeaIncubatorIntakeModel")}
     >
       <Alert
         type="info"
         showIcon
-        message="Idea creation is a declared preview"
-        description="Kreative does not expose an idea-incubator persistence contract in this build. The form remains visible for product review, but submission is disabled."
+        message={i18nT("ui.kreative.ideaIncubator.createNewIdea.ideaCreationIsADeclaredPreview")}
+        description={i18nT("ui.kreative.ideaIncubator.createNewIdea.kreativeDoesNotExposeAnIdeaIncubator")}
         style={{ marginBottom: 16 }}
       />
       <Form<IdeaFormValues> form={form} layout="vertical">
-        <Form.Item label="Title of Idea" name="title">
-          <Input placeholder="Enter title of your idea" />
+        <Form.Item label={i18nT("ui.kreative.ideaIncubator.createNewIdea.titleOfIdea")} name="title">
+          <Input placeholder={i18nT("ui.kreative.ideaIncubator.createNewIdea.enterTitleOfYourIdea")} />
         </Form.Item>
-        <Form.Item label="Detailed Description" name="description">
-          <TextArea rows={6} placeholder="Explain your idea and the problem it addresses" />
+        <Form.Item label={i18nT("ui.kreative.ideaIncubator.createNewIdea.detailedDescription")} name="description">
+          <TextArea rows={6} placeholder={i18nT("ui.kreative.ideaIncubator.createNewIdea.explainYourIdeaAndTheProblemIt")} />
         </Form.Item>
-        <Form.Item label="Category / Field" name="category">
-          <Select placeholder="Select a category">
-            <Option value="Technology">Technology</Option>
-            <Option value="Art">Art</Option>
-            <Option value="Education">Education</Option>
-            <Option value="Health">Health</Option>
-            <Option value="Environment">Environment</Option>
+        <Form.Item label={i18nT("ui.kreative.ideaIncubator.createNewIdea.categoryField")} name="category">
+          <Select placeholder={i18nT("ui.kreative.ideaIncubator.createNewIdea.selectACategory")}>
+            <Option value="Technology">{i18nT("ui.kreative.ideaIncubator.createNewIdea.technology")}</Option>
+            <Option value="Art">{i18nT("ui.kreative.ideaIncubator.createNewIdea.art")}</Option>
+            <Option value="Education">{i18nT("ui.kreative.ideaIncubator.createNewIdea.education")}</Option>
+            <Option value="Health">{i18nT("ui.kreative.ideaIncubator.createNewIdea.health")}</Option>
+            <Option value="Environment">{i18nT("ui.kreative.ideaIncubator.createNewIdea.environment")}</Option>
           </Select>
         </Form.Item>
         <Form.Item>
           <Button type="primary" disabled>
-            Submit unavailable
+            {i18nT("ui.kreative.ideaIncubator.createNewIdea.submitUnavailable")}
           </Button>
         </Form.Item>
       </Form>

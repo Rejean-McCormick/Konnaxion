@@ -1,6 +1,8 @@
 // FILE: frontend/app/keenkonnect/user-reputation/manage-expertise-areas/page.tsx
 ﻿'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import { ProForm, ProFormSelect } from '@ant-design/pro-components';
 import { Alert, Divider, Form, List, Rate, Space, Tag, Typography } from 'antd';
 import React, { useMemo, useState } from 'react';
@@ -100,13 +102,14 @@ const SELECTABLE_FIELDS: string[] = [
   'Jest',
 ];
 
-const VISIBILITY_OPTIONS = [
-  { label: 'Public', value: 'public' as const },
-  { label: 'Team only', value: 'team-only' as const },
-  { label: 'Private', value: 'private' as const },
-];
+const VISIBILITY_OPTIONS = (i18nT: TranslateFunction) => ([
+  { label: i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.public"), value: 'public' as const },
+  { label: i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.teamOnly"), value: 'team-only' as const },
+  { label: i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.private"), value: 'private' as const },
+]);
 
 export default function ManageExpertiseAreasPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [form] = Form.useForm<FormValues>();
 
   // Gestion interne de la sélection via Tag.CheckableTag
@@ -131,23 +134,22 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
 
   return (
     <KeenPageShell
-      title="Manage Expertise Areas"
-      description="Declare and fine-tune the expertise areas used by Ekoh, KeenKonnect matching, and Smart Vote."
-      metaTitle="KeenKonnect · Manage Expertise Areas"
+      title={i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.manageExpertiseAreas")}
+      description={i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.declareAndFineTuneTheExpertiseAreas")}
+      metaTitle={i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.keenkonnectManageExpertiseAreas")}
     >
       <Paragraph type="secondary" style={{ marginBottom: 16 }}>
-        Declare and fine-tune the expertise areas used by Ekoh, KeenKonnect
-        matching, and Smart Vote.
+        {i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.declareAndFineTuneTheExpertiseAreas")}
       </Paragraph>
 
-      <Divider orientation="left">Your expertise profile</Divider>
+      <Divider orientation="left">{i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.yourExpertiseProfile")}</Divider>
 
       <Alert
         type="info"
         showIcon
         style={{ marginBottom: 16 }}
-        message="Expertise editing is a declared read-only preview"
-        description="Expertise source state belongs to EkoH. This KeenKonnect screen does not write expertise until an explicit EkoH-owned mutation contract is connected."
+        message={i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.expertiseEditingIsADeclaredReadOnly")}
+        description={i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.expertiseSourceStateBelongsToEkohThis")}
       />
 
       {/* Formulaire principal avec ProForm + ProFormSelect */}
@@ -171,11 +173,11 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
         {/* Sélection des expertises actuelles via Tag.CheckableTag */}
         <Form.Item
           name="currentExpertise"
-          label="Current expertise areas"
+          label={i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.currentExpertiseAreas")}
           rules={[
             {
               required: true,
-              message: 'Please select at least one expertise area.',
+              message: i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.pleaseSelectAtLeastOneExpertiseArea"),
             },
           ]}
         >
@@ -196,9 +198,9 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
         {/* ProFormSelect pour affiner / ajouter des champs précis */}
         <ProFormSelect
           name="newFields"
-          label="Add or refine fields (optional)"
+          label={i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.addOrRefineFieldsOptional")}
           mode="multiple"
-          placeholder="Select specific technologies, tools, or domains"
+          placeholder={i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.selectSpecificTechnologiesToolsOrDomains")}
           allowClear
           options={SELECTABLE_FIELDS.map((field) => ({
             label: field,
@@ -209,13 +211,13 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
         {/* ProFormSelect pour la visibilité du profil d’expertise */}
         <ProFormSelect
           name="visibility"
-          label="Visibility of your expertise"
-          placeholder="Choose who can view your expertise profile"
-          options={VISIBILITY_OPTIONS}
+          label={i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.visibilityOfYourExpertise")}
+          placeholder={i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.chooseWhoCanViewYourExpertiseProfile")}
+          options={VISIBILITY_OPTIONS(i18nT)}
           rules={[
             {
               required: true,
-              message: 'Please choose a visibility level.',
+              message: i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.pleaseChooseAVisibilityLevel"),
             },
           ]}
         />
@@ -224,11 +226,11 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
           style={{ marginTop: 16 }}
           type="info"
           showIcon
-          message="Note: New expertise or fields may need validation through activity and peer endorsements before they impact your Ekoh score."
+          message={i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.noteNewExpertiseOrFieldsMayNeed")}
         />
       </ProForm>
 
-      <Divider orientation="left">Preview: how others see your expertise</Divider>
+      <Divider orientation="left">{i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.previewHowOthersSeeYourExpertise")}</Divider>
 
       {/* Aperçu des domaines sélectionnés via List + Rate */}
       <List
@@ -237,7 +239,7 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
         dataSource={previewExpertise}
         locale={{
           emptyText:
-            'Select at least one expertise area above to see the preview.',
+            i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.selectAtLeastOneExpertiseAreaAbove"),
         }}
         renderItem={(item) => (
           <List.Item key={item.key}>
@@ -245,14 +247,14 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
               title={
                 <Space>
                   <Text strong>{item.label}</Text>
-                  <Tag color="blue">Core expertise</Tag>
+                  <Tag color="blue">{i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.coreExpertise")}</Tag>
                 </Space>
               }
               description={item.description}
             />
             <div>
               <Text type="secondary" style={{ marginRight: 8 }}>
-                Typical expertise level
+                {i18nT("ui.keenkonnect.userReputation.manageExpertiseAreas.typicalExpertiseLevel")}
               </Text>
               {/* Rate utilisé ici en lecture seule pour l’aperçu */}
               <Rate allowHalf disabled defaultValue={item.defaultLevel} />

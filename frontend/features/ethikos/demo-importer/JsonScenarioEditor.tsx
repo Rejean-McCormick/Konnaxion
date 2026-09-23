@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from '@/context/LanguageContext';
 import { ChangeEvent, useMemo, useRef } from "react";
 
 import type { EthikosDemoScenario } from "./types";
@@ -55,6 +56,7 @@ export function JsonScenarioEditor({
   onChange,
   errorMessage,
 }: JsonScenarioEditorProps) {
+  const { t: i18nT } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const parsedState = useMemo(() => parseJson(value), [value]);
@@ -146,7 +148,7 @@ export function JsonScenarioEditor({
               fontWeight: 600,
             }}
           >
-            Demo scenario JSON
+            {i18nT("ui.features.ethikos.demoImporter.jsonscenarioeditor.demoScenarioJson")}
           </h2>
 
           <p
@@ -158,9 +160,7 @@ export function JsonScenarioEditor({
               lineHeight: 1.5,
             }}
           >
-            Paste or upload an ethiKos demo scenario JSON file. This editor only
-            checks JSON syntax locally; backend validation happens when you
-            preview or import.
+            {i18nT("ui.features.ethikos.demoImporter.jsonscenarioeditor.pasteOrUploadAnEthikosDemoScenario")}
           </p>
         </div>
 
@@ -180,15 +180,15 @@ export function JsonScenarioEditor({
           />
 
           <button type="button" onClick={handleLoadFileClick}>
-            Upload JSON
+            {i18nT("ui.features.ethikos.demoImporter.jsonscenarioeditor.uploadJson")}
           </button>
 
           <button type="button" onClick={handleFormatJson}>
-            Format
+            {i18nT("ui.features.ethikos.demoImporter.jsonscenarioeditor.format")}
           </button>
 
           <button type="button" onClick={handleClear}>
-            Clear
+            {i18nT("ui.features.ethikos.demoImporter.jsonscenarioeditor.clear")}
           </button>
         </div>
       </div>
@@ -227,14 +227,14 @@ export function JsonScenarioEditor({
               color: "var(--muted-foreground, #666)",
             }}
           >
-            <span>Actors: {scenarioSummary.actors}</span>
-            <span>Categories: {scenarioSummary.categories}</span>
-            <span>Topics: {scenarioSummary.topics}</span>
-            <span>Stances: {scenarioSummary.stances}</span>
-            <span>Arguments: {scenarioSummary.arguments}</span>
-            <span>Consultations: {scenarioSummary.consultations}</span>
-            <span>Votes: {scenarioSummary.consultationVotes}</span>
-            <span>Impact: {scenarioSummary.impactItems}</span>
+            <span>{i18nT("ui.features.ethikos.demoImporter.jsonscenarioeditor.actors")} {scenarioSummary.actors}</span>
+            <span>{i18nT("ui.features.ethikos.demoImporter.jsonscenarioeditor.categories")} {scenarioSummary.categories}</span>
+            <span>{i18nT("ui.features.ethikos.demoImporter.jsonscenarioeditor.topics")} {scenarioSummary.topics}</span>
+            <span>{i18nT("ui.features.ethikos.demoImporter.jsonscenarioeditor.stances")} {scenarioSummary.stances}</span>
+            <span>{i18nT("ui.features.ethikos.demoImporter.jsonscenarioeditor.arguments")} {scenarioSummary.arguments}</span>
+            <span>{i18nT("ui.features.ethikos.demoImporter.jsonscenarioeditor.consultations")} {scenarioSummary.consultations}</span>
+            <span>{i18nT("ui.features.ethikos.demoImporter.jsonscenarioeditor.votes")} {scenarioSummary.consultationVotes}</span>
+            <span>{i18nT("ui.features.ethikos.demoImporter.jsonscenarioeditor.impact")} {scenarioSummary.impactItems}</span>
           </div>
         </div>
       )}
@@ -260,21 +260,7 @@ export function JsonScenarioEditor({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         spellCheck={false}
-        placeholder={`{
-  "schema_version": "ethikos-demo-scenario/v1",
-  "scenario_key": "public_square_demo",
-  "scenario_title": "Public Square Redevelopment Demo",
-  "mode": "replace_scenario",
-  "metadata": {},
-  "actors": [],
-  "categories": [],
-  "topics": [],
-  "stances": [],
-  "arguments": [],
-  "consultations": [],
-  "consultation_votes": [],
-  "impact_items": []
-}`}
+        placeholder={i18nT("ui.features.ethikos.demoImporter.jsonscenarioeditor.schemaVersionEthikosDemoScenarioV1Scenario")}
         style={{
           width: "100%",
           minHeight: 520,

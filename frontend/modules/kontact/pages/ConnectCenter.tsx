@@ -2,6 +2,7 @@
 ﻿// frontend/modules/kontact/pages/ConnectCenter.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   AppstoreOutlined,
   SearchOutlined,
@@ -38,7 +39,8 @@ type OpportunityView = NonNullable<
 >[number];
 
 export default function ConnectCenter(): JSX.Element {
-  usePageTitle('Kontact · Connect center');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.kontact.pages.connectcenter.kontactConnectCenter"));
 
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<TabKey>('people');
@@ -120,7 +122,7 @@ export default function ConnectCenter(): JSX.Element {
     }
 
     if (!loading && filteredProfiles.length === 0) {
-      return <Empty description="No matching people yet" />;
+      return <Empty description={i18nT("ui.kontact.pages.connectcenter.noMatchingPeopleYet")} />;
     }
 
     return (
@@ -150,7 +152,7 @@ export default function ConnectCenter(): JSX.Element {
     }
 
     if (!loading && filteredOpportunities.length === 0) {
-      return <Empty description="No matching opportunities yet" />;
+      return <Empty description={i18nT("ui.kontact.pages.connectcenter.noMatchingOpportunitiesYet")} />;
     }
 
     // OpportunityList will be implemented to accept these props
@@ -166,13 +168,13 @@ export default function ConnectCenter(): JSX.Element {
     <Row gutter={[24, 24]}>
       <Col xs={24} lg={12}>
         <Space direction="vertical" size="small" style={{ width: '100%' }}>
-          <Text type="secondary">People</Text>
+          <Text type="secondary">{i18nT("ui.kontact.pages.connectcenter.people")}</Text>
           {renderPeopleTab()}
         </Space>
       </Col>
       <Col xs={24} lg={12}>
         <Space direction="vertical" size="small" style={{ width: '100%' }}>
-          <Text type="secondary">Opportunities</Text>
+          <Text type="secondary">{i18nT("ui.kontact.pages.connectcenter.opportunities")}</Text>
           {renderOpportunitiesTab()}
         </Space>
       </Col>
@@ -184,7 +186,7 @@ export default function ConnectCenter(): JSX.Element {
       key: 'people',
       label: (
         <span>
-          <UserOutlined /> People
+          <UserOutlined /> {i18nT("ui.kontact.pages.connectcenter.people")}
           {filteredProfiles.length > 0 && (
             <Badge
               style={{ marginLeft: 8 }}
@@ -200,7 +202,7 @@ export default function ConnectCenter(): JSX.Element {
       key: 'opportunities',
       label: (
         <span>
-          <AppstoreOutlined /> Opportunities
+          <AppstoreOutlined /> {i18nT("ui.kontact.pages.connectcenter.opportunities")}
           {filteredOpportunities.length > 0 && (
             <Badge
               style={{ marginLeft: 8 }}
@@ -216,7 +218,7 @@ export default function ConnectCenter(): JSX.Element {
       key: 'all',
       label: (
         <span>
-          <TeamOutlined /> Combined
+          <TeamOutlined /> {i18nT("ui.kontact.pages.connectcenter.combined")}
         </span>
       ),
       children: renderAllTabChildren(),
@@ -229,11 +231,10 @@ export default function ConnectCenter(): JSX.Element {
         {/* Header + search */}
         <Space direction="vertical" size="small" style={{ width: '100%' }}>
           <Title level={3} style={{ marginBottom: 0 }}>
-            Connect center
+            {i18nT("ui.kontact.pages.connectcenter.connectCenter")}
           </Title>
           <Text type="secondary">
-            Discover people to collaborate with and opportunities that match your skills,
-            interests, and impact goals.
+            {i18nT("ui.kontact.pages.connectcenter.discoverPeopleToCollaborateWithAndOpportunities")}
           </Text>
 
           <Space
@@ -247,7 +248,7 @@ export default function ConnectCenter(): JSX.Element {
             }}
           >
             <Search
-              placeholder="Search people or opportunities…"
+              placeholder={i18nT("ui.kontact.pages.connectcenter.searchPeopleOrOpportunities")}
               allowClear
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -258,14 +259,14 @@ export default function ConnectCenter(): JSX.Element {
 
             <Space size="small" wrap>
               <Tag color="blue">
-                People&nbsp;
+                {i18nT("ui.kontact.pages.connectcenter.people_1e921b")}
                 {filteredProfiles.length}
               </Tag>
               <Tag color="green">
-                Opportunities&nbsp;
+                {i18nT("ui.kontact.pages.connectcenter.opportunities_098fbb")}
                 {filteredOpportunities.length}
               </Tag>
-              <Tag>{totalMatches} total matches</Tag>
+              <Tag>{totalMatches} {i18nT("ui.kontact.pages.connectcenter.totalMatches")}</Tag>
             </Space>
           </Space>
         </Space>
@@ -275,8 +276,8 @@ export default function ConnectCenter(): JSX.Element {
           <Alert
             type="error"
             showIcon
-            message="Unable to load connect data"
-            description={error.message ?? 'Please try again in a moment.'}
+            message={i18nT("ui.kontact.pages.connectcenter.unableToLoadConnectData")}
+            description={error.message ?? i18nT("ui.kontact.pages.connectcenter.pleaseTryAgainInAMoment")}
           />
         )}
 

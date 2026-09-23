@@ -2,6 +2,7 @@
 // app/keenkonnect/projects/browse-projects/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -65,6 +66,7 @@ interface Project {
 }
 
 export default function BrowseProjectsPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
 
   const [projects, setProjects] = useState<Project[]>([]);
@@ -107,14 +109,14 @@ export default function BrowseProjectsPage(): JSX.Element {
       } catch (err) {
          
         console.error('Failed to load projects', err);
-        setError('Unable to load projects from the server.');
+        setError(i18nT("ui.keenkonnect.projects.browseProjects.unableToLoadProjectsFromTheServer"));
       } finally {
         setLoading(false);
       }
     };
 
     void fetchProjects();
-  }, []);
+  }, [i18nT]);
 
   const domainOptions = useMemo(() => {
     const unique = Array.from(
@@ -187,9 +189,9 @@ export default function BrowseProjectsPage(): JSX.Element {
 
   return (
     <KeenPageShell
-      title="Browse Projects"
-      description="Discover projects and collaborate through KeenKonnect. Data is loaded from the Django backend."
-      metaTitle="KeenKonnect · Browse Projects"
+      title={i18nT("ui.keenkonnect.projects.browseProjects.browseProjects")}
+      description={i18nT("ui.keenkonnect.projects.browseProjects.discoverProjectsAndCollaborateThroughKeenkonnectData")}
+      metaTitle={i18nT("ui.keenkonnect.projects.browseProjects.keenkonnectBrowseProjects")}
       toolbar={
         <Button
           type="primary"
@@ -198,7 +200,7 @@ export default function BrowseProjectsPage(): JSX.Element {
             router.push('/keenkonnect/projects/create-new-project')
           }
         >
-          Create New Project
+          {i18nT("ui.keenkonnect.projects.browseProjects.createNewProject")}
         </Button>
       }
     >
@@ -223,7 +225,7 @@ export default function BrowseProjectsPage(): JSX.Element {
             onChange={handleDomainTabChange}
             items={domainOptions.map((domain) => ({
               key: domain,
-              label: domain === 'All' ? 'All Domains' : domain,
+              label: domain === 'All' ? i18nT("ui.keenkonnect.projects.browseProjects.allDomains") : domain,
             }))}
           />
 
@@ -231,7 +233,7 @@ export default function BrowseProjectsPage(): JSX.Element {
           <Row gutter={[16, 16]} style={{ marginTop: 8 }}>
             <Col xs={24} md={10}>
               <Search
-                placeholder="Search by name or description"
+                placeholder={i18nT("ui.keenkonnect.projects.browseProjects.searchByNameOrDescription")}
                 allowClear
                 prefix={<SearchOutlined />}
                 value={searchText}
@@ -253,7 +255,7 @@ export default function BrowseProjectsPage(): JSX.Element {
               >
                 {domainOptions.map((domain) => (
                   <Option key={domain} value={domain}>
-                    {domain === 'All' ? 'All Domains' : domain}
+                    {domain === 'All' ? i18nT("ui.keenkonnect.projects.browseProjects.allDomains") : domain}
                   </Option>
                 ))}
               </Select>
@@ -269,7 +271,7 @@ export default function BrowseProjectsPage(): JSX.Element {
               >
                 {technologyOptions.map((tech) => (
                   <Option key={tech} value={tech}>
-                    {tech === 'All' ? 'All Technologies' : tech}
+                    {tech === 'All' ? i18nT("ui.keenkonnect.projects.browseProjects.allTechnologies") : tech}
                   </Option>
                 ))}
               </Select>
@@ -280,14 +282,14 @@ export default function BrowseProjectsPage(): JSX.Element {
           <Row style={{ marginTop: 16 }}>
             <Col span={24}>
               <Space>
-                <span>Sort by:</span>
+                <span>{i18nT("ui.keenkonnect.projects.browseProjects.sortBy")}</span>
                 <Select<SortCriteria>
                   value={sortCriteria}
                   onChange={(value) => setSortCriteria(value)}
                   style={{ width: 180 }}
                 >
-                  <Option value="newest">Newest first</Option>
-                  <Option value="mostMembers">Most members</Option>
+                  <Option value="newest">{i18nT("ui.keenkonnect.projects.browseProjects.newestFirst")}</Option>
+                  <Option value="mostMembers">{i18nT("ui.keenkonnect.projects.browseProjects.mostMembers")}</Option>
                 </Select>
               </Space>
             </Col>
@@ -300,7 +302,7 @@ export default function BrowseProjectsPage(): JSX.Element {
             <Empty
               description={
                 <Space direction="vertical">
-                  <span>No projects found yet.</span>
+                  <span>{i18nT("ui.keenkonnect.projects.browseProjects.noProjectsFoundYet")}</span>
                   <Button
                     type="primary"
                     icon={<PlusOutlined />}
@@ -308,7 +310,7 @@ export default function BrowseProjectsPage(): JSX.Element {
                       router.push('/keenkonnect/projects/create-new-project')
                     }
                   >
-                    Create the first project
+                    {i18nT("ui.keenkonnect.projects.browseProjects.createTheFirstProject")}
                   </Button>
                 </Space>
               }
@@ -330,7 +332,7 @@ export default function BrowseProjectsPage(): JSX.Element {
                     onClick={() => handleOpenDrawer(project)}
                     extra={(
                       <Space size={8}>
-                        <Tooltip title="Open workspace">
+                        <Tooltip title={i18nT("ui.keenkonnect.projects.browseProjects.openWorkspace")}>
                           <Button
                             type="link"
                             icon={<UserOutlined />}
@@ -341,17 +343,17 @@ export default function BrowseProjectsPage(): JSX.Element {
                               );
                             }}
                           >
-                            Open
+                            {i18nT("ui.keenkonnect.projects.browseProjects.open")}
                           </Button>
                         </Tooltip>
-                        <Tooltip title="Collaborator drill-down is unavailable until a dedicated project-membership detail contract exists.">
+                        <Tooltip title={i18nT("ui.keenkonnect.projects.browseProjects.collaboratorDrillDownIsUnavailableUntilA")}>
                           <Button
                             type="link"
                             icon={<TeamOutlined />}
                             onClick={(e) => e.stopPropagation()}
                             disabled
                           >
-                            Team preview
+                            {i18nT("ui.keenkonnect.projects.browseProjects.teamPreview")}
                           </Button>
                         </Tooltip>
                       </Space>
@@ -373,13 +375,13 @@ export default function BrowseProjectsPage(): JSX.Element {
                           fontSize: 13,
                         }}
                       >
-                        {project.description || 'No description provided yet.'}
+                        {project.description || i18nT("ui.keenkonnect.projects.browseProjects.noDescriptionProvidedYet")}
                       </div>
 
                       {/* Technologies */}
                       <Space wrap>
                         {project.technologies.length === 0 ? (
-                          <Tag>No technologies listed</Tag>
+                          <Tag>{i18nT("ui.keenkonnect.projects.browseProjects.noTechnologiesListed")}</Tag>
                         ) : (
                           project.technologies.map((tech) => (
                             <Tag key={tech}>{tech}</Tag>
@@ -410,7 +412,7 @@ export default function BrowseProjectsPage(): JSX.Element {
                                 color: 'rgba(0,0,0,0.45)',
                               }}
                             >
-                              Owner: {project.owner || 'Unknown'}
+                              {i18nT("ui.keenkonnect.projects.browseProjects.owner")} {project.owner || i18nT("ui.keenkonnect.projects.browseProjects.unknown")}
                             </span>
                           </Space>
                         </Col>
@@ -425,7 +427,7 @@ export default function BrowseProjectsPage(): JSX.Element {
                               );
                             }}
                           >
-                            Open workspace
+                            {i18nT("ui.keenkonnect.projects.browseProjects.openWorkspace")}
                           </Button>
                         </Col>
                       </Row>
@@ -438,7 +440,7 @@ export default function BrowseProjectsPage(): JSX.Element {
                 <Col span={24}>
                   <Card>
                     <Space direction="vertical">
-                      <span>No projects match your filters.</span>
+                      <span>{i18nT("ui.keenkonnect.projects.browseProjects.noProjectsMatchYourFilters")}</span>
                       <Button
                         type="primary"
                         icon={<PlusOutlined />}
@@ -448,7 +450,7 @@ export default function BrowseProjectsPage(): JSX.Element {
                           )
                         }
                       >
-                        Start a New Project
+                        {i18nT("ui.keenkonnect.projects.browseProjects.startANewProject")}
                       </Button>
                     </Space>
                   </Card>
@@ -493,11 +495,11 @@ export default function BrowseProjectsPage(): JSX.Element {
                 </Avatar.Group>
                 <div>
                   <div>
-                    <strong>Owner: </strong>
-                    {selectedProject.owner || 'Unknown'}
+                    <strong>{i18nT("ui.keenkonnect.projects.browseProjects.owner")} </strong>
+                    {selectedProject.owner || i18nT("ui.keenkonnect.projects.browseProjects.unknown")}
                   </div>
                   <div>
-                    <strong>Members: </strong>
+                    <strong>{i18nT("ui.keenkonnect.projects.browseProjects.members")} </strong>
                     {selectedProject.members}
                   </div>
                 </div>
@@ -507,28 +509,28 @@ export default function BrowseProjectsPage(): JSX.Element {
 
               <div>
                 <p>
-                  <strong>Description</strong>
+                  <strong>{i18nT("ui.keenkonnect.projects.browseProjects.description")}</strong>
                 </p>
                 <p>
                   {selectedProject.description ||
-                    'No detailed description provided yet.'}
+                    i18nT("ui.keenkonnect.projects.browseProjects.noDetailedDescriptionProvidedYet")}
                 </p>
               </div>
 
               <div>
                 <p>
-                  <strong>Domain</strong>
+                  <strong>{i18nT("ui.keenkonnect.projects.browseProjects.domain")}</strong>
                 </p>
                 <Tag color="blue">{selectedProject.domain}</Tag>
               </div>
 
               <div>
                 <p>
-                  <strong>Technologies</strong>
+                  <strong>{i18nT("ui.keenkonnect.projects.browseProjects.technologies")}</strong>
                 </p>
                 <Space wrap>
                   {selectedProject.technologies.length === 0 ? (
-                    <Tag>No technologies listed</Tag>
+                    <Tag>{i18nT("ui.keenkonnect.projects.browseProjects.noTechnologiesListed")}</Tag>
                   ) : (
                     selectedProject.technologies.map((tech) => (
                       <Tag key={tech}>{tech}</Tag>
@@ -539,7 +541,7 @@ export default function BrowseProjectsPage(): JSX.Element {
 
               <div>
                 <p>
-                  <strong>Created At</strong>
+                  <strong>{i18nT("ui.keenkonnect.projects.browseProjects.createdAt")}</strong>
                 </p>
                 <span>{selectedProject.createdAt}</span>
               </div>

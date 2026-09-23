@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Empty, List, Progress, Space, Tag, Typography } from 'antd'
 
 import type { EkohExpertiseScore } from '@/services/ekoh'
@@ -12,20 +13,22 @@ function pct(value: number): number {
 
 export default function EkohDomainRatings({
   ratings,
-  title = 'EkoH expertise by domain',
+  title: titleProp,
 }: {
   ratings: EkohExpertiseScore[] | null
   title?: string
 }): JSX.Element {
+  const { t: i18nT } = useLanguage();
+  const title = titleProp ?? i18nT("ui.ekoh.ekohdomainratings.ekohExpertiseByDomain");
   if (ratings === null) {
-    return <Empty description="Domain ratings are not available in your current access scope." />
+    return <Empty description={i18nT("ui.ekoh.ekohdomainratings.domainRatingsAreNotAvailableInYour")} />
   }
 
   return (
     <List
       header={<Text strong>{title}</Text>}
       dataSource={ratings}
-      locale={{ emptyText: 'No EkoH domain rating is available.' }}
+      locale={{ emptyText: i18nT("ui.ekoh.ekohdomainratings.noEkohDomainRatingIsAvailable") }}
       renderItem={(item) => (
         <List.Item key={item.domainCode}>
           <div style={{ width: '100%' }}>

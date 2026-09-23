@@ -1,5 +1,7 @@
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
+import type { TranslateFunction } from '@/i18n/runtime';
 import { Grid, Space, Typography } from 'antd';
 import Head from 'next/head';
 import { usePathname } from 'next/navigation';
@@ -26,7 +28,7 @@ export type EthikosPageShellProps = {
   maxWidth?: number | string;
 };
 
-function inferSectionLabel(
+function inferSectionLabel(i18nT: TranslateFunction, 
   pathname: string | null | undefined,
 ): string | undefined {
   if (!pathname) return undefined;
@@ -34,26 +36,26 @@ function inferSectionLabel(
   const segments = pathname.split('/').filter(Boolean);
 
   // Konsensus is mounted separately but belongs to ethiKos > Decide.
-  if (segments[0] === 'konsensus') return 'Decide';
+  if (segments[0] === 'konsensus') return i18nT("ui.ethikos.ethikospageshell.decide");
   if (segments[0] !== 'ethikos') return undefined;
 
   switch (segments[1]) {
     case 'decide':
-      return 'Decide';
+      return i18nT("ui.ethikos.ethikospageshell.decide");
     case 'deliberate':
-      return 'Deliberate';
+      return i18nT("ui.ethikos.ethikospageshell.deliberate");
     case 'pulse':
-      return 'Pulse';
+      return i18nT("ui.ethikos.ethikospageshell.pulse");
     case 'trust':
-      return 'Trust';
+      return i18nT("ui.ethikos.ethikospageshell.trust");
     case 'impact':
-      return 'Impact';
+      return i18nT("ui.ethikos.ethikospageshell.impact");
     case 'learn':
-      return 'Learn';
+      return i18nT("ui.ethikos.ethikospageshell.learn");
     case 'admin':
-      return 'Admin';
+      return i18nT("ui.ethikos.ethikospageshell.admin");
     case 'insights':
-      return 'Opinion Analytics';
+      return i18nT("ui.ethikos.ethikospageshell.opinionAnalytics");
     default:
       return undefined;
   }
@@ -70,10 +72,11 @@ function EthikosPageShell({
   children,
   maxWidth = 1200,
 }: EthikosPageShellProps): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const pathname = usePathname();
   const screens = useBreakpoint();
 
-  const inferredSectionLabel = inferSectionLabel(pathname);
+  const inferredSectionLabel = inferSectionLabel(i18nT, pathname);
   const effectiveSectionLabel = sectionLabel ?? inferredSectionLabel;
   const hasActions = Boolean(primaryAction || secondaryActions);
 

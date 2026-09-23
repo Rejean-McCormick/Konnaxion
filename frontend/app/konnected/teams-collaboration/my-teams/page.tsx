@@ -2,6 +2,7 @@
 ﻿// app/konnected/teams-collaboration/my-teams/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   CalendarOutlined,
   DownOutlined,
@@ -106,6 +107,7 @@ function mapToRows(payload: unknown): TeamRow[] {
 }
 
 export default function MyTeamsPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
   const { message } = App.useApp();
 
@@ -159,7 +161,7 @@ export default function MyTeamsPage(): JSX.Element {
         if (!cancelled) {
            
           console.error('Failed to load teams', err);
-          setError('Unable to load your teams right now. Please try again later.');
+          setError(i18nT("ui.konnected.teamsCollaboration.myTeams.unableToLoadYourTeamsRightNow"));
         }
       } finally {
         if (!cancelled) {
@@ -173,14 +175,14 @@ export default function MyTeamsPage(): JSX.Element {
     return () => {
       cancelled = true;
     };
-  }, [reloadFlag]);
+  }, [reloadFlag, i18nT]);
 
   // --- Actions ----------------------------------------------------------------
 
   const handleLeaveTeam = async (team: TeamRow) => {
     if (team.userRole === 'owner') {
       message.warning(
-        'You are the owner of this team. Transfer ownership before leaving.',
+        i18nT("ui.konnected.teamsCollaboration.myTeams.youAreTheOwnerOfThisTeam"),
       );
       return;
     }
@@ -199,13 +201,13 @@ export default function MyTeamsPage(): JSX.Element {
         throw new Error(`HTTP ${res.status} ${res.statusText}`);
       }
 
-      message.success(`You left ${team.teamName}.`);
+      message.success(i18nT("ui.konnected.teamsCollaboration.myTeams.youLeft", { teamName: team.teamName }));
       setData((prev) => prev.filter((row) => row.teamId !== team.teamId));
       setSelectedTeamKeys((prev) => prev.filter((key) => key !== team.key));
     } catch (err) {
        
       console.error('Failed to leave team', err);
-      message.error('Could not leave the team. Please try again.');
+      message.error(i18nT("ui.konnected.teamsCollaboration.myTeams.couldNotLeaveTheTeamPleaseTry"));
     } finally {
       setLeavingTeamId(null);
     }
@@ -273,25 +275,25 @@ export default function MyTeamsPage(): JSX.Element {
 
   const columns: ColumnsType<TeamRow> = [
     {
-      title: 'Team',
+      title: i18nT("ui.konnected.teamsCollaboration.myTeams.team"),
       dataIndex: 'teamName',
       key: 'teamName',
       render: (value: string, record) => (
         <Space direction="vertical" size={0}>
           <Text strong>{value}</Text>
-          <Text type="secondary">ID: {record.teamId}</Text>
+          <Text type="secondary">{i18nT("ui.konnected.teamsCollaboration.myTeams.id")} {record.teamId}</Text>
         </Space>
       ),
     },
     {
-      title: 'Project',
+      title: i18nT("ui.konnected.teamsCollaboration.myTeams.project"),
       dataIndex: 'projectName',
       key: 'projectName',
       ellipsis: true,
       render: (value: string) => <Text>{value}</Text>,
     },
     {
-      title: 'My role',
+      title: i18nT("ui.konnected.teamsCollaboration.myTeams.myRole"),
       dataIndex: 'userRole',
       key: 'userRole',
       width: 140,
@@ -317,7 +319,7 @@ export default function MyTeamsPage(): JSX.Element {
       },
     },
     {
-      title: 'Members',
+      title: i18nT("ui.konnected.teamsCollaboration.myTeams.members"),
       dataIndex: 'roster',
       key: 'roster',
       width: 260,
@@ -337,12 +339,12 @@ export default function MyTeamsPage(): JSX.Element {
             )}
           />
         ) : (
-          <Text type="secondary">Members not loaded</Text>
+          <Text type="secondary">{i18nT("ui.konnected.teamsCollaboration.myTeams.membersNotLoaded")}</Text>
         );
       },
     },
     {
-      title: 'Recent activity',
+      title: i18nT("ui.konnected.teamsCollaboration.myTeams.recentActivity"),
       dataIndex: 'recentActivity',
       key: 'recentActivity',
       width: 260,
@@ -356,55 +358,55 @@ export default function MyTeamsPage(): JSX.Element {
             )}
           />
         ) : (
-          <Text type="secondary">No recent activity</Text>
+          <Text type="secondary">{i18nT("ui.konnected.teamsCollaboration.myTeams.noRecentActivity")}</Text>
         ),
       responsive: ['lg'],
     },
     {
-      title: 'Status',
+      title: i18nT("ui.konnected.teamsCollaboration.myTeams.status"),
       dataIndex: 'membershipStatus',
       key: 'membershipStatus',
       width: 140,
       render: (status: MembershipStatus) => {
         switch (status) {
           case 'active':
-            return <Tag color="green">Active</Tag>;
+            return <Tag color="green">{i18nT("ui.konnected.teamsCollaboration.myTeams.active")}</Tag>;
           case 'invited':
-            return <Tag color="blue">Invitation</Tag>;
+            return <Tag color="blue">{i18nT("ui.konnected.teamsCollaboration.myTeams.invitation")}</Tag>;
           case 'request_pending':
-            return <Tag color="orange">Request pending</Tag>;
+            return <Tag color="orange">{i18nT("ui.konnected.teamsCollaboration.myTeams.requestPending")}</Tag>;
           default:
-            return <Tag>Unknown</Tag>;
+            return <Tag>{i18nT("ui.konnected.teamsCollaboration.myTeams.unknown")}</Tag>;
         }
       },
     },
     {
-      title: 'Access',
+      title: i18nT("ui.konnected.teamsCollaboration.myTeams.access"),
       dataIndex: 'isRestricted',
       key: 'isRestricted',
       width: 120,
       render: (isRestricted: boolean) =>
         isRestricted ? (
-          <Tag color="volcano">Restricted</Tag>
+          <Tag color="volcano">{i18nT("ui.konnected.teamsCollaboration.myTeams.restricted")}</Tag>
         ) : (
-          <Tag color="default">Open</Tag>
+          <Tag color="default">{i18nT("ui.konnected.teamsCollaboration.myTeams.open")}</Tag>
         ),
       responsive: ['md'],
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.konnected.teamsCollaboration.myTeams.actions"),
       key: 'actions',
       fixed: 'right',
       width: 160,
       render: (_: unknown, record) => {
         const items: MenuProps['items'] = [
-          { key: 'view', label: 'Open team' },
-          { key: 'invite', label: 'Invite members' },
+          { key: 'view', label: i18nT("ui.konnected.teamsCollaboration.myTeams.openTeam") },
+          { key: 'invite', label: i18nT("ui.konnected.teamsCollaboration.myTeams.inviteMembers") },
           { type: 'divider' },
           {
             key: 'leave',
             danger: true,
-            label: 'Leave team',
+            label: i18nT("ui.konnected.teamsCollaboration.myTeams.leaveTeam"),
           },
         ];
 
@@ -433,7 +435,7 @@ export default function MyTeamsPage(): JSX.Element {
             disabled={isLeaving}
           >
             <Button loading={isLeaving}>
-              Actions <DownOutlined />
+              {i18nT("ui.konnected.teamsCollaboration.myTeams.actions")} <DownOutlined />
             </Button>
           </Dropdown>
         );
@@ -449,7 +451,7 @@ export default function MyTeamsPage(): JSX.Element {
           router.push('/konnected/teams-collaboration/project-workspaces')
         }
       >
-        Project workspaces
+        {i18nT("ui.konnected.teamsCollaboration.myTeams.projectWorkspaces")}
       </Button>
       <Button
         icon={<CalendarOutlined />}
@@ -457,7 +459,7 @@ export default function MyTeamsPage(): JSX.Element {
           router.push('/konnected/teams-collaboration/activity-planner')
         }
       >
-        Activity planner
+        {i18nT("ui.konnected.teamsCollaboration.myTeams.activityPlanner")}
       </Button>
     </Space>
   );
@@ -470,7 +472,7 @@ export default function MyTeamsPage(): JSX.Element {
         router.push('/konnected/teams-collaboration/team-builder')
       }
     >
-      Create or join a team
+      {i18nT("ui.konnected.teamsCollaboration.myTeams.createOrJoinATeam")}
     </Button>
   );
 
@@ -478,11 +480,10 @@ export default function MyTeamsPage(): JSX.Element {
 
   return (
     <KonnectedPageShell
-      title="My Teams"
+      title={i18nT("ui.konnected.teamsCollaboration.myTeams.myTeams")}
       subtitle={
         <span>
-          Manage the collaboration teams you are part of in KonnectED. View
-          membership, recent activity, and jump into workspaces.
+          {i18nT("ui.konnected.teamsCollaboration.myTeams.manageTheCollaborationTeamsYouArePart")}
         </span>
       }
       primaryAction={headerPrimaryAction}
@@ -491,7 +492,7 @@ export default function MyTeamsPage(): JSX.Element {
       <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
         <Col xs={24} sm={8}>
           <Space direction="vertical" size={0}>
-            <Text type="secondary">Total teams</Text>
+            <Text type="secondary">{i18nT("ui.konnected.teamsCollaboration.myTeams.totalTeams")}</Text>
             <Text strong>
               <TeamOutlined style={{ marginRight: 4 }} />
               {totalTeams}
@@ -500,13 +501,13 @@ export default function MyTeamsPage(): JSX.Element {
         </Col>
         <Col xs={24} sm={8}>
           <Space direction="vertical" size={0}>
-            <Text type="secondary">Teams you own/admin</Text>
+            <Text type="secondary">{i18nT("ui.konnected.teamsCollaboration.myTeams.teamsYouOwnAdmin")}</Text>
             <Text strong>{ownerAdminCount}</Text>
           </Space>
         </Col>
         <Col xs={24} sm={8}>
           <Space direction="vertical" size={0}>
-            <Text type="secondary">Restricted teams</Text>
+            <Text type="secondary">{i18nT("ui.konnected.teamsCollaboration.myTeams.restrictedTeams")}</Text>
             <Text strong>{restrictedCount}</Text>
           </Space>
         </Col>
@@ -515,7 +516,7 @@ export default function MyTeamsPage(): JSX.Element {
       <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
         <Col xs={24} md={10}>
           <Search
-            placeholder="Search by team or project name"
+            placeholder={i18nT("ui.konnected.teamsCollaboration.myTeams.searchByTeamOrProjectName")}
             allowClear
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
@@ -528,11 +529,11 @@ export default function MyTeamsPage(): JSX.Element {
             value={roleFilter}
             onChange={(val) => setRoleFilter(val)}
           >
-            <Option value="all">All roles</Option>
-            <Option value="owner">Owner</Option>
-            <Option value="admin">Admin</Option>
-            <Option value="member">Member</Option>
-            <Option value="observer">Observer</Option>
+            <Option value="all">{i18nT("ui.konnected.teamsCollaboration.myTeams.allRoles")}</Option>
+            <Option value="owner">{i18nT("ui.konnected.teamsCollaboration.myTeams.owner")}</Option>
+            <Option value="admin">{i18nT("ui.konnected.teamsCollaboration.myTeams.admin")}</Option>
+            <Option value="member">{i18nT("ui.konnected.teamsCollaboration.myTeams.member")}</Option>
+            <Option value="observer">{i18nT("ui.konnected.teamsCollaboration.myTeams.observer")}</Option>
           </Select>
         </Col>
         <Col xs={12} md={6}>
@@ -541,10 +542,10 @@ export default function MyTeamsPage(): JSX.Element {
             value={statusFilter}
             onChange={(val) => setStatusFilter(val)}
           >
-            <Option value="all">All membership states</Option>
-            <Option value="active">Active</Option>
-            <Option value="invited">Invitations</Option>
-            <Option value="request_pending">Requests pending</Option>
+            <Option value="all">{i18nT("ui.konnected.teamsCollaboration.myTeams.allMembershipStates")}</Option>
+            <Option value="active">{i18nT("ui.konnected.teamsCollaboration.myTeams.active")}</Option>
+            <Option value="invited">{i18nT("ui.konnected.teamsCollaboration.myTeams.invitations")}</Option>
+            <Option value="request_pending">{i18nT("ui.konnected.teamsCollaboration.myTeams.requestsPending")}</Option>
           </Select>
         </Col>
         <Col xs={24} md={2}>
@@ -553,7 +554,7 @@ export default function MyTeamsPage(): JSX.Element {
               checked={restrictedOnly}
               onChange={(checked) => setRestrictedOnly(checked)}
             />
-            <Text type="secondary">Restricted only</Text>
+            <Text type="secondary">{i18nT("ui.konnected.teamsCollaboration.myTeams.restrictedOnly")}</Text>
           </Space>
         </Col>
       </Row>
@@ -561,12 +562,12 @@ export default function MyTeamsPage(): JSX.Element {
       {error && (
         <Alert
           type="error"
-          message="Unable to load your teams"
+          message={i18nT("ui.konnected.teamsCollaboration.myTeams.unableToLoadYourTeams")}
           description={
             <>
               <Paragraph style={{ marginBottom: 8 }}>{error}</Paragraph>
               <Button size="small" onClick={() => setReloadFlag((n) => n + 1)}>
-                Retry
+                {i18nT("ui.konnected.teamsCollaboration.myTeams.retry")}
               </Button>
             </>
           }
@@ -577,7 +578,7 @@ export default function MyTeamsPage(): JSX.Element {
 
       {!loading && !error && !hasRows ? (
         <Empty
-          description="You are not part of any team yet."
+          description={i18nT("ui.konnected.teamsCollaboration.myTeams.youAreNotPartOfAnyTeam")}
           style={{ padding: '40px 0' }}
         >
           <Space>
@@ -588,7 +589,7 @@ export default function MyTeamsPage(): JSX.Element {
                 router.push('/konnected/teams-collaboration/team-builder')
               }
             >
-              Create or join a team
+              {i18nT("ui.konnected.teamsCollaboration.myTeams.createOrJoinATeam")}
             </Button>
             <Button
               icon={<ProjectOutlined />}
@@ -596,7 +597,7 @@ export default function MyTeamsPage(): JSX.Element {
                 router.push('/konnected/teams-collaboration/project-workspaces')
               }
             >
-              Browse project workspaces
+              {i18nT("ui.konnected.teamsCollaboration.myTeams.browseProjectWorkspaces")}
             </Button>
           </Space>
         </Empty>

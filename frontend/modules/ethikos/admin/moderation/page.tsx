@@ -1,6 +1,7 @@
 // FILE: frontend/modules/ethikos/admin/moderation/page.tsx
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { PageContainer, ProTable } from '@ant-design/pro-components'
 import type { ProColumns } from '@ant-design/pro-components'
 import { useRequest } from 'ahooks'
@@ -45,7 +46,8 @@ function statusColor(status: ModerationStatus): string {
 }
 
 export default function Moderation(): JSX.Element {
-  usePageTitle('Admin · Moderation')
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.ethikos.admin.moderation.adminModeration"))
 
   const { data, loading, refresh } = useRequest<ModerationPayload, []>(
     fetchModerationQueue,
@@ -61,77 +63,77 @@ export default function Moderation(): JSX.Element {
 
   const columns: ProColumns<Report>[] = [
     {
-      title: 'Content',
+      title: i18nT("ui.ethikos.admin.moderation.content"),
       dataIndex: 'contentPreview',
       ellipsis: true,
       render: (_dom, row) => (
         <Space direction="vertical" size={2}>
           {row.contextTitle && <Text strong>{row.contextTitle}</Text>}
           <Text type="secondary">
-            {row.contentPreview ?? 'No preview available.'}
+            {row.contentPreview ?? i18nT("ui.ethikos.admin.moderation.noPreviewAvailable")}
           </Text>
         </Space>
       ),
     },
     {
-      title: 'Reporter',
+      title: i18nT("ui.ethikos.admin.moderation.reporter_d37b68"),
       dataIndex: 'reporterName',
       width: 160,
       render: (_dom, row) => row.reporterName ?? 'Unknown',
     },
     {
-      title: 'Type',
+      title: i18nT("ui.ethikos.admin.moderation.type"),
       dataIndex: 'reason',
       width: 180,
       render: (_dom, row) => (
         <Space size={4} wrap>
           <Tag color={severityColor(row.severity)}>
-            {row.reason ?? 'Report'}
+            {row.reason ?? i18nT("ui.ethikos.admin.moderation.report")}
           </Tag>
           {typeof row.reportCount === 'number' && row.reportCount > 1 && (
-            <Tag>{row.reportCount} reports</Tag>
+            <Tag>{row.reportCount} {i18nT("ui.ethikos.admin.moderation.reports")}</Tag>
           )}
         </Space>
       ),
     },
     {
-      title: 'Status',
+      title: i18nT("ui.ethikos.admin.moderation.status"),
       dataIndex: 'status',
       width: 140,
       render: (_dom, row) => (
         <Tag color={statusColor(row.status)}>{row.status}</Tag>
       ),
       filters: [
-        { text: 'Pending', value: 'Pending' },
-        { text: 'Resolved', value: 'Resolved' },
-        { text: 'Escalated', value: 'Escalated' },
+        { text: i18nT("ui.ethikos.admin.moderation.pending"), value: 'Pending' },
+        { text: i18nT("ui.ethikos.admin.moderation.resolved"), value: 'Resolved' },
+        { text: i18nT("ui.ethikos.admin.moderation.escalated"), value: 'Escalated' },
       ],
       onFilter: (value, row) => row.status === String(value),
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.ethikos.admin.moderation.actions"),
       width: 210,
       render: (_dom, row) =>
         row.status === 'Pending' ? (
           <Space size="small">
             <Popconfirm
-              title="Remove content?"
+              title={i18nT("ui.ethikos.admin.moderation.removeContent")}
               onConfirm={() => {
                 void handleModeration(row.id, true)
               }}
             >
               <Button size="small" danger>
-                Remove
+                {i18nT("ui.ethikos.admin.moderation.remove")}
               </Button>
             </Popconfirm>
 
             <Popconfirm
-              title="Dismiss report?"
+              title={i18nT("ui.ethikos.admin.moderation.dismissReport")}
               onConfirm={() => {
                 void handleModeration(row.id, false)
               }}
             >
-              <Button size="small">Dismiss</Button>
+              <Button size="small">{i18nT("ui.ethikos.admin.moderation.dismiss")}</Button>
             </Popconfirm>
           </Space>
         ) : null,

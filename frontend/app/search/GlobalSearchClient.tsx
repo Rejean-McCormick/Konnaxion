@@ -1,6 +1,7 @@
 // FILE: frontend/app/search/GlobalSearchClient.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   Alert,
   Card,
@@ -34,6 +35,7 @@ type SearchResponseBody = { results: SearchResult[] } | { error: string };
 const MIN_QUERY_LENGTH = 2;
 
 export default function GlobalSearchClient() {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { worldKey, href } = useWorld();
@@ -98,12 +100,12 @@ export default function GlobalSearchClient() {
         setResults('results' in data && Array.isArray(data.results) ? data.results : []);
       } catch {
         setResults([]);
-        setError('Unable to perform search. Please try again.');
+        setError(i18nT("ui.search.globalsearchclient.unableToPerformSearchPleaseTryAgain"));
       } finally {
         setLoading(false);
       }
     },
-    [href, router, worldKey],
+    [href, router, worldKey, i18nT],
   );
 
   useEffect(() => {
@@ -132,13 +134,13 @@ export default function GlobalSearchClient() {
   };
 
   const getTypeTag = (id: string) => {
-    if (id.startsWith('route:')) return <Tag>Route</Tag>;
-    if (id.startsWith('knowledge:')) return <Tag>Knowledge</Tag>;
-    return <Tag>Other</Tag>;
+    if (id.startsWith('route:')) return <Tag>{i18nT("ui.search.globalsearchclient.route")}</Tag>;
+    if (id.startsWith('knowledge:')) return <Tag>{i18nT("ui.search.globalsearchclient.knowledge")}</Tag>;
+    return <Tag>{i18nT("ui.search.globalsearchclient.other")}</Tag>;
   };
 
   const renderList = (items: SearchResult[]) => {
-    if (!items.length) return <Empty description="No results" />;
+    if (!items.length) return <Empty description={i18nT("ui.search.globalsearchclient.noResults")} />;
 
     return (
       <List
@@ -185,40 +187,40 @@ export default function GlobalSearchClient() {
 
   const tabs: TabsProps['items'] = useMemo(
     () => [
-      { key: 'all', label: `All (${results.length})`, children: renderList(results) },
+      { key: 'all', label: i18nT("ui.search.globalsearchclient.all", { length: results.length }), children: renderList(results) },
       {
         key: 'routes',
-        label: `Navigation (${routeResults.length})`,
+        label: i18nT("ui.search.globalsearchclient.navigation", { length: routeResults.length }),
         children: renderList(routeResults),
       },
       {
         key: 'knowledge',
-        label: `Learning (${knowledgeResults.length})`,
+        label: i18nT("ui.search.globalsearchclient.learning", { length: knowledgeResults.length }),
         children: renderList(knowledgeResults),
       },
       {
         key: 'other',
-        label: `Other (${otherResults.length})`,
+        label: i18nT("ui.search.globalsearchclient.other_a4538e", { length: otherResults.length }),
         children: renderList(otherResults),
       },
     ],
-    [results, routeResults, knowledgeResults, otherResults],
+    [results, routeResults, knowledgeResults, otherResults, i18nT],
   );
 
   return (
     <div className="container mx-auto p-5" style={{ maxWidth: 1200 }}>
       <div className="mb-4">
-        <Title level={2}>Krowd Navigator</Title>
+        <Title level={2}>{i18nT("ui.search.globalsearchclient.krowdNavigator")}</Title>
         <Paragraph type="secondary">
-          Global search across routes and KonnectED knowledge resources.
+          {i18nT("ui.search.globalsearchclient.globalSearchAcrossRoutesAndKonnectedKnowledge")}
         </Paragraph>
       </div>
 
       <Card className="mb-4">
         <Search
-          placeholder="Search topics, pages, and learning resources…"
+          placeholder={i18nT("ui.search.globalsearchclient.searchTopicsPagesAndLearningResources")}
           allowClear
-          enterButton="Search"
+          enterButton={i18nT("ui.search.globalsearchclient.search")}
           size="large"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
@@ -226,9 +228,7 @@ export default function GlobalSearchClient() {
         />
         {!hasSearched && !error && (
           <Paragraph type="secondary" style={{ marginTop: 12 }}>
-            Tip: start typing a module name (EkoH, ethiKos, keenKonnect,
-            KonnectED, Kreative) or a topic to jump directly to a page or
-            resource.
+            {i18nT("ui.search.globalsearchclient.tipStartTypingAModuleNameEkoh")}
           </Paragraph>
         )}
       </Card>
@@ -236,7 +236,7 @@ export default function GlobalSearchClient() {
       {error && (
         <Alert
           type="error"
-          message="Search error"
+          message={i18nT("ui.search.globalsearchclient.searchError")}
           description={error}
           showIcon
           className="mb-4"
@@ -256,7 +256,7 @@ export default function GlobalSearchClient() {
           </div>
         ) : !hasSearched && !results.length ? (
           <Empty
-            description="Type a query above to search across Konnaxion."
+            description={i18nT("ui.search.globalsearchclient.typeAQueryAboveToSearchAcross")}
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           />
         ) : (

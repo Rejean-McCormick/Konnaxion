@@ -2,6 +2,7 @@
 'use client';
 
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   CheckCircleOutlined,
   EyeOutlined,
@@ -85,6 +86,7 @@ function isModerationApiResponse(data: unknown): data is ModerationApiResponse {
 }
 
 export default function ModerationQueuePage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [messageApi, messageContextHolder] = message.useMessage();
   const actionRef = useRef<ActionType>();
 
@@ -109,7 +111,7 @@ export default function ModerationQueuePage(): JSX.Element {
     newStatus: string = 'resolved',
   ) => {
     try {
-      messageApi.loading('Processing action...', 0.5);
+      messageApi.loading(i18nT("ui.kontrol.moderation.queue.processingAction"), 0.5);
 
       const response = await apiFetch(`/api/admin/moderation/${id}/`, {
         method: 'PATCH',
@@ -127,20 +129,20 @@ export default function ModerationQueuePage(): JSX.Element {
     } catch (error) {
        
       console.error(error);
-      messageApi.error('Failed to apply action.');
+      messageApi.error(i18nT("ui.kontrol.moderation.queue.failedToApplyAction"));
     }
   };
 
   const columns: ProColumns<ModerationItem>[] = [
     {
-      title: 'Severity',
+      title: i18nT("ui.kontrol.moderation.queue.severity"),
       dataIndex: 'severity',
       width: 100,
       valueEnum: {
-        critical: { text: 'Critical', status: 'Error' },
-        high: { text: 'High', status: 'Warning' },
-        medium: { text: 'Medium', status: 'Processing' },
-        low: { text: 'Low', status: 'Success' },
+        critical: { text: i18nT("ui.kontrol.moderation.queue.critical"), status: 'Error' },
+        high: { text: i18nT("ui.kontrol.moderation.queue.high"), status: 'Warning' },
+        medium: { text: i18nT("ui.kontrol.moderation.queue.medium"), status: 'Processing' },
+        low: { text: i18nT("ui.kontrol.moderation.queue.low"), status: 'Success' },
       },
       sorter: (a, b) => {
         const weight = { critical: 4, high: 3, medium: 2, low: 1 };
@@ -148,18 +150,18 @@ export default function ModerationQueuePage(): JSX.Element {
       },
     },
     {
-      title: 'Type',
+      title: i18nT("ui.kontrol.moderation.queue.type"),
       dataIndex: 'type',
       valueType: 'select',
       valueEnum: {
-        comment: { text: 'Comment' },
-        post: { text: 'Post' },
-        user_profile: { text: 'User Profile' },
+        comment: { text: i18nT("ui.kontrol.moderation.queue.comment") },
+        post: { text: i18nT("ui.kontrol.moderation.queue.post") },
+        user_profile: { text: i18nT("ui.kontrol.moderation.queue.userProfile") },
       },
       width: 120,
     },
     {
-      title: 'Content Snippet',
+      title: i18nT("ui.kontrol.moderation.queue.contentSnippet"),
       dataIndex: 'contentSnippet',
       ellipsis: true,
       render: (dom, entity) => (
@@ -189,7 +191,7 @@ export default function ModerationQueuePage(): JSX.Element {
       ),
     },
     {
-      title: 'Author',
+      title: i18nT("ui.kontrol.moderation.queue.author"),
       dataIndex: 'author',
       width: 140,
       copyable: true,
@@ -208,7 +210,7 @@ export default function ModerationQueuePage(): JSX.Element {
       ),
     },
     {
-      title: 'Time',
+      title: i18nT("ui.kontrol.moderation.queue.time"),
       dataIndex: 'timestamp',
       valueType: 'dateTime',
       width: 160,
@@ -216,34 +218,34 @@ export default function ModerationQueuePage(): JSX.Element {
       search: false,
     },
     {
-      title: 'Status',
+      title: i18nT("ui.kontrol.moderation.queue.status"),
       dataIndex: 'status',
       valueType: 'select',
       width: 100,
       valueEnum: {
-        pending: { text: 'Pending', status: 'Processing' },
-        reviewed: { text: 'Reviewed', status: 'Default' },
-        resolved: { text: 'Resolved', status: 'Success' },
+        pending: { text: i18nT("ui.kontrol.moderation.queue.pending"), status: 'Processing' },
+        reviewed: { text: i18nT("ui.kontrol.moderation.queue.reviewed"), status: 'Default' },
+        resolved: { text: i18nT("ui.kontrol.moderation.queue.resolved"), status: 'Success' },
       },
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.kontrol.moderation.queue.actions"),
       valueType: 'option',
       width: 160,
       render: (_, record) => [
-        <Tooltip title="View details" key="view">
+        <Tooltip title={i18nT("ui.kontrol.moderation.queue.viewDetails")} key="view">
           <Button
             type="text"
             icon={<EyeOutlined />}
             onClick={() => handleOpenDrawer(record)}
           />
         </Tooltip>,
-        <Tooltip title="Dismiss (resolve)" key="dismiss">
+        <Tooltip title={i18nT("ui.kontrol.moderation.queue.dismissResolve")} key="dismiss">
           <Popconfirm
-            title="Dismiss report?"
-            description="The content will remain visible and ticket marked resolved."
+            title={i18nT("ui.kontrol.moderation.queue.dismissReport")}
+            description={i18nT("ui.kontrol.moderation.queue.theContentWillRemainVisibleAndTicket")}
             onConfirm={() =>
-              handleAction('Report dismissed', record.id, 'resolved')
+              handleAction(i18nT("ui.kontrol.moderation.queue.reportDismissed"), record.id, 'resolved')
             }
           >
             <Button
@@ -252,18 +254,18 @@ export default function ModerationQueuePage(): JSX.Element {
             />
           </Popconfirm>
         </Tooltip>,
-        <Tooltip title="Remove & ban" key="ban">
+        <Tooltip title={i18nT("ui.kontrol.moderation.queue.removeBan")} key="ban">
           <Popconfirm
-            title="Remove content & ban user?"
-            description="This is a severe action."
+            title={i18nT("ui.kontrol.moderation.queue.removeContentBanUser")}
+            description={i18nT("ui.kontrol.moderation.queue.thisIsASevereAction")}
             onConfirm={() =>
               handleAction(
-                'User banned & content removed',
+                i18nT("ui.kontrol.moderation.queue.userBannedContentRemoved"),
                 record.id,
                 'resolved',
               )
             }
-            okText="Ban & remove"
+            okText={i18nT("ui.kontrol.moderation.queue.banRemove")}
             okButtonProps={{ danger: true }}
           >
             <Button
@@ -276,11 +278,10 @@ export default function ModerationQueuePage(): JSX.Element {
     },
   ];
 
-  const title = 'Moderation queue';
+  const title = i18nT("ui.kontrol.moderation.queue.moderationQueue");
   const subtitle = (
     <>
-      Central queue for reported content across all modules (EkoH, EthiKos,
-      KonnectED, keenKonnect, Kreative, Team Builder).
+      {i18nT("ui.kontrol.moderation.queue.centralQueueForReportedContentAcrossAll")}
     </>
   );
 
@@ -289,18 +290,18 @@ export default function ModerationQueuePage(): JSX.Element {
       key="refresh"
       onClick={() => actionRef.current?.reload()}
     >
-      Refresh queue
+      {i18nT("ui.kontrol.moderation.queue.refreshQueue")}
     </Button>
   );
 
   const secondaryActions = (
     <Space>
       <Tooltip
-        title="This view aggregates moderation tickets from every module. Use module-specific pages only for content context; governance lives here in Kontrol."
+        title={i18nT("ui.kontrol.moderation.queue.thisViewAggregatesModerationTicketsFromEvery")}
       >
         <Button icon={<InfoCircleOutlined />} />
       </Tooltip>
-      <Button type="default">Export logs</Button>
+      <Button type="default">{i18nT("ui.kontrol.moderation.queue.exportLogs")}</Button>
     </Space>
   );
 
@@ -309,7 +310,7 @@ export default function ModerationQueuePage(): JSX.Element {
       title={title}
       subtitle={subtitle}
       scope="platform"
-      metaTitle="Kontrol · Platform · Moderation queue"
+      metaTitle={i18nT("ui.kontrol.moderation.queue.kontrolPlatformModerationQueue")}
       primaryAction={primaryAction}
       secondaryActions={secondaryActions}
       maxWidth={1200}
@@ -371,7 +372,7 @@ export default function ModerationQueuePage(): JSX.Element {
           } catch (e) {
              
             console.error(e);
-            messageApi.error('Error loading moderation queue');
+            messageApi.error(i18nT("ui.kontrol.moderation.queue.errorLoadingModerationQueue"));
             return { data: [], success: false };
           }
         }}
@@ -382,13 +383,13 @@ export default function ModerationQueuePage(): JSX.Element {
         pagination={{
           pageSize: 10,
         }}
-        headerTitle="Active flags"
+        headerTitle={i18nT("ui.kontrol.moderation.queue.activeFlags")}
         toolBarRender={() => [
-          <Button key="bulk-approve" type="primary" disabled title="Bulk moderation is not exposed by the current API.">
-            Batch dismiss unavailable
+          <Button key="bulk-approve" type="primary" disabled title={i18nT("ui.kontrol.moderation.queue.bulkModerationIsNotExposedByThe")}>
+            {i18nT("ui.kontrol.moderation.queue.batchDismissUnavailable")}
           </Button>,
-          <Button key="bulk-ban" danger disabled title="Bulk moderation is not exposed by the current API.">
-            Batch remove unavailable
+          <Button key="bulk-ban" danger disabled title={i18nT("ui.kontrol.moderation.queue.bulkModerationIsNotExposedByThe")}>
+            {i18nT("ui.kontrol.moderation.queue.batchRemoveUnavailable")}
           </Button>,
         ]}
       />
@@ -400,7 +401,7 @@ export default function ModerationQueuePage(): JSX.Element {
         title={
           <Space>
             <WarningOutlined style={{ color: '#faad14' }} />
-            <span>Moderation ticket #{currentRow?.id}</span>
+            <span>{i18nT("ui.kontrol.moderation.queue.moderationTicket")}{currentRow?.id}</span>
             {currentRow?.severity && (
               <Tag
                 color={
@@ -414,7 +415,7 @@ export default function ModerationQueuePage(): JSX.Element {
         }
         extra={
           <Space>
-            <Button onClick={handleCloseDrawer}>Cancel</Button>
+            <Button onClick={handleCloseDrawer}>{i18nT("ui.kontrol.moderation.queue.cancel")}</Button>
             <Button
               type="primary"
               danger
@@ -427,7 +428,7 @@ export default function ModerationQueuePage(): JSX.Element {
                 )
               }
             >
-              Remove content
+              {i18nT("ui.kontrol.moderation.queue.removeContent")}
             </Button>
           </Space>
         }
@@ -438,7 +439,7 @@ export default function ModerationQueuePage(): JSX.Element {
             items={[
               {
                 key: '1',
-                label: 'Report details',
+                label: i18nT("ui.kontrol.moderation.queue.reportDetails"),
                 children: (
                   <Space
                     direction="vertical"
@@ -450,7 +451,7 @@ export default function ModerationQueuePage(): JSX.Element {
                       bordered
                       headerBordered
                     >
-                      <ProCard title="Reporters" colSpan="50%">
+                      <ProCard title={i18nT("ui.kontrol.moderation.queue.reporters")} colSpan="50%">
                         <List
                           size="small"
                           dataSource={
@@ -466,13 +467,13 @@ export default function ModerationQueuePage(): JSX.Element {
                           )}
                         />
                       </ProCard>
-                      <ProCard title="Metadata" colSpan="50%">
+                      <ProCard title={i18nT("ui.kontrol.moderation.queue.metadata")} colSpan="50%">
                         <ProDescriptions
                           column={1}
                           size="small"
                         >
                           <ProDescriptions.Item
-                            label="Reason"
+                            label={i18nT("ui.kontrol.moderation.queue.reason")}
                             valueType="text"
                           >
                             <Text strong>
@@ -480,12 +481,12 @@ export default function ModerationQueuePage(): JSX.Element {
                             </Text>
                           </ProDescriptions.Item>
                           <ProDescriptions.Item
-                            label="Timestamp"
+                            label={i18nT("ui.kontrol.moderation.queue.timestamp")}
                             valueType="dateTime"
                           >
                             {currentRow.timestamp}
                           </ProDescriptions.Item>
-                          <ProDescriptions.Item label="Type">
+                          <ProDescriptions.Item label={i18nT("ui.kontrol.moderation.queue.type")}>
                             {currentRow.type}
                           </ProDescriptions.Item>
                         </ProDescriptions>
@@ -498,7 +499,7 @@ export default function ModerationQueuePage(): JSX.Element {
                       type="inner"
                       title={
                         <Space>
-                          <InfoCircleOutlined /> Content preview
+                          <InfoCircleOutlined /> {i18nT("ui.kontrol.moderation.queue.contentPreview")}
                         </Space>
                       }
                     >
@@ -521,41 +522,41 @@ export default function ModerationQueuePage(): JSX.Element {
               },
               {
                 key: '2',
-                label: 'Author context',
+                label: i18nT("ui.kontrol.moderation.queue.authorContext"),
                 children: (
                   <ProCard
-                    title={`Author: ${currentRow.author}`}
+                    title={i18nT("ui.kontrol.moderation.queue.author_e025f5", { author: currentRow.author })}
                     bordered
                     headerBordered
                   >
                     <ProDescriptions column={2}>
                       <ProDescriptions.Item
-                        label="Reputation score"
+                        label={i18nT("ui.kontrol.moderation.queue.reputationScore")}
                         valueType="digit"
                       >
                         {currentRow.authorReputation}
                       </ProDescriptions.Item>
                       <ProDescriptions.Item
-                        label="Account age"
+                        label={i18nT("ui.kontrol.moderation.queue.accountAge")}
                         valueType="text"
                       >
-                        2.5 years
+                        {i18nT("ui.kontrol.moderation.queue.text25Years")}
                       </ProDescriptions.Item>
                       <ProDescriptions.Item
-                        label="Previous violations"
+                        label={i18nT("ui.kontrol.moderation.queue.previousViolations")}
                         valueType="digit"
                       >
                         0
                       </ProDescriptions.Item>
-                      <ProDescriptions.Item label="Role">
-                        User
+                      <ProDescriptions.Item label={i18nT("ui.kontrol.moderation.queue.role")}>
+                        {i18nT("ui.kontrol.moderation.queue.user")}
                       </ProDescriptions.Item>
                     </ProDescriptions>
                     <Button
                       type="link"
                       icon={<HistoryOutlined />}
                     >
-                      View full activity log
+                      {i18nT("ui.kontrol.moderation.queue.viewFullActivityLog")}
                     </Button>
                   </ProCard>
                 ),

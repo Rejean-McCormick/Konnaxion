@@ -6,6 +6,7 @@
  * Author: Hieu Chu
  */
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   DeleteOutlined,
   EllipsisOutlined,
@@ -66,6 +67,7 @@ interface Props {
 }
 
 const UserComments: React.FC<Props> = ({ comments, deleteComment }) => {
+  const { t: i18nT } = useLanguage();
   // Tri sans muter les props
   const items = useMemo<UserComment[]>(
     () =>
@@ -77,36 +79,36 @@ const UserComments: React.FC<Props> = ({ comments, deleteComment }) => {
 
   const onMenuClick: MenuProps['onClick'] = ({ key }) => {
     Modal.confirm({
-      title: 'Delete this comment permanently?',
+      title: i18nT("ui.userComponents.usercomments.deleteThisCommentPermanently"),
       icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
       style: { top: 110 },
       maskClosable: true,
-      okText: 'Confirm',
+      okText: i18nT("ui.userComponents.usercomments.confirm"),
       okButtonProps: {
         style: { background: '#ff4d4f', borderColor: '#ff4d4f' },
       },
       onOk: async () => {
         try {
           await api.delete(`/comment/${String(key)}`);
-          antdMessage.success('Deleted comment successfully!', 2);
+          antdMessage.success(i18nT("ui.userComponents.usercomments.deletedCommentSuccessfully"), 2);
           deleteComment(String(key));
         } catch (e) {
           const { message } = normalizeError(e);
-          antdMessage.error(message || 'Failed to delete');
+          antdMessage.error(message || i18nT("ui.userComponents.usercomments.failedToDelete"));
         }
       },
     });
   };
 
   return (
-    <Card title="Comments" bodyStyle={{ padding: '20px 24px 0px' }} bordered={false}>
+    <Card title={i18nT("ui.userComponents.usercomments.comments")} bodyStyle={{ padding: '20px 24px 0px' }} bordered={false}>
       <List<UserComment>
         itemLayout="horizontal"
         dataSource={items}
         className="comment-list"
         locale={{
           emptyText: (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Comments" />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={i18nT("ui.userComponents.usercomments.noComments")} />
           ),
         }}
         pagination={{ pageSize: 15, hideOnSinglePage: true }}
@@ -124,12 +126,12 @@ const UserComments: React.FC<Props> = ({ comments, deleteComment }) => {
                   trigger={['click']}
                   menu={{
                     items: [
-                      { key: x.commentId, label: 'Delete comment', icon: <DeleteOutlined /> },
+                      { key: x.commentId, label: i18nT("ui.userComponents.usercomments.deleteComment"), icon: <DeleteOutlined /> },
                     ],
                     onClick: onMenuClick,
                   }}
                 >
-                  <Button type="text" aria-label="More actions" icon={<EllipsisOutlined />} />
+                  <Button type="text" aria-label={i18nT("ui.userComponents.usercomments.moreActions")} icon={<EllipsisOutlined />} />
                 </Dropdown>,
               ]}
             >
@@ -146,7 +148,7 @@ const UserComments: React.FC<Props> = ({ comments, deleteComment }) => {
                     </Text>
                     <Tooltip title={dayjs(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
                       <Text type="secondary" style={{ fontSize: 14 }}>
-                        {dayjs(x.createdTime).fromNow()} in
+                        {dayjs(x.createdTime).fromNow()} {i18nT("ui.userComponents.usercomments.in")}
                       </Text>
                     </Tooltip>
                     <Link href={`/sculptures/id/${String(x.sculpture.accessionId)}`}>
@@ -167,7 +169,7 @@ const UserComments: React.FC<Props> = ({ comments, deleteComment }) => {
 
       {/* quick reply editor */}
       <div style={{ padding: '16px 24px' }}>
-        <TextArea disabled placeholder="Use admin screen to reply" />
+        <TextArea disabled placeholder={i18nT("ui.userComponents.usercomments.useAdminScreenToReply")} />
       </div>
     </Card>
   );

@@ -1,6 +1,8 @@
 // frontend/app/teambuilder/problems/create/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ArrowLeftOutlined,
   CheckOutlined,
@@ -107,22 +109,23 @@ const UNESCO_TREE_DATA = [
   },
 ];
 
-const MODE_OPTIONS = [
-  { label: 'Elite / critical', value: 'ELITE_CRITICAL' },
-  { label: 'Balanced', value: 'BALANCED' },
-  { label: 'Learning-heavy', value: 'LEARNING' },
-  { label: 'Average-only', value: 'AVERAGE_ONLY' },
-  { label: 'Rehab / high-risk', value: 'REHAB_HIGH_RISK' },
-];
+const MODE_OPTIONS = (i18nT: TranslateFunction) => ([
+  { label: i18nT("ui.teambuilder.problems.create.eliteCritical"), value: 'ELITE_CRITICAL' },
+  { label: i18nT("ui.teambuilder.problems.create.balanced"), value: 'BALANCED' },
+  { label: i18nT("ui.teambuilder.problems.create.learningHeavy"), value: 'LEARNING' },
+  { label: i18nT("ui.teambuilder.problems.create.averageOnly"), value: 'AVERAGE_ONLY' },
+  { label: i18nT("ui.teambuilder.problems.create.rehabHighRisk"), value: 'REHAB_HIGH_RISK' },
+]);
 
-const RISK_OPTIONS = [
-  { label: 'Low', value: 'low' },
-  { label: 'Medium', value: 'medium' },
-  { label: 'High', value: 'high' },
-  { label: 'Critical', value: 'critical' },
-];
+const RISK_OPTIONS = (i18nT: TranslateFunction) => ([
+  { label: i18nT("ui.teambuilder.problems.create.low"), value: 'low' },
+  { label: i18nT("ui.teambuilder.problems.create.medium"), value: 'medium' },
+  { label: i18nT("ui.teambuilder.problems.create.high"), value: 'high' },
+  { label: i18nT("ui.teambuilder.problems.create.critical"), value: 'critical' },
+]);
 
 export default function CreateProblemPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [form] = Form.useForm<ProblemFormValues>();
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<number>(0);
@@ -164,9 +167,9 @@ export default function CreateProblemPage(): JSX.Element {
     };
 
     const created = await teambuilderService.createProblem(payload);
-    const modeLabel = submitMode === 'publish' ? 'published' : 'saved as draft';
+    const modeLabel = submitMode === 'publish' ? 'published' : i18nT("ui.teambuilder.problems.create.savedAsDraft");
 
-    message.success(`Problem ${modeLabel}.`);
+    message.success(i18nT("ui.teambuilder.problems.create.problem", { modeLabel: modeLabel }));
     router.push(`/teambuilder/problems/${created.id}`);
   };
 
@@ -207,7 +210,7 @@ export default function CreateProblemPage(): JSX.Element {
       await persistProblem(values, 'draft');
     } catch (error) {
       console.error('Failed to save TeamBuilder problem draft', error);
-      message.error('Unable to save the problem.');
+      message.error(i18nT("ui.teambuilder.problems.create.unableToSaveTheProblem"));
     } finally {
       setSubmitting(null);
     }
@@ -220,7 +223,7 @@ export default function CreateProblemPage(): JSX.Element {
       await persistProblem(values, 'publish');
     } catch (error) {
       console.error('Failed to publish TeamBuilder problem', error);
-      message.error('Unable to publish the problem.');
+      message.error(i18nT("ui.teambuilder.problems.create.unableToPublishTheProblem"));
     } finally {
       setSubmitting(null);
     }
@@ -234,21 +237,19 @@ export default function CreateProblemPage(): JSX.Element {
 
   const shellSubtitle = (
     <Paragraph type="secondary">
-      Define a reusable problem template: clear statement, UNESCO taxonomy
-      classification, required skills and constraints. Sessions can then
-      reuse this template to form teams tailored to this challenge.
+      {i18nT("ui.teambuilder.problems.create.defineAReusableProblemTemplateClearStatement")}
     </Paragraph>
   );
 
   return (
     <TeamBuilderPageShell
-      title="Create problem"
+      title={i18nT("ui.teambuilder.problems.create.createProblem")}
       subtitle={shellSubtitle}
-      metaTitle="Team Builder · Problems · Create"
-      sectionLabel="Problems"
+      metaTitle={i18nT("ui.teambuilder.problems.create.teamBuilderProblemsCreate")}
+      sectionLabel={i18nT("ui.teambuilder.problems.create.problems")}
       secondaryActions={
         <Button href="/teambuilder/problems" icon={<ArrowLeftOutlined />}>
-          Back to problem library
+          {i18nT("ui.teambuilder.problems.create.backToProblemLibrary")}
         </Button>
       }
       maxWidth={960}
@@ -259,15 +260,15 @@ export default function CreateProblemPage(): JSX.Element {
           style={{ marginBottom: 24 }}
           items={[
             {
-              title: 'Basics',
+              title: i18nT("ui.teambuilder.problems.create.basics"),
               icon: <ProfileOutlined />,
             },
             {
-              title: 'Taxonomy & skills',
+              title: i18nT("ui.teambuilder.problems.create.taxonomySkills"),
               icon: <TagsOutlined />,
             },
             {
-              title: 'Constraints',
+              title: i18nT("ui.teambuilder.problems.create.constraints"),
               icon: <DeploymentUnitOutlined />,
             },
           ]}
@@ -299,12 +300,10 @@ export default function CreateProblemPage(): JSX.Element {
               <Alert
                 type="info"
                 showIcon
-                message="Tip: make the problem clear and testable"
+                message={i18nT("ui.teambuilder.problems.create.tipMakeTheProblemClearAndTestable")}
                 description={
                   <span>
-                    State the outcome you want, the constraints, and what
-                    success looks like. Avoid vague prompts – these make it
-                    harder to evaluate different teams fairly.
+                    {i18nT("ui.teambuilder.problems.create.stateTheOutcomeYouWantTheConstraints")}
                   </span>
                 }
               />
@@ -312,16 +311,16 @@ export default function CreateProblemPage(): JSX.Element {
               <Row gutter={16}>
                 <Col span={24}>
                   <Form.Item
-                    label="Problem title"
+                    label={i18nT("ui.teambuilder.problems.create.problemTitle")}
                     name="title"
                     rules={[
                       {
                         required: true,
-                        message: 'Please enter a title',
+                        message: i18nT("ui.teambuilder.problems.create.pleaseEnterATitle"),
                       },
                     ]}
                   >
-                    <Input placeholder="e.g. Cross-functional team for climate-risk dashboard" />
+                    <Input placeholder={i18nT("ui.teambuilder.problems.create.eGCrossFunctionalTeamForClimate")} />
                   </Form.Item>
                 </Col>
               </Row>
@@ -329,18 +328,18 @@ export default function CreateProblemPage(): JSX.Element {
               <Row gutter={16}>
                 <Col span={24}>
                   <Form.Item
-                    label="Problem statement"
+                    label={i18nT("ui.teambuilder.problems.create.problemStatement")}
                     name="statement"
                     rules={[
                       {
                         required: true,
-                        message: 'Please describe the problem',
+                        message: i18nT("ui.teambuilder.problems.create.pleaseDescribeTheProblem"),
                       },
                     ]}
                   >
                     <TextArea
                       rows={4}
-                      placeholder="Describe the core challenge, key constraints, and desired outcome..."
+                      placeholder={i18nT("ui.teambuilder.problems.create.describeTheCoreChallengeKeyConstraintsAnd")}
                     />
                   </Form.Item>
                 </Col>
@@ -349,12 +348,12 @@ export default function CreateProblemPage(): JSX.Element {
               <Row gutter={16}>
                 <Col span={24}>
                   <Form.Item
-                    label="Context / background (optional)"
+                    label={i18nT("ui.teambuilder.problems.create.contextBackgroundOptional")}
                     name="context"
                   >
                     <TextArea
                       rows={3}
-                      placeholder="Add any background information, stakeholders, or previous attempts..."
+                      placeholder={i18nT("ui.teambuilder.problems.create.addAnyBackgroundInformationStakeholdersOrPrevious")}
                     />
                   </Form.Item>
                 </Col>
@@ -363,37 +362,37 @@ export default function CreateProblemPage(): JSX.Element {
               <Row gutter={16}>
                 <Col xs={24} md={12}>
                   <Form.Item
-                    label="Risk / urgency level"
+                    label={i18nT("ui.teambuilder.problems.create.riskUrgencyLevel")}
                     name="riskLevel"
                     rules={[
                       {
                         required: true,
-                        message: 'Please select a risk/urgency level',
+                        message: i18nT("ui.teambuilder.problems.create.pleaseSelectARiskUrgencyLevel"),
                       },
                     ]}
                   >
                     <Select
-                      options={RISK_OPTIONS}
-                      placeholder="Choose risk level"
+                      options={RISK_OPTIONS(i18nT)}
+                      placeholder={i18nT("ui.teambuilder.problems.create.chooseRiskLevel")}
                     />
                   </Form.Item>
                 </Col>
 
                 <Col xs={24} md={12}>
                   <Form.Item
-                    label="Typical team modes for this problem"
+                    label={i18nT("ui.teambuilder.problems.create.typicalTeamModesForThisProblem")}
                     name="typicalModes"
                     rules={[
                       {
                         required: true,
-                        message: 'Please select at least one mode',
+                        message: i18nT("ui.teambuilder.problems.create.pleaseSelectAtLeastOneMode"),
                       },
                     ]}
                   >
                     <Select
                       mode="multiple"
-                      options={MODE_OPTIONS}
-                      placeholder="e.g. Elite + Learning-heavy"
+                      options={MODE_OPTIONS(i18nT)}
+                      placeholder={i18nT("ui.teambuilder.problems.create.eGEliteLearningHeavy")}
                     />
                   </Form.Item>
                 </Col>
@@ -410,12 +409,10 @@ export default function CreateProblemPage(): JSX.Element {
               <Alert
                 type="info"
                 showIcon
-                message="UNESCO taxonomy & skills"
+                message={i18nT("ui.teambuilder.problems.create.unescoTaxonomySkills")}
                 description={
                   <span>
-                    Use the UNESCO taxonomy to anchor this problem in a
-                    recognised domain. Then list the skills or roles that
-                    teams will likely need to cover.
+                    {i18nT("ui.teambuilder.problems.create.useTheUnescoTaxonomyToAnchorThis")}
                   </span>
                 }
               />
@@ -423,14 +420,14 @@ export default function CreateProblemPage(): JSX.Element {
               <Row gutter={16}>
                 <Col span={24}>
                   <Form.Item
-                    label="UNESCO taxonomy classification"
+                    label={i18nT("ui.teambuilder.problems.create.unescoTaxonomyClassification")}
                     name="taxonomyCodes"
                   >
                     <TreeSelect
                       treeData={UNESCO_TREE_DATA}
                       treeCheckable
                       showCheckedStrategy={TreeSelect.SHOW_PARENT}
-                      placeholder="Select one or more taxonomy codes"
+                      placeholder={i18nT("ui.teambuilder.problems.create.selectOneOrMoreTaxonomyCodes")}
                       style={{ width: '100%' }}
                       allowClear
                     />
@@ -447,7 +444,7 @@ export default function CreateProblemPage(): JSX.Element {
                       style={{ width: '100%' }}
                     >
                       <Text type="secondary">
-                        Selected taxonomy codes:
+                        {i18nT("ui.teambuilder.problems.create.selectedTaxonomyCodes")}
                       </Text>
                       <Space wrap>
                         {selectedTaxonomyCodes.map((code) => (
@@ -464,20 +461,20 @@ export default function CreateProblemPage(): JSX.Element {
               <Row gutter={16}>
                 <Col span={24}>
                   <Form.Item
-                    label="Required skills / roles"
+                    label={i18nT("ui.teambuilder.problems.create.requiredSkillsRoles")}
                     name="requiredSkills"
-                    tooltip="You can type free-text tags (e.g. 'data scientist', 'facilitator', 'policy expert')."
+                    tooltip={i18nT("ui.teambuilder.problems.create.youCanTypeFreeTextTagsE")}
                     rules={[
                       {
                         required: true,
                         message:
-                          'Please specify at least one skill or role',
+                          i18nT("ui.teambuilder.problems.create.pleaseSpecifyAtLeastOneSkillOr"),
                       },
                     ]}
                   >
                     <Select
                       mode="tags"
-                      placeholder="Type and press Enter to add tags..."
+                      placeholder={i18nT("ui.teambuilder.problems.create.typeAndPressEnterToAddTags")}
                     />
                   </Form.Item>
                 </Col>
@@ -492,7 +489,7 @@ export default function CreateProblemPage(): JSX.Element {
                       style={{ width: '100%' }}
                     >
                       <Text type="secondary">
-                        Skills/roles you entered:
+                        {i18nT("ui.teambuilder.problems.create.skillsRolesYouEntered")}
                       </Text>
                       <Space wrap>
                         {requiredSkills.map((skill) => (
@@ -517,12 +514,10 @@ export default function CreateProblemPage(): JSX.Element {
               <Alert
                 type="warning"
                 showIcon
-                message="Constraints & safety"
+                message={i18nT("ui.teambuilder.problems.create.constraintsSafety")}
                 description={
                   <span>
-                    These constraints keep teams realistic and safe. For
-                    critical or high-risk problems, be conservative with team
-                    size and allowed modes.
+                    {i18nT("ui.teambuilder.problems.create.theseConstraintsKeepTeamsRealisticAndSafe")}
                   </span>
                 }
                 icon={<ExclamationCircleOutlined />}
@@ -531,27 +526,27 @@ export default function CreateProblemPage(): JSX.Element {
               <Row gutter={16}>
                 <Col xs={24} md={8}>
                   <Form.Item
-                    label="Minimum team size"
+                    label={i18nT("ui.teambuilder.problems.create.minimumTeamSize")}
                     name="minTeamSize"
                     rules={[
                       {
                         type: 'number',
                         min: 1,
-                        message: 'Minimum team size must be at least 1',
+                        message: i18nT("ui.teambuilder.problems.create.minimumTeamSizeMustBeAtLeast"),
                       },
                     ]}
                   >
                     <InputNumber
                       min={1}
                       style={{ width: '100%' }}
-                      placeholder="e.g. 3"
+                      placeholder={i18nT("ui.teambuilder.problems.create.eG3")}
                     />
                   </Form.Item>
                 </Col>
 
                 <Col xs={24} md={8}>
                   <Form.Item
-                    label="Maximum team size"
+                    label={i18nT("ui.teambuilder.problems.create.maximumTeamSize")}
                     name="maxTeamSize"
                     rules={[
                       ({ getFieldValue }) => ({
@@ -576,29 +571,29 @@ export default function CreateProblemPage(): JSX.Element {
                     <InputNumber
                       min={1}
                       style={{ width: '100%' }}
-                      placeholder="e.g. 7"
+                      placeholder={i18nT("ui.teambuilder.problems.create.eG7")}
                     />
                   </Form.Item>
                 </Col>
 
                 <Col xs={24} md={8}>
                   <Form.Item
-                    label="Expected duration (days)"
+                    label={i18nT("ui.teambuilder.problems.create.expectedDurationDays")}
                     name="expectedDurationDays"
-                    tooltip="Approximate duration of the project or sprint this team will work on."
+                    tooltip={i18nT("ui.teambuilder.problems.create.approximateDurationOfTheProjectOrSprint")}
                     rules={[
                       {
                         type: 'number',
                         min: 1,
                         message:
-                          'Duration should be at least 1 day, or leave empty if unknown',
+                          i18nT("ui.teambuilder.problems.create.durationShouldBeAtLeast1Day"),
                       },
                     ]}
                   >
                     <InputNumber
                       min={1}
                       style={{ width: '100%' }}
-                      placeholder="e.g. 10"
+                      placeholder={i18nT("ui.teambuilder.problems.create.eG10")}
                       addonAfter={<ScheduleOutlined />}
                     />
                   </Form.Item>
@@ -610,10 +605,10 @@ export default function CreateProblemPage(): JSX.Element {
               <Row gutter={16}>
                 <Col xs={24} md={12}>
                   <Form.Item
-                    label="Allow rehab / high-risk teams for this problem"
+                    label={i18nT("ui.teambuilder.problems.create.allowRehabHighRiskTeamsForThis")}
                     name="allowRehabMode"
                     valuePropName="checked"
-                    tooltip="If enabled, the engine may create rehab/high-risk teams using difficult members with strong leaders, when the mode is selected."
+                    tooltip={i18nT("ui.teambuilder.problems.create.ifEnabledTheEngineMayCreateRehab")}
                   >
                     <Switch />
                   </Form.Item>
@@ -621,10 +616,10 @@ export default function CreateProblemPage(): JSX.Element {
 
                 <Col xs={24} md={12}>
                   <Form.Item
-                    label="Allow learning-heavy teams for this problem"
+                    label={i18nT("ui.teambuilder.problems.create.allowLearningHeavyTeamsForThisProblem")}
                     name="allowLearningMode"
                     valuePropName="checked"
-                    tooltip="If enabled, the engine can favor learning-heavy compositions (more juniors, experimental mixes) when the mode allows it."
+                    tooltip={i18nT("ui.teambuilder.problems.create.ifEnabledTheEngineCanFavorLearning")}
                   >
                     <Switch />
                   </Form.Item>
@@ -646,14 +641,14 @@ export default function CreateProblemPage(): JSX.Element {
                 onClick={goPrev}
                 disabled={currentStep === 0}
               >
-                Previous
+                {i18nT("ui.teambuilder.problems.create.previous")}
               </Button>
               <Button
                 type="primary"
                 onClick={goNext}
                 disabled={currentStep === 2}
               >
-                Next
+                {i18nT("ui.teambuilder.problems.create.next")}
               </Button>
             </Space>
 
@@ -663,7 +658,7 @@ export default function CreateProblemPage(): JSX.Element {
                 icon={<SaveOutlined />}
                 loading={submitting === 'draft'}
               >
-                Save draft
+                {i18nT("ui.teambuilder.problems.create.saveDraft")}
               </Button>
               <Button
                 type="primary"
@@ -671,7 +666,7 @@ export default function CreateProblemPage(): JSX.Element {
                 icon={<CheckOutlined />}
                 loading={submitting === 'publish'}
               >
-                Publish problem
+                {i18nT("ui.teambuilder.problems.create.publishProblem")}
               </Button>
             </Space>
           </Space>

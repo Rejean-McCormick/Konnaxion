@@ -7,6 +7,7 @@
  * Author: Hieu Chu
  */
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Comment } from '@ant-design/compatible';
 import { Card, Empty, List, Tooltip } from 'antd';
 import dayjs from 'dayjs';
@@ -38,6 +39,7 @@ type FormattedComment = {
 const FALLBACK_IMG = '/static/no-image.png';
 
 const UserVisit: React.FC<{ visits: Visit[] }> = ({ visits }) => {
+  const { t: i18nT } = useLanguage();
   // Ne pas muter la prop
   // Clone + tri inverse par date de visite
   const items: Visit[] = [...(visits ?? [])]
@@ -68,14 +70,14 @@ const UserVisit: React.FC<{ visits: Visit[] }> = ({ visits }) => {
               color: 'rgba(0, 0, 0, 0.65)',
             }}
           >
-            {x.sculpture?.name ?? 'Untitled sculpture'}
+            {x.sculpture?.name ?? i18nT("ui.userComponents.uservisit.untitledSculpture")}
           </span>
         </Link>
       ),
       avatar: (
         <Image
           src={firstImageUrl}
-          alt={x.sculpture?.name ?? 'Sculpture'}
+          alt={x.sculpture?.name ?? i18nT("ui.userComponents.uservisit.sculpture")}
           width={42}
           height={42}
           unoptimized
@@ -107,7 +109,7 @@ const UserVisit: React.FC<{ visits: Visit[] }> = ({ visits }) => {
 
   return (
     <Card
-      title="Visits"
+      title={i18nT("ui.userComponents.uservisit.visits")}
       bodyStyle={{ padding: '20px 24px 0px' }}
       variant="borderless"
       style={{ marginTop: 12 }}
@@ -118,7 +120,7 @@ const UserVisit: React.FC<{ visits: Visit[] }> = ({ visits }) => {
         className="comment-list"
         locale={{
           emptyText: (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Visits" />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={i18nT("ui.userComponents.uservisit.noVisits")} />
           ),
         }}
         renderItem={(item: FormattedComment) => (

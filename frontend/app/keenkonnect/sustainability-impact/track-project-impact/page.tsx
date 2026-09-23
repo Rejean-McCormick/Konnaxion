@@ -1,6 +1,7 @@
 // FILE: frontend/app/keenkonnect/sustainability-impact/track-project-impact/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   Alert,
   Card,
@@ -53,10 +54,11 @@ type Filters = {
 const COLORS = ['#4e91ff', '#34c759', '#ff9f0a', '#ff375f', '#af52de'];
 
 export default function TrackProjectImpactPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   return (
     <KeenPageShell
-      title="Track Project Impact"
-      description="Monitor sustainability impact across projects over time."
+      title={i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.trackProjectImpact")}
+      description={i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.monitorSustainabilityImpactAcrossProjectsOverTime")}
     >
       <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
         <Content />
@@ -66,6 +68,7 @@ export default function TrackProjectImpactPage(): JSX.Element {
 }
 
 function Content(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [filters, setFilters] = useState<Filters>({
     from: dayjs().subtract(7, 'days').format('YYYY-MM-DD'),
     to: dayjs().format('YYYY-MM-DD'),
@@ -105,8 +108,8 @@ function Content(): JSX.Element {
       <Alert
         type="info"
         showIcon
-        message="Impact analytics preview"
-        description="No native KeenKonnect impact analytics contract is exposed in this build. The charts below use declared preview values; filters are illustrative only."
+        message={i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.impactAnalyticsPreview")}
+        description={i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.noNativeKeenkonnectImpactAnalyticsContractIs")}
         style={{ marginBottom: 16 }}
       />
       {/* Main filters */}
@@ -130,7 +133,7 @@ function Content(): JSX.Element {
 
           <Col xs={24} md={12}>
             <Select
-              placeholder="Filter by team"
+              placeholder={i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.filterByTeam")}
               style={{ width: '100%' }}
               allowClear
               value={filters.team}
@@ -141,9 +144,9 @@ function Content(): JSX.Element {
                 }))
               }
               options={[
-                { label: 'Team A', value: 'team-a' },
-                { label: 'Team B', value: 'team-b' },
-                { label: 'Team C', value: 'team-c' },
+                { label: i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.teamA"), value: 'team-a' },
+                { label: i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.teamB"), value: 'team-b' },
+                { label: i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.teamC"), value: 'team-c' },
               ]}
             />
           </Col>
@@ -152,7 +155,7 @@ function Content(): JSX.Element {
 
       {!hasData ? (
         <Card>
-          <Empty description="No impact data for the selected filters" />
+          <Empty description={i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.noImpactDataForTheSelectedFilters")} />
         </Card>
       ) : (
         <Tabs
@@ -160,11 +163,11 @@ function Content(): JSX.Element {
           items={[
             {
               key: 'overview',
-              label: 'Overview',
+              label: i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.overview"),
               children: (
                 <Row gutter={[24, 24]}>
                   <Col xs={24} md={14}>
-                    <Card title="Impact by Category">
+                    <Card title={i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.impactByCategory")}>
                       <ResponsiveContainer width="100%" height={320}>
                         <PieChart>
                           <Pie
@@ -186,18 +189,18 @@ function Content(): JSX.Element {
                   </Col>
 
                   <Col xs={24} md={10}>
-                    <Card title="Summary">
+                    <Card title={i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.summary")}>
                       <Descriptions column={1} size="small" bordered>
-                        <Descriptions.Item label="Total impact value">
+                        <Descriptions.Item label={i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.totalImpactValue")}>
                           {totalImpact}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Number of categories">
+                        <Descriptions.Item label={i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.numberOfCategories")}>
                           {impactData.length}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Top category">
+                        <Descriptions.Item label={i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.topCategory")}>
                           {topCategory?.category ?? '—'}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Top category value">
+                        <Descriptions.Item label={i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.topCategoryValue")}>
                           {topCategory?.value ?? '—'}
                         </Descriptions.Item>
                       </Descriptions>
@@ -208,9 +211,9 @@ function Content(): JSX.Element {
             },
             {
               key: 'timeline',
-              label: 'Timeline',
+              label: i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.timeline"),
               children: (
-                <Card title="Impact Timeline">
+                <Card title={i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.impactTimeline")}>
                   <Timeline
                     items={impactData.map((item) => ({
                       key: item.category,
@@ -218,7 +221,7 @@ function Content(): JSX.Element {
                         <>
                           <div style={{ fontWeight: 500 }}>{item.category}</div>
                           <div style={{ color: '#666' }}>
-                            Impact value: {item.value}
+                            {i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.impactValue")} {item.value}
                           </div>
                         </>
                       ),
@@ -229,11 +232,11 @@ function Content(): JSX.Element {
             },
             {
               key: 'breakdown',
-              label: 'Category Breakdown',
+              label: i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.categoryBreakdown"),
               children: (
                 <Row gutter={[24, 24]}>
                   <Col xs={24} md={16}>
-                    <Card title="Impact by Category (Bar Chart)">
+                    <Card title={i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.impactByCategoryBarChart")}>
                       <ResponsiveContainer width="100%" height={320}>
                         <BarChart data={chartData}>
                           <CartesianGrid strokeDasharray="3 3" />
@@ -254,7 +257,7 @@ function Content(): JSX.Element {
                   </Col>
 
                   <Col xs={24} md={8}>
-                    <Card title="Category Details">
+                    <Card title={i18nT("ui.keenkonnect.sustainabilityImpact.trackProjectImpact.categoryDetails")}>
                       <Descriptions column={1} size="small" bordered>
                         {impactData.map((item, index) => (
                           <Descriptions.Item

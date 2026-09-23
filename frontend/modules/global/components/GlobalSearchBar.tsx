@@ -5,9 +5,11 @@ import { Input } from 'antd';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { useWorld } from '@/context/WorldContext';
 
 export function GlobalSearchBar() {
+  const { t } = useLanguage();
   const [q, setQ] = useState(useSearchParams().get('q') ?? '');
   const router = useRouter();
   const { href } = useWorld();
@@ -20,7 +22,7 @@ export function GlobalSearchBar() {
 
   return (
     <Input.Search
-      placeholder="Search…"
+      placeholder={t('search.placeholder')}
       value={q}
       onChange={(event) => setQ(event.target.value)}
       onSearch={onSearch}

@@ -1,5 +1,7 @@
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   BarChartOutlined,
   CalendarOutlined,
@@ -115,9 +117,9 @@ function getAggregates(report: UsageReport | undefined): UsageAggregates {
 
 type ModuleRow = ModuleUsageRow;
 
-const moduleColumns: ColumnsType<ModuleRow> = [
+const moduleColumns = (i18nT: TranslateFunction): ColumnsType<ModuleRow> => ([
   {
-    title: 'Module',
+    title: i18nT("ui.reports.usage.module"),
     dataIndex: 'module',
     key: 'module',
     render: (value: string) => (
@@ -128,7 +130,7 @@ const moduleColumns: ColumnsType<ModuleRow> = [
     ),
   },
   {
-    title: 'Active users',
+    title: i18nT("ui.reports.usage.activeUsers"),
     dataIndex: 'activeUsers',
     key: 'activeUsers',
     sorter: (a, b) => a.activeUsers - b.activeUsers,
@@ -140,14 +142,14 @@ const moduleColumns: ColumnsType<ModuleRow> = [
     ),
   },
   {
-    title: 'Avg. session',
+    title: i18nT("ui.reports.usage.avgSession"),
     dataIndex: 'avgSessionMinutes',
     key: 'avgSessionMinutes',
     sorter: (a, b) => a.avgSessionMinutes - b.avgSessionMinutes,
     render: (value: number) => `${value.toFixed(1)} min`,
   },
   {
-    title: '30-day retention',
+    title: i18nT("ui.reports.usage.text30DayRetention"),
     dataIndex: 'retentionRate',
     key: 'retentionRate',
     sorter: (a, b) => a.retentionRate - b.retentionRate,
@@ -161,13 +163,13 @@ const moduleColumns: ColumnsType<ModuleRow> = [
           format={(p) => `${p}%`}
         />
         <Tag color={value >= 80 ? 'green' : value >= 70 ? 'blue' : 'gold'}>
-          {value >= 80 ? 'Strong' : value >= 70 ? 'Healthy' : 'Watch'}
+          {value >= 80 ? i18nT("ui.reports.usage.strong") : value >= 70 ? i18nT("ui.reports.usage.healthy") : i18nT("ui.reports.usage.watch")}
         </Tag>
       </Space>
     ),
   },
   {
-    title: 'Last active',
+    title: i18nT("ui.reports.usage.lastActive"),
     dataIndex: 'lastActive',
     key: 'lastActive',
     render: (value: string) => (
@@ -177,13 +179,14 @@ const moduleColumns: ColumnsType<ModuleRow> = [
       </Space>
     ),
   },
-];
+]);
 
 /* ------------------------------------------------------------------ */
 /* Main page                                                          */
 /* ------------------------------------------------------------------ */
 
 export default function ReportsUsagePage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [range, setRange] = useState<TimeRangeKey>('30d');
   const [data, setData] = useState<UsageReport | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -222,15 +225,15 @@ export default function ReportsUsagePage(): JSX.Element {
     : null;
 
   const shellDescription =
-    'Track adoption, active usage, and module-level activity across the platform.';
+    i18nT("ui.reports.usage.trackAdoptionActiveUsageAndModuleLevel");
 
   const headerExtra = (
     <Space wrap>
       {lastUpdatedLabel && (
-        <Tooltip title={`Last generated at ${lastUpdatedLabel}`}>
+        <Tooltip title={i18nT("ui.reports.usage.lastGeneratedAt", { lastUpdatedLabel: lastUpdatedLabel })}>
           <Badge
             status="processing"
-            text={<Text type="secondary">Updated {lastUpdatedLabel}</Text>}
+            text={<Text type="secondary">{i18nT("ui.reports.usage.updated")} {lastUpdatedLabel}</Text>}
           />
         </Tooltip>
       )}
@@ -239,20 +242,20 @@ export default function ReportsUsagePage(): JSX.Element {
         value={range}
         onChange={(val) => setRange(val as TimeRangeKey)}
         options={[
-          { label: '7 days', value: '7d' },
-          { label: '30 days', value: '30d' },
-          { label: '90 days', value: '90d' },
+          { label: i18nT("ui.reports.usage.text7Days"), value: '7d' },
+          { label: i18nT("ui.reports.usage.text30Days"), value: '30d' },
+          { label: i18nT("ui.reports.usage.text90Days"), value: '90d' },
         ]}
       />
 
-      <Tooltip title="Reload usage snapshot">
+      <Tooltip title={i18nT("ui.reports.usage.reloadUsageSnapshot")}>
         <Button
           icon={<ReloadOutlined />}
           onClick={() => void fetchData(range)}
           type="default"
           size="small"
         >
-          Refresh
+          {i18nT("ui.reports.usage.refresh")}
         </Button>
       </Tooltip>
     </Space>
@@ -261,7 +264,7 @@ export default function ReportsUsagePage(): JSX.Element {
   if (loading && !data) {
     return (
       <ReportsPageShell
-        title="Usage Analytics"
+        title={i18nT("ui.reports.usage.usageAnalytics")}
         subtitle={shellDescription}
         secondaryActions={headerExtra}
       >
@@ -275,7 +278,7 @@ export default function ReportsUsagePage(): JSX.Element {
   if (error && !data) {
     return (
       <ReportsPageShell
-        title="Usage Analytics"
+        title={i18nT("ui.reports.usage.usageAnalytics")}
         subtitle={shellDescription}
         secondaryActions={headerExtra}
       >
@@ -284,7 +287,7 @@ export default function ReportsUsagePage(): JSX.Element {
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
               <Space size="small">
                 <InfoCircleOutlined />
-                <Text type="danger">Unable to load usage data right now.</Text>
+                <Text type="danger">{i18nT("ui.reports.usage.unableToLoadUsageDataRightNow")}</Text>
               </Space>
 
               <Text type="secondary">{error}</Text>
@@ -294,7 +297,7 @@ export default function ReportsUsagePage(): JSX.Element {
                 onClick={() => void fetchData(range)}
                 type="primary"
               >
-                Retry
+                {i18nT("ui.reports.usage.retry")}
               </Button>
             </Space>
           </ProCard>
@@ -306,12 +309,12 @@ export default function ReportsUsagePage(): JSX.Element {
   if (!data) {
     return (
       <ReportsPageShell
-        title="Usage Analytics"
+        title={i18nT("ui.reports.usage.usageAnalytics")}
         subtitle={shellDescription}
         secondaryActions={headerExtra}
       >
         <PageContainer ghost>
-          <Empty description="No usage data available yet" />
+          <Empty description={i18nT("ui.reports.usage.noUsageDataAvailableYet")} />
         </PageContainer>
       </ReportsPageShell>
     );
@@ -322,7 +325,7 @@ export default function ReportsUsagePage(): JSX.Element {
 
   return (
     <ReportsPageShell
-      title="Usage Analytics"
+      title={i18nT("ui.reports.usage.usageAnalytics")}
       subtitle={shellDescription}
       secondaryActions={headerExtra}
     >
@@ -331,7 +334,7 @@ export default function ReportsUsagePage(): JSX.Element {
           {!!error && (
             <ProCard ghost>
               <Text type="warning">
-                Using the last available payload. Latest refresh failed: {error}
+                {i18nT("ui.reports.usage.usingTheLastAvailablePayloadLatestRefresh")} {error}
               </Text>
             </ProCard>
           )}
@@ -339,12 +342,10 @@ export default function ReportsUsagePage(): JSX.Element {
           <ProCard ghost>
             <Space direction="vertical" size={4} style={{ width: '100%' }}>
               <Title level={5} style={{ marginBottom: 0 }}>
-                Overview
+                {i18nT("ui.reports.usage.overview")}
               </Title>
               <Text type="secondary">
-                Snapshot of how many people are actively using Konnaxion, which
-                modules they touch, and how this evolves over time. Data is
-                aggregated from sign-ins, page views, and workspace events.
+                {i18nT("ui.reports.usage.snapshotOfHowManyPeopleAreActively")}
               </Text>
             </Space>
           </ProCard>
@@ -355,7 +356,7 @@ export default function ReportsUsagePage(): JSX.Element {
                 title: (
                   <Space size={4}>
                     <TeamOutlined />
-                    <span>Total unique users</span>
+                    <span>{i18nT("ui.reports.usage.totalUniqueUsers")}</span>
                   </Space>
                 ),
                 value: totalUniqueUsers,
@@ -367,7 +368,7 @@ export default function ReportsUsagePage(): JSX.Element {
                 title: (
                   <Space size={4}>
                     <UserOutlined />
-                    <span>Active today</span>
+                    <span>{i18nT("ui.reports.usage.activeToday")}</span>
                   </Space>
                 ),
                 value: activeToday,
@@ -379,7 +380,7 @@ export default function ReportsUsagePage(): JSX.Element {
                 title: (
                   <Space size={4}>
                     <UserAddOutlined />
-                    <span>New in period</span>
+                    <span>{i18nT("ui.reports.usage.newInPeriod")}</span>
                   </Space>
                 ),
                 value: newInPeriod,
@@ -391,7 +392,7 @@ export default function ReportsUsagePage(): JSX.Element {
                 title: (
                   <Space size={4}>
                     <ProjectOutlined />
-                    <span>Modules touched</span>
+                    <span>{i18nT("ui.reports.usage.modulesTouched")}</span>
                   </Space>
                 ),
                 value: modulesTouched,
@@ -401,7 +402,7 @@ export default function ReportsUsagePage(): JSX.Element {
           </ProCard>
 
           <ProCard gutter={16} wrap>
-            <ProCard colSpan={{ xs: 24, lg: 16 }} title="Active vs New Users">
+            <ProCard colSpan={{ xs: 24, lg: 16 }} title={i18nT("ui.reports.usage.activeVsNewUsers")}>
               <div style={{ height: 300, width: '100%' }}>
                 <ResponsiveContainer>
                   <LineChart data={data.points}>
@@ -431,36 +432,32 @@ export default function ReportsUsagePage(): JSX.Element {
               </div>
             </ProCard>
 
-            <ProCard colSpan={{ xs: 24, lg: 8 }} title="Highlights">
+            <ProCard colSpan={{ xs: 24, lg: 8 }} title={i18nT("ui.reports.usage.highlights")}>
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                 <Space align="start">
                   <Tag icon={<BarChartOutlined />} color="blue">
-                    Concentration
+                    {i18nT("ui.reports.usage.concentration")}
                   </Tag>
                   <Text type="secondary">
-                    Most activity is concentrated in the last few days of the
-                    selected range. Use shorter windows (7 days) to monitor
-                    spikes after launches.
+                    {i18nT("ui.reports.usage.mostActivityIsConcentratedInTheLast")}
                   </Text>
                 </Space>
 
                 <Space align="start">
                   <Tag icon={<UserOutlined />} color="green">
-                    Engagement
+                    {i18nT("ui.reports.usage.engagement")}
                   </Tag>
                   <Text type="secondary">
-                    Combine active users with retention per module to identify
-                    where people stay engaged vs. where they churn quickly.
+                    {i18nT("ui.reports.usage.combineActiveUsersWithRetentionPerModule")}
                   </Text>
                 </Space>
 
                 <Space align="start">
                   <Tag icon={<CalendarOutlined />} color="gold">
-                    Seasonality
+                    {i18nT("ui.reports.usage.seasonality")}
                   </Tag>
                   <Text type="secondary">
-                    Expand to 90 days to detect weekly patterns, such as higher
-                    usage around events or recurring workshops.
+                    {i18nT("ui.reports.usage.expandTo90DaysToDetectWeekly")}
                   </Text>
                 </Space>
               </Space>
@@ -473,11 +470,11 @@ export default function ReportsUsagePage(): JSX.Element {
             title={
               <Space>
                 <ProjectOutlined />
-                <span>Usage by module</span>
+                <span>{i18nT("ui.reports.usage.usageByModule")}</span>
               </Space>
             }
             extra={
-              <Tooltip title="Per-module usage is aggregated from backend logs.">
+              <Tooltip title={i18nT("ui.reports.usage.perModuleUsageIsAggregatedFromBackend")}>
                 <InfoCircleOutlined />
               </Tooltip>
             }
@@ -485,7 +482,7 @@ export default function ReportsUsagePage(): JSX.Element {
             <Table<ModuleRow>
               size="middle"
               rowKey="key"
-              columns={moduleColumns}
+              columns={moduleColumns(i18nT)}
               dataSource={data.modules}
               pagination={{ pageSize: 8 }}
             />

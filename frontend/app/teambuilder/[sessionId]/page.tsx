@@ -1,6 +1,7 @@
 // FILE: frontend/app/teambuilder/[sessionId]/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   AlertOutlined,
   ArrowLeftOutlined,
@@ -116,6 +117,7 @@ type SessionExtensions = {
 // ---------------------------------------------------------------------------
 
 export default function SessionDetailPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const { sessionId } = useParams();
 
   const [session, setSession] = useState<IBuilderSession | null>(null);
@@ -144,12 +146,12 @@ export default function SessionDetailPage(): JSX.Element {
     } catch (err) {
        
       console.error(err);
-      setError('Failed to load session details.');
+      setError(i18nT("ui.teambuilder.sessionid.failedToLoadSessionDetails"));
       setSession(null);
     } finally {
       setLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, i18nT]);
 
   useEffect(() => {
     fetchSession();
@@ -173,7 +175,7 @@ export default function SessionDetailPage(): JSX.Element {
     } catch (err) {
        
       console.error(err);
-      setError('Failed to generate teams. Please try again.');
+      setError(i18nT("ui.teambuilder.sessionid.failedToGenerateTeamsPleaseTryAgain"));
     } finally {
       setGenerating(false);
     }
@@ -195,7 +197,7 @@ export default function SessionDetailPage(): JSX.Element {
     if (!mode) {
       return (
         <Tag color="default">
-          Mode: <Text type="secondary">Not specified</Text>
+          {i18nT("ui.teambuilder.sessionid.mode")} <Text type="secondary">{i18nT("ui.teambuilder.sessionid.notSpecified")}</Text>
         </Tag>
       );
     }
@@ -205,9 +207,9 @@ export default function SessionDetailPage(): JSX.Element {
     if (normalized.includes('ELITE') || normalized.includes('CRITICAL')) {
       return (
         <Tag color="red">
-          Mode:{' '}
+          {i18nT("ui.teambuilder.sessionid.mode")}{' '}
           <Text strong style={{ marginLeft: 4 }}>
-            Elite / Critical
+            {i18nT("ui.teambuilder.sessionid.eliteCritical")}
           </Text>
         </Tag>
       );
@@ -216,9 +218,9 @@ export default function SessionDetailPage(): JSX.Element {
     if (normalized.includes('LEARNING')) {
       return (
         <Tag color="blue">
-          Mode:{' '}
+          {i18nT("ui.teambuilder.sessionid.mode")}{' '}
           <Text strong style={{ marginLeft: 4 }}>
-            Learning
+            {i18nT("ui.teambuilder.sessionid.learning")}
           </Text>
         </Tag>
       );
@@ -227,9 +229,9 @@ export default function SessionDetailPage(): JSX.Element {
     if (normalized.includes('REHAB') || normalized.includes('RISK')) {
       return (
         <Tag color="orange">
-          Mode:{' '}
+          {i18nT("ui.teambuilder.sessionid.mode")}{' '}
           <Text strong style={{ marginLeft: 4 }}>
-            Rehab / High risk
+            {i18nT("ui.teambuilder.sessionid.rehabHighRisk")}
           </Text>
         </Tag>
       );
@@ -237,13 +239,13 @@ export default function SessionDetailPage(): JSX.Element {
 
     return (
       <Tag color="green">
-        Mode:{' '}
+        {i18nT("ui.teambuilder.sessionid.mode")}{' '}
         <Text strong style={{ marginLeft: 4 }}>
           {mode}
         </Text>
       </Tag>
     );
-  }, [sessionExtended]);
+  }, [sessionExtended, i18nT]);
 
   const unresolvedWarnings: string[] =
     sessionExtended?.warnings ?? sessionExtended?.issues ?? [];
@@ -263,19 +265,19 @@ export default function SessionDetailPage(): JSX.Element {
       case 'COMPLETED':
         return (
           <Tag color="success" icon={<CheckCircleOutlined />}>
-            Completed
+            {i18nT("ui.teambuilder.sessionid.completed")}
           </Tag>
         );
       case 'PROCESSING':
         return (
           <Tag color="processing" icon={<ClockCircleOutlined />}>
-            Processing
+            {i18nT("ui.teambuilder.sessionid.processing")}
           </Tag>
         );
       case 'DRAFT':
-        return <Tag>Draft</Tag>;
+        return <Tag>{i18nT("ui.teambuilder.sessionid.draft")}</Tag>;
       case 'ARCHIVED':
-        return <Tag color="default">Archived</Tag>;
+        return <Tag color="default">{i18nT("ui.teambuilder.sessionid.archived")}</Tag>;
       default:
         return <Tag>{session.status}</Tag>;
     }
@@ -285,14 +287,13 @@ export default function SessionDetailPage(): JSX.Element {
   // Shell props
   // ---------------------------------------------------------------------------
 
-  const shellTitle = session?.name ?? 'Team Builder session';
+  const shellTitle = session?.name ?? i18nT("ui.teambuilder.sessionid.teamBuilderSession");
   const shellSubtitle =
     session?.description != null && session.description.trim().length > 0 ? (
       <Text type="secondary">{session.description}</Text>
     ) : (
       <Text type="secondary">
-        Review configuration, history and generated teams for this Team Builder
-        session.
+        {i18nT("ui.teambuilder.sessionid.reviewConfigurationHistoryAndGeneratedTeamsFor")}
       </Text>
     );
 
@@ -304,21 +305,21 @@ export default function SessionDetailPage(): JSX.Element {
         onClick={handleGenerateTeams}
         loading={generating}
       >
-        {hasTeams ? 'Regenerate teams' : 'Generate teams'}
+        {hasTeams ? i18nT("ui.teambuilder.sessionid.regenerateTeams") : i18nT("ui.teambuilder.sessionid.generateTeams")}
       </Button>
     ) : undefined;
 
   const secondaryActions = (
     <Space>
       <Button icon={<ArrowLeftOutlined />} href="/teambuilder">
-        Back to sessions
+        {i18nT("ui.teambuilder.sessionid.backToSessions")}
       </Button>
     </Space>
   );
 
   const metaTitle = session
     ? `Team Builder · Session · ${session.name}`
-    : 'Team Builder · Session';
+    : i18nT("ui.teambuilder.sessionid.teamBuilderSession_90b3ab");
 
   // ---------------------------------------------------------------------------
   // Teams table
@@ -352,7 +353,7 @@ export default function SessionDetailPage(): JSX.Element {
 
   const teamColumns: TableColumnsType<TeamRow> = [
     {
-      title: 'Team',
+      title: i18nT("ui.teambuilder.sessionid.team"),
       dataIndex: 'name',
       key: 'name',
       render: (value, record) => (
@@ -360,14 +361,14 @@ export default function SessionDetailPage(): JSX.Element {
           <Text strong>{value}</Text>
           {record.status && (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Status: {record.status}
+              {i18nT("ui.teambuilder.sessionid.status")} {record.status}
             </Text>
           )}
         </Space>
       ),
     },
     {
-      title: 'Size',
+      title: i18nT("ui.teambuilder.sessionid.size"),
       dataIndex: 'size',
       key: 'size',
       align: 'right',
@@ -380,7 +381,7 @@ export default function SessionDetailPage(): JSX.Element {
       ),
     },
     {
-      title: 'Score',
+      title: i18nT("ui.teambuilder.sessionid.score"),
       dataIndex: 'score',
       key: 'score',
       align: 'right',
@@ -396,9 +397,9 @@ export default function SessionDetailPage(): JSX.Element {
 
   const expandedRowRender = (team: TeamRow) => (
     <Space direction="vertical" size="small" style={{ width: '100%' }}>
-      <Text type="secondary">Members</Text>
+      <Text type="secondary">{i18nT("ui.teambuilder.sessionid.members")}</Text>
       {team.members.length === 0 ? (
-        <Text type="secondary">No members assigned yet.</Text>
+        <Text type="secondary">{i18nT("ui.teambuilder.sessionid.noMembersAssignedYet")}</Text>
       ) : (
         <Space direction="vertical" style={{ width: '100%' }}>
           {team.members.map(member => (
@@ -429,7 +430,7 @@ export default function SessionDetailPage(): JSX.Element {
                 )}
                 {member.isLeader && (
                   <Tag color="gold" icon={<TeamOutlined />}>
-                    Leader
+                    {i18nT("ui.teambuilder.sessionid.leader")}
                   </Tag>
                 )}
                 {member.hasConflict && (
@@ -438,7 +439,7 @@ export default function SessionDetailPage(): JSX.Element {
                     icon={<AlertOutlined />}
                     style={{ marginLeft: 4 }}
                   >
-                    Conflict risk
+                    {i18nT("ui.teambuilder.sessionid.conflictRisk")}
                   </Tag>
                 )}
               </Space>
@@ -463,43 +464,43 @@ export default function SessionDetailPage(): JSX.Element {
 
     if (session?.created_at) {
       items.push({
-        label: `Session created – ${format(
+        label: i18nT("ui.teambuilder.sessionid.sessionCreated", { value1: format(
           new Date(session.created_at),
           'PPP p',
-        )}`,
-        description: 'Initial configuration saved.',
+        ) }),
+        description: i18nT("ui.teambuilder.sessionid.initialConfigurationSaved"),
       });
     }
 
     if (sessionExtended?.last_run_at) {
       items.push({
-        label: `Teams generated – ${format(
+        label: i18nT("ui.teambuilder.sessionid.teamsGenerated", { value1: format(
           new Date(sessionExtended.last_run_at),
           'PPP p',
-        )}`,
-        description: 'Team Builder algorithm executed.',
+        ) }),
+        description: i18nT("ui.teambuilder.sessionid.teamBuilderAlgorithmExecuted"),
       });
     }
 
     if (sessionExtended?.updated_at && sessionExtended.updated_at !== session?.created_at) {
       items.push({
-        label: `Last updated – ${format(
+        label: i18nT("ui.teambuilder.sessionid.lastUpdated", { value1: format(
           new Date(sessionExtended.updated_at),
           'PPP p',
-        )}`,
-        description: 'Configuration or teams updated.',
+        ) }),
+        description: i18nT("ui.teambuilder.sessionid.configurationOrTeamsUpdated"),
       });
     }
 
     if (items.length === 0) {
       items.push({
-        label: 'No history recorded yet',
-        description: 'This session has not been modified since its creation.',
+        label: i18nT("ui.teambuilder.sessionid.noHistoryRecordedYet"),
+        description: i18nT("ui.teambuilder.sessionid.thisSessionHasNotBeenModifiedSince"),
       });
     }
 
     return items;
-  }, [session, sessionExtended]);
+  }, [session, sessionExtended, i18nT]);
 
   // ---------------------------------------------------------------------------
   // Page content
@@ -524,15 +525,15 @@ export default function SessionDetailPage(): JSX.Element {
       <Alert
         type="error"
         showIcon
-        message="Unable to load this session"
-        description={error ?? 'Session not found.'}
+        message={i18nT("ui.teambuilder.sessionid.unableToLoadThisSession")}
+        description={error ?? i18nT("ui.teambuilder.sessionid.sessionNotFound")}
         action={
           <Button
             type="primary"
             href="/teambuilder"
             icon={<ArrowLeftOutlined />}
           >
-            Back to sessions
+            {i18nT("ui.teambuilder.sessionid.backToSessions")}
           </Button>
         }
       />
@@ -543,7 +544,7 @@ export default function SessionDetailPage(): JSX.Element {
         key: 'overview',
         label: (
           <span>
-            <CheckCircleOutlined /> Overview
+            <CheckCircleOutlined /> {i18nT("ui.teambuilder.sessionid.overview")}
           </span>
         ),
         children: (
@@ -562,12 +563,12 @@ export default function SessionDetailPage(): JSX.Element {
                 <Row gutter={[16, 16]} align="middle">
                   <Col xs={24} md={16}>
                     <Space size="middle" wrap>
-                      <Text strong>Status:</Text>
+                      <Text strong>{i18nT("ui.teambuilder.sessionid.status")}</Text>
                       {renderStatusTag()}
                       {modeTag}
                       {session.created_at && (
                         <Text type="secondary">
-                          Created{' '}
+                          {i18nT("ui.teambuilder.sessionid.created")}{' '}
                           {format(
                             new Date(session.created_at),
                             'PPP p',
@@ -586,7 +587,7 @@ export default function SessionDetailPage(): JSX.Element {
                   >
                     <Space direction="vertical" align="end">
                       <Text type="secondary">
-                        Overall progress / lifecycle
+                        {i18nT("ui.teambuilder.sessionid.overallProgressLifecycle")}
                       </Text>
                       <Progress
                         percent={progressValue}
@@ -614,24 +615,24 @@ export default function SessionDetailPage(): JSX.Element {
             </Card>
 
             {/* Config & stats card */}
-            <Card title="Configuration & metrics">
+            <Card title={i18nT("ui.teambuilder.sessionid.configurationMetrics")}>
               <Row gutter={[16, 16]}>
                 <Col xs={24} md={8}>
                   <Statistic
-                    title="Candidates in pool"
+                    title={i18nT("ui.teambuilder.sessionid.candidatesInPool")}
                     value={session.candidates_count}
                     prefix={<TeamOutlined />}
                   />
                 </Col>
                 <Col xs={24} md={8}>
                   <Statistic
-                    title="Target team size"
+                    title={i18nT("ui.teambuilder.sessionid.targetTeamSize")}
                     value={session.algorithm_config?.target_team_size ?? '-'}
                   />
                 </Col>
                 <Col xs={24} md={8}>
                   <Statistic
-                    title="Teams generated"
+                    title={i18nT("ui.teambuilder.sessionid.teamsGenerated_a0f883")}
                     value={session.teams?.length ?? 0}
                   />
                 </Col>
@@ -642,16 +643,16 @@ export default function SessionDetailPage(): JSX.Element {
                   <Descriptions
                     column={1}
                     size="small"
-                    title="Algorithm settings"
+                    title={i18nT("ui.teambuilder.sessionid.algorithmSettings")}
                   >
-                    <Descriptions.Item label="Strategy">
+                    <Descriptions.Item label={i18nT("ui.teambuilder.sessionid.strategy")}>
                       {session.algorithm_config?.strategy
                         ?.replace('_', ' ') ?? '–'}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Max team count">
+                    <Descriptions.Item label={i18nT("ui.teambuilder.sessionid.maxTeamCount")}>
                       {sessionExtended?.algorithm_config?.max_teams ?? '–'}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Fairness / rotation">
+                    <Descriptions.Item label={i18nT("ui.teambuilder.sessionid.fairnessRotation")}>
                       {sessionExtended?.algorithm_config?.fairness ?? '–'}
                     </Descriptions.Item>
                   </Descriptions>
@@ -660,15 +661,15 @@ export default function SessionDetailPage(): JSX.Element {
                   <Descriptions
                     column={1}
                     size="small"
-                    title="Context"
+                    title={i18nT("ui.teambuilder.sessionid.context")}
                   >
-                    <Descriptions.Item label="Project / problem">
-                      {sessionExtended?.problem_name ?? 'Not linked'}
+                    <Descriptions.Item label={i18nT("ui.teambuilder.sessionid.projectProblem")}>
+                      {sessionExtended?.problem_name ?? i18nT("ui.teambuilder.sessionid.notLinked")}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Owner">
+                    <Descriptions.Item label={i18nT("ui.teambuilder.sessionid.owner")}>
                       {sessionExtended?.owner_name ?? '–'}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Mode">
+                    <Descriptions.Item label={i18nT("ui.teambuilder.sessionid.mode_a7b93d")}>
                       {modeTag}
                     </Descriptions.Item>
                   </Descriptions>
@@ -682,7 +683,7 @@ export default function SessionDetailPage(): JSX.Element {
                 type="warning"
                 showIcon
                 icon={<ExclamationCircleOutlined />}
-                message="Warnings for this session"
+                message={i18nT("ui.teambuilder.sessionid.warningsForThisSession")}
                 description={
                   <Space
                     direction="vertical"
@@ -705,15 +706,13 @@ export default function SessionDetailPage(): JSX.Element {
                 header={
                   <Space>
                     <AlertOutlined />
-                    <span>Advanced configuration details</span>
+                    <span>{i18nT("ui.teambuilder.sessionid.advancedConfigurationDetails")}</span>
                   </Space>
                 }
                 key="advanced"
               >
                 <Paragraph type="secondary">
-                  This section can expose raw JSON or extended configuration
-                  details for debugging and fine-tuning. You can keep it hidden
-                  by default for non-technical users.
+                  {i18nT("ui.teambuilder.sessionid.advancedConfigurationExplanation")}
                 </Paragraph>
                 <Card size="small">
                   <pre
@@ -735,7 +734,7 @@ export default function SessionDetailPage(): JSX.Element {
         key: 'teams',
         label: (
           <span>
-            <TeamOutlined /> Teams
+            <TeamOutlined /> {i18nT("ui.teambuilder.sessionid.teams")}
           </span>
         ),
         children: !hasTeams ? (
@@ -744,10 +743,9 @@ export default function SessionDetailPage(): JSX.Element {
               image={Empty.PRESENTED_IMAGE_SIMPLE}
               description={
                 <Space direction="vertical" size={4}>
-                  <Text strong>No teams yet</Text>
+                  <Text strong>{i18nT("ui.teambuilder.sessionid.noTeamsYet")}</Text>
                   <Text type="secondary">
-                    Use the Generate teams action above to run the engine and
-                    create groups.
+                    {i18nT("ui.teambuilder.sessionid.useTheGenerateTeamsActionAboveTo")}
                   </Text>
                 </Space>
               }
@@ -759,7 +757,7 @@ export default function SessionDetailPage(): JSX.Element {
                   onClick={handleGenerateTeams}
                   loading={generating}
                 >
-                  Generate teams
+                  {i18nT("ui.teambuilder.sessionid.generateTeams")}
                 </Button>
               )}
             </Empty>
@@ -782,7 +780,7 @@ export default function SessionDetailPage(): JSX.Element {
         key: 'history',
         label: (
           <span>
-            <HistoryOutlined /> History
+            <HistoryOutlined /> {i18nT("ui.teambuilder.sessionid.history")}
           </span>
         ),
         children: (
@@ -791,7 +789,7 @@ export default function SessionDetailPage(): JSX.Element {
             size="large"
             style={{ width: '100%' }}
           >
-            <Card title="Timeline">
+            <Card title={i18nT("ui.teambuilder.sessionid.timeline")}>
               <Timeline
                 items={historyItems.map((item) => ({
                   children: (
@@ -808,11 +806,9 @@ export default function SessionDetailPage(): JSX.Element {
               />
             </Card>
 
-            <Card title="Raw activity (placeholder)">
+            <Card title={i18nT("ui.teambuilder.sessionid.rawActivityPlaceholder")}>
               <Paragraph type="secondary">
-                Here you could show a more detailed log of changes: who adjusted
-                which settings, when teams were regenerated, conflicts added or
-                removed, etc.
+                {i18nT("ui.teambuilder.sessionid.hereYouCouldShowAMoreDetailed")}
               </Paragraph>
             </Card>
           </Space>
@@ -829,7 +825,7 @@ export default function SessionDetailPage(): JSX.Element {
         {/* Optional breadcrumb inside the shell body */}
         <Breadcrumb
           items={[
-            { title: <Link href="/teambuilder">Sessions</Link> },
+            { title: <Link href="/teambuilder">{i18nT("ui.teambuilder.sessionid.sessions")}</Link> },
             { title: shellTitle },
           ]}
         />
@@ -848,7 +844,7 @@ export default function SessionDetailPage(): JSX.Element {
       title={shellTitle}
       subtitle={shellSubtitle}
       metaTitle={metaTitle}
-      sectionLabel="Sessions"
+      sectionLabel={i18nT("ui.teambuilder.sessionid.sessions")}
       primaryAction={primaryAction}
       secondaryActions={secondaryActions}
       maxWidth={1200}

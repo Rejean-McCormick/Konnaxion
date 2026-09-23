@@ -1,6 +1,8 @@
 // FILE: frontend/app/ethikos/deliberate/guidelines/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import { PageContainer } from '@ant-design/pro-components';
 import {
   Alert,
@@ -53,25 +55,25 @@ const evidenceData: EvidenceRuleRow[] = [
   },
 ];
 
-const evidenceColumns: ColumnsType<EvidenceRuleRow> = [
+const evidenceColumns = (i18nT: TranslateFunction): ColumnsType<EvidenceRuleRow> => ([
   {
-    title: 'Claim type',
+    title: i18nT("ui.ethikos.deliberate.guidelines.claimType"),
     dataIndex: 'claimType',
     key: 'claimType',
     width: 260,
   },
   {
-    title: 'Minimum evidence',
+    title: i18nT("ui.ethikos.deliberate.guidelines.minimumEvidence"),
     dataIndex: 'minimumEvidence',
     key: 'minimumEvidence',
     width: 260,
   },
   {
-    title: 'Preferred sources',
+    title: i18nT("ui.ethikos.deliberate.guidelines.preferredSources"),
     dataIndex: 'preferredSources',
     key: 'preferredSources',
   },
-];
+]);
 
 const quickChecklistItems: string[] = [
   'Is my contribution respectful and focused on the topic?',
@@ -82,46 +84,47 @@ const quickChecklistItems: string[] = [
 ];
 
 export default function Guidelines() {
+  const { t: i18nT } = useLanguage();
   return (
     <EthikosPageShell
-      title="Deliberation guidelines"
-      subtitle="Shared rules for Korum debates and Konsultations consultations in ethiKos."
-      sectionLabel="Deliberate"
+      title={i18nT("ui.ethikos.deliberate.guidelines.deliberationGuidelines")}
+      subtitle={i18nT("ui.ethikos.deliberate.guidelines.sharedRulesForKorumDebatesAndKonsultations")}
+      sectionLabel={i18nT("ui.ethikos.deliberate.guidelines.deliberate")}
     >
       <PageContainer ghost>
         <Row gutter={[24, 24]}>
           {/* Left column: navigation + quick rules */}
           <Col xs={24} md={7} lg={6}>
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
-              <Card size="small" title="Navigate this guide">
+              <Card size="small" title={i18nT("ui.ethikos.deliberate.guidelines.navigateThisGuide")}>
                 <Anchor
                   affix
                   items={[
-                    { key: 'overview', href: '#overview', title: 'Overview' },
-                    { key: 'principles', href: '#principles', title: 'Core principles' },
-                    { key: 'etiquette', href: '#etiquette', title: 'Etiquette & tone' },
-                    { key: 'evidence', href: '#evidence', title: 'Evidence & sources' },
+                    { key: 'overview', href: '#overview', title: i18nT("ui.ethikos.deliberate.guidelines.overview") },
+                    { key: 'principles', href: '#principles', title: i18nT("ui.ethikos.deliberate.guidelines.corePrinciples") },
+                    { key: 'etiquette', href: '#etiquette', title: i18nT("ui.ethikos.deliberate.guidelines.etiquetteTone") },
+                    { key: 'evidence', href: '#evidence', title: i18nT("ui.ethikos.deliberate.guidelines.evidenceSources") },
                     {
                       key: 'identity',
                       href: '#identity',
-                      title: 'Identity, expertise & Ekoh',
+                      title: i18nT("ui.ethikos.deliberate.guidelines.identityExpertiseEkoh"),
                     },
-                    { key: 'korum', href: '#korum', title: 'Korum debates' },
+                    { key: 'korum', href: '#korum', title: i18nT("ui.ethikos.deliberate.guidelines.korumDebates") },
                     {
                       key: 'konsultations',
                       href: '#konsultations',
-                      title: 'Konsultations consultations',
+                      title: i18nT("ui.ethikos.deliberate.guidelines.konsultationsConsultations"),
                     },
-                    { key: 'moderation', href: '#moderation', title: 'Moderation ladder' },
-                    { key: 'appeals', href: '#appeals', title: 'Appeals & transparency' },
-                    { key: 'checklist', href: '#checklist', title: 'Checklist before posting' },
+                    { key: 'moderation', href: '#moderation', title: i18nT("ui.ethikos.deliberate.guidelines.moderationLadder") },
+                    { key: 'appeals', href: '#appeals', title: i18nT("ui.ethikos.deliberate.guidelines.appealsTransparency") },
+                    { key: 'checklist', href: '#checklist', title: i18nT("ui.ethikos.deliberate.guidelines.checklistBeforePosting") },
                   ]}
                 />
               </Card>
 
-              <Card size="small" title="Hard limits">
+              <Card size="small" title={i18nT("ui.ethikos.deliberate.guidelines.hardLimits")}>
                 <Paragraph type="secondary" style={{ marginBottom: 8 }}>
-                  Content may be removed and accounts restricted for:
+                  {i18nT("ui.ethikos.deliberate.guidelines.contentMayBeRemovedAndAccountsRestricted")}
                 </Paragraph>
                 <List
                   size="small"
@@ -143,10 +146,9 @@ export default function Guidelines() {
           <Col xs={24} md={17} lg={18}>
             {/* Overview */}
             <section id="overview">
-              <Title level={3}>What ethiKos is for</Title>
+              <Title level={3}>{i18nT("ui.ethikos.deliberate.guidelines.whatEthikosIsFor")}</Title>
               <Paragraph>
-                ethiKos is Konnaxion&apos;s environment for structured ethical debates and public
-                consultations. It combines:
+                {i18nT("ui.ethikos.deliberate.guidelines.ethikosIsKonnaxionSEnvironmentForStructured")}
               </Paragraph>
               <List
                 size="small"
@@ -164,19 +166,18 @@ export default function Guidelines() {
                 style={{ marginTop: 16 }}
                 type="info"
                 showIcon
-                message="Key operational rules"
+                message={i18nT("ui.ethikos.deliberate.guidelines.keyOperationalRules")}
                 description={
                   <Space direction="vertical">
                     <Text>
-                      • Stance scale is fixed at −3…+3; 0 = neutral. Your slider should reflect what
-                      you actually argue.
+                      {i18nT("ui.ethikos.deliberate.guidelines.stanceScaleIsFixedAt33")}
                     </Text>
                     <Text>
-                      • Moderation auto‑hide is triggered after <strong>3 independent reports</strong>.
+                      {i18nT("ui.ethikos.deliberate.guidelines.moderationAutoHideIsTriggeredAfter")} <strong>{i18nT("ui.ethikos.deliberate.guidelines.text3IndependentReports")}</strong>.
                     </Text>
                     <Text>
-                      • &ldquo;Expert cohort&rdquo; views are only shown once at least{' '}
-                      <strong>12 qualified experts</strong> have voted.
+                      {i18nT("ui.ethikos.deliberate.guidelines.expertCohortViewsAreOnlyShownOnce")}{' '}
+                      <strong>{i18nT("ui.ethikos.deliberate.guidelines.text12QualifiedExperts")}</strong> {i18nT("ui.ethikos.deliberate.guidelines.haveVoted")}
                     </Text>
                   </Space>
                 }
@@ -187,17 +188,17 @@ export default function Guidelines() {
 
             {/* Core principles */}
             <section id="principles">
-              <Title level={3}>Core principles</Title>
+              <Title level={3}>{i18nT("ui.ethikos.deliberate.guidelines.corePrinciples")}</Title>
               <Space wrap>
-                <Tag color="blue">Respect</Tag>
-                <Tag color="green">Evidence</Tag>
-                <Tag color="gold">Transparency</Tag>
-                <Tag color="purple">Nuance</Tag>
-                <Tag color="geekblue">Accountability</Tag>
+                <Tag color="blue">{i18nT("ui.ethikos.deliberate.guidelines.respect")}</Tag>
+                <Tag color="green">{i18nT("ui.ethikos.deliberate.guidelines.evidence")}</Tag>
+                <Tag color="gold">{i18nT("ui.ethikos.deliberate.guidelines.transparency")}</Tag>
+                <Tag color="purple">{i18nT("ui.ethikos.deliberate.guidelines.nuance")}</Tag>
+                <Tag color="geekblue">{i18nT("ui.ethikos.deliberate.guidelines.accountability")}</Tag>
               </Space>
 
               <Paragraph style={{ marginTop: 12 }}>
-                Every contribution in ethiKos should:
+                {i18nT("ui.ethikos.deliberate.guidelines.everyContributionInEthikosShould")}
               </Paragraph>
               <List
                 size="small"
@@ -218,10 +219,9 @@ export default function Guidelines() {
 
             {/* Etiquette & tone */}
             <section id="etiquette">
-              <Title level={3}>Etiquette & tone</Title>
+              <Title level={3}>{i18nT("ui.ethikos.deliberate.guidelines.etiquetteTone")}</Title>
               <Paragraph>
-                The goal is high‑signal, low‑toxicity debate. The following expectations apply
-                across Korum debates and Konsultations comments:
+                {i18nT("ui.ethikos.deliberate.guidelines.theGoalIsHighSignalLowToxicity")}
               </Paragraph>
 
               <List
@@ -243,10 +243,9 @@ export default function Guidelines() {
 
             {/* Evidence & sources */}
             <section id="evidence">
-              <Title level={3}>Evidence & sources</Title>
+              <Title level={3}>{i18nT("ui.ethikos.deliberate.guidelines.evidenceSources")}</Title>
               <Paragraph>
-                ethikos is not just for opinions; it is built for traceable reasoning. As a rule of
-                thumb:
+                {i18nT("ui.ethikos.deliberate.guidelines.ethikosIsNotJustForOpinionsIt")}
               </Paragraph>
 
               <List
@@ -265,12 +264,12 @@ export default function Guidelines() {
               <Card
                 size="small"
                 style={{ marginTop: 16 }}
-                title="Minimum evidence by claim type"
+                title={i18nT("ui.ethikos.deliberate.guidelines.minimumEvidenceByClaimType")}
               >
                 <Table<EvidenceRuleRow>
                   size="small"
                   rowKey={(row) => row.claimType}
-                  columns={evidenceColumns}
+                  columns={evidenceColumns(i18nT)}
                   dataSource={evidenceData}
                   pagination={false}
                 />
@@ -281,10 +280,9 @@ export default function Guidelines() {
 
             {/* Identity, expertise & Ekoh */}
             <section id="identity">
-              <Title level={3}>Identity, expertise & Ekoh weighting</Title>
+              <Title level={3}>{i18nT("ui.ethikos.deliberate.guidelines.identityExpertiseEkohWeighting")}</Title>
               <Paragraph>
-                ethiKos uses the Ekoh reputation system to highlight and weight contributions from
-                users with demonstrated expertise, without turning debates into popularity contests.
+                {i18nT("ui.ethikos.deliberate.guidelines.ethikosUsesTheEkohReputationSystemTo")}
               </Paragraph>
 
               <Card size="small">
@@ -309,15 +307,14 @@ export default function Guidelines() {
 
             {/* Korum-specific rules */}
             <section id="korum">
-              <Title level={3}>Korum debates: structured arguments</Title>
+              <Title level={3}>{i18nT("ui.ethikos.deliberate.guidelines.korumDebatesStructuredArguments")}</Title>
               <Paragraph>
-                Korum is the structured debate environment under ethiKos. Topics represent a single
-                question; threads capture arguments and replies.
+                {i18nT("ui.ethikos.deliberate.guidelines.korumIsTheStructuredDebateEnvironmentUnder")}
               </Paragraph>
 
               <List
                 size="small"
-                header={<Text strong>When posting in a Korum debate, you should:</Text>}
+                header={<Text strong>{i18nT("ui.ethikos.deliberate.guidelines.whenPostingInAKorumDebateYou")}</Text>}
                 dataSource={[
                   'Align your stance slider (−3…+3) with the position you defend in your argument.',
                   'Use one post per main point; avoid packing multiple unrelated arguments into a single block.',
@@ -335,16 +332,15 @@ export default function Guidelines() {
 
             {/* Konsultations-specific rules */}
             <section id="konsultations">
-              <Title level={3}>Konsultations: public consultations & feedback</Title>
+              <Title level={3}>{i18nT("ui.ethikos.deliberate.guidelines.konsultationsPublicConsultationsFeedback")}</Title>
               <Paragraph>
-                Konsultations host time‑boxed consultations and suggestion flows that may feed into
-                policy or organisational decisions.
+                {i18nT("ui.ethikos.deliberate.guidelines.konsultationsHostTimeBoxedConsultationsAndSuggestion")}
               </Paragraph>
 
               <Card size="small">
                 <List
                   size="small"
-                  header={<Text strong>For consultations and suggestions:</Text>}
+                  header={<Text strong>{i18nT("ui.ethikos.deliberate.guidelines.forConsultationsAndSuggestions")}</Text>}
                   dataSource={[
                     'Answer the specific question being asked; off‑topic comments may be hidden.',
                     'When suggesting amendments, be as concrete and implementable as possible.',
@@ -365,10 +361,9 @@ export default function Guidelines() {
 
             {/* Moderation ladder */}
             <section id="moderation">
-              <Title level={3}>Moderation & reporting ladder</Title>
+              <Title level={3}>{i18nT("ui.ethikos.deliberate.guidelines.moderationReportingLadder")}</Title>
               <Paragraph>
-                Moderation in ethiKos is a mix of community signals and dedicated moderator review.
-                Automated actions are transparent and bounded.
+                {i18nT("ui.ethikos.deliberate.guidelines.moderationInEthikosIsAMixOf")}
               </Paragraph>
 
               <Steps
@@ -378,24 +373,24 @@ export default function Guidelines() {
                 style={{ marginTop: 8, maxWidth: 520 }}
               >
                 <Step
-                  title="0. Content posted"
-                  description="A debate argument, comment, or suggestion is created and visible to participants."
+                  title={i18nT("ui.ethikos.deliberate.guidelines.text0ContentPosted")}
+                  description={i18nT("ui.ethikos.deliberate.guidelines.aDebateArgumentCommentOrSuggestionIs")}
                 />
                 <Step
-                  title="1. Reported by users"
-                  description="Other users can report content for clear guideline violations (harassment, spam, misinformation, etc.)."
+                  title={i18nT("ui.ethikos.deliberate.guidelines.text1ReportedByUsers")}
+                  description={i18nT("ui.ethikos.deliberate.guidelines.otherUsersCanReportContentForClear")}
                 />
                 <Step
-                  title="2. Auto‑hide at 3 independent reports"
-                  description="At three distinct reports, the post is temporarily hidden and routed to the moderation queue."
+                  title={i18nT("ui.ethikos.deliberate.guidelines.text2AutoHideAt3IndependentReports")}
+                  description={i18nT("ui.ethikos.deliberate.guidelines.atThreeDistinctReportsThePostIs")}
                 />
                 <Step
-                  title="3. Moderator review"
-                  description="A moderator reviews the context, reports, and user history to decide on the outcome."
+                  title={i18nT("ui.ethikos.deliberate.guidelines.text3ModeratorReview")}
+                  description={i18nT("ui.ethikos.deliberate.guidelines.aModeratorReviewsTheContextReportsAnd")}
                 />
                 <Step
-                  title="4. Outcome"
-                  description="Content may be restored (optionally with a warning), edited/redacted, or permanently removed; account actions apply in repeated or severe cases."
+                  title={i18nT("ui.ethikos.deliberate.guidelines.text4Outcome")}
+                  description={i18nT("ui.ethikos.deliberate.guidelines.contentMayBeRestoredOptionallyWithA")}
                 />
               </Steps>
             </section>
@@ -404,10 +399,9 @@ export default function Guidelines() {
 
             {/* Appeals & transparency */}
             <section id="appeals">
-              <Title level={3}>Appeals & transparency</Title>
+              <Title level={3}>{i18nT("ui.ethikos.deliberate.guidelines.appealsTransparency")}</Title>
               <Paragraph>
-                You can request a second look when your content is removed or your account is
-                restricted. Appeals should focus on clarity and evidence.
+                {i18nT("ui.ethikos.deliberate.guidelines.youCanRequestASecondLookWhen")}
               </Paragraph>
 
               <Timeline
@@ -417,10 +411,9 @@ export default function Guidelines() {
                     color: 'blue',
                     children: (
                       <>
-                        <Text strong>1. Trigger</Text>
+                        <Text strong>{i18nT("ui.ethikos.deliberate.guidelines.text1Trigger")}</Text>
                         <Paragraph style={{ marginBottom: 0 }}>
-                          You receive a notice that a post was removed or that your participation is
-                          temporarily limited.
+                          {i18nT("ui.ethikos.deliberate.guidelines.youReceiveANoticeThatAPost")}
                         </Paragraph>
                       </>
                     ),
@@ -429,11 +422,9 @@ export default function Guidelines() {
                     color: 'blue',
                     children: (
                       <>
-                        <Text strong>2. Appeal submission</Text>
+                        <Text strong>{i18nT("ui.ethikos.deliberate.guidelines.text2AppealSubmission")}</Text>
                         <Paragraph style={{ marginBottom: 0 }}>
-                          Use the &ldquo;Request review&rdquo; or equivalent button (where
-                          available) to explain why you think the decision was incorrect or
-                          disproportionate.
+                          {i18nT("ui.ethikos.deliberate.guidelines.useTheRequestReviewOrEquivalentButton")}
                         </Paragraph>
                       </>
                     ),
@@ -442,10 +433,9 @@ export default function Guidelines() {
                     color: 'green',
                     children: (
                       <>
-                        <Text strong>3. Secondary review</Text>
+                        <Text strong>{i18nT("ui.ethikos.deliberate.guidelines.text3SecondaryReview")}</Text>
                         <Paragraph style={{ marginBottom: 0 }}>
-                          A moderator other than the original reviewer, where possible, examines the
-                          case and may ask for clarification.
+                          {i18nT("ui.ethikos.deliberate.guidelines.aModeratorOtherThanTheOriginalReviewer")}
                         </Paragraph>
                       </>
                     ),
@@ -454,10 +444,9 @@ export default function Guidelines() {
                     color: 'gray',
                     children: (
                       <>
-                        <Text strong>4. Final outcome</Text>
+                        <Text strong>{i18nT("ui.ethikos.deliberate.guidelines.text4FinalOutcome")}</Text>
                         <Paragraph style={{ marginBottom: 0 }}>
-                          The decision may be upheld or adjusted. In all cases, a short rationale
-                          should be recorded for audit and future calibration.
+                          {i18nT("ui.ethikos.deliberate.guidelines.theDecisionMayBeUpheldOrAdjusted")}
                         </Paragraph>
                       </>
                     ),
@@ -470,10 +459,9 @@ export default function Guidelines() {
 
             {/* Checklist */}
             <section id="checklist">
-              <Title level={3}>Checklist before posting</Title>
+              <Title level={3}>{i18nT("ui.ethikos.deliberate.guidelines.checklistBeforePosting")}</Title>
               <Paragraph>
-                Use this short checklist before you submit a new stance, argument, or suggestion in
-                ethiKos:
+                {i18nT("ui.ethikos.deliberate.guidelines.useThisShortChecklistBeforeYouSubmit")}
               </Paragraph>
 
               <List
@@ -490,12 +478,10 @@ export default function Guidelines() {
                 style={{ marginTop: 16 }}
                 type="success"
                 showIcon
-                message="Signal‑boost good debate"
+                message={i18nT("ui.ethikos.deliberate.guidelines.signalBoostGoodDebate")}
                 description={
                   <Paragraph style={{ marginBottom: 0 }}>
-                    Use the available tools (up‑weighting, endorsements, sharing within your
-                    organisation) to promote high‑quality, well‑evidenced arguments—regardless of
-                    whether you personally agree with them.
+                    {i18nT("ui.ethikos.deliberate.guidelines.useTheAvailableToolsUpWeightingEndorsements")}
                   </Paragraph>
                 }
               />

@@ -1,6 +1,8 @@
 // frontend/app/teambuilder/humans/constraints/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ClockCircleOutlined,
   EnvironmentOutlined,
@@ -39,44 +41,45 @@ const { RangePicker } = TimePicker;
 const { TextArea } = Input;
 const { Text, Paragraph } = Typography;
 
-const LANGUAGE_OPTIONS = [
-  { label: 'English', value: 'en' },
-  { label: 'French', value: 'fr' },
-  { label: 'Spanish', value: 'es' },
-  { label: 'German', value: 'de' },
-  { label: 'Arabic', value: 'ar' },
-  { label: 'Chinese (Mandarin)', value: 'zh' },
-];
+const LANGUAGE_OPTIONS = (i18nT: TranslateFunction) => ([
+  { label: i18nT("ui.teambuilder.humans.constraints.english"), value: 'en' },
+  { label: i18nT("ui.teambuilder.humans.constraints.french"), value: 'fr' },
+  { label: i18nT("ui.teambuilder.humans.constraints.spanish"), value: 'es' },
+  { label: i18nT("ui.teambuilder.humans.constraints.german"), value: 'de' },
+  { label: i18nT("ui.teambuilder.humans.constraints.arabic"), value: 'ar' },
+  { label: i18nT("ui.teambuilder.humans.constraints.chineseMandarin"), value: 'zh' },
+]);
 
-const REGION_OPTIONS = [
-  { label: 'Europe', value: 'europe' },
-  { label: 'North America', value: 'north_america' },
-  { label: 'Latin America', value: 'latin_america' },
-  { label: 'Africa', value: 'africa' },
-  { label: 'Middle East', value: 'middle_east' },
-  { label: 'Asia-Pacific', value: 'apac' },
-];
+const REGION_OPTIONS = (i18nT: TranslateFunction) => ([
+  { label: i18nT("ui.teambuilder.humans.constraints.europe"), value: 'europe' },
+  { label: i18nT("ui.teambuilder.humans.constraints.northAmerica"), value: 'north_america' },
+  { label: i18nT("ui.teambuilder.humans.constraints.latinAmerica"), value: 'latin_america' },
+  { label: i18nT("ui.teambuilder.humans.constraints.africa"), value: 'africa' },
+  { label: i18nT("ui.teambuilder.humans.constraints.middleEast"), value: 'middle_east' },
+  { label: i18nT("ui.teambuilder.humans.constraints.asiaPacific"), value: 'apac' },
+]);
 
-const TIMEZONE_OPTIONS = [
-  { label: 'UTC−08:00 (PST)', value: 'America/Los_Angeles' },
-  { label: 'UTC−05:00 (EST)', value: 'America/New_York' },
-  { label: 'UTC±00:00 (UTC)', value: 'Etc/UTC' },
-  { label: 'UTC+01:00 (CET)', value: 'Europe/Paris' },
-  { label: 'UTC+02:00 (EET)', value: 'Europe/Athens' },
-  { label: 'UTC+05:30 (IST)', value: 'Asia/Kolkata' },
-];
+const TIMEZONE_OPTIONS = (i18nT: TranslateFunction) => ([
+  { label: i18nT("ui.teambuilder.humans.constraints.utc0800Pst"), value: 'America/Los_Angeles' },
+  { label: i18nT("ui.teambuilder.humans.constraints.utc0500Est"), value: 'America/New_York' },
+  { label: i18nT("ui.teambuilder.humans.constraints.utc0000Utc"), value: 'Etc/UTC' },
+  { label: i18nT("ui.teambuilder.humans.constraints.utc0100Cet"), value: 'Europe/Paris' },
+  { label: i18nT("ui.teambuilder.humans.constraints.utc0200Eet"), value: 'Europe/Athens' },
+  { label: i18nT("ui.teambuilder.humans.constraints.utc0530Ist"), value: 'Asia/Kolkata' },
+]);
 
-const DAY_OPTIONS = [
-  { label: 'Monday', value: 'mon' },
-  { label: 'Tuesday', value: 'tue' },
-  { label: 'Wednesday', value: 'wed' },
-  { label: 'Thursday', value: 'thu' },
-  { label: 'Friday', value: 'fri' },
-  { label: 'Saturday', value: 'sat' },
-  { label: 'Sunday', value: 'sun' },
-];
+const DAY_OPTIONS = (i18nT: TranslateFunction) => ([
+  { label: i18nT("ui.teambuilder.humans.constraints.monday"), value: 'mon' },
+  { label: i18nT("ui.teambuilder.humans.constraints.tuesday"), value: 'tue' },
+  { label: i18nT("ui.teambuilder.humans.constraints.wednesday"), value: 'wed' },
+  { label: i18nT("ui.teambuilder.humans.constraints.thursday"), value: 'thu' },
+  { label: i18nT("ui.teambuilder.humans.constraints.friday"), value: 'fri' },
+  { label: i18nT("ui.teambuilder.humans.constraints.saturday"), value: 'sat' },
+  { label: i18nT("ui.teambuilder.humans.constraints.sunday"), value: 'sun' },
+]);
 
 export default function HumansConstraintsPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [form] = Form.useForm();
 
   // Live summary via watchers
@@ -119,7 +122,7 @@ export default function HumansConstraintsPage(): JSX.Element {
   if (languages && languages.length > 0) {
     summaryTags.push(
       <Tag key="languages" icon={<GlobalOutlined />}>
-        {languages.length} language{languages.length > 1 ? 's' : ''}
+        {languages.length} {i18nT("ui.teambuilder.humans.constraints.language")}{languages.length > 1 ? 's' : ''}
       </Tag>,
     );
   }
@@ -127,7 +130,7 @@ export default function HumansConstraintsPage(): JSX.Element {
   if (regions && regions.length > 0) {
     summaryTags.push(
       <Tag key="regions" icon={<EnvironmentOutlined />}>
-        {regions.length} region{regions.length > 1 ? 's' : ''}
+        {regions.length} {i18nT("ui.teambuilder.humans.constraints.region")}{regions.length > 1 ? 's' : ''}
       </Tag>,
     );
   }
@@ -135,7 +138,7 @@ export default function HumansConstraintsPage(): JSX.Element {
   if (timezones && timezones.length > 0) {
     summaryTags.push(
       <Tag key="timezones" color="blue">
-        {timezones.length} time zone{timezones.length > 1 ? 's' : ''}
+        {timezones.length} {i18nT("ui.teambuilder.humans.constraints.timeZone")}{timezones.length > 1 ? 's' : ''}
       </Tag>,
     );
   }
@@ -143,7 +146,7 @@ export default function HumansConstraintsPage(): JSX.Element {
   if (workingDays && workingDays.length > 0) {
     summaryTags.push(
       <Tag key="days" color="green">
-        {workingDays.length} working day{workingDays.length > 1 ? 's' : ''}
+        {workingDays.length} {i18nT("ui.teambuilder.humans.constraints.workingDay")}{workingDays.length > 1 ? 's' : ''}
       </Tag>,
     );
   }
@@ -165,7 +168,7 @@ export default function HumansConstraintsPage(): JSX.Element {
   if (allowMixedTZ) {
     summaryTags.push(
       <Tag key="mixed_tz" color="purple">
-        Mixed time zones allowed
+        {i18nT("ui.teambuilder.humans.constraints.mixedTimeZonesAllowed")}
       </Tag>,
     );
   }
@@ -173,28 +176,28 @@ export default function HumansConstraintsPage(): JSX.Element {
   if (useOrgTemplate) {
     summaryTags.push(
       <Tag key="org_template" color="geekblue">
-        Org default template
+        {i18nT("ui.teambuilder.humans.constraints.orgDefaultTemplate")}
       </Tag>,
     );
   }
 
   const primaryAction = (
     <Button type="primary" icon={<SaveOutlined />} onClick={() => form.submit()}>
-      Save constraints
+      {i18nT("ui.teambuilder.humans.constraints.saveConstraints")}
     </Button>
   );
 
   const secondaryActions = (
     <Button icon={<ReloadOutlined />} onClick={handleReset}>
-      Reset
+      {i18nT("ui.teambuilder.humans.constraints.reset")}
     </Button>
   );
 
   return (
     <TeamBuilderPageShell
-      title="Human constraints"
-      subtitle="Configure language, geography, time zones and working schedules that the team builder must respect."
-      sectionLabel="Humans"
+      title={i18nT("ui.teambuilder.humans.constraints.humanConstraints")}
+      subtitle={i18nT("ui.teambuilder.humans.constraints.configureLanguageGeographyTimeZonesAndWorking")}
+      sectionLabel={i18nT("ui.teambuilder.humans.constraints.humans")}
       maxWidth={1040}
       primaryAction={primaryAction}
       secondaryActions={secondaryActions}
@@ -218,13 +221,10 @@ export default function HumansConstraintsPage(): JSX.Element {
                 type="info"
                 showIcon
                 icon={<InfoCircleOutlined />}
-                message="How these constraints are used"
+                message={i18nT("ui.teambuilder.humans.constraints.howTheseConstraintsAreUsed")}
                 description={
                   <Paragraph type="secondary" style={{ margin: 0 }}>
-                    Human constraints act as hard or soft guardrails for the team
-                    builder: language and geography increase collaboration comfort;
-                    schedule and time zones reduce coordination friction. You can
-                    still override them when designing specific sessions.
+                    {i18nT("ui.teambuilder.humans.constraints.humanConstraintsActAsHardOrSoft")}
                   </Paragraph>
                 }
               />
@@ -233,20 +233,19 @@ export default function HumansConstraintsPage(): JSX.Element {
                 size="small"
                 current={2}
                 items={[
-                  { title: 'Pool & profiles' },
-                  { title: 'Human constraints' },
-                  { title: 'Problem & modes' },
+                  { title: i18nT("ui.teambuilder.humans.constraints.poolProfiles") },
+                  { title: i18nT("ui.teambuilder.humans.constraints.humanConstraints") },
+                  { title: i18nT("ui.teambuilder.humans.constraints.problemModes") },
                 ]}
               />
 
               <Divider style={{ margin: '12px 0' }} />
 
               <Space direction="vertical" size={8} style={{ width: '100%' }}>
-                <Text strong>Current summary</Text>
+                <Text strong>{i18nT("ui.teambuilder.humans.constraints.currentSummary")}</Text>
                 {summaryTags.length === 0 ? (
                   <Text type="secondary">
-                    No constraints set yet. Define languages, regions and working time
-                    to help the matching engine propose better teams.
+                    {i18nT("ui.teambuilder.humans.constraints.noConstraintsSetYetDefineLanguagesRegions")}
                   </Text>
                 ) : (
                   <Space wrap>{summaryTags}</Space>
@@ -267,7 +266,7 @@ export default function HumansConstraintsPage(): JSX.Element {
                 header={
                   <Space>
                     <GlobalOutlined />
-                    <span>Languages</span>
+                    <span>{i18nT("ui.teambuilder.humans.constraints.languages")}</span>
                   </Space>
                 }
               >
@@ -275,22 +274,22 @@ export default function HumansConstraintsPage(): JSX.Element {
                   <Col xs={24} md={16}>
                     <Form.Item
                       name="languages"
-                      label="Preferred working languages"
-                      tooltip="Used to avoid creating teams where people cannot communicate comfortably."
+                      label={i18nT("ui.teambuilder.humans.constraints.preferredWorkingLanguages")}
+                      tooltip={i18nT("ui.teambuilder.humans.constraints.usedToAvoidCreatingTeamsWherePeople")}
                     >
                       <Select
                         mode="multiple"
                         allowClear
-                        placeholder="Select one or more languages"
-                        options={LANGUAGE_OPTIONS}
+                        placeholder={i18nT("ui.teambuilder.humans.constraints.selectOneOrMoreLanguages")}
+                        options={LANGUAGE_OPTIONS(i18nT)}
                       />
                     </Form.Item>
                   </Col>
                   <Col xs={24} md={8}>
-                    <Form.Item name="languages_notes" label="Notes">
+                    <Form.Item name="languages_notes" label={i18nT("ui.teambuilder.humans.constraints.notes")}>
                       <TextArea
                         rows={3}
-                        placeholder="Any specific language nuances, accents, or requirements..."
+                        placeholder={i18nT("ui.teambuilder.humans.constraints.anySpecificLanguageNuancesAccentsOrRequirements")}
                       />
                     </Form.Item>
                   </Col>
@@ -303,7 +302,7 @@ export default function HumansConstraintsPage(): JSX.Element {
                 header={
                   <Space>
                     <EnvironmentOutlined />
-                    <span>Geography & time zones</span>
+                    <span>{i18nT("ui.teambuilder.humans.constraints.geographyTimeZones")}</span>
                   </Space>
                 }
               >
@@ -311,28 +310,28 @@ export default function HumansConstraintsPage(): JSX.Element {
                   <Col xs={24} md={12}>
                     <Form.Item
                       name="regions"
-                      label="Allowed regions"
-                      tooltip="Use this to restrict team formation to specific geographical regions."
+                      label={i18nT("ui.teambuilder.humans.constraints.allowedRegions")}
+                      tooltip={i18nT("ui.teambuilder.humans.constraints.useThisToRestrictTeamFormationTo")}
                     >
                       <Select
                         mode="multiple"
                         allowClear
-                        placeholder="Select allowed regions"
-                        options={REGION_OPTIONS}
+                        placeholder={i18nT("ui.teambuilder.humans.constraints.selectAllowedRegions")}
+                        options={REGION_OPTIONS(i18nT)}
                       />
                     </Form.Item>
                   </Col>
                   <Col xs={24} md={12}>
                     <Form.Item
                       name="timezones"
-                      label="Preferred time zones"
-                      tooltip="Optional: if set, the engine will prefer grouping people with overlapping time zones."
+                      label={i18nT("ui.teambuilder.humans.constraints.preferredTimeZones")}
+                      tooltip={i18nT("ui.teambuilder.humans.constraints.optionalIfSetTheEngineWillPrefer")}
                     >
                       <Select
                         mode="multiple"
                         allowClear
-                        placeholder="Select one or more time zones"
-                        options={TIMEZONE_OPTIONS}
+                        placeholder={i18nT("ui.teambuilder.humans.constraints.selectOneOrMoreTimeZones")}
+                        options={TIMEZONE_OPTIONS(i18nT)}
                       />
                     </Form.Item>
                   </Col>
@@ -342,17 +341,17 @@ export default function HumansConstraintsPage(): JSX.Element {
                   <Col xs={24} md={8}>
                     <Form.Item
                       name="allow_mixed_timezones"
-                      label="Allow mixed time zones"
+                      label={i18nT("ui.teambuilder.humans.constraints.allowMixedTimeZones")}
                       valuePropName="checked"
                     >
                       <Switch />
                     </Form.Item>
                   </Col>
                   <Col xs={24} md={16}>
-                    <Form.Item name="geo_notes" label="Notes">
+                    <Form.Item name="geo_notes" label={i18nT("ui.teambuilder.humans.constraints.notes")}>
                       <TextArea
                         rows={2}
-                        placeholder="e.g. avoid pairing Americas with APAC for urgent teams; okay for long-term projects."
+                        placeholder={i18nT("ui.teambuilder.humans.constraints.eGAvoidPairingAmericasWithApac")}
                       />
                     </Form.Item>
                   </Col>
@@ -365,20 +364,20 @@ export default function HumansConstraintsPage(): JSX.Element {
                 header={
                   <Space>
                     <ClockCircleOutlined />
-                    <span>Working schedule</span>
+                    <span>{i18nT("ui.teambuilder.humans.constraints.workingSchedule")}</span>
                   </Space>
                 }
               >
                 <Row gutter={[16, 16]}>
                   <Col xs={24} md={12}>
-                    <Form.Item name="working_days" label="Typical working days">
-                      <Checkbox.Group options={DAY_OPTIONS} />
+                    <Form.Item name="working_days" label={i18nT("ui.teambuilder.humans.constraints.typicalWorkingDays")}>
+                      <Checkbox.Group options={DAY_OPTIONS(i18nT)} />
                     </Form.Item>
                   </Col>
                   <Col xs={24} md={12}>
                     <Form.Item
                       name="working_hours"
-                      label="Typical working hours (local time)"
+                      label={i18nT("ui.teambuilder.humans.constraints.typicalWorkingHoursLocalTime")}
                     >
                       <RangePicker format="HH:mm" minuteStep={15} />
                     </Form.Item>
@@ -389,17 +388,17 @@ export default function HumansConstraintsPage(): JSX.Element {
                   <Col xs={24} md={12}>
                     <Form.Item
                       name="use_org_template"
-                      label="Use organisation default schedule"
+                      label={i18nT("ui.teambuilder.humans.constraints.useOrganisationDefaultSchedule")}
                       valuePropName="checked"
                     >
                       <Switch />
                     </Form.Item>
                   </Col>
                   <Col xs={24} md={12}>
-                    <Form.Item name="schedule_notes" label="Notes">
+                    <Form.Item name="schedule_notes" label={i18nT("ui.teambuilder.humans.constraints.notes")}>
                       <TextArea
                         rows={2}
-                        placeholder="e.g. high-intensity teams available for weekend work, learning teams weekdays only..."
+                        placeholder={i18nT("ui.teambuilder.humans.constraints.eGHighIntensityTeamsAvailableFor")}
                       />
                     </Form.Item>
                   </Col>
@@ -419,16 +418,16 @@ export default function HumansConstraintsPage(): JSX.Element {
             >
               <Space>
                 <Button icon={<ReloadOutlined />} onClick={handleReset}>
-                  Reset
+                  {i18nT("ui.teambuilder.humans.constraints.reset")}
                 </Button>
               </Space>
 
               <Space>
                 <Button icon={<PlusOutlined />} onClick={handleSaveTemplate}>
-                  Save as template
+                  {i18nT("ui.teambuilder.humans.constraints.saveAsTemplate")}
                 </Button>
                 <Button type="primary" icon={<SaveOutlined />} htmlType="submit">
-                  Save constraints
+                  {i18nT("ui.teambuilder.humans.constraints.saveConstraints")}
                 </Button>
               </Space>
             </Space>

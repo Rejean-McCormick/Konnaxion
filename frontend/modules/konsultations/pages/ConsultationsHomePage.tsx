@@ -1,6 +1,8 @@
 // FILE: frontend/modules/konsultations/pages/ConsultationsHomePage.tsx
 ﻿'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
+import { scopeLabel } from '@/i18n/uiModelLabels';
 import {
   BarChartOutlined,
   GlobalOutlined,
@@ -43,7 +45,8 @@ type BallotRow = PublicBallot;
 type ImpactData = Awaited<ReturnType<typeof fetchImpactOutcomes>>;
 
 export default function ConsultationsHomePage(): JSX.Element {
-  usePageTitle('Konsultations · Home');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.konsultations.pages.consultationshomepage.konsultationsHome"));
 
   const { data: ballotsData, loading: loadingBallots } =
     useRequest<PublicBallotResponse, []>(fetchPublicBallots);
@@ -70,9 +73,9 @@ export default function ConsultationsHomePage(): JSX.Element {
   }).length;
 
   const headerStats = [
-    { label: 'Active consultations', value: totalConsultations },
-    { label: 'Avg participation', value: avgTurnout, suffix: '%' },
-    { label: 'Closing ≤ 48h', value: closingSoonCount },
+    { label: i18nT("ui.konsultations.pages.consultationshomepage.activeConsultations"), value: totalConsultations },
+    { label: i18nT("ui.konsultations.pages.consultationshomepage.avgParticipation"), value: avgTurnout, suffix: '%' },
+    { label: i18nT("ui.konsultations.pages.consultationshomepage.closing48h"), value: closingSoonCount },
   ];
 
   const kpiByKey = new Map<string, OutcomeKPI>();
@@ -89,13 +92,13 @@ export default function ConsultationsHomePage(): JSX.Element {
 
   const columns: ProColumns<BallotRow>[] = [
     {
-      title: 'Consultation',
+      title: i18nT("ui.konsultations.pages.consultationshomepage.consultation"),
       dataIndex: 'title',
       width: 320,
       ellipsis: true,
     },
     {
-      title: 'Closes',
+      title: i18nT("ui.konsultations.pages.consultationshomepage.closes"),
       dataIndex: 'closesAt',
       width: 220,
       render: (_, row) => {
@@ -110,13 +113,13 @@ export default function ConsultationsHomePage(): JSX.Element {
                 ? closes.format('YYYY-MM-DD HH:mm')
                 : '—'}
             </span>
-            {closingSoon && <Tag color="volcano">Closing soon</Tag>}
+            {closingSoon && <Tag color="volcano">{i18nT("ui.konsultations.pages.consultationshomepage.closingSoon")}</Tag>}
           </Space>
         );
       },
     },
     {
-      title: 'Turnout',
+      title: i18nT("ui.konsultations.pages.consultationshomepage.turnout"),
       dataIndex: 'turnout',
       width: 180,
       render: (_, row) => {
@@ -130,25 +133,25 @@ export default function ConsultationsHomePage(): JSX.Element {
       },
     },
     {
-      title: 'Scope',
+      title: i18nT("ui.konsultations.pages.consultationshomepage.scope"),
       dataIndex: 'scope',
       width: 120,
-      render: (_, row) => <Tag color="purple">{row.scope}</Tag>,
+      render: (_, row) => <Tag color="purple">{scopeLabel(i18nT, row.scope)}</Tag>,
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.konsultations.pages.consultationshomepage.actions"),
       dataIndex: 'actions',
       width: 240,
       render: () => (
         <Space>
           <Link href="/ethikos/decide/public" prefetch={false}>
             <Button size="small" type="primary">
-              Open voting
+              {i18nT("ui.konsultations.pages.consultationshomepage.openVoting")}
             </Button>
           </Link>
           <Link href="/ethikos/decide/results" prefetch={false}>
             <Button size="small" icon={<BarChartOutlined />}>
-              Results
+              {i18nT("ui.konsultations.pages.consultationshomepage.results")}
             </Button>
           </Link>
         </Space>
@@ -161,9 +164,9 @@ export default function ConsultationsHomePage(): JSX.Element {
       ghost
       loading={loading}
       header={{
-        title: 'Konsultations',
+        title: i18nT("ui.konsultations.pages.consultationshomepage.konsultations"),
         subTitle:
-          'Time‑boxed public consultations on Ethikos topics, with transparent weighted outcomes.',
+          i18nT("ui.konsultations.pages.consultationshomepage.timeBoxedPublicConsultationsOnEthikosTopics"),
       }}
     >
       <Space
@@ -174,13 +177,10 @@ export default function ConsultationsHomePage(): JSX.Element {
         <Alert
           type="info"
           showIcon
-          message="How Konsultations fit into Ethikos"
+          message={i18nT("ui.konsultations.pages.consultationshomepage.howKonsultationsFitIntoEthikos")}
           description={
             <Paragraph style={{ marginBottom: 0 }}>
-              Consultations sit on top of Korum debates. While a
-              consultation is open, verified participants can express a
-              nuanced stance on a −3…+3 scale. Once closed, outcomes feed
-              into the Ethikos impact tracker and opinion analytics.
+              {i18nT("ui.konsultations.pages.consultationshomepage.consultationsSitOnTopOfKorumDebates")}
             </Paragraph>
           }
         />
@@ -213,12 +213,11 @@ export default function ConsultationsHomePage(): JSX.Element {
         </ProCard>
 
         <ProCard
-          title="Open consultations snapshot"
+          title={i18nT("ui.konsultations.pages.consultationshomepage.openConsultationsSnapshot")}
           extra={
             <Space>
               <Text type="secondary">
-                Snapshot of public Ethikos consultations currently open
-                for voting.
+                {i18nT("ui.konsultations.pages.consultationshomepage.snapshotOfPublicEthikosConsultationsCurrentlyOpen")}
               </Text>
               <Link href="/ethikos/decide/public" prefetch={false}>
                 <Button
@@ -226,7 +225,7 @@ export default function ConsultationsHomePage(): JSX.Element {
                   size="small"
                   icon={<GlobalOutlined />}
                 >
-                  Go to full list
+                  {i18nT("ui.konsultations.pages.consultationshomepage.goToFullList")}
                 </Button>
               </Link>
             </Space>
@@ -235,7 +234,7 @@ export default function ConsultationsHomePage(): JSX.Element {
           {ballots.length === 0 ? (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No open public consultations right now."
+              description={i18nT("ui.konsultations.pages.consultationshomepage.noOpenPublicConsultationsRightNow")}
             />
           ) : (
             <ProTable<BallotRow>
@@ -252,7 +251,7 @@ export default function ConsultationsHomePage(): JSX.Element {
         </ProCard>
 
         <ProCard
-          title="Outcomes and implementation"
+          title={i18nT("ui.konsultations.pages.consultationshomepage.outcomesAndImplementation")}
           extra={
             <Space>
               <Link href="/ethikos/impact/outcomes" prefetch={false}>
@@ -260,7 +259,7 @@ export default function ConsultationsHomePage(): JSX.Element {
                   size="small"
                   icon={<BarChartOutlined />}
                 >
-                  Outcomes analytics
+                  {i18nT("ui.konsultations.pages.consultationshomepage.outcomesAnalytics")}
                 </Button>
               </Link>
               <Link href="/ethikos/impact/tracker" prefetch={false}>
@@ -268,16 +267,14 @@ export default function ConsultationsHomePage(): JSX.Element {
                   size="small"
                   icon={<HistoryOutlined />}
                 >
-                  Impact tracker
+                  {i18nT("ui.konsultations.pages.consultationshomepage.impactTracker")}
                 </Button>
               </Link>
             </Space>
           }
         >
           <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-            Use Ethikos impact dashboards to follow how consultation
-            results translate into decisions and implementation work over
-            time.
+            {i18nT("ui.konsultations.pages.consultationshomepage.useEthikosImpactDashboardsToFollowHow")}
           </Paragraph>
         </ProCard>
       </Space>

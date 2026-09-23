@@ -1,6 +1,7 @@
 // FILE: frontend/modules/ethikos/deliberate/elite/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { FireOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import {
   ModalForm,
@@ -48,7 +49,8 @@ type TopicPreview = {
 /* ------------------------------------------------------------------ */
 
 export default function EliteAgora() {
-  usePageTitle('Deliberate · Elite Agora');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.ethikos.deliberate.elite.deliberateEliteAgora"));
 
   // Service wrapper pour garantir { list: TopicRow[] } au typage de useRequest
   const eliteTopicsService = React.useCallback(async (): Promise<{ list: TopicRow[] }> => {
@@ -91,9 +93,9 @@ export default function EliteAgora() {
   /* ---------- KPI header ---------- */
   const headerStats = React.useMemo(
     () => [
-      { label: 'Open topics', value: data?.list.length ?? 0 },
+      { label: i18nT("ui.ethikos.deliberate.elite.openTopics"), value: data?.list.length ?? 0 },
       {
-        label: 'Avg stances / topic',
+        label: i18nT("ui.ethikos.deliberate.elite.avgStancesTopic"),
         value: data?.list?.length
           ? Math.round(
               data!.list.reduce((sum: number, t: TopicRow) => sum + (t.stanceCount ?? 0), 0) /
@@ -101,9 +103,9 @@ export default function EliteAgora() {
             )
           : 0,
       },
-      { label: 'Hot topics', value: (data?.list ?? []).filter((t: TopicRow) => t.hot).length },
+      { label: i18nT("ui.ethikos.deliberate.elite.hotTopics"), value: (data?.list ?? []).filter((t: TopicRow) => t.hot).length },
     ],
-    [data],
+    [data, i18nT],
   );
 
   /* ---------- filtres de catégorie ---------- */
@@ -119,7 +121,7 @@ export default function EliteAgora() {
   const columns: ProColumns<TopicRow>[] = React.useMemo(
     () => [
       {
-        title: 'Title',
+        title: i18nT("ui.ethikos.deliberate.elite.title"),
         dataIndex: 'title',
         render: (_, row) => (
           <a onClick={() => openPreview(row)} style={{ cursor: 'pointer' }}>
@@ -128,20 +130,20 @@ export default function EliteAgora() {
         ),
       },
       {
-        title: 'Category',
+        title: i18nT("ui.ethikos.deliberate.elite.category"),
         dataIndex: 'category',
         filters: categoryFilters,
         onFilter: (value, record) => String(record.category) === String(value),
         render: (_, row) => <Tag color="geekblue">{row.category}</Tag>,
       },
       {
-        title: 'Stances',
+        title: i18nT("ui.ethikos.deliberate.elite.stances"),
         dataIndex: 'stanceCount',
         sorter: true,
         align: 'right',
       },
       {
-        title: 'Last activity',
+        title: i18nT("ui.ethikos.deliberate.elite.lastActivity"),
         dataIndex: 'lastActivity',
         // Pas de valueType "fromNow" (non standard). On formate via dayjs.
         render: (_, row) => dayjs(row.lastActivity).fromNow(),
@@ -152,13 +154,13 @@ export default function EliteAgora() {
         width: 60,
         render: (_, row) =>
           row.hot ? (
-            <Tooltip title="Trending">
+            <Tooltip title={i18nT("ui.ethikos.deliberate.elite.trending")}>
               <FireOutlined style={{ color: '#fa541c' }} />
             </Tooltip>
           ) : null,
       },
     ],
-    [categoryFilters, openPreview],
+    [categoryFilters, openPreview, i18nT],
   );
 
   /* ---------- rendu ---------- */
@@ -168,7 +170,7 @@ export default function EliteAgora() {
       loading={loading}
       extra={
         <Space>
-          <Button icon={<ReloadOutlined />} onClick={refresh} type="text" title="Refresh list" />
+          <Button icon={<ReloadOutlined />} onClick={refresh} type="text" title={i18nT("ui.ethikos.deliberate.elite.refreshList")} />
           <NewTopicButton onCreated={refresh} />
         </Space>
       }
@@ -198,19 +200,19 @@ export default function EliteAgora() {
         width={520}
         open={!!previewId}
         onClose={() => setPreviewId(null)}
-        title={preview?.title || 'Preview'}
+        title={preview?.title || i18nT("ui.ethikos.deliberate.elite.preview")}
       >
         {previewLoading ? (
-          <Empty description="Loading…" />
+          <Empty description={i18nT("ui.ethikos.deliberate.elite.loading")} />
         ) : preview ? (
           <>
             <p>
-              <strong>Category:</strong> {preview.category}
+              <strong>{i18nT("ui.ethikos.deliberate.elite.category_61b920")}</strong> {preview.category}
             </p>
             <p>
-              <strong>Opened:</strong> {dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm')}
+              <strong>{i18nT("ui.ethikos.deliberate.elite.opened")}</strong> {dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm')}
             </p>
-            <h4>Latest statements</h4>
+            <h4>{i18nT("ui.ethikos.deliberate.elite.latestStatements")}</h4>
             <ul>
               {preview.latest.map((s) => (
                 <li key={s.id}>
@@ -222,7 +224,7 @@ export default function EliteAgora() {
               type="primary"
               onClick={() => window.location.assign(`/ethikos/deliberate/${preview.id}`)}
             >
-              Go to thread →
+              {i18nT("ui.ethikos.deliberate.elite.goToThread")}
             </Button>
           </>
         ) : (
@@ -238,6 +240,7 @@ export default function EliteAgora() {
 /* ------------------------------------------------------------------ */
 
 function NewTopicButton({ onCreated }: { onCreated: () => void }) {
+  const { t: i18nT } = useLanguage();
   const [visible, setVisible] = React.useState(false);
 
   // On fige les Params pour typer runAsync correctement
@@ -246,7 +249,7 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }) {
     {
       manual: true,
       onSuccess: () => {
-        antdMessage.success('Topic created 🎉');
+        antdMessage.success(i18nT("ui.ethikos.deliberate.elite.topicCreated_dfca1f"));
         setVisible(false);
         onCreated();
       },
@@ -256,10 +259,10 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }) {
   return (
     <>
       <Button icon={<PlusOutlined />} type="primary" onClick={() => setVisible(true)}>
-        New Topic
+        {i18nT("ui.ethikos.deliberate.elite.newTopic_8358da")}
       </Button>
       <ModalForm<{ title: string; category: string }>
-        title="Create new topic"
+        title={i18nT("ui.ethikos.deliberate.elite.createNewTopic")}
         open={visible}
         onOpenChange={setVisible}
         onFinish={async (values) => {
@@ -268,14 +271,14 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }) {
         }}
         submitter={{ submitButtonProps: { loading } }}
       >
-        <ProFormText name="title" label="Title" rules={[{ required: true, min: 10 }]} />
+        <ProFormText name="title" label={i18nT("ui.ethikos.deliberate.elite.title")} rules={[{ required: true, min: 10 }]} />
         <ProFormSelect
           name="category"
-          label="Category"
+          label={i18nT("ui.ethikos.deliberate.elite.category")}
           options={[
-            { label: 'AI Policy', value: 'AI Policy' },
-            { label: 'Biotech', value: 'Biotech' },
-            { label: 'Ethics', value: 'Ethics' },
+            { label: i18nT("ui.ethikos.deliberate.elite.aiPolicy"), value: 'AI Policy' },
+            { label: i18nT("ui.ethikos.deliberate.elite.biotech"), value: 'Biotech' },
+            { label: i18nT("ui.ethikos.deliberate.elite.ethics"), value: 'Ethics' },
           ]}
           rules={[{ required: true }]}
         />

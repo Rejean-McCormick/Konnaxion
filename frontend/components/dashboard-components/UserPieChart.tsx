@@ -2,6 +2,7 @@
 // C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\UserPieChart.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import React from 'react';
 import {
   Cell,
@@ -97,10 +98,12 @@ const toPieData = (segments: UserSegment[]): PieDatum[] =>
 const UserPieChart: React.FC<UserPieChartProps> = ({
   users,
   segments,
-  title = 'Proportion of Users',
+  title: titleProp,
   height = 294,
   legendFormatter,
 }) => {
+  const { t: i18nT } = useLanguage();
+  const title = titleProp ?? i18nT("ui.dashboardComponents.userpiechart.proportionOfUsers");
   const effectiveSegments: UserSegment[] =
     Array.isArray(segments) && segments.length > 0
       ? segments
@@ -128,7 +131,7 @@ const UserPieChart: React.FC<UserPieChartProps> = ({
             fontSize: 14,
           }}
         >
-          No user data available yet.
+          {i18nT("ui.dashboardComponents.userpiechart.noUserDataAvailableYet")}
         </div>
       ) : (
         <div style={{ width: '100%', height }}>

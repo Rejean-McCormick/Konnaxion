@@ -1,6 +1,7 @@
 // FILE: frontend/app/keenkonnect/user-reputation/view-reputation-ekoh/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Alert, Avatar, Card, Col, Empty, List, Progress, Row, Space, Tag, Timeline, Typography } from 'antd';
 import React from 'react';
 
@@ -20,6 +21,7 @@ function initial(value: string): string {
 }
 
 export default function ViewReputationEkohPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const { data, isLoading, isError, error } = useReputationEvents();
   const ekohProfile = data?.ekohProfile ?? null;
   const activityProfile = data?.profile;
@@ -34,16 +36,16 @@ export default function ViewReputationEkohPage(): JSX.Element {
 
   return (
     <KeenPageShell
-      title="EkoH expertise"
-      description="Domain-specific expertise context available to KeenKonnect and declared Smart Vote readings."
-      metaTitle="KeenKonnect · EkoH expertise"
+      title={i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.ekohExpertise")}
+      description={i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.domainSpecificExpertiseContextAvailableToKeenkonnect")}
+      metaTitle={i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.keenkonnectEkohExpertise")}
     >
       {isError && (
         <Alert
           type="error"
           showIcon
-          message="Unable to load EkoH profile"
-          description={(error as Error | undefined)?.message ?? 'Please try again.'}
+          message={i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.unableToLoadEkohProfile")}
+          description={(error as Error | undefined)?.message ?? i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.pleaseTryAgain")}
           style={{ marginBottom: 16 }}
         />
       )}
@@ -51,8 +53,8 @@ export default function ViewReputationEkohPage(): JSX.Element {
       <Alert
         type="info"
         showIcon
-        message="Contextual expertise, not a global influence score"
-        description="KeenKonnect can use EkoH expertise to discover relevant collaborators. A Smart Vote weight only exists inside a declared decision context; it is not a permanent property of a person."
+        message={i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.contextualExpertiseNotAGlobalInfluenceScore")}
+        description={i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.keenkonnectCanUseEkohExpertiseToDiscover")}
         style={{ marginBottom: 16 }}
       />
 
@@ -65,33 +67,33 @@ export default function ViewReputationEkohPage(): JSX.Element {
               </Avatar>
               <div style={{ textAlign: 'center' }}>
                 <Title level={4} style={{ marginBottom: 4 }}>{displayName}</Title>
-                <Text type="secondary">EkoH domain profile</Text>
+                <Text type="secondary">{i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.ekohDomainProfile")}</Text>
               </div>
               {ekohProfile ? (
                 <Space wrap style={{ justifyContent: 'center' }}>
                   <Tag>{ekohProfile.confidentialityLevel}</Tag>
-                  <Tag>{expertise.length} domains</Tag>
+                  <Tag>{expertise.length} {i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.domains")}</Tag>
                   <Tag>
-                    Reliability {ekohProfile.ethicsScore == null
-                      ? 'restricted'
-                      : `${ekohProfile.ethicsScore.toFixed(2)}×`}
+                    {i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.reliability")} {ekohProfile.ethicsScore == null
+                      ? i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.restricted")
+                      : i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.text", { value1: ekohProfile.ethicsScore.toFixed(2) })}
                   </Tag>
                 </Space>
               ) : (
-                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No EkoH profile" />
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.noEkohProfile")} />
               )}
             </Space>
           </Card>
 
-          <Card title="Profile use" style={{ marginTop: 16 }}>
+          <Card title={i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.profileUse")} style={{ marginTop: 16 }}>
             <Paragraph style={{ marginBottom: 0 }}>
-              Expertise scores help identify contributors whose demonstrated competence matches a project's or consultation's declared domains. They do not create authority outside those domains.
+              {i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.expertiseScoresHelpIdentifyContributorsWhoseDemonstrated")}
             </Paragraph>
           </Card>
         </Col>
 
         <Col xs={24} lg={16}>
-          <Card title="Expertise by domain" loading={isLoading}>
+          <Card title={i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.expertiseByDomain")} loading={isLoading}>
             {expertise.length ? (
               <List<EkohExpertiseScore>
                 dataSource={expertise}
@@ -114,11 +116,11 @@ export default function ViewReputationEkohPage(): JSX.Element {
                 }}
               />
             ) : (
-              <Empty description="No canonical EkoH expertise scores available" />
+              <Empty description={i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.noCanonicalEkohExpertiseScoresAvailable")} />
             )}
           </Card>
 
-          <Card title="Recent evidence and activity context" style={{ marginTop: 16 }}>
+          <Card title={i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.recentEvidenceAndActivityContext")} style={{ marginTop: 16 }}>
             {timeline.length ? (
               <Timeline
                 items={timeline.map((item) => ({
@@ -132,13 +134,13 @@ export default function ViewReputationEkohPage(): JSX.Element {
                 }))}
               />
             ) : (
-              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No recent activity" />
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.noRecentActivity")} />
             )}
           </Card>
         </Col>
       </Row>
 
-      <Card title="Badges and discovery signals" style={{ marginTop: 24 }}>
+      <Card title={i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.badgesAndDiscoverySignals")} style={{ marginTop: 24 }}>
         {badges.length ? (
           <List
             size="small"
@@ -150,10 +152,10 @@ export default function ViewReputationEkohPage(): JSX.Element {
             )}
           />
         ) : (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No badges earned yet" />
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.noBadgesEarnedYet")} />
         )}
         <Paragraph type="secondary" style={{ marginTop: 16, marginBottom: 0 }}>
-          Badges and activity may support discovery, but they are not substitutes for a domain-specific EkoH expertise score or for a declared Smart Vote lens.
+          {i18nT("ui.keenkonnect.userReputation.viewReputationEkoh.badgesAndActivityMaySupportDiscoveryBut")}
         </Paragraph>
       </Card>
     </KeenPageShell>

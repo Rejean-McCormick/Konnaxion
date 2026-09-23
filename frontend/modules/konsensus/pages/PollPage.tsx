@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from '@/context/LanguageContext';
 import { useQueryClient } from "@tanstack/react-query";
 import { Alert, Card, message, Spin } from "antd";
 import React from "react";
@@ -21,6 +22,7 @@ const LIVE_POLL_INTERVAL_MS = 15_000;
  * back to the same endpoint.
  */
 export default function PollPage() {
+  const { t: i18nT } = useLanguage();
   const pollId = DEFAULT_POLL_ID;
   const cfg = pollConfig[pollId];
   const queryClient = useQueryClient();
@@ -50,11 +52,11 @@ export default function PollPage() {
       });
 
       queryClient.invalidateQueries({ queryKey: ["poll", pollId] });
-      message.success("Your vote has been recorded.");
+      message.success(i18nT("ui.konsensus.pages.pollpage.yourVoteHasBeenRecorded"));
     } catch (e) {
        
       console.error("Vote submission failed", e);
-      message.error("Unable to record your vote. Please try again.");
+      message.error(i18nT("ui.konsensus.pages.pollpage.unableToRecordYourVotePleaseTry"));
     }
   };
 
@@ -63,7 +65,7 @@ export default function PollPage() {
     return (
       <Alert
         message={
-          (error as Error)?.message || "Failed to load the current poll."
+          (error as Error)?.message || i18nT("ui.konsensus.pages.pollpage.failedToLoadTheCurrentPoll")
         }
         type="error"
       />
@@ -72,14 +74,14 @@ export default function PollPage() {
 
   return (
     <div className="container mx-auto py-8">
-      <Card title="Current Konsensus Poll">
+      <Card title={i18nT("ui.konsensus.pages.pollpage.currentKonsensusPoll")}>
         <h1 className="mb-4 text-xl font-semibold">{poll.question}</h1>
 
         <div className="mb-4 flex flex-wrap items-baseline gap-4">
-          <span>Yes: {poll.yes}</span>
-          <span>No: {poll.no}</span>
-          <span>Total: {poll.total}</span>
-          <span>Support: {poll.supportPercent}%</span>
+          <span>{i18nT("ui.konsensus.pages.pollpage.yes")} {poll.yes}</span>
+          <span>{i18nT("ui.konsensus.pages.pollpage.no")} {poll.no}</span>
+          <span>{i18nT("ui.konsensus.pages.pollpage.total")} {poll.total}</span>
+          <span>{i18nT("ui.konsensus.pages.pollpage.support")} {poll.supportPercent}%</span>
         </div>
 
         <div className="mb-6 max-w-md">

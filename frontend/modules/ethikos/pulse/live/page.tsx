@@ -1,6 +1,7 @@
 // FILE: frontend/modules/ethikos/pulse/live/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
 import { Badge, Space } from 'antd';
@@ -27,7 +28,8 @@ function normalizePulseChartData(history: LoosePulseChartPoint[] = []) {
 }
 
 export default function PulseLive(): JSX.Element {
-  usePageTitle('Pulse · Live Metrics');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.ethikos.pulse.live.pulseLiveMetrics"));
 
   // Single polling source only.
   const { data, loading, refresh } = usePulseLive(true);

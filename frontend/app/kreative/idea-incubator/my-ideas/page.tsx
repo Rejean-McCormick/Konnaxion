@@ -2,6 +2,7 @@
 // C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\my-ideas\page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Alert, Badge, Button, Input, List, Select, Space, Typography } from 'antd';
 import React, { useMemo, useState } from 'react';
 
@@ -45,6 +46,7 @@ const PREVIEW_IDEAS: Idea[] = [
 ];
 
 export default function MyIdeasPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<StatusFilter>('All');
 
@@ -62,14 +64,14 @@ export default function MyIdeasPage(): JSX.Element {
 
   return (
     <KreativePageShell
-      title="My Ideas"
-      subtitle="Browse and manage your creative ideas in the incubator."
+      title={i18nT("ui.kreative.ideaIncubator.myIdeas.myIdeas")}
+      subtitle={i18nT("ui.kreative.ideaIncubator.myIdeas.browseAndManageYourCreativeIdeasIn")}
     >
       <Alert
         type="info"
         showIcon
-        message="Idea incubator preview"
-        description="This surface uses a declared preview dataset because no dedicated idea/showcase persistence contract exists in the current backend. Preview records are not presented as persisted state."
+        message={i18nT("ui.kreative.ideaIncubator.myIdeas.ideaIncubatorPreview")}
+        description={i18nT("ui.kreative.ideaIncubator.myIdeas.thisSurfaceUsesADeclaredPreviewDataset")}
         style={{ marginBottom: 16 }}
       />
       <Space
@@ -79,7 +81,7 @@ export default function MyIdeasPage(): JSX.Element {
       >
         <Space>
           <Input
-            placeholder="Search by title."
+            placeholder={i18nT("ui.kreative.ideaIncubator.myIdeas.searchByTitle")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ width: 300 }}
@@ -90,9 +92,9 @@ export default function MyIdeasPage(): JSX.Element {
             onChange={(value) => setSelectedStatus(value)}
             style={{ width: 220 }}
             options={[
-              { value: 'All', label: 'All Status' },
-              { value: 'Seeking Collaboration', label: 'Seeking Collaboration' },
-              { value: 'In Progress', label: 'In Progress' },
+              { value: 'All', label: i18nT("ui.kreative.ideaIncubator.myIdeas.allStatus") },
+              { value: 'Seeking Collaboration', label: i18nT("ui.kreative.ideaIncubator.myIdeas.seekingCollaboration") },
+              { value: 'In Progress', label: i18nT("ui.kreative.ideaIncubator.myIdeas.inProgress") },
             ]}
           />
         </Space>
@@ -106,10 +108,10 @@ export default function MyIdeasPage(): JSX.Element {
             key={idea.id}
             actions={[
               <Button key="edit" type="primary" disabled>
-                Edit unavailable
+                {i18nT("ui.kreative.ideaIncubator.myIdeas.editUnavailable")}
               </Button>,
               <Button key="view" disabled>
-                View preview
+                {i18nT("ui.kreative.ideaIncubator.myIdeas.viewPreview")}
               </Button>,
             ]}
           >
@@ -129,10 +131,10 @@ export default function MyIdeasPage(): JSX.Element {
               }
               description={
                 <>
-                  <Text type="secondary">Status: {idea.status}</Text>
+                  <Text type="secondary">{i18nT("ui.kreative.ideaIncubator.myIdeas.status")} {idea.status}</Text>
                   <br />
                   <Text type="secondary">
-                    Created on: {idea.dateCreated}
+                    {i18nT("ui.kreative.ideaIncubator.myIdeas.createdOn")} {idea.dateCreated}
                   </Text>
                 </>
               }

@@ -3,6 +3,10 @@
 // app/ethikos/insights/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
+import { scopeLabel } from '@/i18n/uiModelLabels';
+import { impactKpiLabel, pulseCounterLabel, pulseKpiLabel } from '@/i18n/uiModelLabels';
 import {
   ArrowRightOutlined,
   BranchesOutlined,
@@ -151,9 +155,9 @@ function formatTrendStatus(trend?: number): 'success' | 'error' | 'default' {
   return 'default';
 }
 
-function formatDate(value?: string): string {
+function formatDate(i18nT: TranslateFunction, value?: string): string {
   if (!value) {
-    return 'Unknown';
+    return i18nT("ui.ethikos.insights.unknown");
   }
 
   const parsed = dayjs(value);
@@ -166,6 +170,7 @@ function route(path: string): string {
 }
 
 export default function EthikosOverviewPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [timeRange, setTimeRange] = useState<RangeValue>(() => [
     dayjs().subtract(30, 'day'),
     dayjs(),
@@ -256,29 +261,29 @@ export default function EthikosOverviewPage(): JSX.Element {
 
   const workflowCards: WorkflowCard[] = [
     {
-      title: 'Deliberate',
-      description: 'Open a topic, inspect the argument thread, and contribute a position.',
+      title: i18nT("ui.ethikos.insights.deliberate"),
+      description: i18nT("ui.ethikos.insights.openATopicInspectTheArgumentThread"),
       href: route('/ethikos/deliberate/elite'),
       action: 'Open topics',
       icon: <StarOutlined />,
     },
     {
-      title: 'Decide',
-      description: 'Review public consultations or expert decisions and cast a vote.',
+      title: i18nT("ui.ethikos.insights.decide"),
+      description: i18nT("ui.ethikos.insights.reviewPublicConsultationsOrExpertDecisionsAnd"),
       href: route('/ethikos/decide/public'),
       action: 'Vote now',
       icon: <SafetyCertificateOutlined />,
     },
     {
-      title: 'Track impact',
-      description: 'Follow outcomes and implementation progress after decisions.',
+      title: i18nT("ui.ethikos.insights.trackImpact"),
+      description: i18nT("ui.ethikos.insights.followOutcomesAndImplementationProgressAfterDecisions"),
       href: route('/ethikos/impact/tracker'),
       action: 'Track impact',
       icon: <RadarChartOutlined />,
     },
     {
-      title: 'Monitor pulse',
-      description: 'Check live participation, debate health, and trend signals.',
+      title: i18nT("ui.ethikos.insights.monitorPulse"),
+      description: i18nT("ui.ethikos.insights.checkLiveParticipationDebateHealthAndTrend"),
       href: route('/ethikos/pulse/live'),
       action: 'View pulse',
       icon: <ColumnWidthOutlined />,
@@ -287,39 +292,39 @@ export default function EthikosOverviewPage(): JSX.Element {
 
   const decisionsColumns: ColumnsType<DecisionRow> = [
     {
-      title: 'Decision',
+      title: i18nT("ui.ethikos.insights.decision"),
       dataIndex: 'title',
       key: 'title',
       ellipsis: true,
     },
     {
-      title: 'Result',
+      title: i18nT("ui.ethikos.insights.result"),
       dataIndex: 'passed',
       key: 'passed',
       width: 110,
       render: (_passed: boolean, row) => (
         <Tag color={row.passed ? 'green' : 'red'}>
-          {row.passed ? 'PASSED' : 'REJECTED'}
+          {row.passed ? i18nT("ui.ethikos.insights.passed") : i18nT("ui.ethikos.insights.rejected")}
         </Tag>
       ),
     },
     {
-      title: 'Scope',
+      title: i18nT("ui.ethikos.insights.scope"),
       dataIndex: 'scope',
       key: 'scope',
       width: 110,
       render: (_scope: DecisionScope, row) => (
         <Tag color={row.scope === 'Elite' ? 'geekblue' : 'default'}>
-          {row.scope}
+          {scopeLabel(i18nT, row.scope)}
         </Tag>
       ),
     },
     {
-      title: 'Closed',
+      title: i18nT("ui.ethikos.insights.closed"),
       dataIndex: 'closesAt',
       key: 'closesAt',
       width: 130,
-      render: (_value: string, row) => formatDate(row.closesAt),
+      render: (_value: string, row) => formatDate(i18nT, row.closesAt),
     },
   ];
 
@@ -328,7 +333,7 @@ export default function EthikosOverviewPage(): JSX.Element {
       {lastUpdated && (
         <Badge
           count={
-            <Tooltip title={`Last refreshed at ${lastUpdated}`}>
+            <Tooltip title={i18nT("ui.ethikos.insights.lastRefreshedAt", { lastUpdated: lastUpdated })}>
               <ClockCircleOutlined style={{ color: '#52c41a' }} />
             </Tooltip>
           }
@@ -346,10 +351,10 @@ export default function EthikosOverviewPage(): JSX.Element {
   );
 
   const shellProps = {
-    title: 'Ethikos overview',
+    title: i18nT("ui.ethikos.insights.ethikosOverview"),
     subtitle:
-      'Your current deliberation, decision, trust, pulse, and impact snapshot.',
-    sectionLabel: 'Overview',
+      i18nT("ui.ethikos.insights.yourCurrentDeliberationDecisionTrustPulseAnd"),
+    sectionLabel: i18nT("ui.ethikos.insights.overview"),
     secondaryActions,
   } as const;
 
@@ -368,7 +373,7 @@ export default function EthikosOverviewPage(): JSX.Element {
       <EthikosPageShell {...shellProps}>
         <PageContainer ghost>
           <Empty
-            description="Failed to load Ethikos overview"
+            description={i18nT("ui.ethikos.insights.failedToLoadEthikosOverview")}
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           >
             <Button
@@ -376,7 +381,7 @@ export default function EthikosOverviewPage(): JSX.Element {
               onClick={() => refresh()}
               type="primary"
             >
-              Retry
+              {i18nT("ui.ethikos.insights.retry")}
             </Button>
           </Empty>
         </PageContainer>
@@ -394,7 +399,7 @@ export default function EthikosOverviewPage(): JSX.Element {
     return (
       <EthikosPageShell {...shellProps}>
         <PageContainer ghost>
-          <Empty description="No Ethikos overview data available yet" />
+          <Empty description={i18nT("ui.ethikos.insights.noEthikosOverviewDataAvailableYet")} />
         </PageContainer>
       </EthikosPageShell>
     );
@@ -408,7 +413,7 @@ export default function EthikosOverviewPage(): JSX.Element {
             showIcon
             type="warning"
             style={{ marginBottom: 16 }}
-            message="Some overview sections could not be refreshed"
+            message={i18nT("ui.ethikos.insights.someOverviewSectionsCouldNotBeRefreshed")}
             description={
               <Space direction="vertical" size={2}>
                 {data.errors.map((message) => (
@@ -425,7 +430,7 @@ export default function EthikosOverviewPage(): JSX.Element {
           title={
             <Space>
               <DashboardOutlined />
-              <span>Where to start</span>
+              <span>{i18nT("ui.ethikos.insights.whereToStart")}</span>
             </Space>
           }
           style={{ marginBottom: 16 }}
@@ -457,7 +462,7 @@ export default function EthikosOverviewPage(): JSX.Element {
         </ProCard>
 
         <ProCard
-          title="Current snapshot"
+          title={i18nT("ui.ethikos.insights.currentSnapshot")}
           gutter={[16, 16]}
           wrap
           style={{ marginBottom: 16 }}
@@ -468,7 +473,7 @@ export default function EthikosOverviewPage(): JSX.Element {
                 key={kpi.key ?? kpi.label}
                 colSpan={{ xs: 24, sm: 12, lg: 6 }}
                 statistic={{
-                  title: kpi.label,
+                  title: pulseKpiLabel(i18nT, kpi.key, kpi.label),
                   value: kpi.value,
                   description:
                     typeof kpi.delta === 'number' ? (
@@ -487,7 +492,7 @@ export default function EthikosOverviewPage(): JSX.Element {
             <ProCard>
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="No KPI snapshot available yet"
+                description={i18nT("ui.ethikos.insights.noKpiSnapshotAvailableYet")}
               />
             </ProCard>
           )}
@@ -499,29 +504,29 @@ export default function EthikosOverviewPage(): JSX.Element {
             title={
               <Space>
                 <WarningOutlined />
-                <span>Needs attention</span>
+                <span>{i18nT("ui.ethikos.insights.needsAttention")}</span>
               </Space>
             }
           >
             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
               <StatisticCard
                 statistic={{
-                  title: 'Open debates',
+                  title: i18nT("ui.ethikos.insights.openDebates"),
                   value: openKpi?.value ?? 0,
-                  description: 'Topics still available for participation',
+                  description: i18nT("ui.ethikos.insights.topicsStillAvailableForParticipation"),
                 }}
               />
 
               <StatisticCard
                 statistic={{
-                  title: 'Total stances',
+                  title: i18nT("ui.ethikos.insights.totalStances"),
                   value: stancesKpi?.value ?? 0,
-                  description: 'Participation volume across Ethikos',
+                  description: i18nT("ui.ethikos.insights.participationVolumeAcrossEthikos"),
                 }}
               />
 
               <Button href={route('/ethikos/deliberate/elite')} block>
-                Review open topics
+                {i18nT("ui.ethikos.insights.reviewOpenTopics")}
               </Button>
             </Space>
           </ProCard>
@@ -531,30 +536,30 @@ export default function EthikosOverviewPage(): JSX.Element {
             title={
               <Space>
                 <CheckCircleOutlined />
-                <span>Decision health</span>
+                <span>{i18nT("ui.ethikos.insights.decisionHealth")}</span>
               </Space>
             }
           >
             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
               <StatisticCard
                 statistic={{
-                  title: 'Tracked topics',
+                  title: i18nT("ui.ethikos.insights.trackedTopics"),
                   value: topicsKpi?.value ?? 0,
-                  description: 'Topics included in outcome tracking',
+                  description: i18nT("ui.ethikos.insights.topicsIncludedInOutcomeTracking"),
                 }}
               />
 
               <StatisticCard
                 statistic={{
-                  title: 'Average agreement',
+                  title: i18nT("ui.ethikos.insights.averageAgreement"),
                   value: agreementKpi?.value ?? 0,
                   suffix: '%',
-                  description: 'Derived from topic-level Ethikos stances',
+                  description: i18nT("ui.ethikos.insights.derivedFromTopicLevelEthikosStances"),
                 }}
               />
 
               <Button href={route('/ethikos/decide/results')} block>
-                Review results
+                {i18nT("ui.ethikos.insights.reviewResults")}
               </Button>
             </Space>
           </ProCard>
@@ -564,24 +569,24 @@ export default function EthikosOverviewPage(): JSX.Element {
             title={
               <Space>
                 <LineChartOutlined />
-                <span>Live activity</span>
+                <span>{i18nT("ui.ethikos.insights.liveActivity")}</span>
               </Space>
             }
           >
             {liveCounters.length === 0 ? (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="No live counters available yet"
+                description={i18nT("ui.ethikos.insights.noLiveCountersAvailableYet")}
               />
             ) : (
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                 {liveCounters.slice(0, 3).map((counter) => (
                   <StatisticCard
-                    key={counter.label}
+                    key={counter.key ?? counter.label}
                     statistic={{
                       title: (
                         <Space>
-                          {counter.label}
+                          {pulseCounterLabel(i18nT, counter.key, counter.label)}
                           <Badge status={formatTrendStatus(counter.trend)} />
                         </Space>
                       ),
@@ -605,7 +610,7 @@ export default function EthikosOverviewPage(): JSX.Element {
                 ))}
 
                 <Button href={route('/ethikos/pulse/live')} block>
-                  Open live pulse
+                  {i18nT("ui.ethikos.insights.openLivePulse")}
                 </Button>
               </Space>
             )}
@@ -616,19 +621,19 @@ export default function EthikosOverviewPage(): JSX.Element {
           title={
             <Space>
               <FilterOutlined />
-              <span>Recent decisions</span>
+              <span>{i18nT("ui.ethikos.insights.recentDecisions")}</span>
             </Space>
           }
           extra={
             <Text type="secondary">
-              Showing {recentDecisions.length} / {decisionItems.length}
+              {i18nT("ui.ethikos.insights.showing")} {recentDecisions.length} / {decisionItems.length}
             </Text>
           }
           style={{ marginBottom: 16 }}
         >
           <Space wrap align="center" style={{ marginBottom: 16 }}>
             <Space size="small">
-              <Text type="secondary">Time window</Text>
+              <Text type="secondary">{i18nT("ui.ethikos.insights.timeWindow")}</Text>
               <RangePicker
                 allowEmpty={[true, true]}
                 value={timeRange ?? undefined}
@@ -637,26 +642,26 @@ export default function EthikosOverviewPage(): JSX.Element {
             </Space>
 
             <Space size="small">
-              <Text type="secondary">Scope</Text>
+              <Text type="secondary">{i18nT("ui.ethikos.insights.scope")}</Text>
               <Select<'all' | DecisionScope>
                 style={{ minWidth: 140 }}
                 value={scopeFilter}
                 onChange={(value) => setScopeFilter(value)}
               >
-                <Option value="all">All</Option>
-                <Option value="Elite">Expert</Option>
-                <Option value="Public">Public</Option>
+                <Option value="all">{i18nT("ui.ethikos.insights.all")}</Option>
+                <Option value="Elite">{i18nT("ui.ethikos.insights.expert")}</Option>
+                <Option value="Public">{i18nT("ui.ethikos.insights.public")}</Option>
               </Select>
             </Space>
 
             <Space size="small">
-              <Text type="secondary">Region</Text>
+              <Text type="secondary">{i18nT("ui.ethikos.insights.region")}</Text>
               <Select<string | 'all'>
                 style={{ minWidth: 160 }}
                 value={regionFilter}
                 onChange={(value) => setRegionFilter(value)}
               >
-                <Option value="all">All regions</Option>
+                <Option value="all">{i18nT("ui.ethikos.insights.allRegions")}</Option>
                 {allRegions.map((region) => (
                   <Option key={region} value={region}>
                     {region}
@@ -669,7 +674,7 @@ export default function EthikosOverviewPage(): JSX.Element {
           {recentDecisions.length === 0 ? (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No decisions match the current filters"
+              description={i18nT("ui.ethikos.insights.noDecisionsMatchTheCurrentFilters")}
             />
           ) : (
             <Table<DecisionRow>
@@ -685,19 +690,19 @@ export default function EthikosOverviewPage(): JSX.Element {
 
           <Space wrap>
             <Button href={route('/ethikos/decide/results')}>
-              Open full results
+              {i18nT("ui.ethikos.insights.openFullResults")}
             </Button>
             <Button href={route('/ethikos/impact/outcomes')}>
-              View outcomes
+              {i18nT("ui.ethikos.insights.viewOutcomes")}
             </Button>
             <Button href={route('/ethikos/impact/tracker')}>
-              Track implementation
+              {i18nT("ui.ethikos.insights.trackImplementation")}
             </Button>
           </Space>
         </ProCard>
 
         <ProCard
-          title="Deep-dive areas"
+          title={i18nT("ui.ethikos.insights.deepDiveAreas")}
           gutter={[16, 16]}
           wrap
         >
@@ -707,15 +712,15 @@ export default function EthikosOverviewPage(): JSX.Element {
             title={
               <Space>
                 <ColumnWidthOutlined />
-                <span>Pulse</span>
+                <span>{i18nT("ui.ethikos.insights.pulse")}</span>
               </Space>
             }
           >
             <Paragraph type="secondary">
-              Live activity, debate health, trends, and participation monitoring.
+              {i18nT("ui.ethikos.insights.liveActivityDebateHealthTrendsAndParticipation")}
             </Paragraph>
             <Button href={route('/ethikos/pulse/overview')}>
-              Open pulse overview
+              {i18nT("ui.ethikos.insights.openPulseOverview")}
             </Button>
           </ProCard>
 
@@ -725,15 +730,15 @@ export default function EthikosOverviewPage(): JSX.Element {
             title={
               <Space>
                 <RadarChartOutlined />
-                <span>Impact</span>
+                <span>{i18nT("ui.ethikos.insights.impact")}</span>
               </Space>
             }
           >
             <Paragraph type="secondary">
-              Outcomes, feedback, and implementation tracking after decisions.
+              {i18nT("ui.ethikos.insights.outcomesFeedbackAndImplementationTrackingAfterDecisions")}
             </Paragraph>
             <Button href={route('/ethikos/impact/tracker')}>
-              Open impact tracker
+              {i18nT("ui.ethikos.insights.openImpactTracker")}
             </Button>
           </ProCard>
 
@@ -743,15 +748,15 @@ export default function EthikosOverviewPage(): JSX.Element {
             title={
               <Space>
                 <TrophyOutlined />
-                <span>Trust</span>
+                <span>{i18nT("ui.ethikos.insights.trust")}</span>
               </Space>
             }
           >
             <Paragraph type="secondary">
-              Profile credibility, badges, and credentials for deliberation trust.
+              {i18nT("ui.ethikos.insights.profileCredibilityBadgesAndCredentialsForDeliberation")}
             </Paragraph>
             <Button href={route('/ethikos/trust/profile')}>
-              Open trust profile
+              {i18nT("ui.ethikos.insights.openTrustProfile")}
             </Button>
           </ProCard>
 
@@ -761,15 +766,15 @@ export default function EthikosOverviewPage(): JSX.Element {
             title={
               <Space>
                 <BranchesOutlined />
-                <span>Learn</span>
+                <span>{i18nT("ui.ethikos.insights.learn")}</span>
               </Space>
             }
           >
             <Paragraph type="secondary">
-              Guides, glossary, and changelog for using Ethikos responsibly.
+              {i18nT("ui.ethikos.insights.guidesGlossaryAndChangelogForUsingEthikos")}
             </Paragraph>
             <Button href={route('/ethikos/learn/guides')}>
-              Open guides
+              {i18nT("ui.ethikos.insights.openGuides")}
             </Button>
           </ProCard>
         </ProCard>

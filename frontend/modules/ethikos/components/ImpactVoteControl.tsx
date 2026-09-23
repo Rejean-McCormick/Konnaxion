@@ -1,6 +1,7 @@
 // FILE: frontend/modules/ethikos/components/ImpactVoteControl.tsx
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Button, message, Space, Tooltip, Typography } from 'antd'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
@@ -122,6 +123,7 @@ export default function ImpactVoteControl({
   onChange,
   onVotesLoaded,
 }: ImpactVoteControlProps) {
+  const { t: i18nT } = useLanguage();
   const [votes, setVotes] = useState<ArgumentImpactVoteApi[]>(
     () => initialVotes ?? [],
   )
@@ -241,7 +243,7 @@ export default function ImpactVoteControl({
       return {
         count: 0,
         average: null as number | null,
-        label: 'No impact votes yet',
+        label: i18nT("ui.ethikos.impactvotecontrol.noImpactVotesYet"),
       }
     }
 
@@ -253,11 +255,9 @@ export default function ImpactVoteControl({
     return {
       count,
       average,
-      label: `${average.toFixed(1)} / 4 · ${count} vote${
-        count === 1 ? '' : 's'
-      } · ${IMPACT_LABELS[roundedLabelValue]}`,
+      label: i18nT("ui.ethikos.impactvotecontrol.text4Vote", { value1: average.toFixed(1), count: count, value2: count === 1 ? '' : 's', value3: IMPACT_LABELS[roundedLabelValue] }),
     }
-  }, [votes])
+  }, [votes, i18nT])
 
   const handleVote = useCallback(
     async (value: ArgumentImpactValue) => {
@@ -278,7 +278,7 @@ export default function ImpactVoteControl({
         setVotes((currentVotes) => mergeSubmittedVote(currentVotes, submitted))
         onChangeRef.current?.(submitted)
 
-        message.success('Impact vote saved.')
+        message.success(i18nT("ui.ethikos.impactvotecontrol.impactVoteSaved"))
       } catch (error) {
         if (mountedRef.current) {
           message.error(errorMessage(error))
@@ -289,7 +289,7 @@ export default function ImpactVoteControl({
         }
       }
     },
-    [argumentId, disabled, submittingValue],
+    [argumentId, disabled, submittingValue, i18nT],
   )
 
   return (
@@ -308,7 +308,7 @@ export default function ImpactVoteControl({
                   loading={isSubmitting}
                   disabled={disabled || loading || submittingValue !== null}
                   aria-pressed={selected}
-                  aria-label={`Set argument impact vote to ${value}: ${IMPACT_LABELS[value]}`}
+                  aria-label={i18nT("ui.ethikos.impactvotecontrol.setArgumentImpactVoteTo", { value: value, value1: IMPACT_LABELS[value] })}
                   onClick={() => void handleVote(value)}
                 >
                   {value}

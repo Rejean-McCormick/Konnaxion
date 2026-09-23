@@ -1,6 +1,8 @@
 // FILE: frontend/modules/konsultations/pages/ConsultationDetailPage.tsx
 ﻿'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
+import { scopeLabel } from '@/i18n/uiModelLabels';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { Alert, Empty, Result, Space, Tag, Typography } from 'antd';
 import dayjs from 'dayjs';
@@ -33,6 +35,7 @@ export interface ConsultationDetailProps {
 const ConsultationDetailPage: React.FC<ConsultationDetailProps> = ({
   consultationId,
 }) => {
+  const { t: i18nT } = useLanguage();
   // Primary source of consultation metadata (title, status, dates, etc.)
   const {
     data: impact,
@@ -68,12 +71,12 @@ const ConsultationDetailPage: React.FC<ConsultationDetailProps> = ({
     return (
       <EthikosPageShell
         title={pageTitle}
-        sectionLabel="Consultation"
-        metaTitle={`ethiKos · Consultation · ${pageTitle}`}
+        sectionLabel={i18nT("ui.konsultations.pages.consultationdetailpage.consultation")}
+        metaTitle={i18nT("ui.konsultations.pages.consultationdetailpage.ethikosConsultation", { pageTitle: pageTitle })}
       >
         <Result
           status="error"
-          title="Failed to load consultation"
+          title={i18nT("ui.konsultations.pages.consultationdetailpage.failedToLoadConsultation")}
           subTitle={
             impactError.message ||
             'This consultation may not exist or an error occurred.'
@@ -153,8 +156,8 @@ const ConsultationDetailPage: React.FC<ConsultationDetailProps> = ({
   return (
     <EthikosPageShell
       title={pageTitle}
-      sectionLabel="Consultation"
-      metaTitle={`ethiKos · Consultation · ${pageTitle}`}
+      sectionLabel={i18nT("ui.konsultations.pages.consultationdetailpage.consultation")}
+      metaTitle={i18nT("ui.konsultations.pages.consultationdetailpage.ethikosConsultation", { pageTitle: pageTitle })}
     >
       <PageContainer ghost loading={loading}>
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -169,14 +172,14 @@ const ConsultationDetailPage: React.FC<ConsultationDetailProps> = ({
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
                   {summary.category && (
                     <Text>
-                      Category: <Text strong>{summary.category}</Text>
+                      {i18nT("ui.konsultations.pages.consultationdetailpage.category")} <Text strong>{summary.category}</Text>
                     </Text>
                   )}
                   {summary.scope && (
                     <>
                       {' · '}
                       <Text>
-                        Scope: <Text strong>{summary.scope}</Text>
+                        {i18nT("ui.konsultations.pages.consultationdetailpage.scope")} <Text strong>{scopeLabel(i18nT, summary.scope)}</Text>
                       </Text>
                     </>
                   )}
@@ -184,7 +187,7 @@ const ConsultationDetailPage: React.FC<ConsultationDetailProps> = ({
                     <>
                       {' · '}
                       <Text type="secondary">
-                        {summary.stances} participant stances recorded
+                        {summary.stances} {i18nT("ui.konsultations.pages.consultationdetailpage.participantStancesRecorded")}
                       </Text>
                     </>
                   )}
@@ -194,18 +197,18 @@ const ConsultationDetailPage: React.FC<ConsultationDetailProps> = ({
           )}
 
           {/* Stance submission form */}
-          <ProCard title="Your stance" bordered>
+          <ProCard title={i18nT("ui.konsultations.pages.consultationdetailpage.yourStance")} bordered>
             <ConsultationForm consultationId={consultationId} />
           </ProCard>
 
           {/* Results and Suggestions side by side */}
           <ProCard ghost gutter={16} wrap>
-            <ProCard colSpan={{ xs: 24, md: 12 }} title="Results">
+            <ProCard colSpan={{ xs: 24, md: 12 }} title={i18nT("ui.konsultations.pages.consultationdetailpage.results")}>
               {resultsIsError && resultsError ? (
                 <Alert
                   type="error"
                   showIcon
-                  message="Could not load results."
+                  message={i18nT("ui.konsultations.pages.consultationdetailpage.couldNotLoadResults")}
                   description={resultsError.message}
                 />
               ) : (
@@ -213,7 +216,7 @@ const ConsultationDetailPage: React.FC<ConsultationDetailProps> = ({
               )}
             </ProCard>
 
-            <ProCard colSpan={{ xs: 24, md: 12 }} title="Suggestions">
+            <ProCard colSpan={{ xs: 24, md: 12 }} title={i18nT("ui.konsultations.pages.consultationdetailpage.suggestions")}>
               <SuggestionBoard
                 suggestions={boardSuggestions}
                 isLoading={suggestionsLoading || suggestionsSubmitting}
@@ -230,7 +233,7 @@ const ConsultationDetailPage: React.FC<ConsultationDetailProps> = ({
                 !suggestionsIsError &&
                 boardSuggestions.length === 0 && (
                   <Empty
-                    description="No suggestions yet"
+                    description={i18nT("ui.konsultations.pages.consultationdetailpage.noSuggestionsYet")}
                     style={{ marginTop: 16 }}
                   />
                 )}
@@ -238,11 +241,11 @@ const ConsultationDetailPage: React.FC<ConsultationDetailProps> = ({
           </ProCard>
 
           {/* Impact timeline */}
-          <ProCard title="Impact timeline" bordered>
+          <ProCard title={i18nT("ui.konsultations.pages.consultationdetailpage.impactTimeline")} bordered>
             {impactLoading ? (
-              <Empty description="Loading impact timeline…" />
+              <Empty description={i18nT("ui.konsultations.pages.consultationdetailpage.loadingImpactTimeline")} />
             ) : impactEvents.length === 0 ? (
-              <Empty description="No impact actions recorded yet." />
+              <Empty description={i18nT("ui.konsultations.pages.consultationdetailpage.noImpactActionsRecordedYet")} />
             ) : (
               <ImpactTimeline events={impactEvents} />
             )}

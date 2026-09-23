@@ -1,6 +1,8 @@
 // FILE: frontend/modules/ethikos/components/DiscussionVisibilityPanel.tsx
 'use client'
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   EyeInvisibleOutlined,
   EyeOutlined,
@@ -61,67 +63,67 @@ const DEFAULT_VALUES: VisibilityFormValues = {
   vote_visibility: 'all',
 }
 
-const PARTICIPATION_OPTIONS: Array<{
+const PARTICIPATION_OPTIONS = (i18nT: TranslateFunction): Array<{
   value: DiscussionParticipationType
   label: string
   description: string
-}> = [
+}> => ([
   {
     value: 'standard',
-    label: 'Standard participation',
-    description: 'Authors and roles are handled with normal visibility rules.',
+    label: i18nT("ui.ethikos.discussionvisibilitypanel.standardParticipation"),
+    description: i18nT("ui.ethikos.discussionvisibilitypanel.authorsAndRolesAreHandledWithNormal"),
   },
   {
     value: 'anonymous',
-    label: 'Anonymous participation',
+    label: i18nT("ui.ethikos.discussionvisibilitypanel.anonymousParticipation"),
     description:
-      'Participants may contribute with reduced public identity exposure.',
+      i18nT("ui.ethikos.discussionvisibilitypanel.participantsMayContributeWithReducedPublicIdentity"),
   },
-]
+])
 
-const AUTHOR_VISIBILITY_OPTIONS: Array<{
+const AUTHOR_VISIBILITY_OPTIONS = (i18nT: TranslateFunction): Array<{
   value: AuthorVisibility
   label: string
   description: string
-}> = [
+}> => ([
   {
     value: 'all',
-    label: 'Visible to all',
-    description: 'Author identity may be shown to all participants.',
+    label: i18nT("ui.ethikos.discussionvisibilitypanel.visibleToAll"),
+    description: i18nT("ui.ethikos.discussionvisibilitypanel.authorIdentityMayBeShownToAll"),
   },
   {
     value: 'admins_only',
-    label: 'Admins only',
-    description: 'Author identity is limited to administrators/moderators.',
+    label: i18nT("ui.ethikos.discussionvisibilitypanel.adminsOnly"),
+    description: i18nT("ui.ethikos.discussionvisibilitypanel.authorIdentityIsLimitedToAdministratorsModerators"),
   },
   {
     value: 'never',
-    label: 'Never visible',
-    description: 'Author identity should not be exposed in the discussion UI.',
+    label: i18nT("ui.ethikos.discussionvisibilitypanel.neverVisible"),
+    description: i18nT("ui.ethikos.discussionvisibilitypanel.authorIdentityShouldNotBeExposedIn"),
   },
-]
+])
 
-const VOTE_VISIBILITY_OPTIONS: Array<{
+const VOTE_VISIBILITY_OPTIONS = (i18nT: TranslateFunction): Array<{
   value: VoteVisibility
   label: string
   description: string
-}> = [
+}> => ([
   {
     value: 'all',
-    label: 'Visible to all',
-    description: 'Vote/impact signals may be visible to all participants.',
+    label: i18nT("ui.ethikos.discussionvisibilitypanel.visibleToAll"),
+    description: i18nT("ui.ethikos.discussionvisibilitypanel.voteImpactSignalsMayBeVisibleTo"),
   },
   {
     value: 'admins_only',
-    label: 'Admins only',
-    description: 'Vote/impact signals are limited to administrators/moderators.',
+    label: i18nT("ui.ethikos.discussionvisibilitypanel.adminsOnly"),
+    description: i18nT("ui.ethikos.discussionvisibilitypanel.voteImpactSignalsAreLimitedToAdministrators"),
   },
   {
     value: 'self_only',
-    label: 'Self only',
-    description: 'Participants only see their own vote/impact signal.',
+    label: i18nT("ui.ethikos.discussionvisibilitypanel.selfOnly"),
+    description: i18nT("ui.ethikos.discussionvisibilitypanel.participantsOnlySeeTheirOwnVoteImpact"),
   },
-]
+])
 
 function optionLabel<TValue extends string>(
   options: Array<{ value: TValue; label: string }>,
@@ -192,9 +194,11 @@ export default function DiscussionVisibilityPanel({
   topicId,
   editable = false,
   compact = false,
-  title = 'Discussion visibility',
+  title: titleProp,
   onChange,
 }: DiscussionVisibilityPanelProps): JSX.Element {
+  const { t: i18nT } = useLanguage();
+  const title = titleProp ?? i18nT("ui.ethikos.discussionvisibilitypanel.discussionVisibility");
   const { message } = App.useApp()
   const [form] = Form.useForm<VisibilityFormValues>()
 
@@ -216,26 +220,26 @@ export default function DiscussionVisibilityPanel({
 
   const participationDescription = useMemo(
     () =>
-      PARTICIPATION_OPTIONS.find(
+      PARTICIPATION_OPTIONS(i18nT).find(
         (option) => option.value === participationValue,
       )?.description,
-    [participationValue],
+    [participationValue, i18nT],
   )
 
   const authorVisibilityDescription = useMemo(
     () =>
-      AUTHOR_VISIBILITY_OPTIONS.find(
+      AUTHOR_VISIBILITY_OPTIONS(i18nT).find(
         (option) => option.value === authorVisibilityValue,
       )?.description,
-    [authorVisibilityValue],
+    [authorVisibilityValue, i18nT],
   )
 
   const voteVisibilityDescription = useMemo(
     () =>
-      VOTE_VISIBILITY_OPTIONS.find(
+      VOTE_VISIBILITY_OPTIONS(i18nT).find(
         (option) => option.value === voteVisibilityValue,
       )?.description,
-    [voteVisibilityValue],
+    [voteVisibilityValue, i18nT],
   )
 
   const loadSetting = useCallback(async (): Promise<void> => {
@@ -245,7 +249,7 @@ export default function DiscussionVisibilityPanel({
     if (!hasValidTopicId(topicId)) {
       setSetting(null)
       form.setFieldsValue(DEFAULT_VALUES)
-      setError('Missing topic id for discussion visibility settings.')
+      setError(i18nT("ui.ethikos.discussionvisibilitypanel.missingTopicIdForDiscussionVisibilitySettings"))
       setLoading(false)
       return
     }
@@ -268,7 +272,7 @@ export default function DiscussionVisibilityPanel({
     } finally {
       setLoading(false)
     }
-  }, [form, topicId])
+  }, [form, topicId, i18nT])
 
   useEffect(() => {
     form.setFieldsValue(DEFAULT_VALUES)
@@ -281,7 +285,7 @@ export default function DiscussionVisibilityPanel({
     }
 
     if (!hasValidTopicId(topicId)) {
-      message.error('Missing topic id for discussion visibility settings.')
+      message.error(i18nT("ui.ethikos.discussionvisibilitypanel.missingTopicIdForDiscussionVisibilitySettings"))
       return
     }
 
@@ -307,8 +311,8 @@ export default function DiscussionVisibilityPanel({
 
       message.success(
         settingId
-          ? 'Discussion visibility updated.'
-          : 'Discussion visibility created.',
+          ? i18nT("ui.ethikos.discussionvisibilitypanel.discussionVisibilityUpdated")
+          : i18nT("ui.ethikos.discussionvisibilitypanel.discussionVisibilityCreated"),
       )
     } catch (err) {
       message.error(
@@ -332,9 +336,9 @@ export default function DiscussionVisibilityPanel({
       extra={
         <Space>
           {setting ? (
-            <Tag color="green">Configured</Tag>
+            <Tag color="green">{i18nT("ui.ethikos.discussionvisibilitypanel.configured")}</Tag>
           ) : (
-            <Tag color="default">Default</Tag>
+            <Tag color="default">{i18nT("ui.ethikos.discussionvisibilitypanel.default")}</Tag>
           )}
 
           <Button
@@ -343,7 +347,7 @@ export default function DiscussionVisibilityPanel({
             onClick={() => void loadSetting()}
             disabled={loading || saving || !hasTopicId}
           >
-            Refresh
+            {i18nT("ui.ethikos.discussionvisibilitypanel.refresh")}
           </Button>
 
           {editable ? (
@@ -355,7 +359,7 @@ export default function DiscussionVisibilityPanel({
               disabled={loading || !hasTopicId}
               onClick={() => void handleSave()}
             >
-              {setting?.id ? 'Save' : 'Create'}
+              {setting?.id ? i18nT("ui.ethikos.discussionvisibilitypanel.save") : i18nT("ui.ethikos.discussionvisibilitypanel.create")}
             </Button>
           ) : null}
         </Space>
@@ -369,21 +373,21 @@ export default function DiscussionVisibilityPanel({
             <Alert
               type="error"
               showIcon
-              message="Visibility settings unavailable"
+              message={i18nT("ui.ethikos.discussionvisibilitypanel.visibilitySettingsUnavailable")}
               description={error}
             />
           ) : null}
 
           {showEmpty ? (
-            <Empty description="No visibility setting configured yet" />
+            <Empty description={i18nT("ui.ethikos.discussionvisibilitypanel.noVisibilitySettingConfiguredYet")} />
           ) : null}
 
           {!setting && editable ? (
             <Alert
               type="info"
               showIcon
-              message="No saved visibility setting exists yet"
-              description="Saving will create the topic visibility setting through the canonical ethiKos service."
+              message={i18nT("ui.ethikos.discussionvisibilitypanel.noSavedVisibilitySettingExistsYet")}
+              description={i18nT("ui.ethikos.discussionvisibilitypanel.savingWillCreateTheTopicVisibilitySetting")}
             />
           ) : null}
 
@@ -398,18 +402,18 @@ export default function DiscussionVisibilityPanel({
               label={
                 <Space size={6}>
                   <UserSwitchOutlined />
-                  <span>Participation type</span>
+                  <span>{i18nT("ui.ethikos.discussionvisibilitypanel.participationType")}</span>
                 </Space>
               }
               rules={[
                 {
                   required: true,
-                  message: 'Choose a participation type.',
+                  message: i18nT("ui.ethikos.discussionvisibilitypanel.chooseAParticipationType"),
                 },
               ]}
             >
               <Select
-                options={PARTICIPATION_OPTIONS.map((option) => ({
+                options={PARTICIPATION_OPTIONS(i18nT).map((option) => ({
                   label: option.label,
                   value: option.value,
                 }))}
@@ -421,18 +425,18 @@ export default function DiscussionVisibilityPanel({
               label={
                 <Space size={6}>
                   <EyeOutlined />
-                  <span>Author visibility</span>
+                  <span>{i18nT("ui.ethikos.discussionvisibilitypanel.authorVisibility")}</span>
                 </Space>
               }
               rules={[
                 {
                   required: true,
-                  message: 'Choose author visibility.',
+                  message: i18nT("ui.ethikos.discussionvisibilitypanel.chooseAuthorVisibility"),
                 },
               ]}
             >
               <Select
-                options={AUTHOR_VISIBILITY_OPTIONS.map((option) => ({
+                options={AUTHOR_VISIBILITY_OPTIONS(i18nT).map((option) => ({
                   label: option.label,
                   value: option.value,
                 }))}
@@ -444,18 +448,18 @@ export default function DiscussionVisibilityPanel({
               label={
                 <Space size={6}>
                   <LockOutlined />
-                  <span>Vote visibility</span>
+                  <span>{i18nT("ui.ethikos.discussionvisibilitypanel.voteVisibility")}</span>
                 </Space>
               }
               rules={[
                 {
                   required: true,
-                  message: 'Choose vote visibility.',
+                  message: i18nT("ui.ethikos.discussionvisibilitypanel.chooseVoteVisibility"),
                 },
               ]}
             >
               <Select
-                options={VOTE_VISIBILITY_OPTIONS.map((option) => ({
+                options={VOTE_VISIBILITY_OPTIONS(i18nT).map((option) => ({
                   label: option.label,
                   value: option.value,
                 }))}
@@ -468,7 +472,7 @@ export default function DiscussionVisibilityPanel({
               icon={<UserSwitchOutlined />}
               color={participationColor(participationValue)}
             >
-              {optionLabel(PARTICIPATION_OPTIONS, participationValue)}
+              {optionLabel(PARTICIPATION_OPTIONS(i18nT), participationValue)}
             </Tag>
 
             <Tag
@@ -481,14 +485,14 @@ export default function DiscussionVisibilityPanel({
               }
               color={authorVisibilityColor(authorVisibilityValue)}
             >
-              {optionLabel(AUTHOR_VISIBILITY_OPTIONS, authorVisibilityValue)}
+              {optionLabel(AUTHOR_VISIBILITY_OPTIONS(i18nT), authorVisibilityValue)}
             </Tag>
 
             <Tag
               icon={<LockOutlined />}
               color={voteVisibilityColor(voteVisibilityValue)}
             >
-              {optionLabel(VOTE_VISIBILITY_OPTIONS, voteVisibilityValue)}
+              {optionLabel(VOTE_VISIBILITY_OPTIONS(i18nT), voteVisibilityValue)}
             </Tag>
           </Space>
 
@@ -496,21 +500,21 @@ export default function DiscussionVisibilityPanel({
             <Space direction="vertical" size={8} style={{ width: '100%' }}>
               {participationDescription ? (
                 <Paragraph style={{ marginBottom: 0 }}>
-                  <Text strong>Participation:</Text>{' '}
+                  <Text strong>{i18nT("ui.ethikos.discussionvisibilitypanel.participation")}</Text>{' '}
                   {participationDescription}
                 </Paragraph>
               ) : null}
 
               {authorVisibilityDescription ? (
                 <Paragraph style={{ marginBottom: 0 }}>
-                  <Text strong>Authors:</Text>{' '}
+                  <Text strong>{i18nT("ui.ethikos.discussionvisibilitypanel.authors")}</Text>{' '}
                   {authorVisibilityDescription}
                 </Paragraph>
               ) : null}
 
               {voteVisibilityDescription ? (
                 <Paragraph style={{ marginBottom: 0 }}>
-                  <Text strong>Votes:</Text> {voteVisibilityDescription}
+                  <Text strong>{i18nT("ui.ethikos.discussionvisibilitypanel.votes")}</Text> {voteVisibilityDescription}
                 </Paragraph>
               ) : null}
             </Space>

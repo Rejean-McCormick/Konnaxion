@@ -2,6 +2,7 @@
 // C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\LikeCard.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import type { LineConfig } from '@ant-design/plots';
 import { Card, Skeleton, Statistic } from 'antd';
 import dynamic from 'next/dynamic';
@@ -20,11 +21,13 @@ export interface LikeCardProps {
 }
 
 const LikeCard: React.FC<LikeCardProps> = ({
-  title = 'Likes',
+  title: titleProp,
   total,
   trend = [],
   loading = false,
 }) => {
+  const { t: i18nT } = useLanguage();
+  const title = titleProp ?? i18nT("ui.dashboardComponents.likecard.likes");
   const series: number[] = Array.isArray(trend) ? trend : [];
   const data = series.map((y, i) => ({ x: i, y: Number(y ?? 0) }));
 

@@ -1,6 +1,7 @@
 // FILE: frontend/modules/konsultations/components/ResultsDashboard.tsx
 ﻿'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   Alert,
   Card,
@@ -128,6 +129,7 @@ function formatDateRange(openDate?: string, closeDate?: string): string | null {
 export default function ResultsDashboard({
   consultationId,
 }: ResultsDashboardProps) {
+  const { t: i18nT } = useLanguage();
   // Hooks are currently lightweight adapters; use explicit local contracts
   // until the Konsultations hooks expose stable exported result types.
   const consultationState =
@@ -177,7 +179,7 @@ export default function ResultsDashboard({
       <Card>
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="Select a consultation to view live results and impact."
+          description={i18nT("ui.konsultations.resultsdashboard.selectAConsultationToViewLiveResults")}
         />
       </Card>
     );
@@ -206,14 +208,14 @@ export default function ResultsDashboard({
         <Alert
           type="error"
           showIcon
-          message="Unable to load consultation results."
+          message={i18nT("ui.konsultations.resultsdashboard.unableToLoadConsultationResults")}
           description={headerError.message}
         />
       )}
 
       <Card
         loading={loading}
-        title={consultation?.title ?? 'Consultation results'}
+        title={consultation?.title ?? i18nT("ui.konsultations.resultsdashboard.consultationResults")}
         extra={
           <Space size={8} wrap>
             {consultation?.status && (
@@ -227,35 +229,33 @@ export default function ResultsDashboard({
       >
         <Space direction="vertical" size="small" style={{ width: '100%' }}>
           {dateRange && (
-            <Text type="secondary">Consultation window: {dateRange}</Text>
+            <Text type="secondary">{i18nT("ui.konsultations.resultsdashboard.consultationWindow")} {dateRange}</Text>
           )}
           <Text type="secondary">
-            Results combine raw votes with optional Ekoh‑weighted aggregates. As
-            new votes and impact actions are recorded, this snapshot updates
-            automatically.
+            {i18nT("ui.konsultations.resultsdashboard.resultsCombineRawVotesWithOptionalEkoh")}
           </Text>
 
           <Row gutter={16} style={{ marginTop: 16 }}>
             <Col xs={12} md={6}>
-              <Statistic title="Total votes" value={totalVotes} />
+              <Statistic title={i18nT("ui.konsultations.resultsdashboard.totalVotes")} value={totalVotes} />
             </Col>
             <Col xs={12} md={6}>
               <Statistic
-                title="Weighted support"
+                title={i18nT("ui.konsultations.resultsdashboard.weightedSupport")}
                 value={supportPct != null ? Math.round(supportPct) : undefined}
                 suffix={supportPct != null ? '%' : undefined}
               />
             </Col>
             <Col xs={12} md={6}>
               <Statistic
-                title="Turnout"
+                title={i18nT("ui.konsultations.resultsdashboard.turnout")}
                 value={turnoutPct != null ? Math.round(turnoutPct) : undefined}
                 suffix={turnoutPct != null ? '%' : undefined}
               />
             </Col>
             <Col xs={12} md={6}>
               <Statistic
-                title="Avg. stance"
+                title={i18nT("ui.konsultations.resultsdashboard.avgStance")}
                 value={
                   typeof medianStance === 'number'
                     ? medianStance.toFixed(2)
@@ -269,11 +269,11 @@ export default function ResultsDashboard({
 
       <Row gutter={16}>
         <Col xs={24} lg={14}>
-          <Card loading={resultsLoading} title="Vote distribution">
+          <Card loading={resultsLoading} title={i18nT("ui.konsultations.resultsdashboard.voteDistribution")}>
             {!results || options.length === 0 ? (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="No votes recorded yet for this consultation."
+                description={i18nT("ui.konsultations.resultsdashboard.noVotesRecordedYetForThisConsultation")}
               />
             ) : (
               <List
@@ -285,11 +285,11 @@ export default function ResultsDashboard({
                       description={
                         <Space size={8} wrap>
                           <Text type="secondary">
-                            Raw: {opt.rawCount}
+                            {i18nT("ui.konsultations.resultsdashboard.raw")} {opt.rawCount}
                           </Text>
                           {typeof opt.weightedCount === 'number' && (
                             <Text type="secondary">
-                              Weighted: {opt.weightedCount.toFixed(1)}
+                              {i18nT("ui.konsultations.resultsdashboard.weighted")} {opt.weightedCount.toFixed(1)}
                             </Text>
                           )}
                         </Space>
@@ -315,13 +315,13 @@ export default function ResultsDashboard({
         <Col xs={24} lg={10}>
           <Card
             loading={impactLoading}
-            title="Impact & follow‑up actions"
+            title={i18nT("ui.konsultations.resultsdashboard.impactFollowUpActions")}
           >
             {impactError && (
               <Alert
                 type="error"
                 showIcon
-                message="Could not load impact actions."
+                message={i18nT("ui.konsultations.resultsdashboard.couldNotLoadImpactActions")}
                 description={impactError.message}
                 style={{ marginBottom: 8 }}
               />
@@ -330,7 +330,7 @@ export default function ResultsDashboard({
             {!impactError && impactItems.length === 0 ? (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="No follow‑up actions have been logged yet."
+                description={i18nT("ui.konsultations.resultsdashboard.noFollowUpActionsHaveBeenLogged")}
               />
             ) : (
               <Timeline
@@ -361,14 +361,14 @@ export default function ResultsDashboard({
 
           <Card
             loading={suggestionsLoading}
-            title="Top citizen suggestions"
+            title={i18nT("ui.konsultations.resultsdashboard.topCitizenSuggestions")}
             style={{ marginTop: 16 }}
           >
             {suggestionsError && (
               <Alert
                 type="error"
                 showIcon
-                message="Could not load suggestions."
+                message={i18nT("ui.konsultations.resultsdashboard.couldNotLoadSuggestions")}
                 description={suggestionsError.message}
                 style={{ marginBottom: 8 }}
               />
@@ -377,7 +377,7 @@ export default function ResultsDashboard({
             {!suggestionsError && suggestions.length === 0 ? (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="No suggestions submitted for this consultation yet."
+                description={i18nT("ui.konsultations.resultsdashboard.noSuggestionsSubmittedForThisConsultationYet")}
               />
             ) : (
               <List
@@ -390,7 +390,7 @@ export default function ResultsDashboard({
                       description={
                         <Space size={4} wrap>
                           {s.author && (
-                            <Text type="secondary">By {s.author}</Text>
+                            <Text type="secondary">{i18nT("ui.konsultations.resultsdashboard.by")} {s.author}</Text>
                           )}
                           {s.status && (
                             <Tag
@@ -412,7 +412,7 @@ export default function ResultsDashboard({
                           )}
                           {typeof s.supportCount === 'number' && (
                             <Text type="secondary">
-                              · Support: {s.supportCount}
+                              {i18nT("ui.konsultations.resultsdashboard.support")} {s.supportCount}
                             </Text>
                           )}
                         </Space>

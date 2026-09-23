@@ -1,6 +1,7 @@
 // FILE: frontend/app/teambuilder/problems/taxonomy/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   BookOutlined,
   FilterOutlined,
@@ -183,6 +184,7 @@ const toCascaderOptions = (nodes: TaxonomyNode[]): DefaultOptionType[] =>
 const CASCADER_OPTIONS = toCascaderOptions(UNESCO_TREE);
 
 export default function TaxonomyExplorerPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [searchValue, setSearchValue] = useState('');
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>(['1', '2', '3']);
   const [autoExpandParent, setAutoExpandParent] = useState(true);
@@ -253,24 +255,23 @@ export default function TaxonomyExplorerPage(): JSX.Element {
 
   return (
     <TeamBuilderPageShell
-      title="UNESCO taxonomy explorer"
+      title={i18nT("ui.teambuilder.problems.taxonomy.unescoTaxonomyExplorer")}
       subtitle={
         <Space direction="vertical" size={8}>
           <Text type="secondary">
-            Browse and curate the UNESCO-style taxonomy of problem domains. Use this
-            explorer to pick the domains you want problem templates to reference.
+            {i18nT("ui.teambuilder.problems.taxonomy.browseAndCurateTheUnescoStyleTaxonomy")}
           </Text>
         </Space>
       }
-      sectionLabel="Problems"
+      sectionLabel={i18nT("ui.teambuilder.problems.taxonomy.problems")}
       maxWidth={1200}
       primaryAction={
         <Space>
           <Button icon={<ReloadOutlined />} onClick={handleResetAll}>
-            Reset all
+            {i18nT("ui.teambuilder.problems.taxonomy.resetAll")}
           </Button>
           <Button type="primary" icon={<SaveOutlined />}>
-            Save favourites
+            {i18nT("ui.teambuilder.problems.taxonomy.saveFavourites")}
           </Button>
         </Space>
       }
@@ -279,17 +280,14 @@ export default function TaxonomyExplorerPage(): JSX.Element {
         <Alert
           type="info"
           showIcon
-          message="What is this taxonomy?"
+          message={i18nT("ui.teambuilder.problems.taxonomy.whatIsThisTaxonomy")}
           description={
             <Space direction="vertical">
               <Paragraph type="secondary" style={{ marginBottom: 4 }}>
-                The UNESCO taxonomy organizes knowledge domains into a consistent
-                hierarchy. By selecting favourite nodes, you decide which domains and
-                subdomains will appear when creating problem templates in Team Builder.
+                {i18nT("ui.teambuilder.problems.taxonomy.theUnescoTaxonomyOrganizesKnowledgeDomainsInto")}
               </Paragraph>
               <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                This does not restrict what teams can work on by itself; it just makes
-                it easier to classify problems and reason about coverage and diversity.
+                {i18nT("ui.teambuilder.problems.taxonomy.thisDoesNotRestrictWhatTeamsCan")}
               </Paragraph>
             </Space>
           }
@@ -303,11 +301,11 @@ export default function TaxonomyExplorerPage(): JSX.Element {
               title={
                 <Space>
                   <BookOutlined />
-                  <span>Taxonomy tree</span>
+                  <span>{i18nT("ui.teambuilder.problems.taxonomy.taxonomyTree")}</span>
                 </Space>
               }
               extra={
-                <Tooltip title="Use the search box to quickly find a domain; select nodes to mark them as favourites.">
+                <Tooltip title={i18nT("ui.teambuilder.problems.taxonomy.useTheSearchBoxToQuicklyFind")}>
                   <InfoCircleOutlined />
                 </Tooltip>
               }
@@ -318,7 +316,7 @@ export default function TaxonomyExplorerPage(): JSX.Element {
                 size="middle"
               >
                 <Search
-                  placeholder="Search taxonomy nodes (e.g. AI, psychology, mathematics)…"
+                  placeholder={i18nT("ui.teambuilder.problems.taxonomy.searchTaxonomyNodesEGAiPsychology")}
                   value={searchValue}
                   onChange={e => handleSearchChange(e.target.value)}
                   allowClear
@@ -328,10 +326,10 @@ export default function TaxonomyExplorerPage(): JSX.Element {
                 {searchValue && (
                   <Paragraph type="secondary" style={{ marginBottom: 0 }}>
                     {searchMatches.length === 0 ? (
-                      <>No taxonomy nodes match “{searchValue}”.</>
+                      <>{i18nT("ui.teambuilder.problems.taxonomy.noTaxonomyNodesMatch")}{searchValue}”.</>
                     ) : (
                       <>
-                        <Text strong>{searchMatches.length}</Text> node(s) match “
+                        <Text strong>{searchMatches.length}</Text> {i18nT("ui.teambuilder.problems.taxonomy.nodeSMatch")}
                         {searchValue}”.
                       </>
                     )}
@@ -366,7 +364,7 @@ export default function TaxonomyExplorerPage(): JSX.Element {
                           color="blue"
                           style={{ marginLeft: 4 }}
                         >
-                          Favourite
+                          {i18nT("ui.teambuilder.problems.taxonomy.favourite")}
                         </Tag>
                       )}
                     </Space>
@@ -404,9 +402,9 @@ export default function TaxonomyExplorerPage(): JSX.Element {
                   disabled={selectedKeys.length === 0}
                   onClick={handleAddToFavourites}
                 >
-                  Add selected to favourites
+                  {i18nT("ui.teambuilder.problems.taxonomy.addSelectedToFavourites")}
                 </Button>
-                <Button onClick={() => setSelectedKeys([])}>Clear selection</Button>
+                <Button onClick={() => setSelectedKeys([])}>{i18nT("ui.teambuilder.problems.taxonomy.clearSelection")}</Button>
               </Space>
             </Card>
           </Col>
@@ -418,15 +416,15 @@ export default function TaxonomyExplorerPage(): JSX.Element {
                 title={
                   <Space>
                     <FilterOutlined />
-                    <span>TreeSelect & Cascader views</span>
+                    <span>{i18nT("ui.teambuilder.problems.taxonomy.treeselectCascaderViews")}</span>
                   </Space>
                 }
               >
                 <Space direction="vertical" style={{ width: '100%' }} size="middle">
                   <div>
-                    <Text strong>TreeSelect</Text>
+                    <Text strong>{i18nT("ui.teambuilder.problems.taxonomy.treeselect")}</Text>
                     <Paragraph type="secondary" style={{ marginBottom: 4 }}>
-                      An alternative way to pick a small number of domains or subdomains.
+                      {i18nT("ui.teambuilder.problems.taxonomy.anAlternativeWayToPickASmall")}
                     </Paragraph>
                     <TreeSelect
                       treeData={UNESCO_TREE}
@@ -434,7 +432,7 @@ export default function TaxonomyExplorerPage(): JSX.Element {
                       onChange={v => setTreeSelectValue(v as string[])}
                       treeCheckable
                       showCheckedStrategy="SHOW_PARENT"
-                      placeholder="Select domains via TreeSelect…"
+                      placeholder={i18nT("ui.teambuilder.problems.taxonomy.selectDomainsViaTreeselect")}
                       style={{ width: '100%' }}
                       allowClear
                     />
@@ -443,10 +441,9 @@ export default function TaxonomyExplorerPage(): JSX.Element {
                   <Divider />
 
                   <div>
-                    <Text strong>Cascader</Text>
+                    <Text strong>{i18nT("ui.teambuilder.problems.taxonomy.cascader")}</Text>
                     <Paragraph type="secondary" style={{ marginBottom: 4 }}>
-                      Navigate the hierarchy step by step; useful when the tree is very
-                      deep.
+                      {i18nT("ui.teambuilder.problems.taxonomy.navigateTheHierarchyStepByStepUseful")}
                     </Paragraph>
                     <Cascader
                       options={CASCADER_OPTIONS}
@@ -454,7 +451,7 @@ export default function TaxonomyExplorerPage(): JSX.Element {
                       maxTagCount="responsive"
                       value={cascaderValue}
                       onChange={v => setCascaderValue(v as string[][])}
-                      placeholder="Select one or more paths via Cascader…"
+                      placeholder={i18nT("ui.teambuilder.problems.taxonomy.selectOneOrMorePathsViaCascader")}
                       style={{ width: '100%' }}
                       allowClear
                     />
@@ -466,19 +463,18 @@ export default function TaxonomyExplorerPage(): JSX.Element {
                 title={
                   <Space>
                     <TagOutlined />
-                    <span>Favourite taxonomy nodes</span>
+                    <span>{i18nT("ui.teambuilder.problems.taxonomy.favouriteTaxonomyNodes")}</span>
                   </Space>
                 }
                 extra={
                   <Button size="small" onClick={handleClearFavourites}>
-                    Clear favourites
+                    {i18nT("ui.teambuilder.problems.taxonomy.clearFavourites")}
                   </Button>
                 }
               >
                 {favouriteNodes.length === 0 ? (
                   <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                    No favourites yet. Select nodes in the tree and click “Add selected
-                    to favourites”.
+                    {i18nT("ui.teambuilder.problems.taxonomy.noFavouritesYetSelectNodesInThe")}
                   </Paragraph>
                 ) : (
                   <Space wrap>
@@ -504,17 +500,15 @@ export default function TaxonomyExplorerPage(): JSX.Element {
         <Alert
           type="success"
           showIcon
-          message="Next step: use these domains in your problem templates"
+          message={i18nT("ui.teambuilder.problems.taxonomy.nextStepUseTheseDomainsInYour")}
           description={
             <Space direction="vertical">
               <Text>
-                When you create or edit a problem under{' '}
-                <strong>Problems → Problem library</strong>, you will be able to tag it
-                with one or more of the favourite taxonomy nodes you selected here.
+                {i18nT("ui.teambuilder.problems.taxonomy.whenYouCreateOrEditAProblem")}{' '}
+                <strong>{i18nT("ui.teambuilder.problems.taxonomy.problemsProblemLibrary")}</strong>{i18nT("ui.teambuilder.problems.taxonomy.youWillBeAbleToTagIt")}
               </Text>
               <Text type="secondary">
-                This makes it easier to search for problems, build balanced portfolios of
-                teams across domains, and analyse which areas are under- or over-served.
+                {i18nT("ui.teambuilder.problems.taxonomy.thisMakesItEasierToSearchFor")}
               </Text>
             </Space>
           }

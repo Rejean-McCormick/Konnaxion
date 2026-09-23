@@ -1,6 +1,7 @@
 // FILE: frontend/modules/ethikos/impact/feedback/page.tsx
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Comment } from '@ant-design/compatible';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
@@ -11,7 +12,8 @@ import usePageTitle from '@/hooks/usePageTitle';
 import { fetchFeedback, submitFeedback } from '@/services/impact';
 
 export default function FeedbackLoops() {
-  usePageTitle('Impact · Feedback');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.ethikos.impact.feedback.impactFeedback"));
 
   const { data, loading, mutate } = useRequest(fetchFeedback);
   const [message, setMessage] = useState('');
@@ -30,21 +32,21 @@ export default function FeedbackLoops() {
 
   return (
     <PageContainer ghost loading={loading}>
-      <ProCard title="Add your feedback" ghost>
+      <ProCard title={i18nT("ui.ethikos.impact.feedback.addYourFeedback")} ghost>
         <Rate onChange={setStars} value={stars} />
         <Input.TextArea
           rows={3}
-          placeholder="Tell us what worked or what didn’t…"
+          placeholder={i18nT("ui.ethikos.impact.feedback.tellUsWhatWorkedOrWhatDidn")}
           value={message}
           onChange={e => setMessage(e.target.value)}
           style={{ marginTop: 8 }}
         />
         <Button type="primary" onClick={send} loading={sending} style={{ marginTop: 8 }}>
-          Submit
+          {i18nT("ui.ethikos.impact.feedback.submit")}
         </Button>
       </ProCard>
 
-      <ProCard title="Community Feedback" ghost style={{ marginTop: 24 }}>
+      <ProCard title={i18nT("ui.ethikos.impact.feedback.communityFeedback_e4854a")} ghost style={{ marginTop: 24 }}>
         {data?.items.length ? (
           <List
             dataSource={data.items ?? []}
@@ -64,7 +66,7 @@ export default function FeedbackLoops() {
             )}
           />
         ) : (
-          <Empty description="No feedback yet" />
+          <Empty description={i18nT("ui.ethikos.impact.feedback.noFeedbackYet")} />
         )}
       </ProCard>
     </PageContainer>

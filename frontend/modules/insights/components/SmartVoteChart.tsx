@@ -1,5 +1,6 @@
 // FILE: frontend/modules/insights/components/SmartVoteChart.tsx
 "use client";
+import { useLanguage } from '@/context/LanguageContext';
 import {
   BarElement,
   CategoryScale,
@@ -28,18 +29,19 @@ type Props = {
 };
 
 export default function SmartVoteChart({ labels, votes, scores }: Props) {
+  const { t: i18nT } = useLanguage();
   const data = {
     labels,
     datasets: [
       {
         type: "bar" as const,
-        label: "Votes",
+        label: i18nT("ui.insights.smartvotechart.votes"),
         data: votes,
         yAxisID: "y",
       } as ChartDataset<"bar", number[]>,
       {
         type: "line" as const,
-        label: "Avg Score",
+        label: i18nT("ui.insights.smartvotechart.avgScore"),
         data: scores,
         yAxisID: "y1",
       } as ChartDataset<"line", number[]>,

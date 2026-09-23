@@ -1,6 +1,7 @@
 // FILE: frontend/app/konnected/community-discussions/moderation/page.tsx
 ﻿'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
@@ -142,6 +143,7 @@ function adaptModerationItems(raw: unknown): ModerationQueueItem[] {
 }
 
 export default function CommunityModerationPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [activeStatusFilter, setActiveStatusFilter] = useState<ModerationStatus | 'all'>('Pending');
   const [detailDrawerItem, setDetailDrawerItem] = useState<ModerationQueueItem | null>(null);
@@ -179,12 +181,12 @@ export default function CommunityModerationPage(): JSX.Element {
       await actOnReport(record.id, remove);
       message.success(
         remove
-          ? 'Content removed and report resolved.'
-          : 'Content approved and report resolved.',
+          ? i18nT("ui.konnected.communityDiscussions.moderation.contentRemovedAndReportResolved")
+          : i18nT("ui.konnected.communityDiscussions.moderation.contentApprovedAndReportResolved"),
       );
       await refresh();
     } catch {
-      message.error('Unable to process moderation action. Please try again.');
+      message.error(i18nT("ui.konnected.communityDiscussions.moderation.unableToProcessModerationActionPleaseTry"));
     } finally {
       setGlobalActionLoading(false);
     }
@@ -192,7 +194,7 @@ export default function CommunityModerationPage(): JSX.Element {
 
   const onBulkAction = async (action: 'approve' | 'remove') => {
     if (!selectedRowKeys.length) {
-      message.info('Select at least one item to apply a bulk action.');
+      message.info(i18nT("ui.konnected.communityDiscussions.moderation.selectAtLeastOneItemToApply"));
       return;
     }
 
@@ -210,21 +212,21 @@ export default function CommunityModerationPage(): JSX.Element {
       if (failures.length === 0) {
         message.success(
           remove
-            ? 'Selected content removed and reports resolved.'
-            : 'Selected content approved and reports resolved.',
+            ? i18nT("ui.konnected.communityDiscussions.moderation.selectedContentRemovedAndReportsResolved")
+            : i18nT("ui.konnected.communityDiscussions.moderation.selectedContentApprovedAndReportsResolved"),
         );
       } else if (failures.length === selectedRowKeys.length) {
-        message.error('Bulk action failed for all selected items.');
+        message.error(i18nT("ui.konnected.communityDiscussions.moderation.bulkActionFailedForAllSelectedItems"));
       } else {
         message.warning(
-          'Bulk action completed with some failures. Check the queue and retry if needed.',
+          i18nT("ui.konnected.communityDiscussions.moderation.bulkActionCompletedWithSomeFailuresCheck"),
         );
       }
 
       setSelectedRowKeys([]);
       await refresh();
     } catch {
-      message.error('Unexpected error while processing bulk action.');
+      message.error(i18nT("ui.konnected.communityDiscussions.moderation.unexpectedErrorWhileProcessingBulkAction"));
     } finally {
       setGlobalActionLoading(false);
     }
@@ -235,26 +237,26 @@ export default function CommunityModerationPage(): JSX.Element {
       case 'high':
         return (
           <Tag color="red" icon={<ExclamationCircleOutlined />}>
-            High
+            {i18nT("ui.konnected.communityDiscussions.moderation.high")}
           </Tag>
         );
       case 'low':
-        return <Tag color="green">Low</Tag>;
+        return <Tag color="green">{i18nT("ui.konnected.communityDiscussions.moderation.low")}</Tag>;
       case 'medium':
       default:
-        return <Tag color="gold">Medium</Tag>;
+        return <Tag color="gold">{i18nT("ui.konnected.communityDiscussions.moderation.medium")}</Tag>;
     }
   };
 
   const statusBadge = (status: ModerationStatus): ReactNode => {
     switch (status) {
       case 'Resolved':
-        return <Badge status="success" text="Resolved" />;
+        return <Badge status="success" text={i18nT("ui.konnected.communityDiscussions.moderation.resolved")} />;
       case 'Escalated':
-        return <Badge status="warning" text="Escalated" />;
+        return <Badge status="warning" text={i18nT("ui.konnected.communityDiscussions.moderation.escalated")} />;
       case 'Pending':
       default:
-        return <Badge status="processing" text="Pending" />;
+        return <Badge status="processing" text={i18nT("ui.konnected.communityDiscussions.moderation.pending")} />;
     }
   };
 
@@ -271,7 +273,7 @@ export default function CommunityModerationPage(): JSX.Element {
 
   const columns: ProColumns<ModerationQueueItem>[] = [
     {
-      title: 'Content',
+      title: i18nT("ui.konnected.communityDiscussions.moderation.content"),
       dataIndex: 'contentPreview',
       width: 320,
       ellipsis: true,
@@ -293,33 +295,33 @@ export default function CommunityModerationPage(): JSX.Element {
           )}
           {record.reporterMessage && (
             <Text type="secondary" italic ellipsis={{ tooltip: record.reporterMessage }}>
-              Reporter note: {record.reporterMessage}
+              {i18nT("ui.konnected.communityDiscussions.moderation.reporterNote")} {record.reporterMessage}
             </Text>
           )}
         </Space>
       ),
     },
     {
-      title: 'People',
+      title: i18nT("ui.konnected.communityDiscussions.moderation.people"),
       dataIndex: 'authorName',
       width: 220,
       render: (_, record) => (
         <Space direction="vertical" size={2}>
           {record.authorName && (
             <Text>
-              Author: <Text strong>{record.authorName}</Text>
+              {i18nT("ui.konnected.communityDiscussions.moderation.author")} <Text strong>{record.authorName}</Text>
             </Text>
           )}
           {record.reporterName && (
             <Text type="secondary">
-              Reported by {record.reporterName}
+              {i18nT("ui.konnected.communityDiscussions.moderation.reportedBy")} {record.reporterName}
             </Text>
           )}
         </Space>
       ),
     },
     {
-      title: 'Reports',
+      title: i18nT("ui.konnected.communityDiscussions.moderation.reports"),
       dataIndex: 'reportCount',
       width: 120,
       align: 'center',
@@ -335,26 +337,26 @@ export default function CommunityModerationPage(): JSX.Element {
       ),
     },
     {
-      title: 'Status',
+      title: i18nT("ui.konnected.communityDiscussions.moderation.status"),
       dataIndex: 'status',
       width: 140,
       render: (_, record) => statusBadge(record.status),
       filters: true,
       valueEnum: {
-        Pending: { text: 'Pending' },
-        Escalated: { text: 'Escalated' },
-        Resolved: { text: 'Resolved' },
+        Pending: { text: i18nT("ui.konnected.communityDiscussions.moderation.pending") },
+        Escalated: { text: i18nT("ui.konnected.communityDiscussions.moderation.escalated") },
+        Resolved: { text: i18nT("ui.konnected.communityDiscussions.moderation.resolved") },
       },
     },
     {
-      title: 'Timeline',
+      title: i18nT("ui.konnected.communityDiscussions.moderation.timeline"),
       dataIndex: 'createdAt',
       width: 220,
       render: (_, record) => (
         <Space direction="vertical" size={2}>
           {record.createdAt && (
             <Text type="secondary">
-              Reported{' '}
+              {i18nT("ui.konnected.communityDiscussions.moderation.reported")}{' '}
               {new Date(record.createdAt).toLocaleString(undefined, {
                 dateStyle: 'medium',
                 timeStyle: 'short',
@@ -363,7 +365,7 @@ export default function CommunityModerationPage(): JSX.Element {
           )}
           {record.lastActionAt && (
             <Text type="secondary">
-              Last action{' '}
+              {i18nT("ui.konnected.communityDiscussions.moderation.lastAction")}{' '}
               {new Date(record.lastActionAt).toLocaleString(undefined, {
                 dateStyle: 'medium',
                 timeStyle: 'short',
@@ -374,7 +376,7 @@ export default function CommunityModerationPage(): JSX.Element {
       ),
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.konnected.communityDiscussions.moderation.actions"),
       key: 'actions',
       width: 220,
       fixed: 'right',
@@ -383,7 +385,7 @@ export default function CommunityModerationPage(): JSX.Element {
 
         return (
           <Space>
-            <Tooltip title="Review full report details">
+            <Tooltip title={i18nT("ui.konnected.communityDiscussions.moderation.reviewFullReportDetails")}>
               <Button
                 icon={<EyeOutlined />}
                 size="small"
@@ -391,7 +393,7 @@ export default function CommunityModerationPage(): JSX.Element {
               />
             </Tooltip>
 
-            <Tooltip title="Content is acceptable, resolve report">
+            <Tooltip title={i18nT("ui.konnected.communityDiscussions.moderation.contentIsAcceptableResolveReport")}>
               <Button
                 size="small"
                 icon={<CheckCircleOutlined />}
@@ -399,27 +401,27 @@ export default function CommunityModerationPage(): JSX.Element {
                 disabled={disabled}
                 onClick={() => onSingleAction(record, 'approve')}
               >
-                Approve
+                {i18nT("ui.konnected.communityDiscussions.moderation.approve")}
               </Button>
             </Tooltip>
 
             <Popconfirm
-              title="Remove content?"
-              description="This will remove the content for everyone and resolve all associated reports."
-              okText="Remove"
+              title={i18nT("ui.konnected.communityDiscussions.moderation.removeContent")}
+              description={i18nT("ui.konnected.communityDiscussions.moderation.thisWillRemoveTheContentForEveryone")}
+              okText={i18nT("ui.konnected.communityDiscussions.moderation.remove")}
               okType="danger"
               icon={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
               disabled={disabled}
               onConfirm={() => onSingleAction(record, 'remove')}
             >
-              <Tooltip title="Remove content and resolve report">
+              <Tooltip title={i18nT("ui.konnected.communityDiscussions.moderation.removeContentAndResolveReport")}>
                 <Button
                   size="small"
                   icon={<StopOutlined />}
                   danger
                   disabled={disabled}
                 >
-                  Remove
+                  {i18nT("ui.konnected.communityDiscussions.moderation.remove")}
                 </Button>
               </Tooltip>
             </Popconfirm>
@@ -436,43 +438,43 @@ export default function CommunityModerationPage(): JSX.Element {
         onClick={() => setActiveStatusFilter('Pending')}
         type={activeStatusFilter === 'Pending' ? 'primary' : 'default'}
       >
-        Pending
+        {i18nT("ui.konnected.communityDiscussions.moderation.pending")}
       </Button>
       <Button
         size="small"
         onClick={() => setActiveStatusFilter('Escalated')}
         type={activeStatusFilter === 'Escalated' ? 'primary' : 'default'}
       >
-        Escalated
+        {i18nT("ui.konnected.communityDiscussions.moderation.escalated")}
       </Button>
       <Button
         size="small"
         onClick={() => setActiveStatusFilter('Resolved')}
         type={activeStatusFilter === 'Resolved' ? 'primary' : 'default'}
       >
-        Resolved
+        {i18nT("ui.konnected.communityDiscussions.moderation.resolved")}
       </Button>
       <Button
         size="small"
         onClick={() => setActiveStatusFilter('all')}
         type={activeStatusFilter === 'all' ? 'primary' : 'default'}
       >
-        All
+        {i18nT("ui.konnected.communityDiscussions.moderation.all")}
       </Button>
     </Space>
   );
 
   return (
     <KonnectedPageShell
-      title="Community Moderation"
-      subtitle="Review and act on reports for forum topics, posts, and users across KonnectED."
+      title={i18nT("ui.konnected.communityDiscussions.moderation.communityModeration")}
+      subtitle={i18nT("ui.konnected.communityDiscussions.moderation.reviewAndActOnReportsForForum")}
       primaryAction={
         <Button
           icon={<ReloadOutlined />}
           onClick={() => refresh()}
           loading={loading || globalActionLoading}
         >
-          Refresh Queue
+          {i18nT("ui.konnected.communityDiscussions.moderation.refreshQueue")}
         </Button>
       }
       secondaryActions={bulkActions}
@@ -482,8 +484,8 @@ export default function CommunityModerationPage(): JSX.Element {
           type="error"
           showIcon
           style={{ marginBottom: 16 }}
-          message="You do not have permission to moderate community discussions."
-          description="If you believe this is an error, contact your KonnectED administrator to be granted a moderator role."
+          message={i18nT("ui.konnected.communityDiscussions.moderation.youDoNotHavePermissionToModerate")}
+          description={i18nT("ui.konnected.communityDiscussions.moderation.ifYouBelieveThisIsAnError")}
         />
       )}
 
@@ -492,13 +494,10 @@ export default function CommunityModerationPage(): JSX.Element {
           type="info"
           showIcon
           style={{ marginBottom: 16 }}
-          message="Moderation guidelines"
+          message={i18nT("ui.konnected.communityDiscussions.moderation.moderationGuidelines")}
           description={
             <>
-              Approve content that aligns with your community guidelines, remove
-              content that is harmful or off-topic, and escalate edge cases to
-              your administrator. Bulk actions are available for high-volume
-              periods.
+              {i18nT("ui.konnected.communityDiscussions.moderation.approveContentThatAlignsWithYourCommunity")}
             </>
           }
         />
@@ -509,8 +508,8 @@ export default function CommunityModerationPage(): JSX.Element {
           type="error"
           showIcon
           style={{ marginBottom: 16 }}
-          message="Unable to load moderation queue."
-          description="Check your connection or try again. If the problem persists, the moderation service may be unavailable."
+          message={i18nT("ui.konnected.communityDiscussions.moderation.unableToLoadModerationQueue")}
+          description={i18nT("ui.konnected.communityDiscussions.moderation.checkYourConnectionOrTryAgainIf")}
         />
       )}
 
@@ -519,8 +518,8 @@ export default function CommunityModerationPage(): JSX.Element {
           type="success"
           showIcon
           style={{ marginBottom: 16 }}
-          message="No open reports."
-          description="Your community is all clear. New reports will show up here as they are created."
+          message={i18nT("ui.konnected.communityDiscussions.moderation.noOpenReports")}
+          description={i18nT("ui.konnected.communityDiscussions.moderation.yourCommunityIsAllClearNewReports")}
         />
       )}
 
@@ -534,7 +533,7 @@ export default function CommunityModerationPage(): JSX.Element {
         pagination={{
           pageSize: 10,
           showSizeChanger: true,
-          showTotal: (total) => `${total} reports`,
+          showTotal: (total) => i18nT("ui.konnected.communityDiscussions.moderation.reportsCount", { count: total }),
         }}
         sticky
         rowSelection={{
@@ -544,26 +543,26 @@ export default function CommunityModerationPage(): JSX.Element {
         tableAlertRender={({ selectedRowKeys: keys }) => (
           <Space size={8}>
             <Text strong>{keys.length}</Text>
-            <Text>selected</Text>
+            <Text>{i18nT("ui.konnected.communityDiscussions.moderation.selected")}</Text>
           </Space>
         )}
         tableAlertOptionRender={() => (
           <Space>
-            <Tooltip title="Resolve and keep content">
+            <Tooltip title={i18nT("ui.konnected.communityDiscussions.moderation.resolveAndKeepContent")}>
               <Button
                 size="small"
                 icon={<CheckCircleOutlined />}
                 disabled={!selectedRowKeys.length || unauthorized}
                 onClick={() => onBulkAction('approve')}
               >
-                Bulk approve
+                {i18nT("ui.konnected.communityDiscussions.moderation.bulkApprove")}
               </Button>
             </Tooltip>
-            <Tooltip title="Remove content and resolve reports">
+            <Tooltip title={i18nT("ui.konnected.communityDiscussions.moderation.removeContentAndResolveReports")}>
               <Popconfirm
-                title="Remove selected content?"
-                description="This will remove content for all selected reports and resolve them."
-                okText="Remove"
+                title={i18nT("ui.konnected.communityDiscussions.moderation.removeSelectedContent")}
+                description={i18nT("ui.konnected.communityDiscussions.moderation.thisWillRemoveContentForAllSelected")}
+                okText={i18nT("ui.konnected.communityDiscussions.moderation.remove")}
                 okType="danger"
                 icon={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
                 disabled={!selectedRowKeys.length || unauthorized}
@@ -575,7 +574,7 @@ export default function CommunityModerationPage(): JSX.Element {
                   icon={<StopOutlined />}
                   disabled={!selectedRowKeys.length || unauthorized}
                 >
-                  Bulk remove
+                  {i18nT("ui.konnected.communityDiscussions.moderation.bulkRemove")}
                 </Button>
               </Popconfirm>
             </Tooltip>
@@ -585,7 +584,7 @@ export default function CommunityModerationPage(): JSX.Element {
       />
 
       <Drawer
-        title="Report details"
+        title={i18nT("ui.konnected.communityDiscussions.moderation.reportDetails")}
         width={480}
         open={!!detailDrawerItem}
         onClose={() => setDetailDrawerItem(null)}
@@ -601,52 +600,52 @@ export default function CommunityModerationPage(): JSX.Element {
 
             {detailDrawerItem.contextTitle && (
               <div>
-                <Text strong>Thread / context</Text>
+                <Text strong>{i18nT("ui.konnected.communityDiscussions.moderation.threadContext")}</Text>
                 <Paragraph>{detailDrawerItem.contextTitle}</Paragraph>
               </div>
             )}
 
             {detailDrawerItem.contentPreview && (
               <div>
-                <Text strong>Content preview</Text>
+                <Text strong>{i18nT("ui.konnected.communityDiscussions.moderation.contentPreview")}</Text>
                 <Paragraph>{detailDrawerItem.contentPreview}</Paragraph>
               </div>
             )}
 
             <div>
-              <Text strong>People</Text>
+              <Text strong>{i18nT("ui.konnected.communityDiscussions.moderation.people")}</Text>
               <Paragraph>
                 {detailDrawerItem.authorName && (
                   <>
-                    Author: <Text strong>{detailDrawerItem.authorName}</Text>
+                    {i18nT("ui.konnected.communityDiscussions.moderation.author")} <Text strong>{detailDrawerItem.authorName}</Text>
                     <br />
                   </>
                 )}
                 {detailDrawerItem.reporterName && (
                   <>
-                    Reporter: <Text>{detailDrawerItem.reporterName}</Text>
+                    {i18nT("ui.konnected.communityDiscussions.moderation.reporter")} <Text>{detailDrawerItem.reporterName}</Text>
                     <br />
                   </>
                 )}
                 {detailDrawerItem.reportCount && (
-                  <>Reports merged: {detailDrawerItem.reportCount}</>
+                  <>{i18nT("ui.konnected.communityDiscussions.moderation.reportsMerged")} {detailDrawerItem.reportCount}</>
                 )}
               </Paragraph>
             </div>
 
             {detailDrawerItem.reporterMessage && (
               <div>
-                <Text strong>Reporter note</Text>
+                <Text strong>{i18nT("ui.konnected.communityDiscussions.moderation.reporterNote_96bc48")}</Text>
                 <Paragraph>{detailDrawerItem.reporterMessage}</Paragraph>
               </div>
             )}
 
             <div>
-              <Text strong>Timeline</Text>
+              <Text strong>{i18nT("ui.konnected.communityDiscussions.moderation.timeline")}</Text>
               <Paragraph type="secondary">
                 {detailDrawerItem.createdAt && (
                   <>
-                    Reported:{' '}
+                    {i18nT("ui.konnected.communityDiscussions.moderation.reported_f0fd54")}{' '}
                     {new Date(detailDrawerItem.createdAt).toLocaleString(
                       undefined,
                       { dateStyle: 'medium', timeStyle: 'short' },
@@ -656,7 +655,7 @@ export default function CommunityModerationPage(): JSX.Element {
                 )}
                 {detailDrawerItem.lastActionAt && (
                   <>
-                    Last action:{' '}
+                    {i18nT("ui.konnected.communityDiscussions.moderation.lastAction_d6e246")}{' '}
                     {new Date(detailDrawerItem.lastActionAt).toLocaleString(
                       undefined,
                       { dateStyle: 'medium', timeStyle: 'short' },
@@ -669,8 +668,8 @@ export default function CommunityModerationPage(): JSX.Element {
             <Alert
               type="info"
               showIcon
-              message="Next steps"
-              description="Use the actions in the table to approve or remove this content. For complex cases, escalate through your admin tools or document decisions in your internal playbook."
+              message={i18nT("ui.konnected.communityDiscussions.moderation.nextSteps")}
+              description={i18nT("ui.konnected.communityDiscussions.moderation.useTheActionsInTheTableTo")}
             />
           </Space>
         )}

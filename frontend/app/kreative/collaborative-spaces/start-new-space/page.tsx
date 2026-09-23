@@ -2,6 +2,7 @@
 // app/kreative/collaborative-spaces/start-new-space/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import {
   Alert,
@@ -46,6 +47,7 @@ type UploadChangeParamLite = {
 };
 
 export default function StartNewSpacePage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [form] = Form.useForm<StartNewSpaceFormValues>();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -78,19 +80,19 @@ export default function StartNewSpacePage(): JSX.Element {
 
   return (
     <KreativePageShell
-      title="Start a New Space"
-      subtitle="Define your collaborative space so others can discover and join the right context."
+      title={i18nT("ui.kreative.collaborativeSpaces.startNewSpace.startANewSpace")}
+      subtitle={i18nT("ui.kreative.collaborativeSpaces.startNewSpace.defineYourCollaborativeSpaceSoOthersCan")}
     >
-      <PageContainer title="Start a New Space">
+      <PageContainer title={i18nT("ui.kreative.collaborativeSpaces.startNewSpace.startANewSpace")}>
         <Alert
           type="info"
           showIcon
-          message="Core collaboration session is persisted"
-          description="Name and session type are saved through the real Kreative CollabSession API. Description, privacy, invitations and banner remain declared preview fields until their backend contract exists."
+          message={i18nT("ui.kreative.collaborativeSpaces.startNewSpace.coreCollaborationSessionIsPersisted")}
+          description={i18nT("ui.kreative.collaborativeSpaces.startNewSpace.nameAndSessionTypeAreSavedThrough")}
           style={{ marginBottom: 16 }}
         />
         <Paragraph type="secondary" style={{ marginBottom: 24 }}>
-          Define your collaborative space so others can discover and join the right context.
+          {i18nT("ui.kreative.collaborativeSpaces.startNewSpace.defineYourCollaborativeSpaceSoOthersCan")}
         </Paragraph>
 
         <Form<StartNewSpaceFormValues>
@@ -101,57 +103,57 @@ export default function StartNewSpacePage(): JSX.Element {
         >
           {/* Space Name */}
           <Form.Item
-            label="Space Name"
+            label={i18nT("ui.kreative.collaborativeSpaces.startNewSpace.spaceName")}
             name="name"
-            rules={[{ required: true, message: 'Please enter a space name.' }]}
+            rules={[{ required: true, message: i18nT("ui.kreative.collaborativeSpaces.startNewSpace.pleaseEnterASpaceName") }]}
           >
-            <Input placeholder="Enter the name of your space" />
+            <Input placeholder={i18nT("ui.kreative.collaborativeSpaces.startNewSpace.enterTheNameOfYourSpace")} />
           </Form.Item>
 
           {/* Description / Purpose */}
           <Form.Item
-            label="Description / Purpose"
+            label={i18nT("ui.kreative.collaborativeSpaces.startNewSpace.descriptionPurpose")}
             name="description"
             rules={[
               {
                 required: true,
-                message: 'Please provide a description for your space.',
+                message: i18nT("ui.kreative.collaborativeSpaces.startNewSpace.pleaseProvideADescriptionForYourSpace"),
               },
             ]}
           >
             <TextArea
               rows={5}
-              placeholder="Describe the purpose and vision of your space"
+              placeholder={i18nT("ui.kreative.collaborativeSpaces.startNewSpace.describeThePurposeAndVisionOfYour")}
             />
           </Form.Item>
 
           {/* Category / Type */}
           <Form.Item
-            label="Category / Type"
+            label={i18nT("ui.kreative.collaborativeSpaces.startNewSpace.categoryType")}
             name="category"
-            rules={[{ required: true, message: 'Please select a category.' }]}
+            rules={[{ required: true, message: i18nT("ui.kreative.collaborativeSpaces.startNewSpace.pleaseSelectACategory") }]}
           >
-            <Select placeholder="Select a category">
-              <Option value="Art Study Group">Art Study Group</Option>
-              <Option value="Music Jam Session">Music Jam Session</Option>
+            <Select placeholder={i18nT("ui.kreative.collaborativeSpaces.startNewSpace.selectACategory")}>
+              <Option value="Art Study Group">{i18nT("ui.kreative.collaborativeSpaces.startNewSpace.artStudyGroup")}</Option>
+              <Option value="Music Jam Session">{i18nT("ui.kreative.collaborativeSpaces.startNewSpace.musicJamSession")}</Option>
               <Option value="Creative Writing Circle">
-                Creative Writing Circle
+                {i18nT("ui.kreative.collaborativeSpaces.startNewSpace.creativeWritingCircle")}
               </Option>
               <Option value="Digital Innovation Hub">
-                Digital Innovation Hub
+                {i18nT("ui.kreative.collaborativeSpaces.startNewSpace.digitalInnovationHub")}
               </Option>
             </Select>
           </Form.Item>
 
           {/* Privacy Setting */}
           <Form.Item
-            label="Privacy Setting"
+            label={i18nT("ui.kreative.collaborativeSpaces.startNewSpace.privacySetting")}
             name="privacy"
-            rules={[{ required: true, message: 'Please choose a privacy setting.' }]}
+            rules={[{ required: true, message: i18nT("ui.kreative.collaborativeSpaces.startNewSpace.pleaseChooseAPrivacySetting") }]}
           >
             <Radio.Group>
-              <Radio value="Public">Public (Anyone can join)</Radio>
-              <Radio value="Private">Private (Invite Only)</Radio>
+              <Radio value="Public">{i18nT("ui.kreative.collaborativeSpaces.startNewSpace.publicAnyoneCanJoin")}</Radio>
+              <Radio value="Private">{i18nT("ui.kreative.collaborativeSpaces.startNewSpace.privateInviteOnly")}</Radio>
             </Radio.Group>
           </Form.Item>
 
@@ -173,21 +175,21 @@ export default function StartNewSpacePage(): JSX.Element {
                             rules={[
                               {
                                 required: true,
-                                message: 'Please enter an email address.',
+                                message: i18nT("ui.kreative.collaborativeSpaces.startNewSpace.pleaseEnterAnEmailAddress"),
                               },
                               {
                                 type: 'email',
-                                message: 'Please enter a valid email address.',
+                                message: i18nT("ui.kreative.collaborativeSpaces.startNewSpace.pleaseEnterAValidEmailAddress"),
                               },
                             ]}
                           >
-                            <Input placeholder="Enter member email" />
+                            <Input placeholder={i18nT("ui.kreative.collaborativeSpaces.startNewSpace.enterMemberEmail")} />
                           </Form.Item>
                           <Button
                             type="link"
                             onClick={() => remove(field.name)}
                           >
-                            Remove
+                            {i18nT("ui.kreative.collaborativeSpaces.startNewSpace.remove")}
                           </Button>
                         </Space>
                       ))}
@@ -197,7 +199,7 @@ export default function StartNewSpacePage(): JSX.Element {
                           onClick={() => add()}
                           icon={<PlusOutlined />}
                         >
-                          Invite Member
+                          {i18nT("ui.kreative.collaborativeSpaces.startNewSpace.inviteMember")}
                         </Button>
                       </Form.Item>
                     </Space>
@@ -208,21 +210,21 @@ export default function StartNewSpacePage(): JSX.Element {
           </Form.Item>
 
           {/* Space Banner or Icon Upload */}
-          <Form.Item label="Space Icon / Banner Image" name="banner">
+          <Form.Item label={i18nT("ui.kreative.collaborativeSpaces.startNewSpace.spaceIconBannerImage")} name="banner">
             <Upload
               beforeUpload={() => false} // prevent auto-upload
               fileList={fileList}
               onChange={handleFileChange}
               accept="image/*"
             >
-              <Button icon={<UploadOutlined />}>Upload Image</Button>
+              <Button icon={<UploadOutlined />}>{i18nT("ui.kreative.collaborativeSpaces.startNewSpace.uploadImage")}</Button>
             </Upload>
           </Form.Item>
 
           {/* Submit Button */}
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={submitting}>
-              Create Space
+              {i18nT("ui.kreative.collaborativeSpaces.startNewSpace.createSpace")}
             </Button>
           </Form.Item>
         </Form>

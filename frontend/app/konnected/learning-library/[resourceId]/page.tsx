@@ -2,6 +2,8 @@
 // app/konnected/learning-library/[resourceId]/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ArrowLeftOutlined,
   BookOutlined,
@@ -152,11 +154,11 @@ async function fetchResourceDetail(
 }
 
 /** Choose a short label for the resource type. */
-function formatResourceType(resource: KnowledgeResourceDetail | null): string {
-  if (!resource) return 'Resource';
+function formatResourceType(i18nT: TranslateFunction, resource: KnowledgeResourceDetail | null): string {
+  if (!resource) return i18nT("ui.konnected.learningLibrary.resourceid.resource");
   if (resource.resource_type) return String(resource.resource_type);
   if (resource.type) return String(resource.type);
-  return 'Resource';
+  return i18nT("ui.konnected.learningLibrary.resourceid.resource");
 }
 
 /** Pick the best available content field for inline preview. */
@@ -199,6 +201,7 @@ function normalizeProgress(resource: KnowledgeResourceDetail | null): number {
 }
 
 export default function LearningResourceViewerPage() {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
   const params = useParams<{ resourceId: string }>();
   const resourceId = params.resourceId;
@@ -210,7 +213,7 @@ export default function LearningResourceViewerPage() {
   // Load resource when the ID changes
   useEffect(() => {
     if (!resourceId) {
-      setError('Missing resource identifier in the URL.');
+      setError(i18nT("ui.konnected.learningLibrary.resourceid.missingResourceIdentifierInTheUrl"));
       setLoading(false);
       return;
     }
@@ -226,7 +229,7 @@ export default function LearningResourceViewerPage() {
         if (cancelled) return;
 
         if (!data) {
-          setError('This learning resource could not be found.');
+          setError(i18nT("ui.konnected.learningLibrary.resourceid.thisLearningResourceCouldNotBeFound"));
           setResource(null);
         } else {
           setResource(data);
@@ -251,18 +254,18 @@ export default function LearningResourceViewerPage() {
     return () => {
       cancelled = true;
     };
-  }, [resourceId]);
+  }, [resourceId, i18nT]);
 
   const progressPercent = useMemo(() => normalizeProgress(resource), [resource]);
 
   const inlineHtml = useMemo(() => pickContentHtml(resource), [resource]);
 
-  const shellTitle = resource?.title ?? 'Learning Resource';
+  const shellTitle = resource?.title ?? i18nT("ui.konnected.learningLibrary.resourceid.learningResource");
   const shellDescription =
     (resource?.description &&
       typeof resource.description === 'string' &&
       resource.description.trim().slice(0, 200)) ||
-    'View details and content for this KonnectED learning resource.';
+    i18nT("ui.konnected.learningLibrary.resourceid.viewDetailsAndContentForThisKonnected");
 
   const handleBackClick = () => {
     // Prefer going back if user arrived from another library page
@@ -292,12 +295,12 @@ export default function LearningResourceViewerPage() {
           disabled={!resource?.url}
           onClick={handleOpenResource}
         >
-          Open resource
+          {i18nT("ui.konnected.learningLibrary.resourceid.openResource")}
         </Button>
       }
       secondaryActions={
         <Button icon={<ArrowLeftOutlined />} onClick={handleBackClick}>
-          Back to library
+          {i18nT("ui.konnected.learningLibrary.resourceid.backToLibrary")}
         </Button>
       }
     >
@@ -315,7 +318,7 @@ export default function LearningResourceViewerPage() {
             extra={
               <Space size="small">
                 {resource?.resource_type && (
-                  <Tag color="blue">{formatResourceType(resource)}</Tag>
+                  <Tag color="blue">{formatResourceType(i18nT, resource)}</Tag>
                 )}
                 {resource?.subject && (
                   <Tag icon={<TagOutlined />}>{resource.subject}</Tag>
@@ -330,7 +333,7 @@ export default function LearningResourceViewerPage() {
               <Alert
                 type="error"
                 showIcon
-                message="Unable to load resource"
+                message={i18nT("ui.konnected.learningLibrary.resourceid.unableToLoadResource")}
                 description={error}
                 style={{ marginBottom: 16 }}
               />
@@ -342,8 +345,8 @@ export default function LearningResourceViewerPage() {
               <Alert
                 type="warning"
                 showIcon
-                message="Resource not available"
-                description="This learning resource is not available or may have been removed."
+                message={i18nT("ui.konnected.learningLibrary.resourceid.resourceNotAvailable")}
+                description={i18nT("ui.konnected.learningLibrary.resourceid.thisLearningResourceIsNotAvailableOr")}
               />
             ) : (
               <>
@@ -359,7 +362,7 @@ export default function LearningResourceViewerPage() {
                   items={[
                     {
                       key: 'overview',
-                      label: 'Overview',
+                      label: i18nT("ui.konnected.learningLibrary.resourceid.overview"),
                       children: (
                         <>
                           {inlineHtml ? (
@@ -371,8 +374,7 @@ export default function LearningResourceViewerPage() {
                             />
                           ) : (
                             <Paragraph type="secondary">
-                              Detailed content for this resource will appear here once
-                              the backend exposes it via the API.
+                              {i18nT("ui.konnected.learningLibrary.resourceid.detailedContentForThisResourceWillAppear")}
                             </Paragraph>
                           )}
                         </>
@@ -380,7 +382,7 @@ export default function LearningResourceViewerPage() {
                     },
                     {
                       key: 'details',
-                      label: 'Details',
+                      label: i18nT("ui.konnected.learningLibrary.resourceid.details"),
                       children: (
                         <Space
                           direction="vertical"
@@ -389,51 +391,51 @@ export default function LearningResourceViewerPage() {
                         >
                           <div>
                             <Title level={5} style={{ marginBottom: 8 }}>
-                              Key information
+                              {i18nT("ui.konnected.learningLibrary.resourceid.keyInformation")}
                             </Title>
                             <Space direction="vertical" size={4}>
                               {resource.subject && (
                                 <Text>
-                                  <Text strong>Subject: </Text>
+                                  <Text strong>{i18nT("ui.konnected.learningLibrary.resourceid.subject")} </Text>
                                   {resource.subject}
                                 </Text>
                               )}
                               {resource.level && (
                                 <Text>
-                                  <Text strong>Level: </Text>
+                                  <Text strong>{i18nT("ui.konnected.learningLibrary.resourceid.level")} </Text>
                                   {String(resource.level)}
                                 </Text>
                               )}
                               {resource.language && (
                                 <Text>
-                                  <Text strong>Language: </Text>
+                                  <Text strong>{i18nT("ui.konnected.learningLibrary.resourceid.language")} </Text>
                                   {resource.language}
                                 </Text>
                               )}
                               {resource.resource_type && (
                                 <Text>
-                                  <Text strong>Type: </Text>
-                                  {formatResourceType(resource)}
+                                  <Text strong>{i18nT("ui.konnected.learningLibrary.resourceid.type")} </Text>
+                                  {formatResourceType(i18nT, resource)}
                                 </Text>
                               )}
                               {resource.estimated_minutes != null && (
                                 <Text>
-                                  <Text strong>Estimated duration: </Text>
+                                  <Text strong>{i18nT("ui.konnected.learningLibrary.resourceid.estimatedDuration")} </Text>
                                   <Space>
                                     <ClockCircleOutlined />
-                                    <span>{resource.estimated_minutes} min</span>
+                                    <span>{resource.estimated_minutes} {i18nT("ui.konnected.learningLibrary.resourceid.min")}</span>
                                   </Space>
                                 </Text>
                               )}
                               {resource.author && (
                                 <Text>
-                                  <Text strong>Author: </Text>
+                                  <Text strong>{i18nT("ui.konnected.learningLibrary.resourceid.author")} </Text>
                                   {resource.author}
                                 </Text>
                               )}
                               {resource.created_at && (
                                 <Text type="secondary">
-                                  <Text strong>Created: </Text>
+                                  <Text strong>{i18nT("ui.konnected.learningLibrary.resourceid.created")} </Text>
                                   {resource.created_at}
                                 </Text>
                               )}
@@ -443,7 +445,7 @@ export default function LearningResourceViewerPage() {
                           {hasTags && (
                             <div>
                               <Title level={5} style={{ marginBottom: 8 }}>
-                                Tags
+                                {i18nT("ui.konnected.learningLibrary.resourceid.tags")}
                               </Title>
                               <Space size={[8, 8]} wrap>
                                 {resource.tags!.map((tag) => (
@@ -457,12 +459,10 @@ export default function LearningResourceViewerPage() {
                     },
                     {
                       key: 'notes',
-                      label: 'Notes',
+                      label: i18nT("ui.konnected.learningLibrary.resourceid.notes"),
                       children: (
                         <Paragraph type="secondary">
-                          Personal notes and highlights for this resource can be added
-                          here in a future iteration (e.g. synced with the user profile
-                          or offline notebook).
+                          {i18nT("ui.konnected.learningLibrary.resourceid.personalNotesAndHighlightsForThisResource")}
                         </Paragraph>
                       ),
                     },
@@ -476,30 +476,29 @@ export default function LearningResourceViewerPage() {
         {/* Metadata / actions column */}
         <Col xs={24} lg={8}>
           <Card
-            title="Progress"
+            title={i18nT("ui.konnected.learningLibrary.resourceid.progress")}
             style={{ marginBottom: 16 }}
             extra={
               progressPercent >= 100 ? (
                 <Tag color="green" icon={<CheckCircleOutlined />}>
-                  Completed
+                  {i18nT("ui.konnected.learningLibrary.resourceid.completed")}
                 </Tag>
               ) : null
             }
           >
             <Space direction="vertical" size="small" style={{ width: '100%' }}>
-              <Text type="secondary">Your progress</Text>
+              <Text type="secondary">{i18nT("ui.konnected.learningLibrary.resourceid.yourProgress")}</Text>
               <Progress
                 percent={progressPercent}
                 status={progressPercent >= 100 ? 'success' : 'active'}
               />
               <Text type="secondary" style={{ fontSize: 12 }}>
-                Progress values are provided by the KonnectED backend (user progress
-                tracking). If this stays at 0%, the tracking API may not be wired yet.
+                {i18nT("ui.konnected.learningLibrary.resourceid.progressValuesAreProvidedByTheKonnected")}
               </Text>
             </Space>
           </Card>
 
-          <Card title="Actions" style={{ marginBottom: 16 }}>
+          <Card title={i18nT("ui.konnected.learningLibrary.resourceid.actions")} style={{ marginBottom: 16 }}>
             <Space direction="vertical" style={{ width: '100%' }}>
               <Button
                 type="primary"
@@ -508,10 +507,10 @@ export default function LearningResourceViewerPage() {
                 disabled={!resource?.url}
                 onClick={handleOpenResource}
               >
-                Open resource
+                {i18nT("ui.konnected.learningLibrary.resourceid.openResource")}
               </Button>
               <Button icon={<DownloadOutlined />} block disabled={!resource}>
-                Save for offline
+                {i18nT("ui.konnected.learningLibrary.resourceid.saveForOffline")}
               </Button>
               <Button
                 icon={<LinkOutlined />}
@@ -524,17 +523,15 @@ export default function LearningResourceViewerPage() {
                   }
                 }}
               >
-                Copy link
+                {i18nT("ui.konnected.learningLibrary.resourceid.copyLink")}
               </Button>
             </Space>
           </Card>
 
-          <Card title="Resource meta">
+          <Card title={i18nT("ui.konnected.learningLibrary.resourceid.resourceMeta")}>
             <Space direction="vertical" size="small" style={{ width: '100%' }}>
               <Text type="secondary">
-                This panel summarises the metadata for the selected learning item. As
-                backend fields evolve (e.g. course membership, certifications), they can
-                be surfaced here without changing the overall layout.
+                {i18nT("ui.konnected.learningLibrary.resourceid.thisPanelSummarisesTheMetadataForThe")}
               </Text>
             </Space>
           </Card>

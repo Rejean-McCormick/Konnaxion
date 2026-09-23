@@ -1,5 +1,7 @@
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import { InfoCircleOutlined, ReloadOutlined } from '@ant-design/icons';
 import {
   Alert,
@@ -127,11 +129,11 @@ const EMPTY_SUMMARY: ApiSummary = {
   uptimePct: 99.95,
 };
 
-const TIME_RANGE_OPTIONS: { label: string; value: TimeRange }[] = [
-  { label: '24h', value: '24h' },
-  { label: '7d', value: '7d' },
-  { label: '30d', value: '30d' },
-];
+const TIME_RANGE_OPTIONS = (i18nT: TranslateFunction): { label: string; value: TimeRange }[] => ([
+  { label: i18nT("ui.reports.perf.text24h"), value: '24h' },
+  { label: i18nT("ui.reports.perf.text7d"), value: '7d' },
+  { label: i18nT("ui.reports.perf.text30d"), value: '30d' },
+]);
 
 function buildMockSeries(range: TimeRange): ApiSeriesPoint[] {
   const points =
@@ -169,6 +171,7 @@ function normalizePerfResponse(
 }
 
 export default function PerfReportPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [range, setRange] = useState<TimeRange>('24h');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -196,7 +199,7 @@ export default function PerfReportPage(): JSX.Element {
       setSeries(normalized.series);
     } catch {
       setError(
-        'Performance data is temporarily unavailable. Showing fallback sample metrics.',
+        i18nT("ui.reports.perf.performanceDataIsTemporarilyUnavailableShowingFallback"),
       );
 
       const normalized = normalizePerfResponse(undefined, nextRange);
@@ -224,7 +227,7 @@ export default function PerfReportPage(): JSX.Element {
 
   const endpointColumns: ColumnsType<EndpointRow> = [
     {
-      title: 'Endpoint',
+      title: i18nT("ui.reports.perf.endpoint"),
       dataIndex: 'endpoint',
       key: 'endpoint',
       render: (value: string) => (
@@ -234,41 +237,41 @@ export default function PerfReportPage(): JSX.Element {
       ),
     },
     {
-      title: 'P95',
+      title: i18nT("ui.reports.perf.p95"),
       dataIndex: 'p95',
       key: 'p95',
       width: 100,
       render: (value: number) => `${value} ms`,
     },
     {
-      title: 'P99',
+      title: i18nT("ui.reports.perf.p99"),
       dataIndex: 'p99',
       key: 'p99',
       width: 100,
       render: (value: number) => `${value} ms`,
     },
     {
-      title: 'Error rate',
+      title: i18nT("ui.reports.perf.errorRate"),
       dataIndex: 'errorRate',
       key: 'errorRate',
       width: 120,
       render: (value: number) => `${value.toFixed(1)}%`,
     },
     {
-      title: 'RPS',
+      title: i18nT("ui.reports.perf.rps"),
       dataIndex: 'rps',
       key: 'rps',
       width: 90,
     },
     {
-      title: 'SLO',
+      title: i18nT("ui.reports.perf.slo"),
       dataIndex: 'sloStatus',
       key: 'sloStatus',
       width: 120,
       render: (status: EndpointRow['sloStatus']) => {
-        if (status === 'healthy') return <Tag color="success">Healthy</Tag>;
-        if (status === 'watch') return <Tag color="warning">Watch</Tag>;
-        return <Tag color="error">Breach</Tag>;
+        if (status === 'healthy') return <Tag color="success">{i18nT("ui.reports.perf.healthy")}</Tag>;
+        if (status === 'watch') return <Tag color="warning">{i18nT("ui.reports.perf.watch")}</Tag>;
+        return <Tag color="error">{i18nT("ui.reports.perf.breach")}</Tag>;
       },
     },
   ];
@@ -277,16 +280,16 @@ export default function PerfReportPage(): JSX.Element {
     <Space wrap>
       <Segmented<TimeRange>
         value={range}
-        options={TIME_RANGE_OPTIONS}
+        options={TIME_RANGE_OPTIONS(i18nT)}
         onChange={(value) => setRange(value)}
       />
       <RangePicker
         allowClear={false}
         value={[dayjs().subtract(7, 'day'), dayjs()]}
       />
-      <Tooltip title="Refresh performance metrics">
+      <Tooltip title={i18nT("ui.reports.perf.refreshPerformanceMetrics")}>
         <Button icon={<ReloadOutlined />} onClick={() => void loadReport(range)}>
-          Refresh
+          {i18nT("ui.reports.perf.refresh")}
         </Button>
       </Tooltip>
     </Space>
@@ -295,8 +298,8 @@ export default function PerfReportPage(): JSX.Element {
   if (loading) {
     return (
       <ReportsPageShell
-        title="API performance"
-        subtitle="Monitor latency, reliability, and endpoint health across the platform."
+        title={i18nT("ui.reports.perf.apiPerformance")}
+        subtitle={i18nT("ui.reports.perf.monitorLatencyReliabilityAndEndpointHealthAcross")}
         secondaryActions={toolbar}
       >
         <Skeleton active paragraph={{ rows: 10 }} />
@@ -306,8 +309,8 @@ export default function PerfReportPage(): JSX.Element {
 
   return (
     <ReportsPageShell
-      title="API performance"
-      subtitle="Monitor API latency, reliability, throughput, and SLO compliance for the core services."
+      title={i18nT("ui.reports.perf.apiPerformance")}
+      subtitle={i18nT("ui.reports.perf.monitorApiLatencyReliabilityThroughputAndSlo")}
       secondaryActions={toolbar}
     >
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -315,7 +318,7 @@ export default function PerfReportPage(): JSX.Element {
           <Alert
             type="warning"
             showIcon
-            message="Fallback data in use"
+            message={i18nT("ui.reports.perf.fallbackDataInUse")}
             description={error}
           />
         )}
@@ -324,15 +327,15 @@ export default function PerfReportPage(): JSX.Element {
           type="info"
           showIcon
           icon={<InfoCircleOutlined />}
-          message="About this dashboard"
-          description="This view summarizes p95/p99 latency, error rate, and endpoint-level health. Detailed endpoint breakdown can be refined later when the reports API exposes per-endpoint filters."
+          message={i18nT("ui.reports.perf.aboutThisDashboard")}
+          description={i18nT("ui.reports.perf.thisViewSummarizesP95P99LatencyError")}
         />
 
         <Row gutter={[16, 16]}>
           <Col xs={24} md={12} xl={6}>
             <Card>
               <Statistic
-                title="P95 latency"
+                title={i18nT("ui.reports.perf.p95Latency")}
                 value={summary.p95LatencyMs}
                 suffix="ms"
               />
@@ -341,7 +344,7 @@ export default function PerfReportPage(): JSX.Element {
           <Col xs={24} md={12} xl={6}>
             <Card>
               <Statistic
-                title="P99 latency"
+                title={i18nT("ui.reports.perf.p99Latency")}
                 value={summary.p99LatencyMs}
                 suffix="ms"
               />
@@ -350,7 +353,7 @@ export default function PerfReportPage(): JSX.Element {
           <Col xs={24} md={12} xl={6}>
             <Card>
               <Statistic
-                title="Error rate"
+                title={i18nT("ui.reports.perf.errorRate")}
                 value={summary.errorRatePct}
                 suffix="%"
                 precision={2}
@@ -360,7 +363,7 @@ export default function PerfReportPage(): JSX.Element {
           <Col xs={24} md={12} xl={6}>
             <Card>
               <Statistic
-                title="Throughput"
+                title={i18nT("ui.reports.perf.throughput")}
                 value={summary.throughputRps}
                 suffix="rps"
                 precision={0}
@@ -371,9 +374,9 @@ export default function PerfReportPage(): JSX.Element {
 
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={14}>
-            <Card title="Latency trend">
+            <Card title={i18nT("ui.reports.perf.latencyTrend")}>
               {chartData.length === 0 ? (
-                <Empty description="No latency samples for this range." />
+                <Empty description={i18nT("ui.reports.perf.noLatencySamplesForThisRange")} />
               ) : (
                 <div style={{ width: '100%', height: 300 }}>
                   <ResponsiveContainer>
@@ -405,9 +408,9 @@ export default function PerfReportPage(): JSX.Element {
           </Col>
 
           <Col xs={24} lg={10}>
-            <Card title="Error rate trend">
+            <Card title={i18nT("ui.reports.perf.errorRateTrend")}>
               {chartData.length === 0 ? (
-                <Empty description="No error-rate samples for this range." />
+                <Empty description={i18nT("ui.reports.perf.noErrorRateSamplesForThisRange")} />
               ) : (
                 <div style={{ width: '100%', height: 300 }}>
                   <ResponsiveContainer>
@@ -432,13 +435,13 @@ export default function PerfReportPage(): JSX.Element {
 
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={15}>
-            <Card title="Endpoint-level performance">
+            <Card title={i18nT("ui.reports.perf.endpointLevelPerformance")}>
               <Alert
-                message="Limited data"
+                message={i18nT("ui.reports.perf.limitedData")}
                 type="info"
                 showIcon
                 style={{ marginBottom: 16 }}
-                description="Detailed endpoint breakdown is not yet available via API. Showing representative examples."
+                description={i18nT("ui.reports.perf.detailedEndpointBreakdownIsNotYetAvailable")}
               />
               <Table<EndpointRow>
                 size="small"
@@ -451,14 +454,14 @@ export default function PerfReportPage(): JSX.Element {
           </Col>
 
           <Col xs={24} lg={9}>
-            <Card title="SLO overview">
+            <Card title={i18nT("ui.reports.perf.sloOverview")}>
               <Space
                 direction="vertical"
                 size="middle"
                 style={{ width: '100%' }}
               >
                 <div>
-                  <Text strong>Latency SLO (p95 &lt; 400ms)</Text>
+                  <Text strong>{i18nT("ui.reports.perf.latencySloP95400ms")}</Text>
                   <Progress
                     percent={Math.min(
                       100,
@@ -468,12 +471,12 @@ export default function PerfReportPage(): JSX.Element {
                     showInfo={false}
                   />
                   <Text type="secondary">
-                    Current p95: {summary.p95LatencyMs} ms (target ≤ 400 ms)
+                    {i18nT("ui.reports.perf.currentP95")} {summary.p95LatencyMs} {i18nT("ui.reports.perf.msTarget400Ms")}
                   </Text>
                 </div>
 
                 <div>
-                  <Text strong>Error SLO (rate &lt; 1.0%)</Text>
+                  <Text strong>{i18nT("ui.reports.perf.errorSloRate10")}</Text>
                   <Progress
                     percent={Math.min(
                       100,
@@ -483,13 +486,12 @@ export default function PerfReportPage(): JSX.Element {
                     showInfo={false}
                   />
                   <Text type="secondary">
-                    Current error rate: {summary.errorRatePct.toFixed(2)}% (target
-                    &lt; 1.0%)
+                    {i18nT("ui.reports.perf.currentErrorRate")} {summary.errorRatePct.toFixed(2)}{i18nT("ui.reports.perf.target10")}
                   </Text>
                 </div>
 
                 <div>
-                  <Text strong>Availability SLO (≥ 99.9%)</Text>
+                  <Text strong>{i18nT("ui.reports.perf.availabilitySlo999")}</Text>
                   <Progress
                     percent={summary.uptimePct}
                     status={summary.uptimePct >= 99.9 ? 'active' : 'exception'}
@@ -500,7 +502,7 @@ export default function PerfReportPage(): JSX.Element {
                 </div>
 
                 <div>
-                  <Text strong>Apdex</Text>
+                  <Text strong>{i18nT("ui.reports.perf.apdex")}</Text>
                   <Progress
                     percent={Math.max(0, Math.min(100, summary.apdex * 100))}
                     status={summary.apdex >= 0.9 ? 'active' : 'exception'}
@@ -514,8 +516,8 @@ export default function PerfReportPage(): JSX.Element {
                   <Alert
                     type="warning"
                     showIcon
-                    message="Active watch"
-                    description="Error rates are elevated above the SLO threshold. Check recent deploys, upstream availability, and database pressure."
+                    message={i18nT("ui.reports.perf.activeWatch")}
+                    description={i18nT("ui.reports.perf.errorRatesAreElevatedAboveTheSlo")}
                   />
                 )}
               </Space>

@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import 'dayjs/locale/en'
 import {
   BranchesOutlined,
@@ -34,21 +35,22 @@ dayjs.extend(relativeTime)
 const { Text } = Typography
 
 export default function TopicThreadPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const controller = useTopicThreadController()
   const [participantContext, setParticipantContext] =
     useState<ParticipantContextTarget | null>(null)
 
   if (!controller.topicId) {
     return (
-      <EthikosPageShell title="Deliberate · Topic" sectionLabel="Deliberate">
-        <TopicErrorState description="Missing topic id" />
+      <EthikosPageShell title={i18nT("ui.ethikos.deliberate.topic.deliberateTopic")} sectionLabel={i18nT("ui.ethikos.deliberate.topic.deliberate")}>
+        <TopicErrorState description={i18nT("ui.ethikos.deliberate.topic.missingTopicId")} />
       </EthikosPageShell>
     )
   }
 
   if (controller.loading && !controller.pageData) {
     return (
-      <EthikosPageShell title="Deliberate · Topic" sectionLabel="Deliberate">
+      <EthikosPageShell title={i18nT("ui.ethikos.deliberate.topic.deliberateTopic")} sectionLabel={i18nT("ui.ethikos.deliberate.topic.deliberate")}>
         <TopicLoadingState />
       </EthikosPageShell>
     )
@@ -56,9 +58,9 @@ export default function TopicThreadPage(): JSX.Element {
 
   if (!controller.loading && !controller.pageData) {
     return (
-      <EthikosPageShell title="Deliberate · Topic" sectionLabel="Deliberate">
+      <EthikosPageShell title={i18nT("ui.ethikos.deliberate.topic.deliberateTopic")} sectionLabel={i18nT("ui.ethikos.deliberate.topic.deliberate")}>
         <TopicErrorState
-          description={controller.pageError?.message ?? 'Topic not found'}
+          description={controller.pageError?.message ?? i18nT("ui.ethikos.deliberate.topic.topicNotFound")}
         />
       </EthikosPageShell>
     )
@@ -68,19 +70,19 @@ export default function TopicThreadPage(): JSX.Element {
 
   if (!topic) {
     return (
-      <EthikosPageShell title="Deliberate · Topic" sectionLabel="Deliberate">
-        <TopicErrorState description="Topic data unavailable" />
+      <EthikosPageShell title={i18nT("ui.ethikos.deliberate.topic.deliberateTopic")} sectionLabel={i18nT("ui.ethikos.deliberate.topic.deliberate")}>
+        <TopicErrorState description={i18nT("ui.ethikos.deliberate.topic.topicDataUnavailable")} />
       </EthikosPageShell>
     )
   }
 
   return (
     <EthikosPageShell
-      title={topic?.title ?? 'Deliberate · Topic'}
-      sectionLabel="Deliberate"
+      title={topic?.title ?? i18nT("ui.ethikos.deliberate.topic.deliberateTopic")}
+      sectionLabel={i18nT("ui.ethikos.deliberate.topic.deliberate")}
       subtitle={
         topic?.category
-          ? `${topic.category} · ${formatRelativeDate(topic.lastActivity)}`
+          ? i18nT("ui.ethikos.deliberate.topic.text", { category: topic.category, value1: formatRelativeDate(topic.lastActivity) })
           : undefined
       }
     >
@@ -89,8 +91,8 @@ export default function TopicThreadPage(): JSX.Element {
           <Alert
             type="info"
             showIcon
-            message="Structure the reasons before deciding"
-            description="Read the topic, choose your stance, compare arguments, then select a statement to review its sources, impact signals, suggestions, visibility, and participant context."
+            message={i18nT("ui.ethikos.deliberate.topic.structureTheReasonsBeforeDeciding")}
+            description={i18nT("ui.ethikos.deliberate.topic.readTheTopicChooseYourStanceCompare")}
           />
 
           <ProCard>
@@ -99,23 +101,23 @@ export default function TopicThreadPage(): JSX.Element {
               current={controller.selectedArgument ? 3 : 2}
               items={[
                 {
-                  title: 'Understand',
-                  description: 'Read the topic',
+                  title: i18nT("ui.ethikos.deliberate.topic.understand"),
+                  description: i18nT("ui.ethikos.deliberate.topic.readTheTopic"),
                   icon: <ProfileOutlined />,
                 },
                 {
-                  title: 'Take stance',
-                  description: 'Position yourself',
+                  title: i18nT("ui.ethikos.deliberate.topic.takeStance"),
+                  description: i18nT("ui.ethikos.deliberate.topic.positionYourself"),
                   icon: <CheckCircleOutlined />,
                 },
                 {
-                  title: 'Deliberate',
-                  description: 'Add arguments or replies',
+                  title: i18nT("ui.ethikos.deliberate.topic.deliberate"),
+                  description: i18nT("ui.ethikos.deliberate.topic.addArgumentsOrReplies"),
                   icon: <BranchesOutlined />,
                 },
                 {
-                  title: 'Review details',
-                  description: 'Inspect evidence and signals',
+                  title: i18nT("ui.ethikos.deliberate.topic.reviewDetails"),
+                  description: i18nT("ui.ethikos.deliberate.topic.inspectEvidenceAndSignals"),
                   icon: <MessageOutlined />,
                 },
               ]}
@@ -161,16 +163,15 @@ export default function TopicThreadPage(): JSX.Element {
           </Row>
 
           <ProCard
-            title="Selected argument details"
+            title={i18nT("ui.ethikos.deliberate.topic.selectedArgumentDetails")}
             subTitle={
               controller.selectedArgument ? (
                 <Text type="secondary">
-                  Review the selected statement’s evidence, impact signal,
-                  suggestions, visibility, and participant context.
+                  {i18nT("ui.ethikos.deliberate.topic.reviewTheSelectedStatementSEvidenceImpact")}
                 </Text>
               ) : (
                 <Text type="secondary">
-                  Select an argument above to inspect its sources and signals.
+                  {i18nT("ui.ethikos.deliberate.topic.selectAnArgumentAboveToInspectIts")}
                 </Text>
               )
             }

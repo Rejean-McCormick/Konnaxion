@@ -1,6 +1,7 @@
 // FILE: frontend/app/keenkonnect/knowledge/upload-new-document/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { InboxOutlined } from '@ant-design/icons';
 import {
   ProCard,
@@ -41,6 +42,7 @@ const normFile = (event: unknown): UploadFile[] => {
 };
 
 export default function UploadNewDocumentPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const handleFinish = async (): Promise<boolean> => {
     // Declared read-only: no general knowledge-document upload contract exists.
     return false;
@@ -48,15 +50,15 @@ export default function UploadNewDocumentPage(): JSX.Element {
 
   return (
     <KeenPageShell
-      title="Upload New Document"
-      description="Add a new knowledge asset to KeenKonnect."
-      metaTitle="KeenKonnect · Knowledge · Upload document"
+      title={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.uploadNewDocument")}
+      description={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.addANewKnowledgeAssetToKeenkonnect")}
+      metaTitle={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.keenkonnectKnowledgeUploadDocument")}
     >
       <Alert
         type="info"
         showIcon
-        message="Document upload unavailable"
-        description="This form is retained as a declared read-only product preview. Konnaxion does not currently expose a general knowledge-document upload persistence contract."
+        message={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.documentUploadUnavailable")}
+        description={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.thisFormIsRetainedAsADeclared")}
         style={{ marginBottom: 16 }}
       />
       <ProCard>
@@ -74,72 +76,72 @@ export default function UploadNewDocumentPage(): JSX.Element {
             submitButtonProps: {
               disabled: true,
               type: 'primary',
-              title: 'Unavailable until a knowledge-document persistence contract exists.',
+              title: i18nT("ui.keenkonnect.knowledge.uploadNewDocument.unavailableUntilAKnowledgeDocumentPersistenceContract"),
             },
           }}
         >
           <ProFormText
             name="title"
-            label="Document Title"
-            placeholder="Enter document title"
+            label={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.documentTitle")}
+            placeholder={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.enterDocumentTitle")}
             rules={[
-              { required: true, message: 'Please enter a document title' },
-              { max: 200, message: 'Title is too long' },
+              { required: true, message: i18nT("ui.keenkonnect.knowledge.uploadNewDocument.pleaseEnterADocumentTitle") },
+              { max: 200, message: i18nT("ui.keenkonnect.knowledge.uploadNewDocument.titleIsTooLong") },
             ]}
           />
 
           <ProFormTextArea
             name="description"
-            label="Description / Abstract"
-            placeholder="Short summary of the document contents"
+            label={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.descriptionAbstract")}
+            placeholder={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.shortSummaryOfTheDocumentContents")}
             fieldProps={{ rows: 4 }}
             rules={[
-              { required: true, message: 'Please provide a description or abstract' },
+              { required: true, message: i18nT("ui.keenkonnect.knowledge.uploadNewDocument.pleaseProvideADescriptionOrAbstract") },
             ]}
           />
 
           <ProFormSelect<CategoryOption>
             name="category"
-            label="Category / Topic"
-            placeholder="Select a category"
-            rules={[{ required: true, message: 'Please select a category/topic' }]}
+            label={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.categoryTopic")}
+            placeholder={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.selectACategory")}
+            rules={[{ required: true, message: i18nT("ui.keenkonnect.knowledge.uploadNewDocument.pleaseSelectACategoryTopic") }]}
             options={[
-              { label: 'Robotics', value: 'Robotics' },
-              { label: 'Healthcare', value: 'Healthcare' },
-              { label: 'Technology', value: 'Technology' },
-              { label: 'Energy', value: 'Energy' },
-              { label: 'Education', value: 'Education' },
+              { label: i18nT("ui.keenkonnect.knowledge.uploadNewDocument.robotics"), value: 'Robotics' },
+              { label: i18nT("ui.keenkonnect.knowledge.uploadNewDocument.healthcare"), value: 'Healthcare' },
+              { label: i18nT("ui.keenkonnect.knowledge.uploadNewDocument.technology"), value: 'Technology' },
+              { label: i18nT("ui.keenkonnect.knowledge.uploadNewDocument.energy"), value: 'Energy' },
+              { label: i18nT("ui.keenkonnect.knowledge.uploadNewDocument.education"), value: 'Education' },
             ]}
           />
 
           <ProFormText
             name="version"
-            label="Version"
-            placeholder="e.g. 1.0"
+            label={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.version")}
+            placeholder={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.eG10")}
             rules={[
-              { required: true, message: 'Please specify the document version' },
+              { required: true, message: i18nT("ui.keenkonnect.knowledge.uploadNewDocument.pleaseSpecifyTheDocumentVersion") },
             ]}
           />
 
           <ProFormSelect<LanguageOption>
             name="language"
-            label="Language"
-            placeholder="Select language"
-            rules={[{ required: true, message: 'Please select a language' }]}
+            label={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.language")}
+            placeholder={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.selectLanguage")}
+            rules={[{ required: true, message: i18nT("ui.keenkonnect.knowledge.uploadNewDocument.pleaseSelectALanguage") }]}
             options={[
-              { label: 'English', value: 'English' },
-              { label: 'French', value: 'French' },
+              { label: i18nT("ui.keenkonnect.knowledge.uploadNewDocument.english"), value: 'English' },
+              { label: i18nT("ui.keenkonnect.knowledge.uploadNewDocument.french"), value: 'French' },
             ]}
           />
 
           <ProFormUploadDragger
             name="documentFile"
-            label="Document File"
+            label={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.documentFile")}
             max={1}
             valuePropName="fileList"
             getValueFromEvent={normFile}
             rules={[
-              { required: true, message: 'Please upload the document file' },
+              { required: true, message: i18nT("ui.keenkonnect.knowledge.uploadNewDocument.pleaseUploadTheDocumentFile") },
             ]}
             fieldProps={{
               multiple: false,
@@ -150,17 +152,17 @@ export default function UploadNewDocumentPage(): JSX.Element {
             <div style={{ padding: '24px 0' }}>
               <InboxOutlined style={{ fontSize: 32 }} />
               <div style={{ marginTop: 8 }}>
-                Click or drag file to this area to upload
+                {i18nT("ui.keenkonnect.knowledge.uploadNewDocument.clickOrDragFileToThisArea")}
               </div>
               <div style={{ marginTop: 4, fontSize: 12, color: 'rgba(0,0,0,0.45)' }}>
-                Supported formats: PDF, DOC/DOCX, PPT/PPTX, TXT (single file).
+                {i18nT("ui.keenkonnect.knowledge.uploadNewDocument.supportedFormatsPdfDocDocxPptPptx")}
               </div>
             </div>
           </ProFormUploadDragger>
 
           <ProFormSwitch
             name="publishNow"
-            label="Publish Status"
+            label={i18nT("ui.keenkonnect.knowledge.uploadNewDocument.publishStatus")}
             fieldProps={{
               checkedChildren: 'Publish Now',
               unCheckedChildren: 'Save as Draft',

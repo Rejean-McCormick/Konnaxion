@@ -227,7 +227,7 @@
     "method": "GET",
     "url": "authorization",
     "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/app/_api/search/route.ts"
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/%5Fapi/search/route.ts"
     ]
   },
   {
@@ -255,7 +255,7 @@
     "method": "GET",
     "url": "cookie",
     "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/app/_api/search/route.ts"
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/%5Fapi/search/route.ts"
     ]
   },
   {
@@ -500,7 +500,7 @@
     "method": "GET",
     "url": "q",
     "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/app/_api/search/route.ts",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/%5Fapi/search/route.ts",
       "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-library/browse-resources/page.tsx",
       "C:/mycode/Konnaxion/Konnaxion/frontend/app/search/GlobalSearchClient.tsx",
       "C:/mycode/Konnaxion/Konnaxion/frontend/modules/global/components/GlobalSearchBar.tsx",
@@ -619,7 +619,7 @@
     "method": "GET",
     "url": "world",
     "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/app/_api/search/route.ts"
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/%5Fapi/search/route.ts"
     ]
   }
 ]

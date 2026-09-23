@@ -32,7 +32,9 @@
     "pw:install": "playwright install",
     "harvest:platform": "cross-env CI=1 PLAYWRIGHT_AUTH_STATE=storageState.harvest.json playwright test -c playwright.harvest.config.ts --project=platform-harvest",
     "harvest:platform:headed": "cross-env PLAYWRIGHT_AUTH_STATE=storageState.harvest.json playwright test -c playwright.harvest.config.ts --project=platform-harvest --headed",
-    "harvest:platform:report": "playwright show-report artifacts/playwright-harvest-html"
+    "harvest:platform:report": "playwright show-report artifacts/playwright-harvest-html",
+    "i18n:check": "node scripts/check-i18n.mjs",
+    "i18n:extract": "node scripts/extract-ui-translations.mjs --english-only --min-confidence medium"
   },
   "dependencies": {
     "@ant-design/compatible": "^5.1.4",

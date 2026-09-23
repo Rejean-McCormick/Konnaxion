@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { UploadOutlined } from '@ant-design/icons'
 import {
   Alert,
@@ -37,6 +38,7 @@ function mediaTypeFromFile(file: File): 'image' | 'video' | 'audio' | 'other' {
 }
 
 export default function SubmitCreativeWorkPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [form] = Form.useForm<CreativeWorkFormValues>()
   const [fileList, setFileList] = useState<UploadFile[]>([])
   const [submitting, setSubmitting] = useState(false)
@@ -55,7 +57,7 @@ export default function SubmitCreativeWorkPage(): JSX.Element {
   const onFinish = async (values: CreativeWorkFormValues) => {
     const upload = fileList[0]?.originFileObj
     if (!(upload instanceof File)) {
-      messageApi.error('Please attach one file.')
+      messageApi.error(i18nT("ui.kreative.creativeHub.submitCreativeWork.pleaseAttachOneFile"))
       return
     }
 
@@ -74,7 +76,7 @@ export default function SubmitCreativeWorkPage(): JSX.Element {
     setSubmitting(true)
     try {
       await createKreativeArtwork(payload)
-      messageApi.success('Creative work saved.')
+      messageApi.success(i18nT("ui.kreative.creativeHub.submitCreativeWork.creativeWorkSaved"))
       form.resetFields()
       setFileList([])
       router.push('/kreative/dashboard')
@@ -91,52 +93,52 @@ export default function SubmitCreativeWorkPage(): JSX.Element {
 
   return (
     <KreativePageShell
-      title="Submit Creative Work"
-      subtitle="Share your creative work with the community."
+      title={i18nT("ui.kreative.creativeHub.submitCreativeWork.submitCreativeWork")}
+      subtitle={i18nT("ui.kreative.creativeHub.submitCreativeWork.shareYourCreativeWorkWithTheCommunity")}
     >
       {messageContextHolder}
       <Alert
         type="info"
         showIcon
         style={{ marginBottom: 16 }}
-        message="Submissions on this page are persisted through the Kreative artwork API."
+        message={i18nT("ui.kreative.creativeHub.submitCreativeWork.submissionsOnThisPageArePersistedThrough")}
       />
 
       <Form<CreativeWorkFormValues> layout="vertical" form={form} onFinish={onFinish}>
         <Form.Item
-          label="Title"
+          label={i18nT("ui.kreative.creativeHub.submitCreativeWork.title")}
           name="title"
-          rules={[{ required: true, message: 'Please enter a title' }]}
+          rules={[{ required: true, message: i18nT("ui.kreative.creativeHub.submitCreativeWork.pleaseEnterATitle") }]}
         >
-          <Input placeholder="e.g., Generative sculpture series" />
+          <Input placeholder={i18nT("ui.kreative.creativeHub.submitCreativeWork.eGGenerativeSculptureSeries")} />
         </Form.Item>
 
         <Form.Item
-          label="Description"
+          label={i18nT("ui.kreative.creativeHub.submitCreativeWork.description")}
           name="description"
-          rules={[{ required: true, message: 'Please add a description' }]}
+          rules={[{ required: true, message: i18nT("ui.kreative.creativeHub.submitCreativeWork.pleaseAddADescription") }]}
         >
-          <Input.TextArea rows={4} placeholder="What did you make? How? Why?" />
+          <Input.TextArea rows={4} placeholder={i18nT("ui.kreative.creativeHub.submitCreativeWork.whatDidYouMakeHowWhy")} />
         </Form.Item>
 
         <Form.Item
-          label="Medium / category"
+          label={i18nT("ui.kreative.creativeHub.submitCreativeWork.mediumCategory")}
           name="category"
-          rules={[{ required: true, message: 'Please pick a category' }]}
+          rules={[{ required: true, message: i18nT("ui.kreative.creativeHub.submitCreativeWork.pleasePickACategory") }]}
         >
           <Select
-            placeholder="Choose one"
+            placeholder={i18nT("ui.kreative.creativeHub.submitCreativeWork.chooseOne")}
             options={[
-              { value: 'Art', label: 'Art' },
-              { value: 'Design', label: 'Design' },
-              { value: 'Music', label: 'Music' },
-              { value: 'Other', label: 'Other' },
+              { value: 'Art', label: i18nT("ui.kreative.creativeHub.submitCreativeWork.art") },
+              { value: 'Design', label: i18nT("ui.kreative.creativeHub.submitCreativeWork.design") },
+              { value: 'Music', label: i18nT("ui.kreative.creativeHub.submitCreativeWork.music") },
+              { value: 'Other', label: i18nT("ui.kreative.creativeHub.submitCreativeWork.other") },
             ]}
           />
         </Form.Item>
 
         <Form.Item
-          label="Upload"
+          label={i18nT("ui.kreative.creativeHub.submitCreativeWork.upload")}
           name="creativeFile"
           valuePropName="fileList"
           getValueFromEvent={normFile}
@@ -155,17 +157,17 @@ export default function SubmitCreativeWorkPage(): JSX.Element {
             onChange={handleUploadChange}
             fileList={fileList}
           >
-            <Button icon={<UploadOutlined />}>Select file</Button>
+            <Button icon={<UploadOutlined />}>{i18nT("ui.kreative.creativeHub.submitCreativeWork.selectFile")}</Button>
           </Upload>
         </Form.Item>
 
-        <Form.Item label="Credits" name="credits">
-          <Input placeholder="Collaborators, references, tools…" />
+        <Form.Item label={i18nT("ui.kreative.creativeHub.submitCreativeWork.credits")} name="credits">
+          <Input placeholder={i18nT("ui.kreative.creativeHub.submitCreativeWork.collaboratorsReferencesTools")} />
         </Form.Item>
 
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={submitting}>
-            Submit
+            {i18nT("ui.kreative.creativeHub.submitCreativeWork.submit")}
           </Button>
         </Form.Item>
       </Form>

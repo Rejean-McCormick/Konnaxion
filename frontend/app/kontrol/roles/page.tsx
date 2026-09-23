@@ -1,6 +1,7 @@
 // FILE: frontend/app/kontrol/roles/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   CopyOutlined,
   DeleteOutlined,
@@ -126,6 +127,7 @@ const PERMISSION_TREE = [
 ];
 
 export default function RolesPermissionsPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [messageApi, messageContextHolder] = message.useMessage();
   const actionRef = useRef<ActionType>();
 
@@ -150,7 +152,7 @@ export default function RolesPermissionsPage(): JSX.Element {
 
   const columns: ProColumns<RoleItem>[] = [
     {
-      title: 'Role name',
+      title: i18nT("ui.kontrol.roles.roleName"),
       dataIndex: 'name',
       copyable: true,
       render: (dom, entity) => (
@@ -172,7 +174,7 @@ export default function RolesPermissionsPage(): JSX.Element {
                   padding: '0 4px',
                 }}
               >
-                SYSTEM
+                {i18nT("ui.kontrol.roles.system")}
               </Tag>
             )}
           </Space>
@@ -180,13 +182,13 @@ export default function RolesPermissionsPage(): JSX.Element {
       ),
     },
     {
-      title: 'Description',
+      title: i18nT("ui.kontrol.roles.description"),
       dataIndex: 'description',
       ellipsis: true,
       search: false,
     },
     {
-      title: 'Users',
+      title: i18nT("ui.kontrol.roles.users"),
       dataIndex: 'userCount',
       sorter: (a, b) => a.userCount - b.userCount,
       render: val => (
@@ -196,23 +198,23 @@ export default function RolesPermissionsPage(): JSX.Element {
       ),
     },
     {
-      title: 'Permissions',
+      title: i18nT("ui.kontrol.roles.permissions"),
       dataIndex: 'permissionsCount',
       render: val => (
         <Tag color="blue">
-          {val} capabilities
+          {val} {i18nT("ui.kontrol.roles.capabilities")}
         </Tag>
       ),
     },
     {
-      title: 'Last updated',
+      title: i18nT("ui.kontrol.roles.lastUpdated"),
       dataIndex: 'updatedAt',
       valueType: 'date',
       sorter: true,
       search: false,
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.kontrol.roles.actions"),
       valueType: 'option',
       width: 120,
       render: (_, record) => (
@@ -221,20 +223,20 @@ export default function RolesPermissionsPage(): JSX.Element {
             items: [
               {
                 key: 'edit',
-                label: 'View permissions',
+                label: i18nT("ui.kontrol.roles.viewPermissions"),
                 icon: <EditOutlined />,
                 onClick: () => handleOpenDrawer(record),
               },
               {
                 key: 'clone',
-                label: 'Clone role',
+                label: i18nT("ui.kontrol.roles.cloneRole"),
                 icon: <CopyOutlined />,
                 disabled: true,
               },
               { type: 'divider' },
               {
                 key: 'delete',
-                label: 'Delete role',
+                label: i18nT("ui.kontrol.roles.deleteRole"),
                 icon: <DeleteOutlined />,
                 danger: true,
                 disabled: true,
@@ -252,11 +254,10 @@ export default function RolesPermissionsPage(): JSX.Element {
     },
   ];
 
-  const title = 'Roles & permissions';
+  const title = i18nT("ui.kontrol.roles.rolesPermissions");
   const subtitle = (
     <>
-      Define platform-wide access levels and capabilities across all
-      Konnaxion modules.
+      {i18nT("ui.kontrol.roles.definePlatformWideAccessLevelsAndCapabilities")}
     </>
   );
 
@@ -266,9 +267,9 @@ export default function RolesPermissionsPage(): JSX.Element {
       type="primary"
       icon={<PlusOutlined />}
       disabled
-      title="Role creation is unavailable until a backend role-write contract exists."
+      title={i18nT("ui.kontrol.roles.roleCreationIsUnavailableUntilABackend")}
     >
-      Create role unavailable
+      {i18nT("ui.kontrol.roles.createRoleUnavailable")}
     </Button>
   );
 
@@ -277,7 +278,7 @@ export default function RolesPermissionsPage(): JSX.Element {
       title={title}
       subtitle={subtitle}
       scope="platform"
-      metaTitle="Kontrol · Platform · Roles & permissions"
+      metaTitle={i18nT("ui.kontrol.roles.kontrolPlatformRolesPermissions")}
       primaryAction={primaryAction}
       maxWidth={1200}
     >
@@ -290,26 +291,22 @@ export default function RolesPermissionsPage(): JSX.Element {
         <Alert
           type="warning"
           showIcon
-          message="Read-only role preview"
-          description="Kontrol does not currently expose a backend role-write contract. The entries below document intended access patterns and cannot be mutated from this screen."
+          message={i18nT("ui.kontrol.roles.readOnlyRolePreview")}
+          description={i18nT("ui.kontrol.roles.kontrolDoesNotCurrentlyExposeABackend")}
         />
         {/* Scope / impact info for clarity inside Kontrol */}
         <Alert
           type="info"
           showIcon
-          message="Platform-level roles"
+          message={i18nT("ui.kontrol.roles.platformLevelRoles")}
           description={
             <>
               <Text>
-                Changes here apply to the entire Konnaxion platform
-                (EkoH, EthiKos, KonnectED, keenKonnect, Kreative, Team
-                Builder, etc.).
+                {i18nT("ui.kontrol.roles.changesHereApplyToTheEntireKonnaxion")}
               </Text>
               <br />
               <Text type="secondary">
-                Use module-specific controls in other sections of Kontrol
-                (e.g. Moderation by module) when you need to scope access
-                to a single module.
+                {i18nT("ui.kontrol.roles.useModuleSpecificControlsInOtherSections")}
               </Text>
             </>
           }
@@ -323,7 +320,7 @@ export default function RolesPermissionsPage(): JSX.Element {
           rowKey="id"
           search={{ labelWidth: 'auto' }}
           pagination={{ pageSize: 10 }}
-          headerTitle="Active roles"
+          headerTitle={i18nT("ui.kontrol.roles.activeRoles")}
         />
       </Space>
 
@@ -337,18 +334,18 @@ export default function RolesPermissionsPage(): JSX.Element {
         }}
         title={
           isEditing
-            ? `Edit role: ${currentRole?.name}`
-            : 'Create new role'
+            ? i18nT("ui.kontrol.roles.editRole", { name: currentRole?.name })
+            : i18nT("ui.kontrol.roles.createNewRole")
         }
         extra={
           <Space>
-            <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
+            <Button onClick={() => setDrawerOpen(false)}>{i18nT("ui.kontrol.roles.cancel")}</Button>
             <Button
               type="primary"
               disabled
-              title="Role persistence is not exposed by the backend."
+              title={i18nT("ui.kontrol.roles.rolePersistenceIsNotExposedByThe")}
             >
-              Save unavailable
+              {i18nT("ui.kontrol.roles.saveUnavailable")}
             </Button>
           </Space>
         }
@@ -361,8 +358,8 @@ export default function RolesPermissionsPage(): JSX.Element {
           {/* Warning for System Roles */}
           {currentRole?.type === 'system' && (
             <Alert
-              message="System role"
-              description="This is a core system role. Some permissions cannot be removed to prevent system lockout."
+              message={i18nT("ui.kontrol.roles.systemRole")}
+              description={i18nT("ui.kontrol.roles.thisIsACoreSystemRoleSome")}
               type="warning"
               showIcon
               icon={<LockOutlined />}
@@ -371,7 +368,7 @@ export default function RolesPermissionsPage(): JSX.Element {
 
           {/* Basic Info Form */}
           <ProCard
-            title="Role details"
+            title={i18nT("ui.kontrol.roles.roleDetails")}
             bordered
             headerBordered
           >
@@ -384,38 +381,38 @@ export default function RolesPermissionsPage(): JSX.Element {
                 <ProFormText
                   width="md"
                   name="name"
-                  label="Role name"
-                  placeholder="e.g. Content moderator"
+                  label={i18nT("ui.kontrol.roles.roleName")}
+                  placeholder={i18nT("ui.kontrol.roles.eGContentModerator")}
                   rules={[{ required: true }]}
                   disabled={currentRole?.type === 'system'}
                 />
                 <ProFormSelect
                   width="sm"
                   name="baseRole"
-                  label="Base access level"
+                  label={i18nT("ui.kontrol.roles.baseAccessLevel")}
                   options={[
-                    { label: 'Administrator', value: 'admin' },
-                    { label: 'Moderator', value: 'moderator' },
-                    { label: 'Standard user', value: 'user' },
+                    { label: i18nT("ui.kontrol.roles.administrator"), value: 'admin' },
+                    { label: i18nT("ui.kontrol.roles.moderator"), value: 'moderator' },
+                    { label: i18nT("ui.kontrol.roles.standardUser"), value: 'user' },
                   ]}
                   rules={[{ required: true }]}
-                  tooltip="Determines the baseline access level before granular permissions are applied."
+                  tooltip={i18nT("ui.kontrol.roles.determinesTheBaselineAccessLevelBeforeGranular")}
                 />
               </ProForm.Group>
               <ProFormTextArea
                 name="description"
-                label="Description"
-                placeholder="Describe what this role is used for..."
+                label={i18nT("ui.kontrol.roles.description")}
+                placeholder={i18nT("ui.kontrol.roles.describeWhatThisRoleIsUsedFor")}
               />
             </ProForm>
           </ProCard>
 
           {/* Permission Matrix */}
           <ProCard
-            title="Capabilities matrix"
+            title={i18nT("ui.kontrol.roles.capabilitiesMatrix")}
             bordered
             headerBordered
-            extra={<Button size="small">Select all</Button>}
+            extra={<Button size="small">{i18nT("ui.kontrol.roles.selectAll")}</Button>}
           >
             <div
               style={{
@@ -439,7 +436,7 @@ export default function RolesPermissionsPage(): JSX.Element {
           {/* Danger Zone (only for custom roles) */}
           {currentRole?.type !== 'system' && isEditing && (
             <ProCard
-              title="Danger zone"
+              title={i18nT("ui.kontrol.roles.dangerZone")}
               bordered
               headerBordered
               style={{ borderColor: '#ffa39e' }}
@@ -453,13 +450,12 @@ export default function RolesPermissionsPage(): JSX.Element {
                 }}
               >
                 <Space direction="vertical" size={2}>
-                  <Text strong>Delete this role</Text>
+                  <Text strong>{i18nT("ui.kontrol.roles.deleteThisRole")}</Text>
                   <Text type="secondary">
-                    Once deleted, users with this role will revert to
-                    the default &apos;User&apos; role.
+                    {i18nT("ui.kontrol.roles.onceDeletedUsersWithThisRoleWill")}
                   </Text>
                 </Space>
-                <Button danger>Delete role</Button>
+                <Button danger>{i18nT("ui.kontrol.roles.deleteRole")}</Button>
               </div>
             </ProCard>
           )}

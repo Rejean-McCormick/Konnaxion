@@ -2,6 +2,7 @@
 // C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\StatisticCard.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
 import { Card, Skeleton, Statistic, Tooltip, Typography } from 'antd';
 import React from 'react';
@@ -82,6 +83,7 @@ const StatisticCard: React.FC<StatisticCardProps> = ({
   onClick,
   style,
 }) => {
+  const { t: i18nT } = useLanguage();
   const hasValue = isFiniteNumber(value);
 
   const effectiveTrend =
@@ -180,7 +182,7 @@ const StatisticCard: React.FC<StatisticCardProps> = ({
       {effectiveTrend && delta != null && isFiniteNumber(delta) && !loading && (
         <div style={{ marginTop: 8, fontSize: 12 }}>
           <Tooltip
-            title={deltaLabel ?? 'Change over the comparison period'}
+            title={deltaLabel ?? i18nT("ui.dashboardComponents.statisticcard.changeOverTheComparisonPeriod")}
           >
             <span style={{ color: trendColor }}>
               {effectiveTrend === 'up' && (

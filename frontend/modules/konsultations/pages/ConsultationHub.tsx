@@ -1,6 +1,7 @@
 // FILE: frontend/modules/konsultations/pages/ConsultationHub.tsx
 ﻿'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { Alert, Typography } from 'antd';
 
@@ -18,29 +19,27 @@ import {
 const { Title, Paragraph, Text } = Typography;
 
 export default function ConsultationHub(): JSX.Element {
-  usePageTitle('Konsultations · Consultation Hub');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.konsultations.pages.consultationhub.konsultationsConsultationHub"));
 
   return (
     <PageContainer ghost>
       {/* Intro / context */}
       <ProCard ghost style={{ marginBottom: 16 }}>
         <Title level={2} style={{ marginBottom: 8 }}>
-          Consultation Hub
+          {i18nT("ui.konsultations.pages.consultationhub.consultationHub")}
         </Title>
         <Paragraph type="secondary">
-          Central hub for participatory consultations: discover open topics, take part in votes,
-          review results, and follow how decisions translate into real-world impact.
+          {i18nT("ui.konsultations.pages.consultationhub.centralHubForParticipatoryConsultationsDiscoverOpen")}
         </Paragraph>
         <Alert
           type="info"
           showIcon
           style={{ marginTop: 16 }}
-          message="How this hub is structured"
+          message={i18nT("ui.konsultations.pages.consultationhub.howThisHubIsStructured")}
           description={
             <Text>
-              The blocks below are wired to dedicated Konsultations components (list, vote,
-              results, impact, suggestions). Each widget can evolve independently while keeping a
-              single entry point for consultations.
+              {i18nT("ui.konsultations.pages.consultationhub.theBlocksBelowAreWiredToDedicated")}
             </Text>
           }
         />
@@ -50,7 +49,7 @@ export default function ConsultationHub(): JSX.Element {
       <ProCard gutter={16} wrap>
         {/* Open consultations + create new */}
         <ProCard
-          title="Open consultations"
+          title={i18nT("ui.konsultations.pages.consultationhub.openConsultations")}
           colSpan={{ xs: 24, md: 16 }}
           bordered
         >
@@ -59,7 +58,7 @@ export default function ConsultationHub(): JSX.Element {
         </ProCard>
 
         <ProCard
-          title="Start a new consultation"
+          title={i18nT("ui.konsultations.pages.consultationhub.startANewConsultation")}
           colSpan={{ xs: 24, md: 8 }}
           bordered
         >
@@ -69,7 +68,7 @@ export default function ConsultationHub(): JSX.Element {
 
         {/* Participation panel */}
         <ProCard
-          title="Participate in a consultation"
+          title={i18nT("ui.konsultations.pages.consultationhub.participateInAConsultation")}
           colSpan={{ xs: 24 }}
           bordered
         >
@@ -79,7 +78,7 @@ export default function ConsultationHub(): JSX.Element {
 
         {/* Results + impact */}
         <ProCard
-          title="Results & analytics"
+          title={i18nT("ui.konsultations.pages.consultationhub.resultsAnalytics")}
           colSpan={{ xs: 24, md: 12 }}
           bordered
         >
@@ -88,7 +87,7 @@ export default function ConsultationHub(): JSX.Element {
         </ProCard>
 
         <ProCard
-          title="Impact over time"
+          title={i18nT("ui.konsultations.pages.consultationhub.impactOverTime")}
           colSpan={{ xs: 24, md: 12 }}
           bordered
         >
@@ -98,7 +97,7 @@ export default function ConsultationHub(): JSX.Element {
 
         {/* Suggestions / qualitative input */}
         <ProCard
-          title="Suggestions from participants"
+          title={i18nT("ui.konsultations.pages.consultationhub.suggestionsFromParticipants")}
           colSpan={{ xs: 24 }}
           bordered
         >

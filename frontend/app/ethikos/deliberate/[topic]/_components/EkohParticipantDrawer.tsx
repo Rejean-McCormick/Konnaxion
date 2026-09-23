@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { useRequest } from 'ahooks'
 import { Alert, Descriptions, List, Progress, Space, Tag, Typography } from 'antd'
 
@@ -26,6 +27,7 @@ export default function EkohParticipantDrawer({
   topicId: string | number
   onClose: () => void
 }): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const userId = participant?.userId
 
   const { data: reading, loading: loadingReading } = useRequest(
@@ -56,28 +58,28 @@ export default function EkohParticipantDrawer({
         <Alert
           type="info"
           showIcon
-          message="Expertise is contextual, not a universal rank"
-          description="EkoH owns the ratings and their disclosure. Smart Vote separately computes how those visible ratings align with the domains declared relevant to this question."
+          message={i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.expertiseIsContextualNotAUniversalRank")}
+          description={i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.ekohOwnsTheRatingsAndTheirDisclosure")}
         />
 
         {loadingReading ? (
-          <Text type="secondary">Loading question-specific reading…</Text>
+          <Text type="secondary">{i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.loadingQuestionSpecificReading")}</Text>
         ) : (
           <>
             <Descriptions bordered size="small" column={1}>
-              <Descriptions.Item label="Contextual alignment">
-                {participantReading ? `${pct(participantReading.expertise_alignment)}%` : 'Not available'}
+              <Descriptions.Item label={i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.contextualAlignment")}>
+                {participantReading ? i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.text", { value1: pct(participantReading.expertise_alignment) }) : i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.notAvailable")}
               </Descriptions.Item>
-              <Descriptions.Item label="Advisory weight">
+              <Descriptions.Item label={i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.advisoryWeight")}>
                 {participantReading
-                  ? `${participantReading.advisory_weight.toFixed(2)}×`
-                  : 'Not available'}
+                  ? i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.text_94ea89", { value1: participantReading.advisory_weight.toFixed(2) })
+                  : i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.notAvailable")}
               </Descriptions.Item>
-              <Descriptions.Item label="Advisory status">
+              <Descriptions.Item label={i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.advisoryStatus")}>
                 {participantReading?.included_in_advisory === false ? (
-                  <Tag color="orange">Recused / excluded from advisory reading</Tag>
+                  <Tag color="orange">{i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.recusedExcludedFromAdvisoryReading")}</Tag>
                 ) : (
-                  <Tag color="green">Included when this lens is used</Tag>
+                  <Tag color="green">{i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.includedWhenThisLensIsUsed")}</Tag>
                 )}
               </Descriptions.Item>
             </Descriptions>
@@ -86,15 +88,15 @@ export default function EkohParticipantDrawer({
               <Alert
                 type="warning"
                 showIcon
-                message="Declared advisory exclusion"
+                message={i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.declaredAdvisoryExclusion")}
                 description={participantReading.exclusion_reason}
               />
             ) : null}
 
             <List
-              header={<Text strong>Relevant domains for this question</Text>}
+              header={<Text strong>{i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.relevantDomainsForThisQuestion")}</Text>}
               dataSource={relevantRows}
-              locale={{ emptyText: 'No domain relevance vector is attached to this question.' }}
+              locale={{ emptyText: i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.noDomainRelevanceVectorIsAttachedTo") }}
               renderItem={(item) => (
                 <List.Item key={item.domain_code}>
                   <div style={{ width: '100%' }}>
@@ -102,9 +104,9 @@ export default function EkohParticipantDrawer({
                       <Space wrap>
                         <Text strong>{item.domain_name}</Text>
                         <Tag>{item.domain_code}</Tag>
-                        <Tag>Question {pct(item.weight)}%</Tag>
+                        <Tag>{i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.question")} {pct(item.weight)}%</Tag>
                       </Space>
-                      <Text type="secondary">Profile {pct(item.expertise)}%</Text>
+                      <Text type="secondary">{i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.profile")} {pct(item.expertise)}%</Text>
                     </Space>
                     <Progress percent={pct(item.expertise)} showInfo={false} />
                   </div>
@@ -113,7 +115,7 @@ export default function EkohParticipantDrawer({
             />
 
             <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-              This influence applies to this question. It is not a general rank. The public baseline remains separate from every EkoH-adjusted Smart Vote reading.
+              {i18nT("ui.ethikos.deliberate.topic.ekohparticipantdrawer.thisInfluenceAppliesToThisQuestionIt")}
             </Paragraph>
           </>
         )}

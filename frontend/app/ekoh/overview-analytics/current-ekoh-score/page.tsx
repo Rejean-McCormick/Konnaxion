@@ -1,6 +1,8 @@
 // FILE: frontend/app/ekoh/overview-analytics/current-ekoh-score/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   Alert,
   Card,
@@ -32,15 +34,15 @@ function dateLabel(value: string): string {
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
 }
 
-const historyColumns: ColumnsType<EkohScoreHistoryEntry> = [
+const historyColumns = (i18nT: TranslateFunction): ColumnsType<EkohScoreHistoryEntry> => ([
   {
-    title: 'Changed',
+    title: i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.changed"),
     dataIndex: 'changedAt',
     key: 'changedAt',
     render: (value: string) => dateLabel(value),
   },
   {
-    title: 'Domain',
+    title: i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.domain"),
     key: 'domain',
     render: (_, row) => (
       <Space wrap>
@@ -50,26 +52,27 @@ const historyColumns: ColumnsType<EkohScoreHistoryEntry> = [
     ),
   },
   {
-    title: 'Previous',
+    title: i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.previous"),
     dataIndex: 'oldValue',
     key: 'oldValue',
     render: (value: number) => `${percent(value)}%`,
   },
   {
-    title: 'Current',
+    title: i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.current"),
     dataIndex: 'newValue',
     key: 'newValue',
     render: (value: number) => `${percent(value)}%`,
   },
   {
-    title: 'Reason',
+    title: i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.reason"),
     dataIndex: 'changeReason',
     key: 'changeReason',
-    render: (value: string) => value || 'Not supplied',
+    render: (value: string) => value || i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.notSupplied"),
   },
-];
+]);
 
 export default function CurrentEkohScore(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const { data, isLoading, isError, error } = useReputationEvents();
   const profile = data?.ekohProfile ?? null;
   const expertise = profile?.expertise ?? [];
@@ -78,15 +81,15 @@ export default function CurrentEkohScore(): JSX.Element {
 
   return (
     <EkohPageShell
-      title="EkoH profile analytics"
-      subtitle="Canonical expertise, ethics context, visibility, and disclosed score history."
+      title={i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.ekohProfileAnalytics")}
+      subtitle={i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.canonicalExpertiseEthicsContextVisibilityAndDisclosed")}
     >
       {isError && (
         <Alert
           type="error"
           showIcon
-          message="Unable to load EkoH profile"
-          description={(error as Error | undefined)?.message ?? 'Please try again.'}
+          message={i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.unableToLoadEkohProfile")}
+          description={(error as Error | undefined)?.message ?? i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.pleaseTryAgain")}
           style={{ marginBottom: 16 }}
         />
       )}
@@ -94,21 +97,21 @@ export default function CurrentEkohScore(): JSX.Element {
       <Alert
         type="info"
         showIcon
-        message="No synthetic composite score"
-        description="EkoH exposes domain expertise and an ethics/reliability modifier. This page does not combine them with community feedback or random values into an invented universal score."
+        message={i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.noSyntheticCompositeScore")}
+        description={i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.ekohExposesDomainExpertiseAndAnEthics")}
         style={{ marginBottom: 16 }}
       />
 
       <Row gutter={[16, 16]}>
         <Col xs={24} md={6}>
           <Card loading={isLoading}>
-            <Statistic title="Expertise domains" value={expertise.length} />
+            <Statistic title={i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.expertiseDomains")} value={expertise.length} />
           </Card>
         </Col>
         <Col xs={24} md={6}>
           <Card loading={isLoading}>
             <Statistic
-              title="Strongest domain"
+              title={i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.strongestDomain")}
               value={topDomain ? percent(topDomain.weightedScore) : 0}
               suffix={topDomain ? '%' : undefined}
             />
@@ -118,7 +121,7 @@ export default function CurrentEkohScore(): JSX.Element {
         <Col xs={24} md={6}>
           <Card loading={isLoading}>
             <Statistic
-              title="Ethics / reliability modifier"
+              title={i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.ethicsReliabilityModifier")}
               value={profile?.ethicsScore ?? 1}
               precision={2}
               suffix="×"
@@ -128,14 +131,14 @@ export default function CurrentEkohScore(): JSX.Element {
         <Col xs={24} md={6}>
           <Card loading={isLoading}>
             <Statistic
-              title="Rating visibility"
+              title={i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.ratingVisibility")}
               value={profile?.ratingVisibility ?? 'N/A'}
             />
           </Card>
         </Col>
       </Row>
 
-      <Card title="Domain expertise" loading={isLoading} style={{ marginTop: 16 }}>
+      <Card title={i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.domainExpertise")} loading={isLoading} style={{ marginTop: 16 }}>
         {expertise.length ? (
           <List<EkohExpertiseScore>
             dataSource={expertise}
@@ -161,25 +164,25 @@ export default function CurrentEkohScore(): JSX.Element {
             }}
           />
         ) : (
-          <Empty description="No canonical EkoH expertise profile available" />
+          <Empty description={i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.noCanonicalEkohExpertiseProfileAvailable")} />
         )}
       </Card>
 
-      <Card title="Disclosed score history" loading={isLoading} style={{ marginTop: 16 }}>
+      <Card title={i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.disclosedScoreHistory")} loading={isLoading} style={{ marginTop: 16 }}>
         {history.length ? (
           <Table<EkohScoreHistoryEntry>
             rowKey={(row) => `${row.domainCode}-${row.changedAt}`}
-            columns={historyColumns}
+            columns={historyColumns(i18nT)}
             dataSource={history}
             pagination={false}
           />
         ) : (
-          <Empty description="No score history available in the current EkoH access scope" />
+          <Empty description={i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.noScoreHistoryAvailableInTheCurrent")} />
         )}
       </Card>
 
       {profile?.ratingPublicationBasis && (
-        <Card title="Publication basis" style={{ marginTop: 16 }}>
+        <Card title={i18nT("ui.ekoh.overviewAnalytics.currentEkohScore.publicationBasis")} style={{ marginTop: 16 }}>
           <Paragraph style={{ marginBottom: 0 }}>
             {profile.ratingPublicationBasis}
           </Paragraph>

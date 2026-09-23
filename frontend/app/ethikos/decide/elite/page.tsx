@@ -1,6 +1,8 @@
 // FILE: frontend/app/ethikos/decide/elite/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import { InfoCircleOutlined, ReloadOutlined } from '@ant-design/icons';
 import {
   PageContainer,
@@ -45,12 +47,12 @@ type Preview = TopicPreviewResponse;
 
 const { Paragraph, Title, Text } = Typography;
 
-const VIEW_OPTIONS: { label: string; value: ViewMode }[] = [
-  { label: 'All', value: 'all' },
-  { label: 'Closing ≤24h', value: 'closingSoon' },
-  { label: 'High turnout', value: 'highTurnout' },
-  { label: 'Low turnout', value: 'lowTurnout' },
-];
+const VIEW_OPTIONS = (i18nT: TranslateFunction): { label: string; value: ViewMode }[] => ([
+  { label: i18nT("ui.ethikos.decide.elite.all"), value: 'all' },
+  { label: i18nT("ui.ethikos.decide.elite.closing24h"), value: 'closingSoon' },
+  { label: i18nT("ui.ethikos.decide.elite.highTurnout"), value: 'highTurnout' },
+  { label: i18nT("ui.ethikos.decide.elite.lowTurnout"), value: 'lowTurnout' },
+]);
 
 function isClosingSoon(closesAt?: string): boolean {
   if (!closesAt) {
@@ -74,9 +76,9 @@ function clampPercent(value?: number): number {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
-function formatDateTime(value?: string): string {
+function formatDateTime(i18nT: TranslateFunction, value?: string): string {
   if (!value) {
-    return 'Unknown';
+    return i18nT("ui.ethikos.decide.elite.unknown");
   }
 
   const date = dayjs(value);
@@ -88,32 +90,33 @@ function formatDateTime(value?: string): string {
   return date.format('YYYY-MM-DD HH:mm');
 }
 
-function getBallotStatus(closesAt?: string): {
+function getBallotStatus(i18nT: TranslateFunction, closesAt?: string): {
   label: string;
   color?: string;
 } {
   if (!closesAt) {
-    return { label: 'Unknown' };
+    return { label: i18nT('ui.ethikos.decide.elite.unknown') };
   }
 
   const closes = dayjs(closesAt);
 
   if (!closes.isValid()) {
-    return { label: 'Unknown' };
+    return { label: i18nT('ui.ethikos.decide.elite.unknown') };
   }
 
   if (closes.isBefore(dayjs())) {
-    return { label: 'Closed' };
+    return { label: i18nT('ui.ethikos.decide.elite.closed') };
   }
 
   if (isClosingSoon(closesAt)) {
-    return { label: 'Closing soon', color: 'red' };
+    return { label: i18nT('ui.ethikos.decide.elite.closingSoon'), color: 'red' };
   }
 
-  return { label: 'Open', color: 'green' };
+  return { label: i18nT('ui.ethikos.decide.elite.open'), color: 'green' };
 }
 
 export default function EliteBallots(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [viewMode, setViewMode] = React.useState<ViewMode>('all');
   const [activeBallot, setActiveBallot] = React.useState<Row | null>(null);
 
@@ -183,11 +186,11 @@ export default function EliteBallots(): JSX.Element {
     ).length;
 
     return [
-      { label: 'Active elite ballots', value: total },
-      { label: 'Avg turnout', value: avgTurnout, suffix: '%' },
-      { label: 'Closing ≤ 24h', value: closingSoon },
+      { label: i18nT("ui.ethikos.decide.elite.activeEliteBallots"), value: total },
+      { label: i18nT("ui.ethikos.decide.elite.avgTurnout"), value: avgTurnout, suffix: '%' },
+      { label: i18nT("ui.ethikos.decide.elite.closing24h_d50fd4"), value: closingSoon },
     ];
-  }, [ballots]);
+  }, [ballots, i18nT]);
 
   const openPreview = React.useCallback(
     async (row: Row): Promise<void> => {
@@ -206,7 +209,7 @@ export default function EliteBallots(): JSX.Element {
   const columns: ProColumns<Row>[] = React.useMemo(
     () => [
       {
-        title: 'Title',
+        title: i18nT("ui.ethikos.decide.elite.title"),
         dataIndex: 'title',
         width: 320,
         ellipsis: true,
@@ -223,17 +226,17 @@ export default function EliteBallots(): JSX.Element {
         ),
       },
       {
-        title: 'Status',
+        title: i18nT("ui.ethikos.decide.elite.status"),
         dataIndex: 'closesAt',
         width: 140,
         render: (_dom, row) => {
-          const status = getBallotStatus(row.closesAt);
+          const status = getBallotStatus(i18nT, row.closesAt);
 
           return <Tag color={status.color}>{status.label}</Tag>;
         },
       },
       {
-        title: 'Closes In',
+        title: i18nT("ui.ethikos.decide.elite.closesIn"),
         dataIndex: 'closesAt',
         width: 200,
         sorter: (a, b) =>
@@ -254,7 +257,7 @@ export default function EliteBallots(): JSX.Element {
         },
       },
       {
-        title: 'Turnout',
+        title: i18nT("ui.ethikos.decide.elite.turnout"),
         dataIndex: 'turnout',
         width: 220,
         sorter: (a, b) => clampPercent(a.turnout) - clampPercent(b.turnout),
@@ -270,51 +273,51 @@ export default function EliteBallots(): JSX.Element {
         },
       },
       {
-        title: 'Scope',
+        title: i18nT("ui.ethikos.decide.elite.scope"),
         dataIndex: 'scope',
         width: 120,
         render: (_dom, row) => <Tag color="purple">{row.scope}</Tag>,
       },
       {
-        title: 'Actions',
+        title: i18nT("ui.ethikos.decide.elite.actions"),
         key: 'actions',
         width: 240,
         render: (_dom, row) => (
           <Space>
-            <Tooltip title="See the structured debate that feeds this vote">
+            <Tooltip title={i18nT("ui.ethikos.decide.elite.seeTheStructuredDebateThatFeedsThis")}>
               <Link href={`/ethikos/deliberate/${row.id}`} prefetch={false}>
-                <Button size="small">View debate</Button>
+                <Button size="small">{i18nT("ui.ethikos.decide.elite.viewDebate")}</Button>
               </Link>
             </Tooltip>
 
-            <Tooltip title="View historical decisions">
+            <Tooltip title={i18nT("ui.ethikos.decide.elite.viewHistoricalDecisions")}>
               <Link href="/ethikos/decide/results" prefetch={false}>
-                <Button size="small">Results archive</Button>
+                <Button size="small">{i18nT("ui.ethikos.decide.elite.resultsArchive")}</Button>
               </Link>
             </Tooltip>
           </Space>
         ),
       },
     ],
-    [openPreview],
+    [openPreview, i18nT],
   );
 
   return (
     <EthikosPageShell
-      title="Decide · Elite Ballots"
-      sectionLabel="Decide"
-      subtitle="Expert advisory ballots built on Ethikos debates and the canonical −3…+3 topic stance scale."
+      title={i18nT("ui.ethikos.decide.elite.decideEliteBallots")}
+      sectionLabel={i18nT("ui.ethikos.decide.elite.decide")}
+      subtitle={i18nT("ui.ethikos.decide.elite.expertAdvisoryBallotsBuiltOnEthikosDebates")}
       primaryAction={
         <Link href="/ethikos/decide/methodology" prefetch={false}>
           <Button type="primary" icon={<InfoCircleOutlined />}>
-            Voting methodology
+            {i18nT("ui.ethikos.decide.elite.votingMethodology")}
           </Button>
         </Link>
       }
       secondaryActions={
         <Space>
           <Link href="/ethikos/decide/public" prefetch={false}>
-            <Button>Switch to public ballots</Button>
+            <Button>{i18nT("ui.ethikos.decide.elite.switchToPublicBallots")}</Button>
           </Link>
         </Space>
       }
@@ -324,16 +327,16 @@ export default function EliteBallots(): JSX.Element {
           <Alert
             type="info"
             showIcon
-            message="How elite ballots work"
-            description="Each elite ballot aggregates expert stances from its debate thread, maps them onto the canonical −3…+3 Ethikos stance scale, and surfaces an advisory decision signal."
+            message={i18nT("ui.ethikos.decide.elite.howEliteBallotsWork")}
+            description={i18nT("ui.ethikos.decide.elite.eachEliteBallotAggregatesExpertStancesFrom")}
           />
 
           {error && (
             <Alert
               type="error"
               showIcon
-              message="Unable to load elite ballots."
-              description="Check the Decide service and the canonical Ethikos topics endpoint."
+              message={i18nT("ui.ethikos.decide.elite.unableToLoadEliteBallots")}
+              description={i18nT("ui.ethikos.decide.elite.checkTheDecideServiceAndTheCanonical")}
             />
           )}
 
@@ -352,7 +355,7 @@ export default function EliteBallots(): JSX.Element {
           </ProCard>
 
           {filteredBallots.length === 0 && !loading ? (
-            <Empty description="No elite ballots are open right now." />
+            <Empty description={i18nT("ui.ethikos.decide.elite.noEliteBallotsAreOpenRightNow")} />
           ) : (
             <ProTable<Row>
               rowKey="id"
@@ -367,7 +370,7 @@ export default function EliteBallots(): JSX.Element {
                   size="small"
                   value={viewMode}
                   onChange={setViewMode}
-                  options={VIEW_OPTIONS}
+                  options={VIEW_OPTIONS(i18nT)}
                 />,
                 <Button
                   key="refresh"
@@ -375,7 +378,7 @@ export default function EliteBallots(): JSX.Element {
                   onClick={() => refresh()}
                   loading={loading}
                 >
-                  Refresh
+                  {i18nT("ui.ethikos.decide.elite.refresh")}
                 </Button>,
               ]}
             />
@@ -386,12 +389,12 @@ export default function EliteBallots(): JSX.Element {
             open={!!activeBallot}
             onClose={closePreview}
             destroyOnClose
-            title={preview?.title || activeBallot?.title || 'Ballot details'}
+            title={preview?.title || activeBallot?.title || i18nT("ui.ethikos.decide.elite.ballotDetails")}
           >
             {previewLoading ? (
-              <Empty description="Loading preview…" />
+              <Empty description={i18nT("ui.ethikos.decide.elite.loadingPreview")} />
             ) : previewError ? (
-              <Empty description="Unable to load preview." />
+              <Empty description={i18nT("ui.ethikos.decide.elite.unableToLoadPreview")} />
             ) : preview ? (
               <Space
                 direction="vertical"
@@ -399,8 +402,8 @@ export default function EliteBallots(): JSX.Element {
                 style={{ width: '100%' }}
               >
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  {preview.category ? `${preview.category} · ` : ''}
-                  {formatDateTime(preview.createdAt)}
+                  {preview.category ? i18nT("ui.ethikos.decide.elite.text", { category: preview.category }) : ''}
+                  {formatDateTime(i18nT, preview.createdAt)}
                 </Paragraph>
 
                 {preview.description && (
@@ -411,7 +414,7 @@ export default function EliteBallots(): JSX.Element {
 
                 <div>
                   <Title level={4} style={{ marginTop: 0 }}>
-                    Latest statements
+                    {i18nT("ui.ethikos.decide.elite.latestStatements")}
                   </Title>
 
                   {preview.latest.length > 0 ? (
@@ -426,7 +429,7 @@ export default function EliteBallots(): JSX.Element {
                   ) : (
                     <Empty
                       image={Empty.PRESENTED_IMAGE_SIMPLE}
-                      description="No statements yet."
+                      description={i18nT("ui.ethikos.decide.elite.noStatementsYet")}
                     />
                   )}
                 </div>
@@ -435,7 +438,7 @@ export default function EliteBallots(): JSX.Element {
                   href={`/ethikos/deliberate/${preview.id}`}
                   prefetch={false}
                 >
-                  <Button type="primary">Go to full thread</Button>
+                  <Button type="primary">{i18nT("ui.ethikos.decide.elite.goToFullThread")}</Button>
                 </Link>
               </Space>
             ) : activeBallot ? (
@@ -445,19 +448,18 @@ export default function EliteBallots(): JSX.Element {
                 style={{ width: '100%' }}
               >
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  Preview metadata is unavailable, but the debate can still be
-                  opened from the canonical Ethikos route.
+                  {i18nT("ui.ethikos.decide.elite.previewMetadataIsUnavailableButTheDebate")}
                 </Paragraph>
 
                 <Link
                   href={`/ethikos/deliberate/${activeBallot.id}`}
                   prefetch={false}
                 >
-                  <Button type="primary">Go to full thread</Button>
+                  <Button type="primary">{i18nT("ui.ethikos.decide.elite.goToFullThread")}</Button>
                 </Link>
               </Space>
             ) : (
-              <Empty description="No preview available." />
+              <Empty description={i18nT("ui.ethikos.decide.elite.noPreviewAvailable")} />
             )}
           </Drawer>
         </Space>

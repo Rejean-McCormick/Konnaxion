@@ -1,4 +1,7 @@
+'use client';
+
 // frontend/components/teambuilder/AlgorithmConfig.tsx
+import { useLanguage } from '@/context/LanguageContext';
 import React from 'react';
 
 import { IAlgorithmConfig } from '@/services/teambuilder/types';
@@ -14,6 +17,7 @@ export const AlgorithmConfig: React.FC<AlgorithmConfigProps> = ({
   onChange,
   disabled = false,
 }) => {
+  const { t: i18nT } = useLanguage();
   
   const handleChange = <K extends keyof IAlgorithmConfig,>(
     field: K,
@@ -42,14 +46,14 @@ export const AlgorithmConfig: React.FC<AlgorithmConfigProps> = ({
             d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
           />
         </svg>
-        Algorithm Settings
+        {i18nT("ui.teambuilder.algorithmconfig.algorithmSettings")}
       </h3>
 
       <div className="space-y-6">
         {/* Target Team Size */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Target Team Size
+            {i18nT("ui.teambuilder.algorithmconfig.targetTeamSize")}
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -63,11 +67,10 @@ export const AlgorithmConfig: React.FC<AlgorithmConfigProps> = ({
               disabled={disabled}
               className="block w-24 border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm disabled:bg-gray-100"
             />
-            <span className="text-sm text-gray-500">members per team</span>
+            <span className="text-sm text-gray-500">{i18nT("ui.teambuilder.algorithmconfig.membersPerTeam")}</span>
           </div>
           <p className="mt-1 text-xs text-gray-400">
-            The algorithm will try to keep teams as close to this number as
-            possible.
+            {i18nT("ui.teambuilder.algorithmconfig.theAlgorithmWillTryToKeepTeams")}
           </p>
         </div>
 
@@ -76,7 +79,7 @@ export const AlgorithmConfig: React.FC<AlgorithmConfigProps> = ({
         {/* Distribution Strategy */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Distribution Strategy
+            {i18nT("ui.teambuilder.algorithmconfig.distributionStrategy")}
           </label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Random Strategy Card */}
@@ -93,13 +96,13 @@ export const AlgorithmConfig: React.FC<AlgorithmConfigProps> = ({
               `}
             >
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-gray-900">True Random</span>
+                <span className="font-semibold text-gray-900">{i18nT("ui.teambuilder.algorithmconfig.trueRandom")}</span>
                 {config.strategy === 'random' && (
                   <span className="h-2 w-2 rounded-full bg-indigo-600"></span>
                 )}
               </div>
               <p className="text-xs text-gray-500">
-                Shuffles all candidates and assigns them blindly. Good for ice-breakers or pure chance.
+                {i18nT("ui.teambuilder.algorithmconfig.shufflesAllCandidatesAndAssignsThemBlindly")}
               </p>
             </div>
 
@@ -120,14 +123,14 @@ export const AlgorithmConfig: React.FC<AlgorithmConfigProps> = ({
             >
               <div className="flex items-center justify-between">
                 <span className="font-semibold text-gray-900">
-                  Balanced Expertise
+                  {i18nT("ui.teambuilder.algorithmconfig.balancedExpertise")}
                 </span>
                 {config.strategy === 'balanced_expertise' && (
                   <span className="h-2 w-2 rounded-full bg-indigo-600"></span>
                 )}
               </div>
               <p className="text-xs text-gray-500">
-                Uses Ekoh scores to distribute experts evenly. Ensures no team is overpowered.
+                {i18nT("ui.teambuilder.algorithmconfig.usesEkohScoresToDistributeExpertsEvenly")}
               </p>
             </div>
           </div>
@@ -138,7 +141,7 @@ export const AlgorithmConfig: React.FC<AlgorithmConfigProps> = ({
           <div className="pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
             <div className="flex justify-between items-center mb-1">
               <label className="text-sm font-medium text-gray-700">
-                Diversity Weight
+                {i18nT("ui.teambuilder.algorithmconfig.diversityWeight")}
               </label>
               <span className="text-xs text-gray-500">
                 {config.diversity_weight || 0.5}
@@ -157,8 +160,8 @@ export const AlgorithmConfig: React.FC<AlgorithmConfigProps> = ({
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
-              <span>Pure Skill</span>
-              <span>Mixed Factors</span>
+              <span>{i18nT("ui.teambuilder.algorithmconfig.pureSkill")}</span>
+              <span>{i18nT("ui.teambuilder.algorithmconfig.mixedFactors")}</span>
             </div>
           </div>
         )}

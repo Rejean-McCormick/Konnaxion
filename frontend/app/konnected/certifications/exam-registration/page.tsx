@@ -2,6 +2,8 @@
 ﻿// app/konnected/certifications/exam-registration/page.tsx
 ﻿'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   Alert,
   App as AntdApp,
@@ -104,17 +106,18 @@ function parseErrorBody(value: unknown): ErrorBody {
 }
 
 
-const steps: { key: StepKey; title: string; description?: string }[] = [
-  { key: 0, title: 'Choose exam', description: 'Select the certification you want to attempt.' },
+const steps = (i18nT: TranslateFunction): { key: StepKey; title: string; description?: string }[] => ([
+  { key: 0, title: i18nT("ui.konnected.certifications.examRegistration.chooseExam"), description: i18nT("ui.konnected.certifications.examRegistration.selectTheCertificationYouWantToAttempt") },
   {
     key: 1,
-    title: 'Schedule & details',
-    description: 'Pick an exam session and confirm your details.',
+    title: i18nT("ui.konnected.certifications.examRegistration.scheduleDetails"),
+    description: i18nT("ui.konnected.certifications.examRegistration.pickAnExamSessionAndConfirmYour"),
   },
-  { key: 2, title: 'Confirm', description: 'Review and submit your registration.' },
-];
+  { key: 2, title: i18nT("ui.konnected.certifications.examRegistration.confirm"), description: i18nT("ui.konnected.certifications.examRegistration.reviewAndSubmitYourRegistration") },
+]);
 
 const ExamRegistrationPageInner: React.FC = () => {
+  const { t: i18nT } = useLanguage();
   const { message: messageApi } = AntdApp.useApp();
   const searchParams = useSearchParams();
   const [form] = Form.useForm<ExamRegistrationFormValues>();
@@ -301,7 +304,7 @@ const ExamRegistrationPageInner: React.FC = () => {
     const values = form.getFieldsValue() as Required<ExamRegistrationFormValues>;
 
     if (!values.examPathId || !values.sessionId) {
-      messageApi.error('Please select an exam and session before submitting.');
+      messageApi.error(i18nT("ui.konnected.certifications.examRegistration.pleaseSelectAnExamAndSessionBefore"));
       return;
     }
 
@@ -325,7 +328,7 @@ const ExamRegistrationPageInner: React.FC = () => {
 
       if (res.ok || res.status === 201) {
         setRegistrationCompleted(true);
-        messageApi.success('Exam registration completed successfully.');
+        messageApi.success(i18nT("ui.konnected.certifications.examRegistration.examRegistrationCompletedSuccessfully"));
         return;
       }
 
@@ -359,7 +362,7 @@ const ExamRegistrationPageInner: React.FC = () => {
         <div className="flex justify-center py-8">
           <Space>
             <Spin />
-            <Text>Loading certification programs...</Text>
+            <Text>{i18nT("ui.konnected.certifications.examRegistration.loadingCertificationPrograms")}</Text>
           </Space>
         </div>
       );
@@ -369,7 +372,7 @@ const ExamRegistrationPageInner: React.FC = () => {
       return (
         <Alert
           type="error"
-          message="Unable to load certification programs"
+          message={i18nT("ui.konnected.certifications.examRegistration.unableToLoadCertificationPrograms")}
           description={pathsError}
           showIcon
         />
@@ -379,7 +382,7 @@ const ExamRegistrationPageInner: React.FC = () => {
     if (!paths.length) {
       return (
         <Empty
-          description="No certification programs are available for registration at this time."
+          description={i18nT("ui.konnected.certifications.examRegistration.noCertificationProgramsAreAvailableForRegistration")}
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         />
       );
@@ -389,18 +392,18 @@ const ExamRegistrationPageInner: React.FC = () => {
       <Space direction="vertical" size="large" className="w-full">
         <Form.Item
           name="examPathId"
-          label="Certification exam"
-          rules={[{ required: true, message: 'Please select a certification exam.' }]}
+          label={i18nT("ui.konnected.certifications.examRegistration.certificationExam")}
+          rules={[{ required: true, message: i18nT("ui.konnected.certifications.examRegistration.pleaseSelectACertificationExam") }]}
         >
           <Select
-            placeholder="Select an exam to register for"
+            placeholder={i18nT("ui.konnected.certifications.examRegistration.selectAnExamToRegisterFor")}
             optionFilterProp="children"
             showSearch
           >
             {paths.map((path) => (
               <Option key={path.id} value={path.id}>
                 {path.name}
-                {path.level ? ` · ${path.level}` : ''}
+                {path.level ? i18nT("ui.konnected.certifications.examRegistration.text", { level: path.level }) : ''}
               </Option>
             ))}
           </Select>
@@ -423,8 +426,8 @@ const ExamRegistrationPageInner: React.FC = () => {
               {isPathAlreadyPassed && (
                 <Alert
                   type="success"
-                  message="You are already certified for this path."
-                  description="Creating new attempts is not allowed because you already hold this certification."
+                  message={i18nT("ui.konnected.certifications.examRegistration.youAreAlreadyCertifiedForThisPath")}
+                  description={i18nT("ui.konnected.certifications.examRegistration.creatingNewAttemptsIsNotAllowedBecause")}
                   showIcon
                 />
               )}
@@ -432,8 +435,8 @@ const ExamRegistrationPageInner: React.FC = () => {
               {isUnderCooldown && (
                 <Alert
                   type="warning"
-                  message="Retry cooldown active"
-                  description={`You must wait ${cooldownMinutes} more minutes before registering another attempt for this exam.`}
+                  message={i18nT("ui.konnected.certifications.examRegistration.retryCooldownActive")}
+                  description={i18nT("ui.konnected.certifications.examRegistration.youMustWaitMoreMinutesBeforeRegistering", { cooldownMinutes: cooldownMinutes })}
                   showIcon
                 />
               )}
@@ -449,8 +452,8 @@ const ExamRegistrationPageInner: React.FC = () => {
       return (
         <Alert
           type="info"
-          message="Select an exam first"
-          description="Choose a certification exam in the previous step before picking a session."
+          message={i18nT("ui.konnected.certifications.examRegistration.selectAnExamFirst")}
+          description={i18nT("ui.konnected.certifications.examRegistration.chooseACertificationExamInThePrevious")}
           showIcon
         />
       );
@@ -462,7 +465,7 @@ const ExamRegistrationPageInner: React.FC = () => {
           <div className="flex justify-center py-4">
             <Space>
               <Spin />
-              <Text>Loading exam sessions...</Text>
+              <Text>{i18nT("ui.konnected.certifications.examRegistration.loadingExamSessions")}</Text>
             </Space>
           </div>
         )}
@@ -470,7 +473,7 @@ const ExamRegistrationPageInner: React.FC = () => {
         {sessionsError && (
           <Alert
             type="error"
-            message="Unable to load exam sessions"
+            message={i18nT("ui.konnected.certifications.examRegistration.unableToLoadExamSessions")}
             description={sessionsError}
             showIcon
           />
@@ -479,18 +482,18 @@ const ExamRegistrationPageInner: React.FC = () => {
         {!sessionsLoading && !sessionsError && sessions.length === 0 && (
           <Alert
             type="warning"
-            message="No sessions available"
-            description="There are currently no upcoming sessions for this exam. Please check back later or contact your administrator."
+            message={i18nT("ui.konnected.certifications.examRegistration.noSessionsAvailable")}
+            description={i18nT("ui.konnected.certifications.examRegistration.thereAreCurrentlyNoUpcomingSessionsFor")}
             showIcon
           />
         )}
 
         <Form.Item
           name="sessionId"
-          label="Exam session"
-          rules={[{ required: true, message: 'Please select an exam session.' }]}
+          label={i18nT("ui.konnected.certifications.examRegistration.examSession")}
+          rules={[{ required: true, message: i18nT("ui.konnected.certifications.examRegistration.pleaseSelectAnExamSession") }]}
         >
-          <Select placeholder="Select a session" disabled={sessions.length === 0}>
+          <Select placeholder={i18nT("ui.konnected.certifications.examRegistration.selectASession")} disabled={sessions.length === 0}>
             {sessions.map((session) => {
               const start = new Date(session.start_at);
               const end = session.end_at ? new Date(session.end_at) : null;
@@ -520,10 +523,10 @@ const ExamRegistrationPageInner: React.FC = () => {
 
         <Form.Item
           name="fullName"
-          label="Full name"
-          rules={[{ required: true, message: 'Please enter your full name.' }]}
+          label={i18nT("ui.konnected.certifications.examRegistration.fullName")}
+          rules={[{ required: true, message: i18nT("ui.konnected.certifications.examRegistration.pleaseEnterYourFullName") }]}
         >
-          <Input placeholder="This will be used on your exam record and certificate" />
+          <Input placeholder={i18nT("ui.konnected.certifications.examRegistration.thisWillBeUsedOnYourExam")} />
         </Form.Item>
 
         <Form.Item
@@ -541,20 +544,18 @@ const ExamRegistrationPageInner: React.FC = () => {
           ]}
         >
           <Checkbox>
-            I confirm that I have read and agree to the exam terms, proctoring rules, and
-            integrity policies.
+            {i18nT("ui.konnected.certifications.examRegistration.iConfirmThatIHaveReadAnd")}
           </Checkbox>
         </Form.Item>
 
         <Alert
           type="info"
           showIcon
-          message="Before you register"
+          message={i18nT("ui.konnected.certifications.examRegistration.beforeYouRegister")}
           description={
             <span>
-              You will be able to view this exam and its status in your Exam Dashboard after
-              registration. You must achieve at least <b>80%</b> to pass, and there is a{' '}
-              <b>30-minute retry cooldown</b> if you fail an attempt.
+              {i18nT("ui.konnected.certifications.examRegistration.youWillBeAbleToViewThis")} <b>80%</b> {i18nT("ui.konnected.certifications.examRegistration.toPassAndThereIsA")}{' '}
+              <b>{i18nT("ui.konnected.certifications.examRegistration.text30MinuteRetryCooldown")}</b> {i18nT("ui.konnected.certifications.examRegistration.ifYouFailAnAttempt")}
             </span>
           }
         />
@@ -568,8 +569,8 @@ const ExamRegistrationPageInner: React.FC = () => {
       return (
         <Alert
           type="info"
-          message="Incomplete registration"
-          description="Please select an exam and session in the previous steps before confirming."
+          message={i18nT("ui.konnected.certifications.examRegistration.incompleteRegistration")}
+          description={i18nT("ui.konnected.certifications.examRegistration.pleaseSelectAnExamAndSessionIn")}
           showIcon
         />
       );
@@ -581,10 +582,10 @@ const ExamRegistrationPageInner: React.FC = () => {
 
     return (
       <Space direction="vertical" size="large" className="w-full">
-        <Card title="Review your registration">
+        <Card title={i18nT("ui.konnected.certifications.examRegistration.reviewYourRegistration")}>
           <Space direction="vertical" size="middle">
             <div>
-              <Text type="secondary">Certification exam</Text>
+              <Text type="secondary">{i18nT("ui.konnected.certifications.examRegistration.certificationExam")}</Text>
               <br />
               <Text strong>{selectedPath.name}</Text>
               {selectedPath.level && (
@@ -596,7 +597,7 @@ const ExamRegistrationPageInner: React.FC = () => {
             </div>
 
             <div>
-              <Text type="secondary">Session</Text>
+              <Text type="secondary">{i18nT("ui.konnected.certifications.examRegistration.session")}</Text>
               <br />
               <Text strong>
                 {start.toLocaleString()}
@@ -605,21 +606,21 @@ const ExamRegistrationPageInner: React.FC = () => {
               {session.modality && (
                 <>
                   <br />
-                  <Text type="secondary">Mode: {session.modality}</Text>
+                  <Text type="secondary">{i18nT("ui.konnected.certifications.examRegistration.mode")} {session.modality}</Text>
                 </>
               )}
               {session.location && (
                 <>
                   <br />
-                  <Text type="secondary">Location: {session.location}</Text>
+                  <Text type="secondary">{i18nT("ui.konnected.certifications.examRegistration.location")} {session.location}</Text>
                 </>
               )}
             </div>
 
             <div>
-              <Text type="secondary">Name on record</Text>
+              <Text type="secondary">{i18nT("ui.konnected.certifications.examRegistration.nameOnRecord")}</Text>
               <br />
-              <Text strong>{fullName || 'Not provided'}</Text>
+              <Text strong>{fullName || i18nT("ui.konnected.certifications.examRegistration.notProvided")}</Text>
             </div>
           </Space>
         </Card>
@@ -627,8 +628,8 @@ const ExamRegistrationPageInner: React.FC = () => {
         <Alert
           type="warning"
           showIcon
-          message="Please confirm"
-          description="Once you submit, this session will be reserved for you, subject to capacity and eligibility checks. You may need to contact support to change or cancel your booking."
+          message={i18nT("ui.konnected.certifications.examRegistration.pleaseConfirm")}
+          description={i18nT("ui.konnected.certifications.examRegistration.onceYouSubmitThisSessionWillBe")}
         />
       </Space>
     );
@@ -657,7 +658,7 @@ const ExamRegistrationPageInner: React.FC = () => {
     }
 
     const isFirstStep = currentStep === 0;
-    const isLastStep = currentStep === steps.length - 1;
+    const isLastStep = currentStep === steps(i18nT).length - 1;
 
     const nextDisabled =
       currentStep === 0
@@ -670,7 +671,7 @@ const ExamRegistrationPageInner: React.FC = () => {
       <Space style={{ marginTop: 24 }}>
         {!isFirstStep && (
           <Button onClick={handlePrev} disabled={submitting}>
-            Back
+            {i18nT("ui.konnected.certifications.examRegistration.back")}
           </Button>
         )}
         {!isLastStep && (
@@ -679,7 +680,7 @@ const ExamRegistrationPageInner: React.FC = () => {
             onClick={handleNext}
             disabled={nextDisabled || (currentStep === 0 && cannotRegisterForPath)}
           >
-            Next
+            {i18nT("ui.konnected.certifications.examRegistration.next")}
           </Button>
         )}
         {isLastStep && (
@@ -689,7 +690,7 @@ const ExamRegistrationPageInner: React.FC = () => {
             loading={submitting}
             disabled={cannotRegisterForPath}
           >
-            Submit registration
+            {i18nT("ui.konnected.certifications.examRegistration.submitRegistration")}
           </Button>
         )}
       </Space>
@@ -699,21 +700,21 @@ const ExamRegistrationPageInner: React.FC = () => {
   if (registrationCompleted) {
     return (
       <KonnectedPageShell
-        title="Exam registration completed"
-        subtitle="Your exam attempt has been scheduled. You can review your registrations and outcomes in the Exam Dashboard."
+        title={i18nT("ui.konnected.certifications.examRegistration.examRegistrationCompleted")}
+        subtitle={i18nT("ui.konnected.certifications.examRegistration.yourExamAttemptHasBeenScheduledYou")}
       >
-        <PageContainer title="Exam registration completed">
+        <PageContainer title={i18nT("ui.konnected.certifications.examRegistration.examRegistrationCompleted")}>
           <Result
             status="success"
-            title="Your exam registration is confirmed"
-            subTitle="You will receive a confirmation with details by email. You can also review this exam under your Exam Dashboard."
+            title={i18nT("ui.konnected.certifications.examRegistration.yourExamRegistrationIsConfirmed")}
+            subTitle={i18nT("ui.konnected.certifications.examRegistration.confirmationSubtitle")}
             extra={
               <Space>
                 <Button type="primary" href="/konnected/certifications/exam-dashboard-results">
-                  Go to Exam Dashboard
+                  {i18nT("ui.konnected.certifications.examRegistration.goToExamDashboard")}
                 </Button>
                 <Button href="/konnected/certifications/exam-preparation">
-                  View preparation resources
+                  {i18nT("ui.konnected.certifications.examRegistration.viewPreparationResources")}
                 </Button>
               </Space>
             }
@@ -725,15 +726,15 @@ const ExamRegistrationPageInner: React.FC = () => {
 
   return (
     <KonnectedPageShell
-      title="Register for an exam"
-      subtitle="Choose a certification exam, pick a session, and confirm your registration."
+      title={i18nT("ui.konnected.certifications.examRegistration.registerForAnExam")}
+      subtitle={i18nT("ui.konnected.certifications.examRegistration.chooseACertificationExamPickASession")}
     >
-      <PageContainer title="Register for an exam">
+      <PageContainer title={i18nT("ui.konnected.certifications.examRegistration.registerForAnExam")}>
         <Card>
           <Space direction="vertical" size="large" className="w-full">
             <div>
               <Steps current={currentStep} responsive>
-                {steps.map((step) => (
+                {steps(i18nT).map((step) => (
                   <Step key={step.key} title={step.title} description={step.description} />
                 ))}
               </Steps>
@@ -743,8 +744,8 @@ const ExamRegistrationPageInner: React.FC = () => {
               <Alert
                 type="info"
                 showIcon
-                message="Loading exam options"
-                description="We are loading the available certification programs and checking your eligibility."
+                message={i18nT("ui.konnected.certifications.examRegistration.loadingExamOptions")}
+                description={i18nT("ui.konnected.certifications.examRegistration.weAreLoadingTheAvailableCertificationPrograms")}
               />
             )}
 

@@ -1,6 +1,7 @@
 // FILE: frontend/app/teambuilder/problems/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   AppstoreOutlined,
   DownOutlined,
@@ -64,6 +65,7 @@ function displayEnum(value: string): string {
 }
 
 export default function ProblemsLibraryPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [problems, setProblems] = useState<ITeambuilderProblem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -162,9 +164,9 @@ export default function ProblemsLibraryPage(): JSX.Element {
   }, [problems, searchText, domainFilter, riskFilter, modeFilter, sortKey]);
 
   const sortMenuItems: MenuProps['items'] = [
-    { key: 'updated', label: 'Sort by last updated' },
-    { key: 'usage', label: 'Sort by usage' },
-    { key: 'title', label: 'Sort by title' },
+    { key: 'updated', label: i18nT("ui.teambuilder.problems.sortByLastUpdated") },
+    { key: 'usage', label: i18nT("ui.teambuilder.problems.sortByUsage") },
+    { key: 'title', label: i18nT("ui.teambuilder.problems.sortByTitle") },
   ];
 
   const handleSortMenuClick: MenuProps['onClick'] = ({ key }) => {
@@ -181,7 +183,7 @@ export default function ProblemsLibraryPage(): JSX.Element {
           <a href={`/teambuilder/problems/${item.id}`}>{dom}</a>
           <Space size="small" wrap>
             <Tag color={riskTagColor[item.risk_level]}>
-              {displayEnum(item.risk_level)} risk
+              {displayEnum(item.risk_level)} {i18nT("ui.teambuilder.problems.risk")}
             </Tag>
             {(item.recommended_modes ?? []).map((mode) => (
               <Tag key={mode} icon={<TagsOutlined />}>
@@ -224,11 +226,11 @@ export default function ProblemsLibraryPage(): JSX.Element {
             text={displayEnum(item.status)}
           />
           <Text type="secondary" style={{ fontSize: 12 }}>
-            Used in {item.usage_count ?? 0} session
+            {i18nT("ui.teambuilder.problems.usedIn")} {item.usage_count ?? 0} {i18nT("ui.teambuilder.problems.session")}
             {(item.usage_count ?? 0) === 1 ? '' : 's'}
           </Text>
           <Text type="secondary" style={{ fontSize: 12 }}>
-            Updated {new Date(item.updated_at).toLocaleDateString()}
+            {i18nT("ui.teambuilder.problems.updated")} {new Date(item.updated_at).toLocaleDateString()}
           </Text>
         </Space>
       ),
@@ -237,9 +239,9 @@ export default function ProblemsLibraryPage(): JSX.Element {
 
   return (
     <TeamBuilderPageShell
-      title="Problem library"
-      subtitle="Define and manage reusable problem scenarios, classified with UNESCO taxonomy, that Team Builder sessions can reference."
-      sectionLabel="Problems"
+      title={i18nT("ui.teambuilder.problems.problemLibrary")}
+      subtitle={i18nT("ui.teambuilder.problems.defineAndManageReusableProblemScenariosClassified")}
+      sectionLabel={i18nT("ui.teambuilder.problems.problems")}
       primaryAction={
         <Space>
           <Button
@@ -247,14 +249,14 @@ export default function ProblemsLibraryPage(): JSX.Element {
             onClick={() => void loadProblems()}
             loading={loading}
           >
-            Reload
+            {i18nT("ui.teambuilder.problems.reload")}
           </Button>
           <Button
             type="primary"
             icon={<PlusCircleOutlined />}
             href="/teambuilder/problems/create"
           >
-            New problem
+            {i18nT("ui.teambuilder.problems.newProblem")}
           </Button>
         </Space>
       }
@@ -263,7 +265,7 @@ export default function ProblemsLibraryPage(): JSX.Element {
           href="/teambuilder/problems/taxonomy"
           icon={<AppstoreOutlined />}
         >
-          UNESCO taxonomy
+          {i18nT("ui.teambuilder.problems.unescoTaxonomy")}
         </Button>
       }
       maxWidth={1200}
@@ -276,7 +278,7 @@ export default function ProblemsLibraryPage(): JSX.Element {
             message={loadError}
             action={
               <Button size="small" onClick={() => void loadProblems()}>
-                Retry
+                {i18nT("ui.teambuilder.problems.retry")}
               </Button>
             }
           />
@@ -285,11 +287,10 @@ export default function ProblemsLibraryPage(): JSX.Element {
         <Card>
           <Space direction="vertical" size="small" style={{ width: '100%' }}>
             <Title level={4} style={{ marginBottom: 0 }}>
-              Reusable problem templates
+              {i18nT("ui.teambuilder.problems.reusableProblemTemplates")}
             </Title>
             <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-              Problems are persisted through the TeamBuilder API and can be reused
-              by new team-building sessions.
+              {i18nT("ui.teambuilder.problems.problemsArePersistedThroughTheTeambuilderApi")}
             </Paragraph>
           </Space>
         </Card>
@@ -298,7 +299,7 @@ export default function ProblemsLibraryPage(): JSX.Element {
           <Row gutter={[16, 16]} align="middle">
             <Col xs={24} md={8}>
               <Search
-                placeholder="Search problems by title or description"
+                placeholder={i18nT("ui.teambuilder.problems.searchProblemsByTitleOrDescription")}
                 allowClear
                 onSearch={setSearchText}
                 onChange={(event) => setSearchText(event.target.value)}
@@ -308,7 +309,7 @@ export default function ProblemsLibraryPage(): JSX.Element {
               <Space wrap>
                 <Select
                   allowClear
-                  placeholder="Filter by category"
+                  placeholder={i18nT("ui.teambuilder.problems.filterByCategory")}
                   style={{ minWidth: 180 }}
                   value={domainFilter}
                   onChange={setDomainFilter}
@@ -316,20 +317,20 @@ export default function ProblemsLibraryPage(): JSX.Element {
                 />
                 <Select<ProblemRiskLevel>
                   allowClear
-                  placeholder="Risk level"
+                  placeholder={i18nT("ui.teambuilder.problems.riskLevel")}
                   style={{ minWidth: 140 }}
                   value={riskFilter}
                   onChange={setRiskFilter}
                   options={[
-                    { label: 'Low', value: 'LOW' },
-                    { label: 'Medium', value: 'MEDIUM' },
-                    { label: 'High', value: 'HIGH' },
-                    { label: 'Critical', value: 'CRITICAL' },
+                    { label: i18nT("ui.teambuilder.problems.low"), value: 'LOW' },
+                    { label: i18nT("ui.teambuilder.problems.medium"), value: 'MEDIUM' },
+                    { label: i18nT("ui.teambuilder.problems.high"), value: 'HIGH' },
+                    { label: i18nT("ui.teambuilder.problems.critical"), value: 'CRITICAL' },
                   ]}
                 />
                 <Select
                   allowClear
-                  placeholder="Mode suitability"
+                  placeholder={i18nT("ui.teambuilder.problems.modeSuitability")}
                   style={{ minWidth: 180 }}
                   value={modeFilter}
                   onChange={setModeFilter}
@@ -350,7 +351,7 @@ export default function ProblemsLibraryPage(): JSX.Element {
               >
                 <Button>
                   <Space>
-                    Sort
+                    {i18nT("ui.teambuilder.problems.sort")}
                     <DownOutlined />
                   </Space>
                 </Button>

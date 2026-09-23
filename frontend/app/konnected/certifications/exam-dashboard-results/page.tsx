@@ -2,6 +2,8 @@
 // app/konnected/certifications/exam-dashboard-results/page.tsx
 'use client'
 
+import TranslatedText from '@/components/i18n/TranslatedText';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -127,7 +129,7 @@ const getStatusTag = (attempt: ExamAttempt) => {
   if (attempt.status === 'scheduled') {
     return (
       <Tag icon={<ClockCircleOutlined />} color="default">
-        Scheduled
+        <TranslatedText id="ui.konnected.certifications.examDashboardResults.scheduled" />
       </Tag>
     )
   }
@@ -135,7 +137,7 @@ const getStatusTag = (attempt: ExamAttempt) => {
   if (attempt.status === 'in_progress') {
     return (
       <Tag icon={<ClockCircleOutlined />} color="processing">
-        In progress
+        <TranslatedText id="ui.konnected.certifications.examDashboardResults.inProgress" />
       </Tag>
     )
   }
@@ -145,13 +147,13 @@ const getStatusTag = (attempt: ExamAttempt) => {
       // Passed automated evaluation but still waiting on peers
       return (
         <Tag icon={<ClockCircleOutlined />} color="processing">
-          Pending peer validation
+          <TranslatedText id="ui.konnected.certifications.examDashboardResults.pendingPeerValidation" />
         </Tag>
       )
     }
     return (
       <Tag icon={<CheckCircleOutlined />} color="success">
-        Passed
+        <TranslatedText id="ui.konnected.certifications.examDashboardResults.passed" />
       </Tag>
     )
   }
@@ -159,7 +161,7 @@ const getStatusTag = (attempt: ExamAttempt) => {
   if (attempt.status === 'failed') {
     return (
       <Tag icon={<ExclamationCircleOutlined />} color="error">
-        Not passed
+        <TranslatedText id="ui.konnected.certifications.examDashboardResults.notPassed" />
       </Tag>
     )
   }
@@ -167,7 +169,7 @@ const getStatusTag = (attempt: ExamAttempt) => {
   if (attempt.status === 'pending_peer') {
     return (
       <Tag icon={<ClockCircleOutlined />} color="processing">
-        Pending peer validation
+        <TranslatedText id="ui.konnected.certifications.examDashboardResults.pendingPeerValidation" />
       </Tag>
     )
   }
@@ -175,12 +177,12 @@ const getStatusTag = (attempt: ExamAttempt) => {
   if (attempt.status === 'under_review') {
     return (
       <Tag icon={<ClockCircleOutlined />} color="warning">
-        Under review
+        <TranslatedText id="ui.konnected.certifications.examDashboardResults.underReview" />
       </Tag>
     )
   }
 
-  return <Tag>Unknown</Tag>
+  return <Tag><TranslatedText id="ui.konnected.certifications.examDashboardResults.unknown" /></Tag>
 }
 
 const getAppealTag = (attempt: ExamAttempt) => {
@@ -191,7 +193,7 @@ const getAppealTag = (attempt: ExamAttempt) => {
   if (attempt.appealStatus === 'open') {
     return (
       <Tag color="processing" icon={<ClockCircleOutlined />}>
-        Appeal open
+        <TranslatedText id="ui.konnected.certifications.examDashboardResults.appealOpen" />
       </Tag>
     )
   }
@@ -199,7 +201,7 @@ const getAppealTag = (attempt: ExamAttempt) => {
   if (attempt.appealStatus === 'resolved') {
     return (
       <Tag color="success" icon={<CheckCircleOutlined />}>
-        Appeal resolved
+        <TranslatedText id="ui.konnected.certifications.examDashboardResults.appealResolved" />
       </Tag>
     )
   }
@@ -207,7 +209,7 @@ const getAppealTag = (attempt: ExamAttempt) => {
   if (attempt.appealStatus === 'rejected') {
     return (
       <Tag color="error" icon={<ExclamationCircleOutlined />}>
-        Appeal rejected
+        <TranslatedText id="ui.konnected.certifications.examDashboardResults.appealRejected" />
       </Tag>
     )
   }
@@ -229,6 +231,7 @@ const getScoreColor = (percent: number | null): ScoreColor => {
 // -----------------------------------------------------------------------------
 
 const ExamDashboardResultsPage: React.FC = () => {
+  const { t: i18nT } = useLanguage();
   const [selectedAttempt, setSelectedAttempt] = useState<ExamAttempt | null>(null)
   const [appealLoadingId, setAppealLoadingId] = useState<string | null>(null)
   const [retryLoadingId, setRetryLoadingId] = useState<string | null>(null)
@@ -307,7 +310,7 @@ const ExamDashboardResultsPage: React.FC = () => {
     if (attempt.certificateUrl) {
       window.open(attempt.certificateUrl, '_blank', 'noopener,noreferrer')
     } else {
-      message.info('Certificate is not yet available for this attempt.')
+      message.info(i18nT("ui.konnected.certifications.examDashboardResults.certificateIsNotYetAvailableForThis"))
     }
   }
 
@@ -315,7 +318,7 @@ const ExamDashboardResultsPage: React.FC = () => {
     if (attempt.portfolioUrl) {
       window.open(attempt.portfolioUrl, '_blank', 'noopener,noreferrer')
     } else {
-      message.info('This attempt is not yet linked to your portfolio.')
+      message.info(i18nT("ui.konnected.certifications.examDashboardResults.thisAttemptIsNotYetLinkedTo"))
     }
   }
 
@@ -325,9 +328,9 @@ const ExamDashboardResultsPage: React.FC = () => {
       const updated = await api.post<ExamAttempt>(EXAM_APPEAL_ENDPOINT(attempt.id))
       setSelectedAttempt((prev) => (prev && prev.id === attempt.id ? updated : prev))
       refreshAttempts()
-      message.success('Appeal request submitted. You will be notified when it is reviewed.')
+      message.success(i18nT("ui.konnected.certifications.examDashboardResults.appealRequestSubmittedYouWillBeNotified"))
     } catch {
-      message.error('Unable to submit appeal. Please try again or contact support.')
+      message.error(i18nT("ui.konnected.certifications.examDashboardResults.unableToSubmitAppealPleaseTryAgain"))
     } finally {
       setAppealLoadingId(null)
     }
@@ -338,7 +341,7 @@ const ExamDashboardResultsPage: React.FC = () => {
     try {
       const newAttempt = await api.post<ExamAttempt>(EXAM_RETRY_ENDPOINT(attempt.id))
       refreshAttempts()
-      message.success('New attempt scheduled successfully.')
+      message.success(i18nT("ui.konnected.certifications.examDashboardResults.newAttemptScheduledSuccessfully"))
 
       // Redirect into the certification flow for this path
       if (newAttempt.certificationPathId) {
@@ -367,7 +370,7 @@ const ExamDashboardResultsPage: React.FC = () => {
         // e.g. "Retry cooldown is still active for this exam."
         message.error(detail)
       } else {
-        message.error('Unable to start a new attempt. Please try again or contact support.')
+        message.error(i18nT("ui.konnected.certifications.examDashboardResults.unableToStartANewAttemptPlease"))
       }
     } finally {
       setRetryLoadingId(null)
@@ -376,27 +379,27 @@ const ExamDashboardResultsPage: React.FC = () => {
 
   const columns: ColumnsType<ExamAttempt> = [
     {
-      title: 'Certification path',
+      title: i18nT("ui.konnected.certifications.examDashboardResults.certificationPath"),
       dataIndex: 'certificationPathName',
       key: 'certificationPathName',
       render: (text: string, record) => (
         <Space direction="vertical" size={0}>
           <Text strong>{text}</Text>
           <Text type="secondary" style={{ fontSize: 12 }}>
-            Attempt #{record.attemptNumber}
+            {i18nT("ui.konnected.certifications.examDashboardResults.attempt")}{record.attemptNumber}
           </Text>
         </Space>
       ),
     },
     {
-      title: 'Status',
+      title: i18nT("ui.konnected.certifications.examDashboardResults.status"),
       dataIndex: 'status',
       key: 'status',
       filters: [
-        { text: 'Passed', value: 'passed' },
-        { text: 'Not passed', value: 'failed' },
-        { text: 'Pending peer validation', value: 'pending_peer' },
-        { text: 'Under review', value: 'under_review' },
+        { text: i18nT("ui.konnected.certifications.examDashboardResults.passed"), value: 'passed' },
+        { text: i18nT("ui.konnected.certifications.examDashboardResults.notPassed"), value: 'failed' },
+        { text: i18nT("ui.konnected.certifications.examDashboardResults.pendingPeerValidation"), value: 'pending_peer' },
+        { text: i18nT("ui.konnected.certifications.examDashboardResults.underReview"), value: 'under_review' },
       ],
       onFilter: (value, record) => record.status === value,
       render: (_value, record) => (
@@ -407,12 +410,12 @@ const ExamDashboardResultsPage: React.FC = () => {
       ),
     },
     {
-      title: 'Score',
+      title: i18nT("ui.konnected.certifications.examDashboardResults.score"),
       dataIndex: 'scorePercent',
       key: 'scorePercent',
       render: (value: number | null) => {
         if (value == null) {
-          return <Text type="secondary">Pending</Text>
+          return <Text type="secondary">{i18nT("ui.konnected.certifications.examDashboardResults.pending")}</Text>
         }
         const color = getScoreColor(value)
         return (
@@ -432,14 +435,14 @@ const ExamDashboardResultsPage: React.FC = () => {
               {value}%
             </Text>
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Pass threshold: {CERT_PASS_PERCENT}%
+              {i18nT("ui.konnected.certifications.examDashboardResults.passThreshold")} {CERT_PASS_PERCENT}%
             </Text>
           </Space>
         )
       },
     },
     {
-      title: 'Date',
+      title: i18nT("ui.konnected.certifications.examDashboardResults.date"),
       dataIndex: 'takenAt',
       key: 'takenAt',
       render: (value: string) => <Text>{formatDateTime(value)}</Text>,
@@ -451,45 +454,45 @@ const ExamDashboardResultsPage: React.FC = () => {
       defaultSortOrder: 'descend',
     },
     {
-      title: 'Delivery',
+      title: i18nT("ui.konnected.certifications.examDashboardResults.delivery"),
       dataIndex: 'deliveryMode',
       key: 'deliveryMode',
       render: (_value, record) => (
         <Space direction="vertical" size={0}>
-          <Text>{record.deliveryMode === 'online' ? 'Online' : record.deliveryMode}</Text>
+          <Text>{record.deliveryMode === 'online' ? i18nT("ui.konnected.certifications.examDashboardResults.online") : record.deliveryMode}</Text>
           {record.proctored && (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Proctored
+              {i18nT("ui.konnected.certifications.examDashboardResults.proctored")}
             </Text>
           )}
         </Space>
       ),
     },
     {
-      title: 'Validation',
+      title: i18nT("ui.konnected.certifications.examDashboardResults.validation"),
       key: 'validation',
       render: (_value, record) => {
         if (!record.peerValidationRequired) {
-          return <Text type="secondary">Not required</Text>
+          return <Text type="secondary">{i18nT("ui.konnected.certifications.examDashboardResults.notRequired")}</Text>
         }
         if (!record.peerValidationStatus || record.peerValidationStatus === 'pending') {
           return (
             <Tag icon={<ClockCircleOutlined />} color="processing">
-              Waiting for peers
+              {i18nT("ui.konnected.certifications.examDashboardResults.waitingForPeers")}
             </Tag>
           )
         }
         if (record.peerValidationStatus === 'approved') {
           return (
             <Tag icon={<CheckCircleOutlined />} color="success">
-              Peer-approved
+              {i18nT("ui.konnected.certifications.examDashboardResults.peerApproved")}
             </Tag>
           )
         }
         if (record.peerValidationStatus === 'rejected') {
           return (
             <Tag icon={<ExclamationCircleOutlined />} color="error">
-              Peer-rejected
+              {i18nT("ui.konnected.certifications.examDashboardResults.peerRejected")}
             </Tag>
           )
         }
@@ -497,18 +500,18 @@ const ExamDashboardResultsPage: React.FC = () => {
       },
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.konnected.certifications.examDashboardResults.actions"),
       key: 'actions',
       render: (_value, record) => (
         <Space>
-          <Tooltip title="View attempt details">
+          <Tooltip title={i18nT("ui.konnected.certifications.examDashboardResults.viewAttemptDetails")}>
             <Button
               size="small"
               icon={<EyeOutlined />}
               onClick={() => handleOpenDetails(record)}
             />
           </Tooltip>
-          <Tooltip title="Open certificate (if available)">
+          <Tooltip title={i18nT("ui.konnected.certifications.examDashboardResults.openCertificateIfAvailable")}>
             <Button
               size="small"
               icon={<FilePdfOutlined />}
@@ -516,16 +519,16 @@ const ExamDashboardResultsPage: React.FC = () => {
               disabled={!record.certificateUrl}
             />
           </Tooltip>
-          <Tooltip title="Open portfolio entry (if available)">
+          <Tooltip title={i18nT("ui.konnected.certifications.examDashboardResults.openPortfolioEntryIfAvailable")}>
             <Button
               size="small"
               onClick={() => handleOpenPortfolio(record)}
               disabled={!record.portfolioUrl}
             >
-              Portfolio
+              {i18nT("ui.konnected.certifications.examDashboardResults.portfolio")}
             </Button>
           </Tooltip>
-          <Tooltip title="Request a manual review of this attempt">
+          <Tooltip title={i18nT("ui.konnected.certifications.examDashboardResults.requestAManualReviewOfThisAttempt")}>
             <Button
               size="small"
               type="default"
@@ -534,10 +537,10 @@ const ExamDashboardResultsPage: React.FC = () => {
               onClick={() => handleOpenAppeal(record)}
               disabled={record.appealStatus === 'open'}
             >
-              Appeal
+              {i18nT("ui.konnected.certifications.examDashboardResults.appeal")}
             </Button>
           </Tooltip>
-          <Tooltip title="Start a new attempt (if allowed)">
+          <Tooltip title={i18nT("ui.konnected.certifications.examDashboardResults.startANewAttemptIfAllowed")}>
             <Button
               size="small"
               type="primary"
@@ -546,7 +549,7 @@ const ExamDashboardResultsPage: React.FC = () => {
               onClick={() => handleRetry(record)}
               disabled={!record.canRetry}
             >
-              Retry
+              {i18nT("ui.konnected.certifications.examDashboardResults.retry")}
             </Button>
           </Tooltip>
         </Space>
@@ -562,13 +565,13 @@ const ExamDashboardResultsPage: React.FC = () => {
     <Row gutter={[16, 16]}>
       <Col xs={24} sm={12} md={6}>
         <Card>
-          <Statistic title="Total attempts" value={stats.totalAttempts} />
+          <Statistic title={i18nT("ui.konnected.certifications.examDashboardResults.totalAttempts")} value={stats.totalAttempts} />
         </Card>
       </Col>
       <Col xs={24} sm={12} md={6}>
         <Card>
           <Statistic
-            title="Paths passed"
+            title={i18nT("ui.konnected.certifications.examDashboardResults.pathsPassed")}
             value={stats.passedCount}
             suffix={`/ ${stats.uniqueCerts || stats.totalAttempts || 0}`}
           />
@@ -576,12 +579,12 @@ const ExamDashboardResultsPage: React.FC = () => {
       </Col>
       <Col xs={24} sm={12} md={6}>
         <Card>
-          <Statistic title="Pass rate" value={stats.passRate} suffix="%" />
+          <Statistic title={i18nT("ui.konnected.certifications.examDashboardResults.passRate")} value={stats.passRate} suffix="%" />
         </Card>
       </Col>
       <Col xs={24} sm={12} md={6}>
         <Card>
-          <Statistic title="Average score" value={stats.avgScore} suffix="%" />
+          <Statistic title={i18nT("ui.konnected.certifications.examDashboardResults.averageScore")} value={stats.avgScore} suffix="%" />
         </Card>
       </Col>
     </Row>
@@ -598,12 +601,11 @@ const ExamDashboardResultsPage: React.FC = () => {
         type="info"
         showIcon
         style={{ marginBottom: 16 }}
-        message="Retry cooldown in effect"
+        message={i18nT("ui.konnected.certifications.examDashboardResults.retryCooldownInEffect")}
         description={
           <Space direction="vertical">
             <Text>
-              Some attempts are temporarily blocked from retries to prevent burnout and
-              encourage reflection.
+              {i18nT("ui.konnected.certifications.examDashboardResults.retryBlockExplanation")}
             </Text>
             <List
               size="small"
@@ -613,15 +615,14 @@ const ExamDashboardResultsPage: React.FC = () => {
                   <Space direction="vertical" size={0}>
                     <Text strong>{a.certificationPathName}</Text>
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                      Next retry available: {formatDateTime(a.nextRetryAt)}
+                      {i18nT("ui.konnected.certifications.examDashboardResults.nextRetryAvailable")} {formatDateTime(a.nextRetryAt)}
                     </Text>
                   </Space>
                 </List.Item>
               )}
             />
             <Text type="secondary">
-              Global policy: {EXAM_RETRY_COOLDOWN_MIN} minutes minimum between failed attempts
-              on the same path (configurable per tenant).
+              {i18nT("ui.konnected.certifications.examDashboardResults.globalPolicy")} {EXAM_RETRY_COOLDOWN_MIN} {i18nT("ui.konnected.certifications.examDashboardResults.minutesMinimumBetweenFailedAttemptsOnThe")}
             </Text>
           </Space>
         }
@@ -636,8 +637,8 @@ const ExamDashboardResultsPage: React.FC = () => {
   if (loading && !data) {
     return (
       <KonnectedPageShell
-        title="Exam Dashboard & Results"
-        subtitle="Track your certification exam attempts, scores, and outcomes."
+        title={i18nT("ui.konnected.certifications.examDashboardResults.examDashboardResults")}
+        subtitle={i18nT("ui.konnected.certifications.examDashboardResults.trackYourCertificationExamAttemptsScoresAnd")}
       >
         <div style={{ padding: 24, textAlign: 'center' }}>
           <Spin size="large" />
@@ -649,17 +650,17 @@ const ExamDashboardResultsPage: React.FC = () => {
   if (error) {
     return (
       <KonnectedPageShell
-        title="Exam Dashboard & Results"
-        subtitle="Track your certification exam attempts, scores, and outcomes."
+        title={i18nT("ui.konnected.certifications.examDashboardResults.examDashboardResults")}
+        subtitle={i18nT("ui.konnected.certifications.examDashboardResults.trackYourCertificationExamAttemptsScoresAnd")}
       >
         <div style={{ padding: 24 }}>
           <Result
             status="error"
-            title="We could not load your exam results."
-            subTitle="There was a problem contacting the CertifiKation service. Please try again in a few seconds."
+            title={i18nT("ui.konnected.certifications.examDashboardResults.weCouldNotLoadYourExamResults")}
+            subTitle={i18nT("ui.konnected.certifications.examDashboardResults.serviceContactError")}
             extra={
               <Button type="primary" onClick={() => refreshAttempts()}>
-                Retry loading
+                {i18nT("ui.konnected.certifications.examDashboardResults.retryLoading")}
               </Button>
             }
           />
@@ -672,8 +673,8 @@ const ExamDashboardResultsPage: React.FC = () => {
   if (!allAttempts.length) {
     return (
       <KonnectedPageShell
-        title="Exam Dashboard & Results"
-        subtitle="Track your certification exam attempts, scores, and outcomes."
+        title={i18nT("ui.konnected.certifications.examDashboardResults.examDashboardResults")}
+        subtitle={i18nT("ui.konnected.certifications.examDashboardResults.trackYourCertificationExamAttemptsScoresAnd")}
       >
         <Row gutter={24}>
           <Col xs={24} md={16}>
@@ -682,10 +683,9 @@ const ExamDashboardResultsPage: React.FC = () => {
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
                 description={
                   <Space direction="vertical">
-                    <Text>You have not attempted any certification exams yet.</Text>
+                    <Text>{i18nT("ui.konnected.certifications.examDashboardResults.youHaveNotAttemptedAnyCertificationExams")}</Text>
                     <Text type="secondary">
-                      Once you complete an exam in the CertifiKation module, it will appear
-                      here with your score, status, and certificate links.
+                      {i18nT("ui.konnected.certifications.examDashboardResults.onceYouCompleteAnExamInThe")}
                     </Text>
                   </Space>
                 }
@@ -694,17 +694,16 @@ const ExamDashboardResultsPage: React.FC = () => {
                   type="primary"
                   href="/konnected/certifications/exam-registration"
                 >
-                  Browse certification exams
+                  {i18nT("ui.konnected.certifications.examDashboardResults.browseCertificationExams")}
                 </Button>
               </Empty>
             </Card>
           </Col>
           <Col xs={24} md={8}>
-            <Card title="How this dashboard works">
+            <Card title={i18nT("ui.konnected.certifications.examDashboardResults.howThisDashboardWorks")}>
               <Space direction="vertical">
                 <Text>
-                  This dashboard consolidates all your exam attempts from the CertifiKation
-                  module.
+                  {i18nT("ui.konnected.certifications.examDashboardResults.thisDashboardConsolidatesAllYourExamAttempts")}
                 </Text>
                 <List
                   size="small"
@@ -731,8 +730,8 @@ const ExamDashboardResultsPage: React.FC = () => {
   if (!attempts.length) {
     return (
       <KonnectedPageShell
-        title="Exam Dashboard & Results"
-        subtitle="Track your certification exam attempts, scores, and outcomes."
+        title={i18nT("ui.konnected.certifications.examDashboardResults.examDashboardResults")}
+        subtitle={i18nT("ui.konnected.certifications.examDashboardResults.trackYourCertificationExamAttemptsScoresAnd")}
       >
         <Row gutter={24}>
           <Col xs={24} md={16}>
@@ -741,9 +740,9 @@ const ExamDashboardResultsPage: React.FC = () => {
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
                 description={
                   <Space direction="vertical">
-                    <Text>No attempts yet for this certification.</Text>
+                    <Text>{i18nT("ui.konnected.certifications.examDashboardResults.noAttemptsYetForThisCertification")}</Text>
                     <Text type="secondary">
-                      You can register for an exam session from the Exam Registration page.
+                      {i18nT("ui.konnected.certifications.examDashboardResults.youCanRegisterForAnExamSession")}
                     </Text>
                   </Space>
                 }
@@ -752,7 +751,7 @@ const ExamDashboardResultsPage: React.FC = () => {
                   type="primary"
                   href="/konnected/certifications/exam-registration"
                 >
-                  Go to exam registration
+                  {i18nT("ui.konnected.certifications.examDashboardResults.goToExamRegistration")}
                 </Button>
               </Empty>
             </Card>
@@ -768,8 +767,8 @@ const ExamDashboardResultsPage: React.FC = () => {
 
   return (
     <KonnectedPageShell
-      title="Exam Dashboard & Results"
-      subtitle="Track your certification exam attempts, scores, and outcomes."
+      title={i18nT("ui.konnected.certifications.examDashboardResults.examDashboardResults")}
+      subtitle={i18nT("ui.konnected.certifications.examDashboardResults.trackYourCertificationExamAttemptsScoresAnd")}
     >
       <Space direction="vertical" size={24} style={{ width: '100%' }}>
         {cooldownAlerts}
@@ -779,12 +778,12 @@ const ExamDashboardResultsPage: React.FC = () => {
         <Row gutter={24}>
           <Col xs={24} lg={16}>
             <Card
-              title="Recent exam attempts"
+              title={i18nT("ui.konnected.certifications.examDashboardResults.recentExamAttempts")}
               extra={
                 <Space>
-                  <Badge color="success" text="Passed" />
-                  <Badge color="error" text="Not passed" />
-                  <Badge color="processing" text="Pending / In progress" />
+                  <Badge color="success" text={i18nT("ui.konnected.certifications.examDashboardResults.passed")} />
+                  <Badge color="error" text={i18nT("ui.konnected.certifications.examDashboardResults.notPassed")} />
+                  <Badge color="processing" text={i18nT("ui.konnected.certifications.examDashboardResults.pendingInProgress")} />
                 </Space>
               }
             >
@@ -803,11 +802,10 @@ const ExamDashboardResultsPage: React.FC = () => {
 
           <Col xs={24} lg={8}>
             <Space direction="vertical" size={16} style={{ width: '100%' }}>
-              <Card title="Certification outcomes">
+              <Card title={i18nT("ui.konnected.certifications.examDashboardResults.certificationOutcomes")}>
                 <Space direction="vertical" size={8} style={{ width: '100%' }}>
                   <Paragraph>
-                    When you pass a CertifiKation path (and, if required, peer validation is
-                    approved), your certification is:
+                    {i18nT("ui.konnected.certifications.examDashboardResults.whenYouPassACertifikationPathAnd")}
                   </Paragraph>
                   <List
                     size="small"
@@ -825,7 +823,7 @@ const ExamDashboardResultsPage: React.FC = () => {
                 </Space>
               </Card>
 
-              <Card title="Tips for improving your score">
+              <Card title={i18nT("ui.konnected.certifications.examDashboardResults.tipsForImprovingYourScore")}>
                 <List
                   size="small"
                   dataSource={[
@@ -846,7 +844,7 @@ const ExamDashboardResultsPage: React.FC = () => {
 
         {/* Details drawer */}
         <Drawer
-          title="Exam attempt details"
+          title={i18nT("ui.konnected.certifications.examDashboardResults.examAttemptDetails")}
           width={520}
           open={!!selectedAttempt}
           onClose={handleCloseDetails}
@@ -857,68 +855,68 @@ const ExamDashboardResultsPage: React.FC = () => {
               <div>
                 <Title level={4}>{selectedAttempt.certificationPathName}</Title>
                 <Text type="secondary">
-                  Attempt #{selectedAttempt.attemptNumber} ·{' '}
+                  {i18nT("ui.konnected.certifications.examDashboardResults.attempt")}{selectedAttempt.attemptNumber} ·{' '}
                   {formatDateTime(selectedAttempt.takenAt)}
                 </Text>
               </div>
 
               <Space size={16}>
                 <Statistic
-                  title="Score"
+                  title={i18nT("ui.konnected.certifications.examDashboardResults.score")}
                   value={selectedAttempt.scorePercent ?? 0}
                   suffix="%"
                 />
                 <Statistic
-                  title="Pass threshold"
+                  title={i18nT("ui.konnected.certifications.examDashboardResults.passThreshold_5f0fe9")}
                   value={CERT_PASS_PERCENT}
                   suffix="%"
                 />
               </Space>
 
               <Space direction="vertical" size={8}>
-                <Text strong>Status</Text>
+                <Text strong>{i18nT("ui.konnected.certifications.examDashboardResults.status")}</Text>
                 {getStatusTag(selectedAttempt)}
                 {getAppealTag(selectedAttempt)}
               </Space>
 
               <Space direction="vertical" size={8}>
-                <Text strong>Validation & review</Text>
+                <Text strong>{i18nT("ui.konnected.certifications.examDashboardResults.validationReview")}</Text>
                 <Space direction="vertical" size={4}>
                   <Text>
-                    Peer validation required:{' '}
-                    {selectedAttempt.peerValidationRequired ? 'Yes' : 'No'}
+                    {i18nT("ui.konnected.certifications.examDashboardResults.peerValidationRequired")}{' '}
+                    {selectedAttempt.peerValidationRequired ? i18nT("ui.konnected.certifications.examDashboardResults.yes") : i18nT("ui.konnected.certifications.examDashboardResults.no")}
                   </Text>
                   <Text>
-                    Peer validation status:{' '}
+                    {i18nT("ui.konnected.certifications.examDashboardResults.peerValidationStatus")}{' '}
                     {selectedAttempt.peerValidationStatus ?? '—'}
                   </Text>
-                  <Text>Appeal status: {selectedAttempt.appealStatus ?? 'none'}</Text>
+                  <Text>{i18nT("ui.konnected.certifications.examDashboardResults.appealStatus")} {selectedAttempt.appealStatus ?? i18nT("ui.konnected.certifications.examDashboardResults.none")}</Text>
                 </Space>
               </Space>
 
               <Space direction="vertical" size={8}>
-                <Text strong>Delivery & conditions</Text>
+                <Text strong>{i18nT("ui.konnected.certifications.examDashboardResults.deliveryConditions")}</Text>
                 <Space direction="vertical" size={4}>
-                  <Text>Mode: {selectedAttempt.deliveryMode}</Text>
-                  <Text>Proctored: {selectedAttempt.proctored ? 'Yes' : 'No'}</Text>
+                  <Text>{i18nT("ui.konnected.certifications.examDashboardResults.mode")} {selectedAttempt.deliveryMode}</Text>
+                  <Text>{i18nT("ui.konnected.certifications.examDashboardResults.proctored_4bc147")} {selectedAttempt.proctored ? i18nT("ui.konnected.certifications.examDashboardResults.yes") : i18nT("ui.konnected.certifications.examDashboardResults.no")}</Text>
                 </Space>
               </Space>
 
               <Space direction="vertical" size={8}>
-                <Text strong>Linked assets</Text>
+                <Text strong>{i18nT("ui.konnected.certifications.examDashboardResults.linkedAssets")}</Text>
                 <Space>
                   <Button
                     icon={<FilePdfOutlined />}
                     onClick={() => handleOpenCertificate(selectedAttempt)}
                     disabled={!selectedAttempt.certificateUrl}
                   >
-                    Open certificate
+                    {i18nT("ui.konnected.certifications.examDashboardResults.openCertificate")}
                   </Button>
                   <Button
                     onClick={() => handleOpenPortfolio(selectedAttempt)}
                     disabled={!selectedAttempt.portfolioUrl}
                   >
-                    View portfolio entry
+                    {i18nT("ui.konnected.certifications.examDashboardResults.viewPortfolioEntry")}
                   </Button>
                 </Space>
               </Space>
@@ -929,17 +927,16 @@ const ExamDashboardResultsPage: React.FC = () => {
                   showIcon
                   message={
                     selectedAttempt.canRetry
-                      ? 'You can start a new attempt now.'
-                      : 'Retry cooldown in effect for this path.'
+                      ? i18nT("ui.konnected.certifications.examDashboardResults.youCanStartANewAttemptNow")
+                      : i18nT("ui.konnected.certifications.examDashboardResults.retryCooldownInEffectForThisPath")
                   }
                   description={
                     <Space direction="vertical" size={4}>
                       <Text>
-                        Next retry available: {formatDateTime(selectedAttempt.nextRetryAt)}
+                        {i18nT("ui.konnected.certifications.examDashboardResults.nextRetryAvailable")} {formatDateTime(selectedAttempt.nextRetryAt)}
                       </Text>
                       <Text type="secondary">
-                        Global cooldown: {EXAM_RETRY_COOLDOWN_MIN} minutes between attempts
-                        on the same path.
+                        {i18nT("ui.konnected.certifications.examDashboardResults.globalCooldown")} {EXAM_RETRY_COOLDOWN_MIN} {i18nT("ui.konnected.certifications.examDashboardResults.minutesBetweenAttemptsOnTheSamePath")}
                       </Text>
                     </Space>
                   }
@@ -954,7 +951,7 @@ const ExamDashboardResultsPage: React.FC = () => {
                   onClick={() => handleOpenAppeal(selectedAttempt)}
                   disabled={selectedAttempt.appealStatus === 'open'}
                 >
-                  Open appeal
+                  {i18nT("ui.konnected.certifications.examDashboardResults.openAppeal")}
                 </Button>
                 <Button
                   type="primary"
@@ -963,7 +960,7 @@ const ExamDashboardResultsPage: React.FC = () => {
                   onClick={() => handleRetry(selectedAttempt)}
                   disabled={!selectedAttempt.canRetry}
                 >
-                  Start new attempt
+                  {i18nT("ui.konnected.certifications.examDashboardResults.startNewAttempt")}
                 </Button>
               </Space>
             </Space>

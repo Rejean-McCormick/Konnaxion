@@ -1,6 +1,7 @@
 // frontend/app/teambuilder/problems/[problemId]/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   AlertOutlined,
   ApartmentOutlined,
@@ -95,6 +96,7 @@ interface IProblemDetailResponse {
 type TabKey = 'overview' | 'sessions' | 'taxonomy';
 
 export default function ProblemDetailPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const { problemId } = useParams();
 
   const [problem, setProblem] = useState<ITeambuilderProblem | null>(null);
@@ -125,11 +127,11 @@ export default function ProblemDetailPage(): JSX.Element {
     } catch (err) {
        
       console.error(err);
-      setError('Failed to load problem details.');
+      setError(i18nT("ui.teambuilder.problems.problemid.failedToLoadProblemDetails"));
     } finally {
       setLoading(false);
     }
-  }, [problemId]);
+  }, [problemId, i18nT]);
 
   useEffect(() => {
     fetchProblem();
@@ -167,7 +169,7 @@ export default function ProblemDetailPage(): JSX.Element {
 
     return (
       <Tag color={color} icon={icon}>
-        {label} risk
+        {label} {i18nT("ui.teambuilder.problems.problemid.risk")}
       </Tag>
     );
   };
@@ -177,13 +179,13 @@ export default function ProblemDetailPage(): JSX.Element {
 
     switch (problem.status) {
       case 'ACTIVE':
-        return <Badge status="success" text="Active" />;
+        return <Badge status="success" text={i18nT("ui.teambuilder.problems.problemid.active")} />;
       case 'DRAFT':
-        return <Badge status="warning" text="Draft" />;
+        return <Badge status="warning" text={i18nT("ui.teambuilder.problems.problemid.draft")} />;
       case 'DEPRECATED':
-        return <Badge status="error" text="Deprecated" />;
+        return <Badge status="error" text={i18nT("ui.teambuilder.problems.problemid.deprecated")} />;
       default:
-        return <Badge status="default" text={problem.status ?? 'Unknown'} />;
+        return <Badge status="default" text={problem.status ?? i18nT("ui.teambuilder.problems.problemid.unknown")} />;
     }
   };
 
@@ -229,14 +231,13 @@ export default function ProblemDetailPage(): JSX.Element {
       <Text type="secondary">{problem.description}</Text>
     ) : (
       <Text type="secondary">
-        View detailed metadata, taxonomy and sessions using this problem
-        template.
+        {i18nT("ui.teambuilder.problems.problemid.viewDetailedMetadataTaxonomyAndSessionsUsing")}
       </Text>
     );
 
   const metaTitle = problem
     ? `Team Builder · Problem · ${problem.name}`
-    : 'Team Builder · Problem';
+    : i18nT("ui.teambuilder.problems.problemid.teamBuilderProblem");
 
   const primaryAction = problem ? (
     <Space>
@@ -245,7 +246,7 @@ export default function ProblemDetailPage(): JSX.Element {
         icon={<ProjectOutlined />}
         href={`/teambuilder/create?problemId=${encodeURIComponent(problem.id)}`}
       >
-        Create session with this problem
+        {i18nT("ui.teambuilder.problems.problemid.createSessionWithThisProblem")}
       </Button>
     </Space>
   ) : undefined;
@@ -253,7 +254,7 @@ export default function ProblemDetailPage(): JSX.Element {
   const secondaryActions = problem ? (
     <Space>
       <Button icon={<ArrowLeftOutlined />} href="/teambuilder/problems">
-        Back to problems
+        {i18nT("ui.teambuilder.problems.problemid.backToProblems")}
       </Button>
       <Button
         icon={<CopyOutlined />}
@@ -261,18 +262,18 @@ export default function ProblemDetailPage(): JSX.Element {
           problem.id,
         )}`}
       >
-        Duplicate
+        {i18nT("ui.teambuilder.problems.problemid.duplicate")}
       </Button>
       <Button
         icon={<ProfileOutlined />}
         href={`/teambuilder/problems/${encodeURIComponent(problem.id)}/edit`}
       >
-        Edit
+        {i18nT("ui.teambuilder.problems.problemid.edit")}
       </Button>
     </Space>
   ) : (
     <Button icon={<ArrowLeftOutlined />} href="/teambuilder/problems">
-      Back to problems
+      {i18nT("ui.teambuilder.problems.problemid.backToProblems")}
     </Button>
   );
 
@@ -284,7 +285,7 @@ export default function ProblemDetailPage(): JSX.Element {
     if (!problem) {
       return (
         <Card>
-          <Empty description="No problem data available." />
+          <Empty description={i18nT("ui.teambuilder.problems.problemid.noProblemDataAvailable")} />
         </Card>
       );
     }
@@ -298,13 +299,13 @@ export default function ProblemDetailPage(): JSX.Element {
             icon={<ExclamationCircleOutlined />}
             message={
               problem.status === 'DEPRECATED'
-                ? 'This problem is deprecated'
-                : 'This problem is still in draft'
+                ? i18nT("ui.teambuilder.problems.problemid.thisProblemIsDeprecated")
+                : i18nT("ui.teambuilder.problems.problemid.thisProblemIsStillInDraft")
             }
             description={
               problem.status === 'DEPRECATED'
-                ? 'Avoid using this problem for new sessions. Existing sessions may still reference it, but it is not recommended for future work.'
-                : 'You can use this problem for experiments and learning sessions, but mark it as Active when you are ready to use it widely.'
+                ? i18nT("ui.teambuilder.problems.problemid.avoidUsingThisProblemForNewSessions")
+                : i18nT("ui.teambuilder.problems.problemid.youCanUseThisProblemForExperiments")
             }
           />
         )}
@@ -313,33 +314,33 @@ export default function ProblemDetailPage(): JSX.Element {
         <Card>
           <Row gutter={[16, 16]}>
             <Col xs={24} md={16}>
-              <Descriptions title="Problem metadata" column={1} bordered={false}>
-                <Descriptions.Item label="Name">
+              <Descriptions title={i18nT("ui.teambuilder.problems.problemid.problemMetadata")} column={1} bordered={false}>
+                <Descriptions.Item label={i18nT("ui.teambuilder.problems.problemid.name")}>
                   {problem.name}
                 </Descriptions.Item>
-                <Descriptions.Item label="Status">
+                <Descriptions.Item label={i18nT("ui.teambuilder.problems.problemid.status")}>
                   {statusBadge()}
                 </Descriptions.Item>
-                <Descriptions.Item label="Risk level">
+                <Descriptions.Item label={i18nT("ui.teambuilder.problems.problemid.riskLevel")}>
                   {riskTag()}
                 </Descriptions.Item>
-                <Descriptions.Item label="Typical team size">
+                <Descriptions.Item label={i18nT("ui.teambuilder.problems.problemid.typicalTeamSize")}>
                   {problem.min_team_size && problem.max_team_size
-                    ? `${problem.min_team_size}–${problem.max_team_size} people`
-                    : 'Not specified'}
+                    ? i18nT("ui.teambuilder.problems.problemid.people", { min_team_size: problem.min_team_size, max_team_size: problem.max_team_size })
+                    : i18nT("ui.teambuilder.problems.problemid.notSpecified")}
                 </Descriptions.Item>
-                <Descriptions.Item label="Recommended modes">
+                <Descriptions.Item label={i18nT("ui.teambuilder.problems.problemid.recommendedModes")}>
                   {modeTags.length > 0 ? (
                     modeTags
                   ) : (
-                    <Text type="secondary">None explicitly set</Text>
+                    <Text type="secondary">{i18nT("ui.teambuilder.problems.problemid.noneExplicitlySet")}</Text>
                   )}
                 </Descriptions.Item>
-                <Descriptions.Item label="Categories">
+                <Descriptions.Item label={i18nT("ui.teambuilder.problems.problemid.categories")}>
                   {categoryTags.length > 0 ? (
                     categoryTags
                   ) : (
-                    <Text type="secondary">Not categorised yet</Text>
+                    <Text type="secondary">{i18nT("ui.teambuilder.problems.problemid.notCategorisedYet")}</Text>
                   )}
                 </Descriptions.Item>
               </Descriptions>
@@ -347,18 +348,18 @@ export default function ProblemDetailPage(): JSX.Element {
 
             <Col xs={24} md={8}>
               <Space direction="vertical" style={{ width: '100%' }}>
-                <Title level={5}>Usage & outcomes</Title>
+                <Title level={5}>{i18nT("ui.teambuilder.problems.problemid.usageOutcomes")}</Title>
                 <Row gutter={[16, 16]}>
                   <Col span={12}>
                     <Statistic
-                      title="Sessions using this problem"
+                      title={i18nT("ui.teambuilder.problems.problemid.sessionsUsingThisProblem")}
                       value={usageCount}
                       prefix={<ApartmentOutlined />}
                     />
                   </Col>
                   <Col span={12}>
                     <Statistic
-                      title="Avg. outcome score"
+                      title={i18nT("ui.teambuilder.problems.problemid.avgOutcomeScore")}
                       value={averageOutcome}
                       prefix={<FundOutlined />}
                     />
@@ -367,12 +368,12 @@ export default function ProblemDetailPage(): JSX.Element {
 
                 {problem.created_at && (
                   <Text type="secondary">
-                    Created {format(new Date(problem.created_at), 'PPP p')}
+                    {i18nT("ui.teambuilder.problems.problemid.created")} {format(new Date(problem.created_at), 'PPP p')}
                   </Text>
                 )}
                 {problem.updated_at && (
                   <Text type="secondary">
-                    Last updated {format(new Date(problem.updated_at), 'PPP p')}
+                    {i18nT("ui.teambuilder.problems.problemid.lastUpdated")} {format(new Date(problem.updated_at), 'PPP p')}
                   </Text>
                 )}
               </Space>
@@ -381,11 +382,11 @@ export default function ProblemDetailPage(): JSX.Element {
         </Card>
 
         {/* History / changes */}
-        <Card title="History of changes">
+        <Card title={i18nT("ui.teambuilder.problems.problemid.historyOfChanges")}>
           {history.length === 0 ? (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No history recorded yet."
+              description={i18nT("ui.teambuilder.problems.problemid.noHistoryRecordedYet")}
             />
           ) : (
             <Timeline
@@ -417,14 +418,14 @@ export default function ProblemDetailPage(): JSX.Element {
     if (!problem) {
       return (
         <Card>
-          <Empty description="No problem loaded." />
+          <Empty description={i18nT("ui.teambuilder.problems.problemid.noProblemLoaded")} />
         </Card>
       );
     }
 
     const columns = [
       {
-        title: 'Session',
+        title: i18nT("ui.teambuilder.problems.problemid.session"),
         dataIndex: 'name',
         key: 'name',
         render: (value: string, record: IProblemSessionSummary) => (
@@ -434,26 +435,26 @@ export default function ProblemDetailPage(): JSX.Element {
         ),
       },
       {
-        title: 'Status',
+        title: i18nT("ui.teambuilder.problems.problemid.status"),
         dataIndex: 'status',
         key: 'status',
         render: (status: ProblemSessionStatus) => {
           switch (status) {
             case 'COMPLETED':
-              return <Badge status="success" text="Completed" />;
+              return <Badge status="success" text={i18nT("ui.teambuilder.problems.problemid.completed")} />;
             case 'PROCESSING':
-              return <Badge status="processing" text="Processing" />;
+              return <Badge status="processing" text={i18nT("ui.teambuilder.problems.problemid.processing")} />;
             case 'DRAFT':
-              return <Badge status="warning" text="Draft" />;
+              return <Badge status="warning" text={i18nT("ui.teambuilder.problems.problemid.draft")} />;
             case 'ARCHIVED':
-              return <Badge status="default" text="Archived" />;
+              return <Badge status="default" text={i18nT("ui.teambuilder.problems.problemid.archived")} />;
             default:
               return <Badge status="default" text={status} />;
           }
         },
       },
       {
-        title: 'Mode',
+        title: i18nT("ui.teambuilder.problems.problemid.mode"),
         dataIndex: 'mode',
         key: 'mode',
         render: (mode: string | undefined) =>
@@ -464,14 +465,14 @@ export default function ProblemDetailPage(): JSX.Element {
           ),
       },
       {
-        title: 'Created',
+        title: i18nT("ui.teambuilder.problems.problemid.created"),
         dataIndex: 'created_at',
         key: 'created_at',
         render: (value: string | undefined) =>
           value ? format(new Date(value), 'PPP p') : '—',
       },
       {
-        title: 'Outcome score',
+        title: i18nT("ui.teambuilder.problems.problemid.outcomeScore"),
         dataIndex: 'outcome_score',
         key: 'outcome_score',
         render: (score: number | undefined) =>
@@ -486,7 +487,7 @@ export default function ProblemDetailPage(): JSX.Element {
             icon={<ArrowRightOutlined />}
             href={`/teambuilder/${record.id}`}
           >
-            View
+            {i18nT("ui.teambuilder.problems.problemid.view")}
           </Button>
         ),
       },
@@ -499,10 +500,9 @@ export default function ProblemDetailPage(): JSX.Element {
             image={Empty.PRESENTED_IMAGE_SIMPLE}
             description={
               <Space direction="vertical" size={4}>
-                <Text strong>No sessions yet</Text>
+                <Text strong>{i18nT("ui.teambuilder.problems.problemid.noSessionsYet")}</Text>
                 <Text type="secondary">
-                  Use “Create session with this problem” to generate the first
-                  team configuration for this scenario.
+                  {i18nT("ui.teambuilder.problems.problemid.useCreateSessionWithThisProblemTo")}
                 </Text>
               </Space>
             }
@@ -514,7 +514,7 @@ export default function ProblemDetailPage(): JSX.Element {
                 problem.id,
               )}`}
             >
-              Create session
+              {i18nT("ui.teambuilder.problems.problemid.createSession")}
             </Button>
           </Empty>
         ) : (
@@ -533,53 +533,49 @@ export default function ProblemDetailPage(): JSX.Element {
     if (!problem) {
       return (
         <Card>
-          <Empty description="No problem loaded." />
+          <Empty description={i18nT("ui.teambuilder.problems.problemid.noProblemLoaded")} />
         </Card>
       );
     }
 
     return (
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        <Card title="UNESCO taxonomy & domains">
+        <Card title={i18nT("ui.teambuilder.problems.problemid.unescoTaxonomyDomains")}>
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             <Space direction="vertical">
-              <Text type="secondary">UNESCO codes</Text>
+              <Text type="secondary">{i18nT("ui.teambuilder.problems.problemid.unescoCodes")}</Text>
               {unescoTags.length > 0 ? (
                 <Space wrap>{unescoTags}</Space>
               ) : (
                 <Text type="secondary">
-                  No UNESCO classification set yet.
+                  {i18nT("ui.teambuilder.problems.problemid.noUnescoClassificationSetYet")}
                 </Text>
               )}
             </Space>
 
             <Space direction="vertical">
-              <Text type="secondary">Categories</Text>
+              <Text type="secondary">{i18nT("ui.teambuilder.problems.problemid.categories")}</Text>
               {categoryTags.length > 0 ? (
                 <Space wrap>{categoryTags}</Space>
               ) : (
                 <Text type="secondary">
-                  No additional categories defined.
+                  {i18nT("ui.teambuilder.problems.problemid.noAdditionalCategoriesDefined")}
                 </Text>
               )}
             </Space>
 
             <Paragraph type="secondary">
-              UNESCO taxonomy helps you classify problems according to fields of
-              science, education and societal challenges. This can be used to
-              route problems to the right experts and ensure coverage of
-              relevant disciplines in teams.
+              {i18nT("ui.teambuilder.problems.problemid.unescoTaxonomyHelpsYouClassifyProblemsAccording")}
             </Paragraph>
           </Space>
         </Card>
 
-        <Card title="Notes for facilitators">
+        <Card title={i18nT("ui.teambuilder.problems.problemid.notesForFacilitators")}>
           {problem.facilitator_notes ? (
             <Paragraph>{problem.facilitator_notes}</Paragraph>
           ) : (
             <Text type="secondary">
-              No specific notes provided yet. Use this space to add guidance on
-              how to present this problem to participants.
+              {i18nT("ui.teambuilder.problems.problemid.noSpecificNotesProvidedYetUseThis")}
             </Text>
           )}
         </Card>
@@ -603,7 +599,7 @@ export default function ProblemDetailPage(): JSX.Element {
             padding: '48px 0',
           }}
         >
-          <Typography.Text>Loading problem…</Typography.Text>
+          <Typography.Text>{i18nT("ui.teambuilder.problems.problemid.loadingProblem")}</Typography.Text>
         </Space>
       </Card>
     );
@@ -613,15 +609,15 @@ export default function ProblemDetailPage(): JSX.Element {
         <Alert
           type="error"
           showIcon
-          message="Unable to load this problem"
-          description={error ?? 'Problem not found.'}
+          message={i18nT("ui.teambuilder.problems.problemid.unableToLoadThisProblem")}
+          description={error ?? i18nT("ui.teambuilder.problems.problemid.problemNotFound")}
           action={
             <Button
               type="primary"
               href="/teambuilder/problems"
               icon={<ArrowLeftOutlined />}
             >
-              Back to problems
+              {i18nT("ui.teambuilder.problems.problemid.backToProblems")}
             </Button>
           }
         />
@@ -633,8 +629,8 @@ export default function ProblemDetailPage(): JSX.Element {
         {/* Breadcrumb / context */}
         <Breadcrumb
           items={[
-            { title: <Link href="/teambuilder">Team Builder</Link> },
-            { title: <Link href="/teambuilder/problems">Problems</Link> },
+            { title: <Link href="/teambuilder">{i18nT("ui.teambuilder.problems.problemid.teamBuilder")}</Link> },
+            { title: <Link href="/teambuilder/problems">{i18nT("ui.teambuilder.problems.problemid.problems")}</Link> },
             { title: problem.name },
           ]}
         />
@@ -646,17 +642,17 @@ export default function ProblemDetailPage(): JSX.Element {
             items={[
               {
                 key: 'overview',
-                label: 'Overview',
+                label: i18nT("ui.teambuilder.problems.problemid.overview"),
                 children: renderOverviewTab(),
               },
               {
                 key: 'sessions',
-                label: `Sessions (${usageCount})`,
+                label: i18nT("ui.teambuilder.problems.problemid.sessions", { usageCount: usageCount }),
                 children: renderSessionsTab(),
               },
               {
                 key: 'taxonomy',
-                label: 'Taxonomy',
+                label: i18nT("ui.teambuilder.problems.problemid.taxonomy"),
                 children: renderTaxonomyTab(),
               },
             ]}
@@ -671,7 +667,7 @@ export default function ProblemDetailPage(): JSX.Element {
       title={shellTitle}
       subtitle={shellSubtitle}
       metaTitle={metaTitle}
-      sectionLabel="Problems"
+      sectionLabel={i18nT("ui.teambuilder.problems.problemid.problems")}
       maxWidth={1200}
       primaryAction={primaryAction}
       secondaryActions={secondaryActions}

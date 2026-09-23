@@ -35,6 +35,7 @@ export interface KPIWithHistory extends Omit<KPI, 'history'> {
 }
 
 export interface LiveCounter {
+  key: string
   label: string
   value: number
   trend?: number
@@ -427,6 +428,7 @@ export async function fetchPulseLiveData(): Promise<PulseLivePayload> {
   const counters: LiveCounter[] = [
     withOptionalTrend(
       {
+        key: 'open',
         label: 'Open debates',
         value: openTopics.length,
         history: toPulseChartHistory(topicsSeries),
@@ -435,6 +437,7 @@ export async function fetchPulseLiveData(): Promise<PulseLivePayload> {
     ),
     withOptionalTrend(
       {
+        key: 'stances',
         label: 'New stances (7d)',
         value: sumSeries(stancesSeries),
         history: toPulseChartHistory(stancesSeries),
@@ -443,6 +446,7 @@ export async function fetchPulseLiveData(): Promise<PulseLivePayload> {
     ),
     withOptionalTrend(
       {
+        key: 'arguments',
         label: 'New arguments (7d)',
         value: sumSeries(argsSeries),
         history: toPulseChartHistory(argsSeries),

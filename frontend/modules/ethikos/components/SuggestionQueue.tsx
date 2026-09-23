@@ -1,6 +1,8 @@
 // FILE: frontend/modules/ethikos/components/SuggestionQueue.tsx
 'use client'
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   Alert,
   Button,
@@ -80,14 +82,13 @@ const STATUS_COLORS: Record<ArgumentSuggestionStatus, string> = {
   revision_requested: 'blue',
 }
 
-const STATUS_FILTER_OPTIONS: { label: string; value: SuggestionStatusFilter }[] =
-  [
-    { label: 'All statuses', value: 'all' },
-    { label: 'Pending', value: 'pending' },
-    { label: 'Accepted', value: 'accepted' },
-    { label: 'Rejected', value: 'rejected' },
-    { label: 'Revision requested', value: 'revision_requested' },
-  ]
+const STATUS_FILTER_OPTIONS = (i18nT: TranslateFunction): { label: string; value: SuggestionStatusFilter }[] => ([
+    { label: i18nT("ui.ethikos.suggestionqueue.allStatuses"), value: 'all' },
+    { label: i18nT("ui.ethikos.suggestionqueue.pending"), value: 'pending' },
+    { label: i18nT("ui.ethikos.suggestionqueue.accepted"), value: 'accepted' },
+    { label: i18nT("ui.ethikos.suggestionqueue.rejected"), value: 'rejected' },
+    { label: i18nT("ui.ethikos.suggestionqueue.revisionRequested"), value: 'revision_requested' },
+  ])
 
 const SIDE_LABELS: Record<ArgumentSide, string> = {
   pro: 'Pro',
@@ -111,16 +112,16 @@ function normalizeContent(value: unknown): string {
   return typeof value === 'string' ? value.trim() : ''
 }
 
-function displayAuthor(value: string | number | null | undefined): string {
+function displayAuthor(i18nT: TranslateFunction, value: string | number | null | undefined): string {
   if (value === null || value === undefined || value === '') {
-    return 'Anonymous'
+    return i18nT("ui.ethikos.suggestionqueue.anonymous")
   }
 
   return String(value)
 }
 
-function formatDate(value?: string | null): string {
-  if (!value) return 'Unknown date'
+function formatDate(i18nT: TranslateFunction, value?: string | null): string {
+  if (!value) return i18nT("ui.ethikos.suggestionqueue.unknownDate")
 
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) {
@@ -157,8 +158,9 @@ function SuggestionStatusTag({
 }
 
 function SuggestionSideTag({ side }: { side?: ArgumentSide | null }) {
+  const { t: i18nT } = useLanguage();
   if (!side) {
-    return <Tag>General</Tag>
+    return <Tag>{i18nT("ui.ethikos.suggestionqueue.general")}</Tag>
   }
 
   return <Tag color={SIDE_COLORS[side] ?? 'default'}>{SIDE_LABELS[side]}</Tag>
@@ -169,9 +171,9 @@ export default function SuggestionQueue({
   parentId,
   side = null,
   status = 'all',
-  title = 'Suggestion queue',
-  description = 'Propose a new argument or reply for review.',
-  emptyText = 'No suggestions yet.',
+  title: titleProp,
+  description: descriptionProp,
+  emptyText: emptyTextProp,
   submitLabel = 'Submit suggestion',
   showComposer = true,
   showStatusFilter = true,
@@ -182,6 +184,10 @@ export default function SuggestionQueue({
   onLoaded,
   onError,
 }: SuggestionQueueProps) {
+  const { t: i18nT } = useLanguage();
+  const title = titleProp ?? i18nT("ui.ethikos.suggestionqueue.suggestionQueue");
+  const description = descriptionProp ?? i18nT("ui.ethikos.suggestionqueue.proposeANewArgumentOrReplyFor");
+  const emptyText = emptyTextProp ?? i18nT("ui.ethikos.suggestionqueue.noSuggestionsYet");
   const [form] = Form.useForm<SuggestionFormValues>()
   const [suggestions, setSuggestions] = useState<ArgumentSuggestionApi[]>([])
   const [statusFilter, setStatusFilter] =
@@ -309,7 +315,7 @@ export default function SuggestionQueue({
         form.setFieldsValue({ side: side ?? 'none' })
 
         onSubmitted?.(created)
-        message.success('Suggestion submitted.')
+        message.success(i18nT("ui.ethikos.suggestionqueue.suggestionSubmitted"))
       } catch (err) {
         reportError('Unable to submit argument suggestion.', err)
       } finally {
@@ -322,7 +328,7 @@ export default function SuggestionQueue({
       normalizedTopicId,
       onSubmitted,
       reportError,
-      side,
+      side,, i18nT
     ],
   )
 
@@ -344,7 +350,7 @@ export default function SuggestionQueue({
       title={
         <Space size={8} wrap>
           <span>{title}</span>
-          {pendingCount > 0 && <Tag color="gold">{pendingCount} pending</Tag>}
+          {pendingCount > 0 && <Tag color="gold">{pendingCount} {i18nT("ui.ethikos.suggestionqueue.pending_e22586")}</Tag>}
         </Space>
       }
       extra={
@@ -354,7 +360,7 @@ export default function SuggestionQueue({
               size="small"
               value={statusFilter}
               style={{ minWidth: 180 }}
-              options={STATUS_FILTER_OPTIONS}
+              options={STATUS_FILTER_OPTIONS(i18nT)}
               disabled={loading || submitting}
               onChange={(value) =>
                 setStatusFilter(value as SuggestionStatusFilter)
@@ -369,7 +375,7 @@ export default function SuggestionQueue({
             }}
             disabled={loading || submitting || !normalizedTopicId}
           >
-            Refresh
+            {i18nT("ui.ethikos.suggestionqueue.refresh")}
           </Button>
         </Space>
       }
@@ -410,12 +416,12 @@ export default function SuggestionQueue({
         >
           <Form.Item
             name="content"
-            label="Suggestion"
+            label={i18nT("ui.ethikos.suggestionqueue.suggestion")}
             rules={[
               {
                 required: true,
                 whitespace: true,
-                message: 'Enter a suggestion before submitting.',
+                message: i18nT("ui.ethikos.suggestionqueue.enterASuggestionBeforeSubmitting"),
               },
             ]}
           >
@@ -423,21 +429,21 @@ export default function SuggestionQueue({
               rows={4}
               maxLength={2000}
               showCount
-              placeholder="Suggest a new argument, clarification, or reply."
+              placeholder={i18nT("ui.ethikos.suggestionqueue.suggestANewArgumentClarificationOrReply")}
             />
           </Form.Item>
 
           <Space align="end" wrap>
             <Form.Item
               name="side"
-              label="Side"
+              label={i18nT("ui.ethikos.suggestionqueue.side")}
               style={{ minWidth: 160, marginBottom: 0 }}
             >
               <Select
                 options={[
-                  { label: 'General', value: 'none' },
-                  { label: 'Pro', value: 'pro' },
-                  { label: 'Con', value: 'con' },
+                  { label: i18nT("ui.ethikos.suggestionqueue.general"), value: 'none' },
+                  { label: i18nT("ui.ethikos.suggestionqueue.pro"), value: 'pro' },
+                  { label: i18nT("ui.ethikos.suggestionqueue.con"), value: 'con' },
                 ]}
               />
             </Form.Item>
@@ -472,12 +478,12 @@ export default function SuggestionQueue({
                     <SuggestionSideTag side={item.side ?? null} />
 
                     {item.parent != null && (
-                      <Tag>Reply to #{String(item.parent)}</Tag>
+                      <Tag>{i18nT("ui.ethikos.suggestionqueue.replyTo")}{String(item.parent)}</Tag>
                     )}
 
                     {item.accepted_argument != null && (
                       <Tag color="green">
-                        Accepted as #{String(item.accepted_argument)}
+                        {i18nT("ui.ethikos.suggestionqueue.acceptedAs")}{String(item.accepted_argument)}
                       </Tag>
                     )}
                   </Space>
@@ -487,14 +493,14 @@ export default function SuggestionQueue({
                   </Paragraph>
 
                   <Text type="secondary">
-                    Suggested by {displayAuthor(item.created_by)} ·{' '}
-                    {formatDate(item.created_at)}
+                    {i18nT("ui.ethikos.suggestionqueue.suggestedBy")} {displayAuthor(i18nT, item.created_by)} ·{' '}
+                    {formatDate(i18nT, item.created_at)}
                     {item.reviewed_by ? (
                       <>
                         {' '}
-                        · Reviewed by {displayAuthor(item.reviewed_by)}
+                        {i18nT("ui.ethikos.suggestionqueue.reviewedBy")} {displayAuthor(i18nT, item.reviewed_by)}
                         {item.reviewed_at
-                          ? ` · ${formatDate(item.reviewed_at)}`
+                          ? i18nT("ui.ethikos.suggestionqueue.text", { value1: formatDate(i18nT, item.reviewed_at) })
                           : ''}
                       </>
                     ) : null}

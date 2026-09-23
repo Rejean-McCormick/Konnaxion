@@ -2,6 +2,9 @@
 // app/ethikos/impact/outcomes/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
+import { scopeLabel } from '@/i18n/uiModelLabels';
+import { impactChartTitle, impactKpiLabel } from '@/i18n/uiModelLabels';
 import { BarChartOutlined } from '@ant-design/icons';
 import { Bar, Line } from '@ant-design/plots';
 import {
@@ -30,6 +33,7 @@ type DecisionResultsData = Awaited<ReturnType<typeof fetchDecisionResults>>;
 type DecisionRow = DecisionResult & { key: string };
 
 export default function Outcomes(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const { data: outcomesData, loading: loadingOutcomes } =
     useRequest<OutcomesData, []>(fetchImpactOutcomes);
 
@@ -93,44 +97,44 @@ export default function Outcomes(): JSX.Element {
 
   const decisionsColumns: ProColumns<DecisionRow>[] = [
     {
-      title: 'Decision',
+      title: i18nT("ui.ethikos.impact.outcomes.decision"),
       dataIndex: 'title',
       key: 'title',
       ellipsis: true,
       width: 260,
     },
     {
-      title: 'Result',
+      title: i18nT("ui.ethikos.impact.outcomes.result"),
       dataIndex: 'passed',
       key: 'passed',
       width: 120,
       render: (_, row) => (
         <Tag color={row.passed ? 'green' : 'red'}>
-          {row.passed ? 'PASSED' : 'REJECTED'}
+          {row.passed ? i18nT("ui.ethikos.impact.outcomes.passed") : i18nT("ui.ethikos.impact.outcomes.rejected")}
         </Tag>
       ),
     },
     {
-      title: 'Scope',
+      title: i18nT("ui.ethikos.impact.outcomes.scope"),
       dataIndex: 'scope',
       key: 'scope',
       width: 120,
       render: (_, row) => (
         <Tag color={row.scope === 'Elite' ? 'geekblue' : 'default'}>
-          {row.scope}
+          {scopeLabel(i18nT, row.scope)}
         </Tag>
       ),
     },
     {
-      title: 'Region',
+      title: i18nT("ui.ethikos.impact.outcomes.region"),
       dataIndex: 'region',
       key: 'region',
       ellipsis: true,
       render: (_, row) =>
-        row.region ?? <Text type="secondary">Unspecified</Text>,
+        row.region ?? <Text type="secondary">{i18nT("ui.ethikos.impact.outcomes.unspecified")}</Text>,
     },
     {
-      title: 'Closed at',
+      title: i18nT("ui.ethikos.impact.outcomes.closedAt"),
       dataIndex: 'closesAt',
       key: 'closesAt',
       width: 180,
@@ -141,9 +145,9 @@ export default function Outcomes(): JSX.Element {
 
   return (
     <EthikosPageShell
-      title="Impact · Outcomes"
-      sectionLabel="Impact"
-      subtitle="Aggregated decision outcomes, agreement levels and regional distribution across Ethikos debates."
+      title={i18nT("ui.ethikos.impact.outcomes.impactOutcomes")}
+      sectionLabel={i18nT("ui.ethikos.impact.outcomes.impact")}
+      subtitle={i18nT("ui.ethikos.impact.outcomes.aggregatedDecisionOutcomesAgreementLevelsAndRegional")}
     >
       <PageContainer ghost loading={loading}>
         <ProCard gutter={[16, 16]} wrap>
@@ -152,7 +156,7 @@ export default function Outcomes(): JSX.Element {
             title={
               <Space>
                 <BarChartOutlined />
-                <span>Impact · Outcomes</span>
+                <span>{i18nT("ui.ethikos.impact.outcomes.impactOutcomes")}</span>
               </Space>
             }
           >
@@ -167,7 +171,7 @@ export default function Outcomes(): JSX.Element {
                     <StatisticCard
                       key={kpi.key}
                       statistic={{
-                        title: kpi.label,
+                        title: impactKpiLabel(i18nT, kpi.key, kpi.label),
                         value: kpi.value,
                         suffix: kpi.key === 'agreement' ? '%' : undefined,
                         description:
@@ -190,34 +194,34 @@ export default function Outcomes(): JSX.Element {
                 <Divider />
 
                 <Space direction="vertical" size={8}>
-                  <Text type="secondary">Highlights</Text>
+                  <Text type="secondary">{i18nT("ui.ethikos.impact.outcomes.highlights")}</Text>
                   <ul style={{ paddingLeft: 20, margin: 0 }}>
                     <li>
                       <Text>
                         <Text strong>
                           {kpis.find((k) => k.key === 'resolved')?.value ?? 0}
                         </Text>{' '}
-                        decisions resolved overall.
+                        {i18nT("ui.ethikos.impact.outcomes.decisionsResolvedOverall")}
                       </Text>
                     </li>
                     <li>
                       <Text>
-                        Average agreement is{' '}
+                        {i18nT("ui.ethikos.impact.outcomes.averageAgreementIs")}{' '}
                         <Text strong>
                           {kpis.find((k) => k.key === 'agreement')?.value ?? 0}
                           %
                         </Text>
-                        , combining stance direction and turnout.
+                        {i18nT("ui.ethikos.impact.outcomes.combiningStanceDirectionAndTurnout")}
                       </Text>
                     </li>
                     <li>
                       <Text>
-                        Participation volume is{' '}
+                        {i18nT("ui.ethikos.impact.outcomes.participationVolumeIs")}{' '}
                         <Text strong>
                           {kpis.find((k) => k.key === 'participation')?.value ??
                             0}
                         </Text>{' '}
-                        total stances across all debates.
+                        {i18nT("ui.ethikos.impact.outcomes.totalStancesAcrossAllDebates")}
                       </Text>
                     </li>
                   </ul>
@@ -226,7 +230,7 @@ export default function Outcomes(): JSX.Element {
             ) : (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="No outcome metrics available yet"
+                description={i18nT("ui.ethikos.impact.outcomes.noOutcomeMetricsAvailableYet")}
               />
             )}
           </ProCard>
@@ -236,7 +240,7 @@ export default function Outcomes(): JSX.Element {
             title={
               <Space>
                 <BarChartOutlined />
-                <span>Outcome distribution</span>
+                <span>{i18nT("ui.ethikos.impact.outcomes.outcomeDistribution")}</span>
               </Space>
             }
           >
@@ -244,7 +248,7 @@ export default function Outcomes(): JSX.Element {
               <Tabs
                 items={charts.map((c) => ({
                   key: c.key,
-                  label: c.title,
+                  label: impactChartTitle(i18nT, c.key, c.title),
                   children: (
                     <ProCard ghost>
                       {c.type === 'line' && <Line {...c.config} />}
@@ -256,39 +260,39 @@ export default function Outcomes(): JSX.Element {
             ) : (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="No outcome charts available yet"
+                description={i18nT("ui.ethikos.impact.outcomes.noOutcomeChartsAvailableYet")}
               />
             )}
           </ProCard>
 
           <ProCard
             colSpan={{ xs: 24, xl: 8 }}
-            title="Closed decisions · outcomes vs engagement"
+            title={i18nT("ui.ethikos.impact.outcomes.closedDecisionsOutcomesVsEngagement")}
             extra={
               <Text type="secondary">
                 {decisionRows.length
-                  ? `${decisionRows.length} closed decisions`
-                  : 'No closed decisions yet'}
+                  ? i18nT("ui.ethikos.impact.outcomes.closedDecisions", { length: decisionRows.length })
+                  : i18nT("ui.ethikos.impact.outcomes.noClosedDecisionsYet")}
               </Text>
             }
           >
             <ProCard split="horizontal" ghost>
-              <ProCard title="Outcomes by region">
+              <ProCard title={i18nT("ui.ethikos.impact.outcomes.outcomesByRegion")}>
                 {decisionOutcomeData.length === 0 ? (
                   <Empty
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description="No regional outcome data available"
+                    description={i18nT("ui.ethikos.impact.outcomes.noRegionalOutcomeDataAvailable")}
                   />
                 ) : (
                   <Bar {...decisionOutcomeConfig} />
                 )}
               </ProCard>
 
-              <ProCard title="Closed decisions">
+              <ProCard title={i18nT("ui.ethikos.impact.outcomes.closedDecisions_f7bb51")}>
                 {decisionRows.length === 0 ? (
                   <Empty
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description="No closed decisions yet"
+                    description={i18nT("ui.ethikos.impact.outcomes.noClosedDecisionsYet")}
                   />
                 ) : (
                   <ProTable<DecisionRow>

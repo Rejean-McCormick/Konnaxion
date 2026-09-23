@@ -1,6 +1,7 @@
 // FILE: frontend/modules/ethikos/trust/profile/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
 import { Avatar, Descriptions, Tag, Timeline, Typography } from 'antd';
@@ -11,7 +12,8 @@ import { fetchUserProfile, type ReputationProfile } from '@/services/trust';
 const { Text } = Typography;
 
 export default function MyProfile() {
-  usePageTitle('Trust · My Profile');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.ethikos.trust.profile.trustMyProfile"));
 
   // ahooks generics: <Data, Params>
   const { data, loading } = useRequest<ReputationProfile, []>(fetchUserProfile);
@@ -31,15 +33,15 @@ export default function MyProfile() {
           <Avatar size={120}>{initial}</Avatar>
 
           <Descriptions size="small" column={1} style={{ marginTop: 16 }}>
-            <Descriptions.Item label="Level">
+            <Descriptions.Item label={i18nT("ui.ethikos.trust.profile.level")}>
               <Tag color="blue">{level}</Tag>
             </Descriptions.Item>
 
-            <Descriptions.Item label="Reputation score">
+            <Descriptions.Item label={i18nT("ui.ethikos.trust.profile.reputationScore")}>
               <Text>{score}</Text>
             </Descriptions.Item>
 
-            <Descriptions.Item label="Dimensions">
+            <Descriptions.Item label={i18nT("ui.ethikos.trust.profile.dimensions")}>
               {dimensions.length ? (
                 dimensions.map((d) => (
                   <Tag key={d.key} style={{ marginBottom: 4 }}>
@@ -47,14 +49,14 @@ export default function MyProfile() {
                   </Tag>
                 ))
               ) : (
-                <Text type="secondary">No reputation data yet</Text>
+                <Text type="secondary">{i18nT("ui.ethikos.trust.profile.noReputationDataYet")}</Text>
               )}
             </Descriptions.Item>
           </Descriptions>
         </ProCard>
 
         {/* Right column: recent activity derived from `recent` */}
-        <ProCard title="Recent Activity" ghost>
+        <ProCard title={i18nT("ui.ethikos.trust.profile.recentActivity")} ghost>
           {recent.length ? (
             <Timeline
               items={recent.map((item) => ({
@@ -68,7 +70,7 @@ export default function MyProfile() {
               }))}
             />
           ) : (
-            <Text type="secondary">No recent activity</Text>
+            <Text type="secondary">{i18nT("ui.ethikos.trust.profile.noRecentActivity")}</Text>
           )}
         </ProCard>
       </ProCard>

@@ -1,4 +1,7 @@
+'use client';
+
 // frontend/components/teambuilder/CandidateSelector.tsx
+import { useLanguage } from '@/context/LanguageContext';
 import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
 
@@ -15,6 +18,7 @@ export const CandidateSelector: React.FC<CandidateSelectorProps> = ({
   selectedIds,
   onChange,
 }) => {
+  const { t: i18nT } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
 
   // ---------------------------------------------------------------------------
@@ -61,16 +65,16 @@ export const CandidateSelector: React.FC<CandidateSelectorProps> = ({
     <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
         <h3 className="text-lg font-semibold text-gray-800">
-          Select Candidates
+          {i18nT("ui.teambuilder.candidateselector.selectCandidates")}
           <span className="ml-2 text-sm font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-            {selectedIds.length} selected
+            {selectedIds.length} {i18nT("ui.teambuilder.candidateselector.selected")}
           </span>
         </h3>
 
         <div className="w-full md:w-auto flex gap-2">
           <input
             type="text"
-            placeholder="Search users..."
+            placeholder={i18nT("ui.teambuilder.candidateselector.searchUsers")}
             className="border border-gray-300 rounded px-3 py-2 text-sm w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -83,21 +87,21 @@ export const CandidateSelector: React.FC<CandidateSelectorProps> = ({
           onClick={selectAllFiltered}
           className="text-indigo-600 hover:text-indigo-800 font-medium"
         >
-          Select All Visible
+          {i18nT("ui.teambuilder.candidateselector.selectAllVisible")}
         </button>
         <span className="text-gray-300">|</span>
         <button
           onClick={deselectAllFiltered}
           className="text-gray-500 hover:text-gray-700"
         >
-          Deselect All
+          {i18nT("ui.teambuilder.candidateselector.deselectAll")}
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto pr-2">
         {filteredCandidates.length === 0 ? (
           <div className="col-span-full text-center py-8 text-gray-500">
-            No candidates found.
+            {i18nT("ui.teambuilder.candidateselector.noCandidatesFound")}
           </div>
         ) : (
           filteredCandidates.map((user) => {

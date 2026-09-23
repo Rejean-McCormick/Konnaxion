@@ -1,6 +1,7 @@
 // FILE: frontend/app/teambuilder/layout.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Layout } from 'antd';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { type ReactNode, Suspense, useEffect } from 'react';
@@ -62,6 +63,7 @@ function TeamBuilderShell({ children }: SegmentLayoutProps) {
  * - Provides an Ant Design–based Suspense fallback while children load.
  */
 export default function SegmentLayout({ children }: SegmentLayoutProps) {
+  const { t: i18nT } = useLanguage();
   return (
     <Suspense
       fallback={
@@ -74,7 +76,7 @@ export default function SegmentLayout({ children }: SegmentLayoutProps) {
               justifyContent: 'center',
             }}
           >
-            <Loading fullscreen message="Loading Team Builder…" />
+            <Loading fullscreen message={i18nT("ui.teambuilder.layout.loadingTeamBuilder")} />
           </Content>
         </Layout>
       }

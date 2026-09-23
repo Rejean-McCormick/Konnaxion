@@ -1,6 +1,9 @@
 // FILE: frontend/app/ethikos/pulse/overview/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
+import { pulseKpiLabel } from '@/i18n/uiModelLabels';
 import {
   BarChartOutlined,
   ClockCircleOutlined,
@@ -42,27 +45,27 @@ type KpiMeta = {
   color: string;
 };
 
-const KPI_DEFINITIONS: Record<string, KpiMeta> = {
+const KPI_DEFINITIONS = (i18nT: TranslateFunction): Record<string, KpiMeta> => ({
   topics: {
-    description: 'New debate topics created across Ethikos over the last 30 days.',
+    description: i18nT("ui.ethikos.pulse.overview.newDebateTopicsCreatedAcrossEthikosOver"),
     color: 'blue',
   },
   stances: {
     description:
-      'Individual stance submissions linked to debates in the last 30 days.',
+      i18nT("ui.ethikos.pulse.overview.individualStanceSubmissionsLinkedToDebatesIn"),
     color: 'green',
   },
   arguments: {
     description:
-      'Arguments, comments, and replies added to debates over the last 30 days.',
+      i18nT("ui.ethikos.pulse.overview.argumentsCommentsAndRepliesAddedToDebates"),
     color: 'purple',
   },
   votes: {
     description:
-      'Weighted votes cast across topics and outcomes in the last 30 days.',
+      i18nT("ui.ethikos.pulse.overview.weightedVotesCastAcrossTopicsAndOutcomes"),
     color: 'volcano',
   },
-};
+});
 
 function usePulseOverview() {
   return useRequest<OverviewData, []>(fetchPulseOverview, {
@@ -89,6 +92,7 @@ function renderDelta(delta?: number): ReactNode {
 }
 
 export default function PulseOverview() {
+  const { t: i18nT } = useLanguage();
   const { data, loading, error, refresh } = usePulseOverview();
   const lastUpdated = data?.refreshedAt
     ? dayjs(data.refreshedAt).format('HH:mm:ss')
@@ -99,14 +103,14 @@ export default function PulseOverview() {
       {lastUpdated && (
         <Badge
           count={
-            <Tooltip title={`Last refreshed at ${lastUpdated}`}>
+            <Tooltip title={i18nT("ui.ethikos.pulse.overview.lastRefreshedAt", { lastUpdated: lastUpdated })}>
               <ClockCircleOutlined style={{ color: '#52c41a' }} />
             </Tooltip>
           }
         />
       )}
       <Button
-        aria-label="Refresh pulse overview"
+        aria-label={i18nT("ui.ethikos.pulse.overview.refreshPulseOverview")}
         disabled={loading}
         icon={<SyncOutlined spin={loading} />}
         onClick={() => void refresh()}
@@ -128,11 +132,11 @@ export default function PulseOverview() {
     body = (
       <PageContainer ghost>
         <Empty
-          description="Failed to load metrics"
+          description={i18nT("ui.ethikos.pulse.overview.failedToLoadMetrics")}
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         >
           <Button icon={<SyncOutlined />} onClick={() => void refresh()}>
-            Retry
+            {i18nT("ui.ethikos.pulse.overview.retry")}
           </Button>
         </Empty>
       </PageContainer>
@@ -140,15 +144,15 @@ export default function PulseOverview() {
   } else if (data && data.kpis.length === 0) {
     body = (
       <PageContainer ghost>
-        <Empty description="No KPI data yet" />
+        <Empty description={i18nT("ui.ethikos.pulse.overview.noKpiDataYet")} />
       </PageContainer>
     );
   } else if (data) {
     body = (
       <PageContainer ghost>
         <Alert
-          description="Debates, stances, arguments, and votes aggregated daily across all Ethikos topics. Use this view as a quick pulse before drilling into trends or live participation."
-          message="Aggregated participation metrics (last 30 days)"
+          description={i18nT("ui.ethikos.pulse.overview.debatesStancesArgumentsAndVotesAggregatedDaily")}
+          message={i18nT("ui.ethikos.pulse.overview.aggregatedParticipationMetricsLast30Days")}
           showIcon
           style={{ marginBottom: 16 }}
           type="info"
@@ -167,7 +171,7 @@ export default function PulseOverview() {
                     lg: 6,
                   }}
                   statistic={{
-                    title: kpi.label,
+                    title: pulseKpiLabel(i18nT, kpi.key, kpi.label),
                     value: kpi.value,
                     suffix: kpi.delta !== undefined ? '%' : undefined,
                     description: renderDelta(kpi.delta),
@@ -196,15 +200,15 @@ export default function PulseOverview() {
             title={
               <Space>
                 <InfoCircleOutlined />
-                <span>How to read these KPIs</span>
+                <span>{i18nT("ui.ethikos.pulse.overview.howToReadTheseKpis")}</span>
               </Space>
             }
           >
             <List
               dataSource={data.kpis}
               renderItem={(kpi) => {
-                const meta = KPI_DEFINITIONS[kpi.key] ?? {
-                  description: 'Activity metric in the Ethikos opinion layer.',
+                const meta = KPI_DEFINITIONS(i18nT)[kpi.key] ?? {
+                  description: i18nT("ui.ethikos.pulse.overview.activityMetricInTheEthikosOpinionLayer"),
                   color: 'default',
                 };
 
@@ -213,10 +217,10 @@ export default function PulseOverview() {
                     <List.Item.Meta
                       title={
                         <Space size="small">
-                          <Tag color={meta.color}>{kpi.label}</Tag>
+                          <Tag color={meta.color}>{pulseKpiLabel(i18nT, kpi.key, kpi.label)}</Tag>
                           {typeof kpi.delta === 'number' && (
                             <Text type={kpi.delta >= 0 ? 'success' : 'danger'}>
-                              {kpi.delta >= 0 ? `+${kpi.delta}%` : `${kpi.delta}%`}
+                              {kpi.delta >= 0 ? i18nT("ui.ethikos.pulse.overview.text", { delta: kpi.delta }) : i18nT("ui.ethikos.pulse.overview.text_86f229", { delta: kpi.delta })}
                             </Text>
                           )}
                         </Space>
@@ -237,16 +241,16 @@ export default function PulseOverview() {
           title={
             <Space>
               <LineChartOutlined />
-              <span>Where to go next</span>
+              <span>{i18nT("ui.ethikos.pulse.overview.whereToGoNext")}</span>
             </Space>
           }
         >
           <Space wrap>
-            <Button href="/ethikos/pulse/live">Live participation</Button>
-            <Button href="/ethikos/pulse/trends">Opinion trends</Button>
-            <Button href="/ethikos/pulse/health">Participation health</Button>
+            <Button href="/ethikos/pulse/live">{i18nT("ui.ethikos.pulse.overview.liveParticipation")}</Button>
+            <Button href="/ethikos/pulse/trends">{i18nT("ui.ethikos.pulse.overview.opinionTrends")}</Button>
+            <Button href="/ethikos/pulse/health">{i18nT("ui.ethikos.pulse.overview.participationHealth")}</Button>
             <Button href="/ethikos/insights" icon={<BarChartOutlined />}>
-              Full analytics
+              {i18nT("ui.ethikos.pulse.overview.fullAnalytics")}
             </Button>
           </Space>
         </ProCard>
@@ -255,22 +259,22 @@ export default function PulseOverview() {
   } else {
     body = (
       <PageContainer ghost>
-        <Empty description="No data available" />
+        <Empty description={i18nT("ui.ethikos.pulse.overview.noDataAvailable")} />
       </PageContainer>
     );
   }
 
   return (
     <EthikosPageShell
-      title="Pulse · Overview"
-      subtitle="30-day snapshot of debates, stances, arguments, and votes across Ethikos."
+      title={i18nT("ui.ethikos.pulse.overview.pulseOverview")}
+      subtitle={i18nT("ui.ethikos.pulse.overview.text30DaySnapshotOfDebatesStancesArguments")}
       primaryAction={
         <Button
           type="primary"
           href="/ethikos/insights"
           icon={<BarChartOutlined />}
         >
-          Open opinion analytics
+          {i18nT("ui.ethikos.pulse.overview.openOpinionAnalytics")}
         </Button>
       }
       secondaryActions={secondaryActions}

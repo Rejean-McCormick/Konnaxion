@@ -2,6 +2,7 @@
 // app/konnected/teams-collaboration/project-workspaces/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ArrowRightOutlined,
   DownOutlined,
@@ -167,6 +168,7 @@ function buildWorkspaceRow(
 }
 
 export default function KonnectedProjectWorkspacesPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
 
   const [messageApi, contextHolder] = antdMessage.useMessage();
@@ -216,7 +218,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
          
         console.error('Failed to load project workspaces', error);
         messageApi.error(
-          'Unable to load project workspaces. Please try again later.',
+          i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.unableToLoadProjectWorkspacesPleaseTry"),
         );
       } finally {
         if (isMounted) {
@@ -230,7 +232,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
     return () => {
       isMounted = false;
     };
-  }, [messageApi]);
+  }, [messageApi, i18nT]);
 
   // --- Derived filters & stats -----------------------------------------------
 
@@ -314,7 +316,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
 
   const goToWorkspace = (row: ProjectWorkspaceRow) => {
     if (row.canEnter === false) {
-      messageApi.warning('You do not have permission to enter this workspace.');
+      messageApi.warning(i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.youDoNotHavePermissionToEnter"));
       return;
     }
 
@@ -329,7 +331,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
 
   const handleArchiveWorkspace = (row: ProjectWorkspaceRow) => {
     if (!row.canArchive) {
-      messageApi.warning('You do not have permission to archive this workspace.');
+      messageApi.warning(i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.youDoNotHavePermissionToArchive"));
       return;
     }
     // TODO: plug to a real archive endpoint when implemented (e.g. PATCH /projects/{id}/archive/)
@@ -342,7 +344,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
 
   const columns: ColumnsType<ProjectWorkspaceRow> = [
     {
-      title: 'Project Workspace',
+      title: i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.projectWorkspace"),
       dataIndex: 'projectTitle',
       key: 'projectTitle',
       width: 280,
@@ -353,13 +355,13 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
             <Text strong>{value}</Text>
           </Space>
           <Text type="secondary" style={{ fontSize: 12 }}>
-            Project ID: {row.projectId}
+            {i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.projectId")} {row.projectId}
           </Text>
         </Space>
       ),
     },
     {
-      title: 'Team',
+      title: i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.team"),
       dataIndex: 'teamName',
       key: 'teamName',
       width: 200,
@@ -373,63 +375,85 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
               <Text>{name}</Text>
             </Space>
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Team ID: {idLabel}
+              {i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.teamId")} {idLabel}
             </Text>
           </Space>
         );
       },
     },
     {
-      title: 'Status',
+      title: i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.status"),
       dataIndex: 'status',
       key: 'status',
       width: 120,
-      render: (status: string) => (
-        <Tag color={getStatusTagColor(status)}>{status}</Tag>
-      ),
+      render: (status: string) => {
+        const statusLabel =
+          status === 'Planning'
+            ? i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.planning")
+            : status === 'Active'
+              ? i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.active")
+              : status === 'Completed'
+                ? i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.completed")
+                : status === 'Archived'
+                  ? i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.archived")
+                  : status;
+        return <Tag color={getStatusTagColor(status)}>{statusLabel}</Tag>;
+      },
     },
     {
-      title: 'Your role',
+      title: i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.yourRole"),
       dataIndex: 'userRole',
       key: 'userRole',
       width: 140,
-      render: (role: string) => <Tag>{role || 'Member'}</Tag>,
+      render: (role: string) => {
+        const roleLabel =
+          role === 'Owner'
+            ? i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.owner")
+            : role === 'Member'
+              ? i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.member")
+              : role;
+        return (
+          <Tag>
+            {roleLabel || i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.member")}
+          </Tag>
+        );
+      },
     },
     {
-      title: 'Members',
+      title: i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.members"),
       key: 'members',
       width: 130,
       render: (_: unknown, row) => {
         const totalMembers = row.totalMembers ?? 0;
         const onlineMembers = row.onlineMembers ?? 0;
         return (
-          <Tooltip title="Online / total members in this workspace">
+          <Tooltip title={i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.onlineTotalMembersInThisWorkspace")}>
             <Text>
-              {onlineMembers}/{totalMembers} online
+              {onlineMembers}/{totalMembers} {i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.online")}
             </Text>
           </Tooltip>
         );
       },
     },
     {
-      title: 'Linked learning',
+      title: i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.linkedLearning"),
       key: 'linked',
       width: 180,
       render: (_: unknown, row) => (
         <Space direction="vertical" size={2}>
           <Text style={{ fontSize: 12 }}>
-            Knowledge items:{' '}
+            {i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.knowledgeItems")}{' '}
             <Text strong>{row.linkedKnowledgeCount ?? 0}</Text>
           </Text>
           <Text style={{ fontSize: 12 }}>
-            Certifications:{' '}
+            {i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.certifications")}{' '}
             <Text strong>{row.linkedCertificationsCount ?? 0}</Text>
           </Text>
         </Space>
       ),
     },
     {
-      title: 'Last activity',
+      title: i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.lastActivity"),
       dataIndex: 'lastActivityAt',
       key: 'lastActivityAt',
       width: 160,
@@ -438,7 +462,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
       ),
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.actions"),
       key: 'actions',
       fixed: 'right',
       width: 210,
@@ -446,24 +470,24 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
         const primaryDisabled = row.canEnter === false;
         const primaryLabel =
           row.isWorkspaceLaunched && !primaryDisabled
-            ? 'Open workspace'
+            ? i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.openWorkspace")
             : row.isWorkspaceLaunched && primaryDisabled
-              ? 'View only'
-              : 'Launch workspace';
+              ? i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.viewOnly")
+              : i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.launchWorkspace");
 
         const items: MenuProps['items'] = [
           {
             key: 'view-team',
-            label: 'View team',
+            label: i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.viewTeam"),
             onClick: () => goToTeam(row),
           },
           {
             key: 'archive',
             disabled: !row.canArchive,
             label: row.canArchive ? (
-              <span>Archive workspace</span>
+              <span>{i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.archiveWorkspace")}</span>
             ) : (
-              <span style={{ opacity: 0.65 }}>Archive (no permission)</span>
+              <span style={{ opacity: 0.65 }}>{i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.archiveNoPermission")}</span>
             ),
             onClick: () => handleArchiveWorkspace(row),
           },
@@ -487,7 +511,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
               placement="bottomRight"
             >
               <Button size="small" icon={<DownOutlined />}>
-                More
+                {i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.more")}
               </Button>
             </Dropdown>
           </Space>
@@ -502,11 +526,10 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
 
   return (
     <KonnectedPageShell
-      title="Project Workspaces"
+      title={i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.projectWorkspaces")}
       subtitle={
         <span>
-          Bridge your keenKonnect project workspaces with KonnectED learning
-          activities for each team.
+          {i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.bridgeYourKeenkonnectProjectWorkspacesWithKonnected")}
         </span>
       }
       primaryAction={
@@ -516,7 +539,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
             router.push('/keenkonnect/projects/create-new-project')
           }
         >
-          Start a new project
+          {i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.startANewProject")}
         </Button>
       }
       secondaryActions={
@@ -525,7 +548,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
             router.push('/konnected/teams-collaboration/my-teams')
           }
         >
-          Manage teams
+          {i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.manageTeams")}
         </Button>
       }
     >
@@ -536,7 +559,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
         <Col xs={24} sm={8}>
           <Card>
             <Statistic
-              title="Total project workspaces"
+              title={i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.totalProjectWorkspaces")}
               value={total}
               suffix="linked"
             />
@@ -545,7 +568,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
         <Col xs={24} sm={8}>
           <Card>
             <Statistic
-              title="Active workspaces"
+              title={i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.activeWorkspaces")}
               value={totalActive}
               valueStyle={{ color: '#52c41a' }}
             />
@@ -553,7 +576,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
         </Col>
         <Col xs={24} sm={8}>
           <Card>
-            <Statistic title="Workspaces you own" value={totalOwned} />
+            <Statistic title={i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.workspacesYouOwn")} value={totalOwned} />
           </Card>
         </Col>
       </Row>
@@ -563,7 +586,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
         <Row gutter={[16, 16]} align="middle">
           <Col xs={24} md={10}>
             <Search
-              placeholder="Search by project or team"
+              placeholder={i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.searchByProjectOrTeam")}
               allowClear
               onSearch={(value) => setSearchText(value)}
               onChange={(e) => setSearchText(e.target.value)}
@@ -572,39 +595,39 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
 
           <Col xs={24} sm={8} md={4}>
             <Text type="secondary" style={{ display: 'block', marginBottom: 4 }}>
-              Status
+              {i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.status")}
             </Text>
             <Select<StatusFilterValue>
               value={statusFilter}
               onChange={(value) => setStatusFilter(value)}
               style={{ width: '100%' }}
             >
-              <Option value="all">All statuses</Option>
-              <Option value="active">Active</Option>
-              <Option value="planning">Planning</Option>
-              <Option value="completed">Completed</Option>
-              <Option value="archived">Archived</Option>
+              <Option value="all">{i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.allStatuses")}</Option>
+              <Option value="active">{i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.active")}</Option>
+              <Option value="planning">{i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.planning")}</Option>
+              <Option value="completed">{i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.completed")}</Option>
+              <Option value="archived">{i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.archived")}</Option>
             </Select>
           </Col>
 
           <Col xs={24} sm={8} md={4}>
             <Text type="secondary" style={{ display: 'block', marginBottom: 4 }}>
-              Ownership
+              {i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.ownership")}
             </Text>
             <Select<OwnershipFilterValue>
               value={ownershipFilter}
               onChange={(value) => setOwnershipFilter(value)}
               style={{ width: '100%' }}
             >
-              <Option value="all">All memberships</Option>
-              <Option value="owner">Owned by me</Option>
-              <Option value="member">Where I collaborate</Option>
+              <Option value="all">{i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.allMemberships")}</Option>
+              <Option value="owner">{i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.ownedByMe")}</Option>
+              <Option value="member">{i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.whereICollaborate")}</Option>
             </Select>
           </Col>
 
           <Col xs={24} sm={8} md={6}>
             <Text type="secondary" style={{ display: 'block', marginBottom: 4 }}>
-              Team
+              {i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.team")}
             </Text>
             <Select<string | 'all'>
               value={teamFilter}
@@ -612,7 +635,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
               style={{ width: '100%' }}
               allowClear={false}
             >
-              <Option value="all">All teams</Option>
+              <Option value="all">{i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.allTeams")}</Option>
               {teamOptions.map((team) => (
                 <Option key={team} value={team}>
                   {team}
@@ -643,9 +666,9 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
             }}
             locale={{
               emptyText: hasData ? (
-                <Empty description="No workspaces match the current filters." />
+                <Empty description={i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.noWorkspacesMatchTheCurrentFilters")} />
               ) : (
-                <Empty description="No project workspaces linked to your teams yet." />
+                <Empty description={i18nT("ui.konnected.teamsCollaboration.projectWorkspaces.noProjectWorkspacesLinkedToYourTeams")} />
               ),
             }}
           />

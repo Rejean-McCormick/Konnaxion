@@ -1,6 +1,7 @@
 // FILE: frontend/app/keenkonnect/knowledge/search-filter-documents/page.tsx
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import type { ProColumns } from '@ant-design/pro-components'
 import {
   ProFormDateRangePicker,
@@ -106,6 +107,7 @@ const allLanguages = Array.from(new Set(PREVIEW_DOCUMENTS.map((d) => d.language)
 const DEFAULT_SORT: SortOption = 'relevance'
 
 export default function SearchFilterDocumentsPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [filters, setFilters] = useState<FilterState>({
     sort: DEFAULT_SORT,
   })
@@ -235,7 +237,7 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
 
   const columns: ProColumns<DocumentResource>[] = [
     {
-      title: 'Title & Snippet',
+      title: i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.titleSnippet"),
       dataIndex: 'title',
       key: 'title',
       ellipsis: true,
@@ -255,13 +257,13 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
       ),
     },
     {
-      title: 'Author',
+      title: i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.author"),
       dataIndex: 'author',
       key: 'author',
       width: 140,
     },
     {
-      title: 'Tags',
+      title: i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.tags"),
       dataIndex: 'tags',
       key: 'tags',
       width: 220,
@@ -274,25 +276,25 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
       ),
     },
     {
-      title: 'Language',
+      title: i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.language"),
       dataIndex: 'language',
       key: 'language',
       width: 110,
     },
     {
-      title: 'Version',
+      title: i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.version"),
       dataIndex: 'version',
       key: 'version',
       width: 90,
     },
     {
-      title: 'Last Updated',
+      title: i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.lastUpdated"),
       dataIndex: 'lastUpdated',
       key: 'lastUpdated',
       width: 140,
     },
     {
-      title: 'Relevance',
+      title: i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.relevance"),
       dataIndex: 'relevanceScore',
       key: 'relevanceScore',
       width: 120,
@@ -307,9 +309,11 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
     showSizeChanger: true,
     pageSizeOptions: ['5', '10', '20'],
     showTotal: (totalItems, range) =>
-      `${range[0]}-${range[1]} of ${totalItems} document${
-        totalItems > 1 ? 's' : ''
-      }`,
+      i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.resultsRange", {
+        start: range[0],
+        end: range[1],
+        count: totalItems,
+      }),
     onChange: (page, size) => {
       setCurrentPage(page)
       setPageSize(size || pageSize)
@@ -322,8 +326,8 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
 
   return (
     <KeenPage
-      title="Search & Filter Documents"
-      description="Advanced search and filtering for knowledge documents in KeenKonnect."
+      title={i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.searchFilterDocuments")}
+      description={i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.advancedSearchAndFilteringForKnowledgeDocuments")}
     >
       {/* Advanced filters (QueryFilter) */}
       <Card className="mb-4">
@@ -337,14 +341,14 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
         >
           <ProFormText
             name="keyword"
-            label="Keywords"
-            placeholder="Search by title or content"
+            label={i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.keywords")}
+            placeholder={i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.searchByTitleOrContent")}
           />
 
           <ProFormSelect
             name="authors"
-            label="Authors"
-            placeholder="Select authors"
+            label={i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.authors")}
+            placeholder={i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.selectAuthors")}
             mode="multiple"
             options={allAuthors.map((a) => ({
               label: a,
@@ -354,8 +358,8 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
 
           <ProFormSelect
             name="tags"
-            label="Tags"
-            placeholder="Select tags"
+            label={i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.tags")}
+            placeholder={i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.selectTags")}
             mode="multiple"
             options={allTags.map((t) => ({
               label: t,
@@ -365,8 +369,8 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
 
           <ProFormSelect
             name="language"
-            label="Language"
-            placeholder="All languages"
+            label={i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.language")}
+            placeholder={i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.allLanguages")}
             allowClear
             options={allLanguages.map((lang) => ({
               label: lang,
@@ -376,17 +380,17 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
 
           <ProFormDateRangePicker
             name="dateRange"
-            label="Last Updated"
+            label={i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.lastUpdated")}
             placeholder={['From', 'To']}
           />
 
           <ProFormSelect
             name="sort"
-            label="Sort By"
+            label={i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.sortBy")}
             options={[
-              { label: 'Relevance', value: 'relevance' },
-              { label: 'Date', value: 'date' },
-              { label: 'Popularity', value: 'popularity' },
+              { label: i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.relevance"), value: 'relevance' },
+              { label: i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.date"), value: 'date' },
+              { label: i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.popularity"), value: 'popularity' },
             ]}
           />
         </QueryFilter>
@@ -399,16 +403,16 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
         className="mb-4"
         message={
           total === 0
-            ? 'No documents match your criteria.'
-            : `${total} document${total > 1 ? 's' : ''} match your criteria.`
+            ? i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.noDocumentsMatchYourCriteria")
+            : i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.documentMatchYourCriteria", { total: total, value1: total > 1 ? 's' : '' })
         }
         description={
           <div style={{ fontSize: 12 }}>
             <div>
-              Sort: <strong>{sortLabel}</strong>
+              {i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.sort")} <strong>{sortLabel}</strong>
             </div>
             <div>
-              Active filters: <strong>{activeFilterCount}</strong>
+              {i18nT("ui.keenkonnect.knowledge.searchFilterDocuments.activeFilters")} <strong>{activeFilterCount}</strong>
             </div>
           </div>
         }

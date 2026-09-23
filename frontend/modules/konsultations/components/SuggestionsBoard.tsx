@@ -2,6 +2,8 @@
 ﻿// modules/konsultations/components/SuggestionsBoard.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ClockCircleOutlined,
   CommentOutlined,
@@ -83,19 +85,19 @@ const STATUS_COLORS: Record<SuggestionStatus, string> = {
   rejected: 'error',
 };
 
-const DEFAULT_STATUS_FILTER_OPTIONS: { label: string; value: StatusFilter }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'new', label: 'New' },
-  { value: 'under-review', label: 'Under review' },
-  { value: 'accepted', label: 'Accepted' },
-  { value: 'rejected', label: 'Rejected' },
-];
+const DEFAULT_STATUS_FILTER_OPTIONS = (i18nT: TranslateFunction): { label: string; value: StatusFilter }[] => ([
+  { value: 'all', label: i18nT("ui.konsultations.suggestionsboard.all") },
+  { value: 'new', label: i18nT("ui.konsultations.suggestionsboard.new") },
+  { value: 'under-review', label: i18nT("ui.konsultations.suggestionsboard.underReview") },
+  { value: 'accepted', label: i18nT("ui.konsultations.suggestionsboard.accepted") },
+  { value: 'rejected', label: i18nT("ui.konsultations.suggestionsboard.rejected") },
+]);
 
-const SORT_OPTIONS: { value: SuggestionsSortKey; label: string }[] = [
-  { value: 'most-supported', label: 'Most supported' },
-  { value: 'newest', label: 'Newest first' },
-  { value: 'oldest', label: 'Oldest first' },
-];
+const SORT_OPTIONS = (i18nT: TranslateFunction): { value: SuggestionsSortKey; label: string }[] => ([
+  { value: 'most-supported', label: i18nT("ui.konsultations.suggestionsboard.mostSupported") },
+  { value: 'newest', label: i18nT("ui.konsultations.suggestionsboard.newestFirst") },
+  { value: 'oldest', label: i18nT("ui.konsultations.suggestionsboard.oldestFirst") },
+]);
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
@@ -110,6 +112,7 @@ export default function SuggestionsBoard({
   onVote,
   onOpenSuggestion,
 }: SuggestionsBoardProps): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(defaultStatusFilter);
   const [sortKey, setSortKey] = useState<SuggestionsSortKey>(defaultSort);
 
@@ -148,7 +151,7 @@ export default function SuggestionsBoard({
 
   return (
     <Card
-      title="Suggestions"
+      title={i18nT("ui.konsultations.suggestionsboard.suggestions")}
       loading={loading && !hasData}
       extra={
         <Space size="middle" wrap>
@@ -156,14 +159,14 @@ export default function SuggestionsBoard({
             size="small"
             value={statusFilter}
             onChange={(val) => setStatusFilter(val as StatusFilter)}
-            options={DEFAULT_STATUS_FILTER_OPTIONS}
+            options={DEFAULT_STATUS_FILTER_OPTIONS(i18nT)}
           />
           <Select<SuggestionsSortKey>
             size="small"
             style={{ minWidth: 160 }}
             value={sortKey}
             onChange={(val) => setSortKey(val)}
-            options={SORT_OPTIONS}
+            options={SORT_OPTIONS(i18nT)}
           />
         </Space>
       }
@@ -215,11 +218,11 @@ export default function SuggestionsBoard({
                     <Text type="secondary">
                       <ClockCircleOutlined /> {created.format('YYYY-MM-DD HH:mm')}
                     </Text>
-                    <Text type="secondary">By {item.author}</Text>
+                    <Text type="secondary">{i18nT("ui.konsultations.suggestionsboard.by")} {item.author}</Text>
                   </Space>
 
                   <Space size={12} wrap>
-                    <Tooltip title="Support this suggestion">
+                    <Tooltip title={i18nT("ui.konsultations.suggestionsboard.supportThisSuggestion")}>
                       <Button
                         size="small"
                         icon={<LikeOutlined />}
@@ -230,7 +233,7 @@ export default function SuggestionsBoard({
                     </Tooltip>
 
                     {hasDownvotes && (
-                      <Tooltip title="Express reservations">
+                      <Tooltip title={i18nT("ui.konsultations.suggestionsboard.expressReservations")}>
                         <Button
                           size="small"
                           icon={<DislikeOutlined />}
@@ -242,7 +245,7 @@ export default function SuggestionsBoard({
                     )}
 
                     {hasComments && (
-                      <Tooltip title="Comments">
+                      <Tooltip title={i18nT("ui.konsultations.suggestionsboard.comments")}>
                         <span>
                           <CommentOutlined /> {item.commentsCount}
                         </span>
@@ -255,7 +258,7 @@ export default function SuggestionsBoard({
                         type="link"
                         onClick={() => onOpenSuggestion(item)}
                       >
-                        Open details
+                        {i18nT("ui.konsultations.suggestionsboard.openDetails")}
                       </Button>
                     )}
                   </Space>

@@ -1,6 +1,7 @@
 // FILE: frontend/app/keenkonnect/projects/create-new-project/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ProFormDatePicker,
   ProFormSelect,
@@ -34,10 +35,11 @@ type CreateProjectFormValues = {
 };
 
 export default function CreateNewProjectPage() {
+  const { t: i18nT } = useLanguage();
   return (
     <KeenPageShell
-      title="Create New Project"
-      description="Use this guided wizard to describe your project, configure the team and timeline, and attach any supporting files."
+      title={i18nT("ui.keenkonnect.projects.createNewProject.createNewProject")}
+      description={i18nT("ui.keenkonnect.projects.createNewProject.useThisGuidedWizardToDescribeYour")}
     >
       <Suspense fallback={null}>
         <Content />
@@ -47,6 +49,7 @@ export default function CreateNewProjectPage() {
 }
 
 function Content() {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -64,13 +67,13 @@ function Content() {
 
       await apiPost(PROJECTS_ENDPOINT, payload);
 
-      message.success('Project created successfully!');
+      message.success(i18nT("ui.keenkonnect.projects.createNewProject.projectCreatedSuccessfully"));
       router.push('/keenkonnect/projects/my-projects');
       return true;
     } catch (err) {
        
       console.error('Create project error:', err);
-      message.error('Failed to create project.');
+      message.error(i18nT("ui.keenkonnect.projects.createNewProject.failedToCreateProject"));
       return false;
     } finally {
       setSubmitting(false);
@@ -80,8 +83,7 @@ function Content() {
   return (
     <>
       <Paragraph type="secondary" className="mb-4">
-        The core project record is created in the Django backend. You can refine
-        team, timeline and attachments in the steps below.
+        {i18nT("ui.keenkonnect.projects.createNewProject.theCoreProjectRecordIsCreatedIn")}
       </Paragraph>
 
       <Row justify="center">
@@ -102,33 +104,33 @@ function Content() {
               }}
             >
               {/* Step 1 – Basic Info */}
-              <StepsForm.StepForm name="basic" title="Basic Info">
+              <StepsForm.StepForm name="basic" title={i18nT("ui.keenkonnect.projects.createNewProject.basicInfo")}>
                 <ProFormText
                   name="name"
-                  label="Project Name"
-                  placeholder="Enter project name"
+                  label={i18nT("ui.keenkonnect.projects.createNewProject.projectName")}
+                  placeholder={i18nT("ui.keenkonnect.projects.createNewProject.enterProjectName")}
                   rules={[
-                    { required: true, message: 'Please enter a project name' },
+                    { required: true, message: i18nT("ui.keenkonnect.projects.createNewProject.pleaseEnterAProjectName") },
                   ]}
                 />
 
                 <ProFormTextArea
                   name="description"
-                  label="Description"
-                  placeholder="Describe your project goals, context, and expected outcomes"
+                  label={i18nT("ui.keenkonnect.projects.createNewProject.description")}
+                  placeholder={i18nT("ui.keenkonnect.projects.createNewProject.describeYourProjectGoalsContextAndExpected")}
                   fieldProps={{ rows: 4 }}
                 />
 
                 <ProFormSelect
                   name="category"
-                  label="Category"
-                  placeholder="Choose a domain or focus area"
+                  label={i18nT("ui.keenkonnect.projects.createNewProject.category")}
+                  placeholder={i18nT("ui.keenkonnect.projects.createNewProject.chooseADomainOrFocusArea")}
                   options={[
-                    { label: 'Civic', value: 'Civic' },
-                    { label: 'Arts', value: 'Arts' },
-                    { label: 'Education', value: 'Education' },
-                    { label: 'Environment', value: 'Environment' },
-                    { label: 'Other', value: 'Other' },
+                    { label: i18nT("ui.keenkonnect.projects.createNewProject.civic"), value: 'Civic' },
+                    { label: i18nT("ui.keenkonnect.projects.createNewProject.arts"), value: 'Arts' },
+                    { label: i18nT("ui.keenkonnect.projects.createNewProject.education"), value: 'Education' },
+                    { label: i18nT("ui.keenkonnect.projects.createNewProject.environment"), value: 'Environment' },
+                    { label: i18nT("ui.keenkonnect.projects.createNewProject.other"), value: 'Other' },
                   ]}
                 />
               </StepsForm.StepForm>
@@ -136,15 +138,15 @@ function Content() {
               {/* Step 2 – Team & Timeline */}
               <StepsForm.StepForm
                 name="team-settings"
-                title="Team & Timeline"
+                title={i18nT("ui.keenkonnect.projects.createNewProject.teamTimeline")}
               >
                 <ProFormSelect
                   name="team"
-                  label="Team"
-                  placeholder="Select team (optional for now)"
+                  label={i18nT("ui.keenkonnect.projects.createNewProject.team")}
+                  placeholder={i18nT("ui.keenkonnect.projects.createNewProject.selectTeamOptionalForNow")}
                   options={[
-                    { label: 'Team Alpha', value: 'alpha' },
-                    { label: 'Team Beta', value: 'beta' },
+                    { label: i18nT("ui.keenkonnect.projects.createNewProject.teamAlpha"), value: 'alpha' },
+                    { label: i18nT("ui.keenkonnect.projects.createNewProject.teamBeta"), value: 'beta' },
                   ]}
                 />
 
@@ -152,14 +154,14 @@ function Content() {
                   <Col xs={24} md={12}>
                     <ProFormDatePicker
                       name="startDate"
-                      label="Start Date"
+                      label={i18nT("ui.keenkonnect.projects.createNewProject.startDate")}
                       fieldProps={{ style: { width: '100%' } }}
                     />
                   </Col>
                   <Col xs={24} md={12}>
                     <ProFormDatePicker
                       name="endDate"
-                      label="End Date"
+                      label={i18nT("ui.keenkonnect.projects.createNewProject.endDate")}
                       fieldProps={{ style: { width: '100%' } }}
                     />
                   </Col>
@@ -169,11 +171,11 @@ function Content() {
               {/* Step 3 – Attachments & Notes */}
               <StepsForm.StepForm
                 name="attachments"
-                title="Attachments & Notes"
+                title={i18nT("ui.keenkonnect.projects.createNewProject.attachmentsNotes")}
               >
                 <ProFormUploadButton
                   name="attachments"
-                  label="Attachments"
+                  label={i18nT("ui.keenkonnect.projects.createNewProject.attachments")}
                   max={5}
                   fieldProps={{
                     multiple: true,
@@ -181,13 +183,13 @@ function Content() {
                     beforeUpload: () => false,
                     listType: 'text',
                   }}
-                  extra="Optional: upload briefs, specs, or reference documents."
+                  extra={i18nT("ui.keenkonnect.projects.createNewProject.attachmentsHint")}
                 />
 
                 <ProFormTextArea
                   name="notes"
-                  label="Additional Notes"
-                  placeholder="Anything else your collaborators should know?"
+                  label={i18nT("ui.keenkonnect.projects.createNewProject.additionalNotes")}
+                  placeholder={i18nT("ui.keenkonnect.projects.createNewProject.anythingElseYourCollaboratorsShouldKnow")}
                   fieldProps={{ rows: 4 }}
                 />
               </StepsForm.StepForm>

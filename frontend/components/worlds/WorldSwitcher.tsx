@@ -5,6 +5,7 @@ import { Select, Tag, Tooltip } from 'antd';
 import { useMemo } from 'react';
 import styled from 'styled-components';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { useWorld } from '@/context/WorldContext';
 
 const Wrapper = styled.div`
@@ -35,6 +36,7 @@ const Wrapper = styled.div`
 `;
 
 export default function WorldSwitcher() {
+  const { t } = useLanguage();
   const {
     worldKey,
     runtime,
@@ -80,12 +82,12 @@ export default function WorldSwitcher() {
 
   const dataPlaneDisabled = runtime?.capabilities?.data_plane_enabled === false;
   const title = runtimeError
-    ? 'The active World could not be resolved. World-scoped data is fail-closed.'
+    ? t('worlds.runtimeError')
     : catalogError
-      ? 'The World catalogue is unavailable.'
+      ? t('worlds.catalogError')
       : dataPlaneDisabled
-        ? 'World routing is active, but the business data plane is not enabled yet.'
-        : 'Switch the entire Konnaxion data World';
+        ? t('worlds.dataPlaneDisabled')
+        : t('worlds.switchTooltip');
 
   return (
     <Wrapper>
@@ -98,10 +100,10 @@ export default function WorldSwitcher() {
       </Tooltip>
       <Select<string>
         className="k-world-select"
-        aria-label="Active World"
+        aria-label={t('worlds.activeAria')}
         loading={loadingCatalog || loadingRuntime}
         value={worldKey ?? undefined}
-        placeholder="Select World"
+        placeholder={t('worlds.select')}
         showSearch
         allowClear={false}
         onChange={switchWorld}
@@ -113,11 +115,13 @@ export default function WorldSwitcher() {
           return searchText.includes(input.trim().toLowerCase());
         }}
         options={options}
-        notFoundContent={catalogError ? 'World catalogue unavailable' : 'No Worlds'}
+        notFoundContent={
+          catalogError ? t('worlds.catalogUnavailable') : t('worlds.none')
+        }
       />
       {runtime?.release.dirty ? (
-        <Tooltip title="This World release has changes since its last clean build/snapshot.">
-          <Tag style={{ marginInlineEnd: 0 }}>Modified</Tag>
+        <Tooltip title={t('worlds.dirtyTooltip')}>
+          <Tag style={{ marginInlineEnd: 0 }}>{t('worlds.modified')}</Tag>
         </Tooltip>
       ) : null}
     </Wrapper>

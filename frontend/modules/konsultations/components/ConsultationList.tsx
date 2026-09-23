@@ -1,6 +1,7 @@
 // FILE: frontend/modules/konsultations/components/ConsultationList.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Alert, List, Spin, Tag } from 'antd';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
@@ -16,6 +17,7 @@ interface Consultation {
 }
 
 export default function ConsultationList(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [consultations, setConsultations] = useState<Consultation[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export default function ConsultationList(): JSX.Element {
       } catch (err) {
         console.error('Error loading consultations:', err);
         if (isMounted) {
-          setError('Unable to load consultations from the server.');
+          setError(i18nT("ui.konsultations.consultationlist.unableToLoadConsultationsFromTheServer"));
         }
       } finally {
         if (isMounted) setLoading(false);
@@ -54,7 +56,7 @@ export default function ConsultationList(): JSX.Element {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [i18nT]);
 
   const openConsultations = consultations.filter(
     (consultation) => consultation.status.toLowerCase() === 'open',
@@ -90,7 +92,7 @@ export default function ConsultationList(): JSX.Element {
 
       {openConsultations.length > 0 && (
         <List
-          header={<h3 style={{ marginBottom: 8 }}>Open Consultations</h3>}
+          header={<h3 style={{ marginBottom: 8 }}>{i18nT("ui.konsultations.consultationlist.openConsultations")}</h3>}
           itemLayout="vertical"
           dataSource={openConsultations}
           renderItem={(item) => {
@@ -107,7 +109,7 @@ export default function ConsultationList(): JSX.Element {
                       query: { consultationId: String(item.id) },
                     }}
                   >
-                    Participate
+                    {i18nT("ui.konsultations.consultationlist.participate")}
                   </Link>,
                 ]}
               >
@@ -117,7 +119,7 @@ export default function ConsultationList(): JSX.Element {
                       {item.title} <Tag color="green">{statusLabel}</Tag>
                     </span>
                   }
-                  description={closeDate ? `Closes on ${closeDate}` : undefined}
+                  description={closeDate ? i18nT("ui.konsultations.consultationlist.closesOn", { closeDate: closeDate }) : undefined}
                 />
               </List.Item>
             );
@@ -127,7 +129,7 @@ export default function ConsultationList(): JSX.Element {
 
       {closedConsultations.length > 0 && (
         <List
-          header={<h3 style={{ marginTop: 24, marginBottom: 8 }}>Closed Consultations</h3>}
+          header={<h3 style={{ marginTop: 24, marginBottom: 8 }}>{i18nT("ui.konsultations.consultationlist.closedConsultations")}</h3>}
           itemLayout="vertical"
           dataSource={closedConsultations}
           renderItem={(item) => {
@@ -144,7 +146,7 @@ export default function ConsultationList(): JSX.Element {
                       query: { consultationId: String(item.id) },
                     }}
                   >
-                    View Results
+                    {i18nT("ui.konsultations.consultationlist.viewResults")}
                   </Link>,
                 ]}
               >
@@ -154,7 +156,7 @@ export default function ConsultationList(): JSX.Element {
                       {item.title} <Tag color="blue">{statusLabel}</Tag>
                     </span>
                   }
-                  description={closeDate ? `Closed on ${closeDate}` : undefined}
+                  description={closeDate ? i18nT("ui.konsultations.consultationlist.closedOn", { closeDate: closeDate }) : undefined}
                 />
               </List.Item>
             );

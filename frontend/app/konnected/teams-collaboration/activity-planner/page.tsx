@@ -2,6 +2,7 @@
 // app/konnected/teams-collaboration/activity-planner/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { PlusOutlined } from '@ant-design/icons';
 import type { CalendarProps } from 'antd';
 import {
@@ -83,13 +84,14 @@ const RESOURCE_OPTIONS = [
 ];
 
 export default function ActivityPlannerPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   /** Initial mocked events – replace with API data later */
   const [events, setEvents] = useState<ActivityEvent[]>([
     {
       id: 'evt1',
-      title: 'Team Onboarding Workshop',
+      title: i18nT("ui.konnected.teamsCollaboration.activityPlanner.teamOnboardingWorkshop"),
       description:
-        'Kick-off session for new members, reviewing our current learning path and workspace norms.',
+        i18nT("ui.konnected.teamsCollaboration.activityPlanner.kickOffSessionForNewMembersReviewing"),
       dateTime: dayjs().add(2, 'day').hour(10).minute(0),
       owner: 'Alice',
       team: 'Alpha Innovators',
@@ -98,9 +100,9 @@ export default function ActivityPlannerPage(): JSX.Element {
     },
     {
       id: 'evt2',
-      title: 'Sprint Learning Check-in',
+      title: i18nT("ui.konnected.teamsCollaboration.activityPlanner.sprintLearningCheckIn"),
       description:
-        'Short sync on what we learned this sprint and which resources to bookmark in Knowledge.',
+        i18nT("ui.konnected.teamsCollaboration.activityPlanner.shortSyncOnWhatWeLearnedThis"),
       dateTime: dayjs().add(4, 'day').hour(9).minute(30),
       owner: 'Bob',
       team: 'Beta Coders',
@@ -151,7 +153,7 @@ export default function ActivityPlannerPage(): JSX.Element {
         {listData.length > 3 && (
           <li>
             <Text type="secondary" style={{ fontSize: 10 }}>
-              +{listData.length - 3} more
+              +{listData.length - 3} {i18nT("ui.konnected.teamsCollaboration.activityPlanner.more")}
             </Text>
           </li>
         )}
@@ -170,7 +172,7 @@ export default function ActivityPlannerPage(): JSX.Element {
   /** Add new activity (currently client-side only) */
   const handleAddEvent = (values: ActivityFormValues) => {
     if (!values.eventDate || !values.eventTime || !values.team || !values.owner) {
-      message.error('Please fill in all required fields.');
+      message.error(i18nT("ui.konnected.teamsCollaboration.activityPlanner.pleaseFillInAllRequiredFields"));
       return;
     }
 
@@ -194,12 +196,12 @@ export default function ActivityPlannerPage(): JSX.Element {
     setModalVisible(false);
     form.resetFields();
     setPreSelectedDate(null);
-    message.success('Activity added to the team calendar.');
+    message.success(i18nT("ui.konnected.teamsCollaboration.activityPlanner.activityAddedToTheTeamCalendar"));
   };
 
   const handleDeleteEvent = (id: string) => {
     setEvents((prev) => prev.filter((evt) => evt.id !== id));
-    message.success('Activity removed.');
+    message.success(i18nT("ui.konnected.teamsCollaboration.activityPlanner.activityRemoved"));
   };
 
   const handleOpenModalEmpty = () => {
@@ -210,20 +212,19 @@ export default function ActivityPlannerPage(): JSX.Element {
 
   const modalTitle = preSelectedDate
     ? `Add Activity on ${preSelectedDate.format('YYYY-MM-DD')}`
-    : 'Add New Activity';
+    : i18nT("ui.konnected.teamsCollaboration.activityPlanner.addNewActivity");
 
   return (
     <KonnectedPageShell
-      title="Activity Planner"
+      title={i18nT("ui.konnected.teamsCollaboration.activityPlanner.activityPlanner")}
       subtitle={
         <span>
-          Plan team learning sessions, workshops, and collaborative check-ins, and optionally link
-          them to Learning Paths or Knowledge resources.
+          {i18nT("ui.konnected.teamsCollaboration.activityPlanner.planTeamLearningSessionsWorkshopsAndCollaborative")}
         </span>
       }
       primaryAction={
         <Button type="primary" icon={<PlusOutlined />} onClick={handleOpenModalEmpty}>
-          Add Activity
+          {i18nT("ui.konnected.teamsCollaboration.activityPlanner.addActivity")}
         </Button>
       }
       secondaryActions={
@@ -238,10 +239,10 @@ export default function ActivityPlannerPage(): JSX.Element {
       <Row gutter={[24, 24]}>
         <Col xs={24} lg={16}>
           <Card
-            title="Team Activity Calendar"
+            title={i18nT("ui.konnected.teamsCollaboration.activityPlanner.teamActivityCalendar")}
             extra={
               <Text type="secondary">
-                Click a date to schedule a new session for a team.
+                {i18nT("ui.konnected.teamsCollaboration.activityPlanner.clickADateToScheduleANew")}
               </Text>
             }
             bordered
@@ -257,18 +258,18 @@ export default function ActivityPlannerPage(): JSX.Element {
         <Col xs={24} lg={8}>
           <Card bordered>
             <Title level={4} style={{ marginBottom: 8 }}>
-              Upcoming Activities
+              {i18nT("ui.konnected.teamsCollaboration.activityPlanner.upcomingActivities")}
             </Title>
             <Paragraph type="secondary" style={{ marginBottom: 16 }}>
-              Showing activities for{' '}
-              <Text strong>{selectedTeam === 'All' ? 'all teams' : selectedTeam}</Text>.
+              {i18nT("ui.konnected.teamsCollaboration.activityPlanner.showingActivitiesFor")}{' '}
+              <Text strong>{selectedTeam === 'All' ? i18nT("ui.konnected.teamsCollaboration.activityPlanner.allTeams") : selectedTeam}</Text>.
             </Paragraph>
 
             <List
               size="small"
               dataSource={upcomingEvents}
               locale={{
-                emptyText: 'No planned activities yet. Use “Add Activity” to get started.',
+                emptyText: i18nT("ui.konnected.teamsCollaboration.activityPlanner.noPlannedActivitiesYetUseAddActivity"),
               }}
               renderItem={(item) => (
                 <List.Item
@@ -280,7 +281,7 @@ export default function ActivityPlannerPage(): JSX.Element {
                       size="small"
                       onClick={() => handleDeleteEvent(item.id)}
                     >
-                      Delete
+                      {i18nT("ui.konnected.teamsCollaboration.activityPlanner.delete")}
                     </Button>,
                   ]}
                 >
@@ -300,19 +301,19 @@ export default function ActivityPlannerPage(): JSX.Element {
                         </div>
                         <div>
                           <Text type="secondary">
-                            Team: {item.team} • Owner: {item.owner}
+                            {i18nT("ui.konnected.teamsCollaboration.activityPlanner.team")} {item.team} {i18nT("ui.konnected.teamsCollaboration.activityPlanner.owner")} {item.owner}
                           </Text>
                         </div>
                         {(item.linkedLearningPathLabel || item.linkedResourceLabel) && (
                           <div style={{ marginTop: 4 }}>
                             {item.linkedLearningPathLabel && (
                               <Tag color="green">
-                                Path: {item.linkedLearningPathLabel}
+                                {i18nT("ui.konnected.teamsCollaboration.activityPlanner.path")} {item.linkedLearningPathLabel}
                               </Tag>
                             )}
                             {item.linkedResourceLabel && (
                               <Tag color="purple">
-                                Resource: {item.linkedResourceLabel}
+                                {i18nT("ui.konnected.teamsCollaboration.activityPlanner.resource")} {item.linkedResourceLabel}
                               </Tag>
                             )}
                           </div>
@@ -332,8 +333,7 @@ export default function ActivityPlannerPage(): JSX.Element {
             <Divider />
 
             <Text type="secondary">
-              Tip: You can later wire this planner to real team data, Learning Paths, and Knowledge
-              resources so that attendance and completion stats feed into analytics.
+              {i18nT("ui.konnected.teamsCollaboration.activityPlanner.tipYouCanLaterWireThisPlanner")}
             </Text>
           </Card>
         </Col>
@@ -352,35 +352,35 @@ export default function ActivityPlannerPage(): JSX.Element {
       >
         <Form<ActivityFormValues> form={form} layout="vertical" onFinish={handleAddEvent}>
           <Form.Item
-            label="Activity Title"
+            label={i18nT("ui.konnected.teamsCollaboration.activityPlanner.activityTitle")}
             name="eventTitle"
-            rules={[{ required: true, message: 'Please enter the activity title.' }]}
+            rules={[{ required: true, message: i18nT("ui.konnected.teamsCollaboration.activityPlanner.pleaseEnterTheActivityTitle") }]}
           >
-            <Input placeholder="e.g. Sprint Learning Check-in" />
+            <Input placeholder={i18nT("ui.konnected.teamsCollaboration.activityPlanner.eGSprintLearningCheckIn")} />
           </Form.Item>
 
-          <Form.Item label="Description" name="eventDescription">
+          <Form.Item label={i18nT("ui.konnected.teamsCollaboration.activityPlanner.description")} name="eventDescription">
             <Input.TextArea
               rows={3}
-              placeholder="What is the team expected to do or learn during this activity?"
+              placeholder={i18nT("ui.konnected.teamsCollaboration.activityPlanner.whatIsTheTeamExpectedToDo")}
             />
           </Form.Item>
 
           <Row gutter={12}>
             <Col span={12}>
               <Form.Item
-                label="Date"
+                label={i18nT("ui.konnected.teamsCollaboration.activityPlanner.date")}
                 name="eventDate"
-                rules={[{ required: true, message: 'Please select a date.' }]}
+                rules={[{ required: true, message: i18nT("ui.konnected.teamsCollaboration.activityPlanner.pleaseSelectADate") }]}
               >
                 <DatePicker style={{ width: '100%' }} />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                label="Time"
+                label={i18nT("ui.konnected.teamsCollaboration.activityPlanner.time")}
                 name="eventTime"
-                rules={[{ required: true, message: 'Please select a time.' }]}
+                rules={[{ required: true, message: i18nT("ui.konnected.teamsCollaboration.activityPlanner.pleaseSelectATime") }]}
               >
                 <TimePicker style={{ width: '100%' }} format="HH:mm" />
               </Form.Item>
@@ -388,9 +388,9 @@ export default function ActivityPlannerPage(): JSX.Element {
           </Row>
 
           <Form.Item
-            label="Team"
+            label={i18nT("ui.konnected.teamsCollaboration.activityPlanner.team_218887")}
             name="team"
-            rules={[{ required: true, message: 'Please select a team.' }]}
+            rules={[{ required: true, message: i18nT("ui.konnected.teamsCollaboration.activityPlanner.pleaseSelectATeam") }]}
             initialValue={teamOptions[1]}
           >
             <Select
@@ -400,33 +400,33 @@ export default function ActivityPlannerPage(): JSX.Element {
             />
           </Form.Item>
 
-          <Form.Item label="Activity Type" name="activityType">
+          <Form.Item label={i18nT("ui.konnected.teamsCollaboration.activityPlanner.activityType")} name="activityType">
             <Select
-              placeholder="Select an activity type"
+              placeholder={i18nT("ui.konnected.teamsCollaboration.activityPlanner.selectAnActivityType")}
               allowClear
               options={ACTIVITY_TYPE_OPTIONS.map((t) => ({ label: t, value: t }))}
             />
           </Form.Item>
 
           <Form.Item
-            label="Owner"
+            label={i18nT("ui.konnected.teamsCollaboration.activityPlanner.owner_89ff31")}
             name="owner"
-            rules={[{ required: true, message: 'Please enter the owner.' }]}
+            rules={[{ required: true, message: i18nT("ui.konnected.teamsCollaboration.activityPlanner.pleaseEnterTheOwner") }]}
           >
-            <Input placeholder="e.g. Team lead or facilitator name" />
+            <Input placeholder={i18nT("ui.konnected.teamsCollaboration.activityPlanner.eGTeamLeadOrFacilitatorName")} />
           </Form.Item>
 
-          <Form.Item label="Linked Learning Path (optional)" name="linkedLearningPathLabel">
+          <Form.Item label={i18nT("ui.konnected.teamsCollaboration.activityPlanner.linkedLearningPathOptional")} name="linkedLearningPathLabel">
             <Select
-              placeholder="Link to a Learning Path"
+              placeholder={i18nT("ui.konnected.teamsCollaboration.activityPlanner.linkToALearningPath")}
               allowClear
               options={LEARNING_PATH_OPTIONS.map((label) => ({ label, value: label }))}
             />
           </Form.Item>
 
-          <Form.Item label="Linked Knowledge Resource (optional)" name="linkedResourceLabel">
+          <Form.Item label={i18nT("ui.konnected.teamsCollaboration.activityPlanner.linkedKnowledgeResourceOptional")} name="linkedResourceLabel">
             <Select
-              placeholder="Link to a Knowledge resource"
+              placeholder={i18nT("ui.konnected.teamsCollaboration.activityPlanner.linkToAKnowledgeResource")}
               allowClear
               options={RESOURCE_OPTIONS.map((label) => ({ label, value: label }))}
             />
@@ -434,7 +434,7 @@ export default function ActivityPlannerPage(): JSX.Element {
 
           <Form.Item>
             <Button type="primary" htmlType="submit" block icon={<PlusOutlined />}>
-              Add Activity
+              {i18nT("ui.konnected.teamsCollaboration.activityPlanner.addActivity")}
             </Button>
           </Form.Item>
         </Form>

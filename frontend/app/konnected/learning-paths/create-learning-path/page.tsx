@@ -1,6 +1,8 @@
 // FILE: frontend/app/konnected/learning-paths/create-learning-path/page.tsx
 "use client";
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   PageContainer,
   ProCard,
@@ -146,31 +148,32 @@ async function fetchKnowledgeResources(
   return [];
 }
 
-const CONTENT_TYPE_OPTIONS: {
+const CONTENT_TYPE_OPTIONS = (i18nT: TranslateFunction): {
   label: string;
   value: ResourceSearchParams["type"];
-}[] = [
-  { label: "All types", value: "all" },
-  { label: "Articles", value: "article" },
-  { label: "Videos", value: "video" },
-  { label: "Lessons", value: "lesson" },
-  { label: "Quizzes", value: "quiz" },
-  { label: "Datasets", value: "dataset" },
-];
+}[] => ([
+  { label: i18nT("ui.konnected.learningPaths.createLearningPath.allTypes"), value: "all" },
+  { label: i18nT("ui.konnected.learningPaths.createLearningPath.articles"), value: "article" },
+  { label: i18nT("ui.konnected.learningPaths.createLearningPath.videos"), value: "video" },
+  { label: i18nT("ui.konnected.learningPaths.createLearningPath.lessons"), value: "lesson" },
+  { label: i18nT("ui.konnected.learningPaths.createLearningPath.quizzes"), value: "quiz" },
+  { label: i18nT("ui.konnected.learningPaths.createLearningPath.datasets"), value: "dataset" },
+]);
 
-const difficultyOptions = [
-  { label: "Beginner", value: "Beginner" },
-  { label: "Intermediate", value: "Intermediate" },
-  { label: "Advanced", value: "Advanced" },
-];
+const difficultyOptions = (i18nT: TranslateFunction) => ([
+  { label: i18nT("ui.konnected.learningPaths.createLearningPath.beginner"), value: "Beginner" },
+  { label: i18nT("ui.konnected.learningPaths.createLearningPath.intermediate"), value: "Intermediate" },
+  { label: i18nT("ui.konnected.learningPaths.createLearningPath.advanced"), value: "Advanced" },
+]);
 
-const stepTypeOptions = [
-  { label: "Lesson", value: "lesson" },
-  { label: "Quiz", value: "quiz" },
-  { label: "Assignment", value: "assignment" },
-];
+const stepTypeOptions = (i18nT: TranslateFunction) => ([
+  { label: i18nT("ui.konnected.learningPaths.createLearningPath.lesson"), value: "lesson" },
+  { label: i18nT("ui.konnected.learningPaths.createLearningPath.quiz"), value: "quiz" },
+  { label: i18nT("ui.konnected.learningPaths.createLearningPath.assignment"), value: "assignment" },
+]);
 
 const CreateLearningPathPage: React.FC = () => {
+  const { t: i18nT } = useLanguage();
   const formRef = useRef<ProFormInstance<LearningPathFormValues>>();
   const [submitMode, setSubmitMode] = useState<LearningPathStatus>("draft");
   const [submitting, setSubmitting] = useState(false);
@@ -200,13 +203,13 @@ const CreateLearningPathPage: React.FC = () => {
     fetchKnowledgeResources({})
       .then(setResources)
       .catch((err) => {
-        message.error(err.message || "Failed to load resources.");
+        message.error(err.message || i18nT("ui.konnected.learningPaths.createLearningPath.failedToLoadResources"));
         setResources([]);
       })
       .finally(() => setResourcesLoading(false));
 
     setResourceDrawerOpen(true);
-  }, []);
+  }, [i18nT]);
 
   const closeResourceDrawer = () => {
     setResourceDrawerOpen(false);
@@ -225,12 +228,12 @@ const CreateLearningPathPage: React.FC = () => {
       fetchKnowledgeResources(nextParams)
         .then(setResources)
         .catch((err) => {
-          message.error(err.message || "Failed to load resources.");
+          message.error(err.message || i18nT("ui.konnected.learningPaths.createLearningPath.failedToLoadResources"));
           setResources([]);
         })
         .finally(() => setResourcesLoading(false));
     },
-    [resourceSearchParams]
+    [resourceSearchParams, i18nT]
   );
 
   const handleResourceTypeChange = (type: ResourceSearchParams["type"]): void => {
@@ -244,7 +247,7 @@ const CreateLearningPathPage: React.FC = () => {
     fetchKnowledgeResources(nextParams)
       .then(setResources)
       .catch((err) => {
-        message.error(err.message || "Failed to load resources.");
+        message.error(err.message || i18nT("ui.konnected.learningPaths.createLearningPath.failedToLoadResources"));
         setResources([]);
       })
       .finally(() => setResourcesLoading(false));
@@ -272,42 +275,42 @@ const CreateLearningPathPage: React.FC = () => {
   const resourceColumns: ColumnsType<KnowledgeResource> = useMemo(
     () => [
       {
-        title: "Title",
+        title: i18nT("ui.konnected.learningPaths.createLearningPath.title"),
         dataIndex: "title",
         key: "title",
       },
       {
-        title: "Type",
+        title: i18nT("ui.konnected.learningPaths.createLearningPath.type"),
         dataIndex: "type",
         key: "type",
         render: (value) => <Tag>{value}</Tag>,
       },
       {
-        title: "Author",
+        title: i18nT("ui.konnected.learningPaths.createLearningPath.author"),
         dataIndex: "author",
         key: "author",
         render: (value) => value || "—",
       },
       {
-        title: "Subject",
+        title: i18nT("ui.konnected.learningPaths.createLearningPath.subject"),
         dataIndex: "subject",
         key: "subject",
         render: (value) => value || "—",
       },
       {
-        title: "Estimated time",
+        title: i18nT("ui.konnected.learningPaths.createLearningPath.estimatedTime"),
         dataIndex: "estimated_duration_minutes",
         key: "estimated_duration_minutes",
         render: (value) => (value ? `${value} min` : "—"),
       },
     ],
-    []
+    [i18nT]
   );
 
   const handleFinish = async (values: LearningPathFormValues) => {
     if (submitMode === "published") {
       if (!values.steps || values.steps.length === 0) {
-        message.error("You must add at least one step before publishing.");
+        message.error(i18nT("ui.konnected.learningPaths.createLearningPath.youMustAddAtLeastOneStep"));
         return false;
       }
 
@@ -316,7 +319,7 @@ const CreateLearningPathPage: React.FC = () => {
       );
       if (missingResources) {
         message.error(
-          "Each step must have at least one resource attached before publishing."
+          i18nT("ui.konnected.learningPaths.createLearningPath.eachStepMustHaveAtLeastOne")
         );
         return false;
       }
@@ -327,13 +330,13 @@ const CreateLearningPathPage: React.FC = () => {
       await createLearningPath(values, submitMode);
       message.success(
         submitMode === "published"
-          ? "Learning path published."
-          : "Learning path saved as draft."
+          ? i18nT("ui.konnected.learningPaths.createLearningPath.learningPathPublished")
+          : i18nT("ui.konnected.learningPaths.createLearningPath.learningPathSavedAsDraft")
       );
       return true;
     } catch (error: unknown) {
       message.error(
-        error instanceof Error ? error.message : "Failed to save learning path.",
+        error instanceof Error ? error.message : i18nT("ui.konnected.learningPaths.createLearningPath.failedToSaveLearningPath"),
       );
       return false;
     } finally {
@@ -343,8 +346,8 @@ const CreateLearningPathPage: React.FC = () => {
 
   return (
     <KonnectedPageShell
-      title="Create learning path"
-      subtitle="Author a structured sequence of resources that learners can follow."
+      title={i18nT("ui.konnected.learningPaths.createLearningPath.createLearningPath")}
+      subtitle={i18nT("ui.konnected.learningPaths.createLearningPath.authorAStructuredSequenceOfResourcesThat")}
       primaryAction={null}
     >
       <PageContainer>
@@ -353,7 +356,7 @@ const CreateLearningPathPage: React.FC = () => {
             type="info"
             showIcon
             style={{ marginBottom: 16 }}
-            message="Use this wizard to define metadata, steps, and resources for a new learning path. You can save it as a draft or publish it when complete."
+            message={i18nT("ui.konnected.learningPaths.createLearningPath.useThisWizardToDefineMetadataSteps")}
           />
 
           <StepsForm<LearningPathFormValues>
@@ -369,7 +372,7 @@ const CreateLearningPathPage: React.FC = () => {
                       onPre?.();
                     }}
                   >
-                    Previous
+                    {i18nT("ui.konnected.learningPaths.createLearningPath.previous")}
                   </Button>,
                   <Button
                     key="save-draft"
@@ -379,7 +382,7 @@ const CreateLearningPathPage: React.FC = () => {
                     }}
                     loading={submitting}
                   >
-                    Save draft
+                    {i18nT("ui.konnected.learningPaths.createLearningPath.saveDraft")}
                   </Button>,
                   <Button
                     key="publish"
@@ -390,7 +393,7 @@ const CreateLearningPathPage: React.FC = () => {
                     }}
                     loading={submitting}
                   >
-                    Publish
+                    {i18nT("ui.konnected.learningPaths.createLearningPath.publish")}
                   </Button>,
                 ];
               },
@@ -398,61 +401,61 @@ const CreateLearningPathPage: React.FC = () => {
           >
             <StepsForm.StepForm<LearningPathFormValues>
               name="basic"
-              title="Basics"
+              title={i18nT("ui.konnected.learningPaths.createLearningPath.basics")}
             >
               <ProFormText
                 name="name"
-                label="Path name"
-                placeholder="e.g. Web fundamentals for new team members"
+                label={i18nT("ui.konnected.learningPaths.createLearningPath.pathName")}
+                placeholder={i18nT("ui.konnected.learningPaths.createLearningPath.eGWebFundamentalsForNewTeam")}
                 rules={[
-                  { required: true, message: "Please enter a path name." },
+                  { required: true, message: i18nT("ui.konnected.learningPaths.createLearningPath.pleaseEnterAPathName") },
                   {
                     min: 4,
-                    message: "Name should be at least 4 characters long.",
+                    message: i18nT("ui.konnected.learningPaths.createLearningPath.nameShouldBeAtLeast4Characters"),
                   },
                 ]}
               />
               <ProFormTextArea
                 name="description"
-                label="Description"
-                placeholder="Describe who this path is for and what it covers."
+                label={i18nT("ui.konnected.learningPaths.createLearningPath.description")}
+                placeholder={i18nT("ui.konnected.learningPaths.createLearningPath.describeWhoThisPathIsForAnd")}
                 fieldProps={{ autoSize: { minRows: 3, maxRows: 6 } }}
                 rules={[
                   {
                     required: true,
-                    message: "Please enter a description.",
+                    message: i18nT("ui.konnected.learningPaths.createLearningPath.pleaseEnterADescription"),
                   },
                   {
                     min: 20,
-                    message: "Description should be at least 20 characters long.",
+                    message: i18nT("ui.konnected.learningPaths.createLearningPath.descriptionShouldBeAtLeast20Characters"),
                   },
                 ]}
               />
               <ProFormSelect
                 name="difficulty"
-                label="Difficulty"
-                options={difficultyOptions}
-                placeholder="Select difficulty level"
+                label={i18nT("ui.konnected.learningPaths.createLearningPath.difficulty")}
+                options={difficultyOptions(i18nT)}
+                placeholder={i18nT("ui.konnected.learningPaths.createLearningPath.selectDifficultyLevel")}
                 rules={[
-                  { required: true, message: "Please select a difficulty." },
+                  { required: true, message: i18nT("ui.konnected.learningPaths.createLearningPath.pleaseSelectADifficulty") },
                 ]}
               />
               <ProFormSelect
                 name="tags"
-                label="Tags"
+                label={i18nT("ui.konnected.learningPaths.createLearningPath.tags")}
                 mode="tags"
-                placeholder="Add tags (optional)"
+                placeholder={i18nT("ui.konnected.learningPaths.createLearningPath.addTagsOptional")}
                 fieldProps={{ tokenSeparators: [","] }}
               />
             </StepsForm.StepForm>
 
             <StepsForm.StepForm<LearningPathFormValues>
               name="steps"
-              title="Steps"
+              title={i18nT("ui.konnected.learningPaths.createLearningPath.steps")}
             >
               <ProFormList
                 name="steps"
-                label="Path steps"
+                label={i18nT("ui.konnected.learningPaths.createLearningPath.pathSteps")}
                 creatorButtonProps={{
                   position: "bottom",
                   creatorButtonText: "Add step",
@@ -473,34 +476,34 @@ const CreateLearningPathPage: React.FC = () => {
                   <ProCard
                     bordered
                     style={{ marginBottom: 8 }}
-                    title={`Step ${index + 1}`}
+                    title={i18nT("ui.konnected.learningPaths.createLearningPath.step", { value1: index + 1 })}
                   >
                     <ProFormText
                       name={[field.name, "title"]}
-                      label="Step title"
-                      placeholder="e.g. Introduction to HTML & CSS"
+                      label={i18nT("ui.konnected.learningPaths.createLearningPath.stepTitle")}
+                      placeholder={i18nT("ui.konnected.learningPaths.createLearningPath.eGIntroductionToHtmlCss")}
                       rules={[
                         {
                           required: true,
-                          message: "Please enter a step title.",
+                          message: i18nT("ui.konnected.learningPaths.createLearningPath.pleaseEnterAStepTitle"),
                         },
                       ]}
                     />
                     <ProFormSelect
                       name={[field.name, "type"]}
-                      label="Step type"
-                      options={stepTypeOptions}
+                      label={i18nT("ui.konnected.learningPaths.createLearningPath.stepType")}
+                      options={stepTypeOptions(i18nT)}
                       rules={[
                         {
                           required: true,
-                          message: "Please select a step type.",
+                          message: i18nT("ui.konnected.learningPaths.createLearningPath.pleaseSelectAStepType"),
                         },
                       ]}
                     />
                     <ProFormTextArea
                       name={[field.name, "objective"]}
-                      label="Learning objective"
-                      placeholder="What should learners be able to do after this step?"
+                      label={i18nT("ui.konnected.learningPaths.createLearningPath.learningObjective")}
+                      placeholder={i18nT("ui.konnected.learningPaths.createLearningPath.whatShouldLearnersBeAbleToDo")}
                       fieldProps={{
                         autoSize: { minRows: 2, maxRows: 4 },
                       }}
@@ -512,7 +515,7 @@ const CreateLearningPathPage: React.FC = () => {
 
             <StepsForm.StepForm<LearningPathFormValues>
               name="resources"
-              title="Resources"
+              title={i18nT("ui.konnected.learningPaths.createLearningPath.resources")}
             >
               <ProFormDependency name={["steps"]}>
                 {({ steps }) => {
@@ -522,7 +525,7 @@ const CreateLearningPathPage: React.FC = () => {
                       <Alert
                         type="warning"
                         showIcon
-                        message="You need to create at least one step in the previous step before attaching resources."
+                        message={i18nT("ui.konnected.learningPaths.createLearningPath.youNeedToCreateAtLeastOne")}
                       />
                     );
                   }
@@ -530,10 +533,7 @@ const CreateLearningPathPage: React.FC = () => {
                   return (
                     <>
                       <Paragraph>
-                        Attach one or more library resources to each step. You can
-                        still save as a draft without completing all attachments,
-                        but every step must have at least one resource before
-                        publishing.
+                        {i18nT("ui.konnected.learningPaths.createLearningPath.attachOneOrMoreLibraryResourcesTo")}
                       </Paragraph>
 
                       <Space direction="vertical" style={{ width: "100%" }}>
@@ -541,27 +541,25 @@ const CreateLearningPathPage: React.FC = () => {
                           <ProCard
                             key={index}
                             bordered
-                            title={`Step ${index + 1}: ${
-                              step.title || "Untitled"
-                            }`}
+                            title={i18nT("ui.konnected.learningPaths.createLearningPath.step_934d7a", { value1: index + 1, value2: step.title || "Untitled" })}
                             extra={
                               <Button
                                 onClick={() => openResourceDrawer(index)}
                                 size="small"
                               >
-                                Select resources
+                                {i18nT("ui.konnected.learningPaths.createLearningPath.selectResources")}
                               </Button>
                             }
                           >
                             {step.resourceIds && step.resourceIds.length > 0 ? (
                               <Space wrap>
                                 {step.resourceIds.map((id) => (
-                                  <Tag key={id}>{`Resource #${id}`}</Tag>
+                                  <Tag key={id}>{i18nT("ui.konnected.learningPaths.createLearningPath.resource", { id: id })}</Tag>
                                 ))}
                               </Space>
                             ) : (
                               <Paragraph type="secondary">
-                                No resources attached yet.
+                                {i18nT("ui.konnected.learningPaths.createLearningPath.noResourcesAttachedYet")}
                               </Paragraph>
                             )}
                           </ProCard>
@@ -575,7 +573,7 @@ const CreateLearningPathPage: React.FC = () => {
 
             <StepsForm.StepForm<LearningPathFormValues>
               name="review"
-              title="Review & publish"
+              title={i18nT("ui.konnected.learningPaths.createLearningPath.reviewPublish")}
             >
               <ProFormDependency
                 name={["name", "description", "difficulty", "tags", "steps"]}
@@ -587,7 +585,7 @@ const CreateLearningPathPage: React.FC = () => {
                     <Space direction="vertical" style={{ width: "100%" }}>
                       <ProDescriptions
                         column={1}
-                        title="Path summary"
+                        title={i18nT("ui.konnected.learningPaths.createLearningPath.pathSummary")}
                         dataSource={{
                           name,
                           description,
@@ -595,17 +593,17 @@ const CreateLearningPathPage: React.FC = () => {
                           tags,
                         }}
                       >
-                        <ProDescriptions.Item label="Name" dataIndex="name" />
+                        <ProDescriptions.Item label={i18nT("ui.konnected.learningPaths.createLearningPath.name")} dataIndex="name" />
                         <ProDescriptions.Item
-                          label="Description"
+                          label={i18nT("ui.konnected.learningPaths.createLearningPath.description")}
                           dataIndex="description"
                         />
                         <ProDescriptions.Item
-                          label="Difficulty"
+                          label={i18nT("ui.konnected.learningPaths.createLearningPath.difficulty")}
                           dataIndex="difficulty"
                         />
                         <ProDescriptions.Item
-                          label="Tags"
+                          label={i18nT("ui.konnected.learningPaths.createLearningPath.tags")}
                           dataIndex="tags"
                           render={(_, record) => {
                             const value = (record as {
@@ -625,10 +623,10 @@ const CreateLearningPathPage: React.FC = () => {
                         />
                       </ProDescriptions>
 
-                      <ProCard title="Steps" bordered>
+                      <ProCard title={i18nT("ui.konnected.learningPaths.createLearningPath.steps")} bordered>
                         {stepList.length === 0 ? (
                           <Paragraph type="secondary">
-                            No steps defined yet.
+                            {i18nT("ui.konnected.learningPaths.createLearningPath.noStepsDefinedYet")}
                           </Paragraph>
                         ) : (
                           <Space direction="vertical" style={{ width: "100%" }}>
@@ -636,29 +634,27 @@ const CreateLearningPathPage: React.FC = () => {
                               <ProCard
                                 key={index}
                                 bordered
-                                title={`Step ${index + 1}: ${
-                                  step.title || "Untitled"
-                                }`}
+                                title={i18nT("ui.konnected.learningPaths.createLearningPath.step_934d7a", { value1: index + 1, value2: step.title || "Untitled" })}
                               >
                                 <Paragraph>
-                                  <strong>Type:</strong> {step.type}
+                                  <strong>{i18nT("ui.konnected.learningPaths.createLearningPath.type_ee3fb1")}</strong> {step.type}
                                 </Paragraph>
                                 {step.objective && (
                                   <Paragraph>
-                                    <strong>Objective:</strong> {step.objective}
+                                    <strong>{i18nT("ui.konnected.learningPaths.createLearningPath.objective")}</strong> {step.objective}
                                   </Paragraph>
                                 )}
                                 <Paragraph>
-                                  <strong>Resources:</strong>{" "}
+                                  <strong>{i18nT("ui.konnected.learningPaths.createLearningPath.resources_90bdbc")}</strong>{" "}
                                   {step.resourceIds &&
                                   step.resourceIds.length > 0 ? (
                                     <Space wrap>
                                       {step.resourceIds.map((id) => (
-                                        <Tag key={id}>{`Resource #${id}`}</Tag>
+                                        <Tag key={id}>{i18nT("ui.konnected.learningPaths.createLearningPath.resource", { id: id })}</Tag>
                                       ))}
                                     </Space>
                                   ) : (
-                                    <span>None</span>
+                                    <span>{i18nT("ui.konnected.learningPaths.createLearningPath.none")}</span>
                                   )}
                                 </Paragraph>
                               </ProCard>
@@ -671,7 +667,7 @@ const CreateLearningPathPage: React.FC = () => {
                         <Alert
                           type="warning"
                           showIcon
-                          message="Publishing will make this path visible to eligible learners. Make sure steps and resources are complete."
+                          message={i18nT("ui.konnected.learningPaths.createLearningPath.publishingWillMakeThisPathVisibleTo")}
                         />
                       )}
                     </Space>
@@ -684,23 +680,23 @@ const CreateLearningPathPage: React.FC = () => {
       </PageContainer>
 
       <Drawer
-        title="Select resources"
+        title={i18nT("ui.konnected.learningPaths.createLearningPath.selectResources")}
         width={720}
         open={resourceDrawerOpen}
         onClose={closeResourceDrawer}
         destroyOnClose
         extra={
           <Space>
-            <Button onClick={closeResourceDrawer}>Cancel</Button>
+            <Button onClick={closeResourceDrawer}>{i18nT("ui.konnected.learningPaths.createLearningPath.cancel")}</Button>
             <Button type="primary" onClick={handleResourceDrawerOk}>
-              Attach selected
+              {i18nT("ui.konnected.learningPaths.createLearningPath.attachSelected")}
             </Button>
           </Space>
         }
       >
         <Space style={{ marginBottom: 16 }} wrap>
           <Search
-            placeholder="Search resources"
+            placeholder={i18nT("ui.konnected.learningPaths.createLearningPath.searchResources")}
             allowClear
             onSearch={(value) => handleResourceSearch(value || undefined)}
             style={{ width: 260 }}
@@ -708,7 +704,7 @@ const CreateLearningPathPage: React.FC = () => {
           <Select
             style={{ width: 200 }}
             defaultValue="all"
-            options={CONTENT_TYPE_OPTIONS}
+            options={CONTENT_TYPE_OPTIONS(i18nT)}
             onChange={(value) =>
               handleResourceTypeChange(value as ResourceSearchParams["type"])
             }
@@ -718,7 +714,7 @@ const CreateLearningPathPage: React.FC = () => {
         {resourcesLoading ? (
           <Spin />
         ) : resources.length === 0 ? (
-          <Empty description="No resources found." />
+          <Empty description={i18nT("ui.konnected.learningPaths.createLearningPath.noResourcesFound")} />
         ) : (
           <Table<KnowledgeResource>
             rowKey="id"

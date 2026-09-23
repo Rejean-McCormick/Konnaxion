@@ -1,6 +1,7 @@
 // FILE: frontend/app/ethikos/admin/moderation/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
@@ -333,6 +334,7 @@ function formatDate(value?: string): string | null {
 }
 
 export default function EthikosModerationPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [activeStatusFilter, setActiveStatusFilter] = useState<
     ModerationStatus | 'all'
@@ -376,13 +378,13 @@ export default function EthikosModerationPage(): JSX.Element {
 
       message.success(
         remove
-          ? 'Debate content removed and report resolved.'
-          : 'Content approved and report resolved.',
+          ? i18nT("ui.ethikos.admin.moderation.debateContentRemovedAndReportResolved")
+          : i18nT("ui.ethikos.admin.moderation.contentApprovedAndReportResolved"),
       );
 
       refresh();
     } catch {
-      message.error('Unable to process moderation action. Please try again.');
+      message.error(i18nT("ui.ethikos.admin.moderation.unableToProcessModerationActionPleaseTry"));
     } finally {
       setGlobalActionLoading(false);
     }
@@ -390,7 +392,7 @@ export default function EthikosModerationPage(): JSX.Element {
 
   const onBulkAction = async (action: ModerationAction): Promise<void> => {
     if (selectedRowKeys.length === 0) {
-      message.info('Select at least one report to apply a bulk action.');
+      message.info(i18nT("ui.ethikos.admin.moderation.selectAtLeastOneReportToApply"));
       return;
     }
 
@@ -408,21 +410,21 @@ export default function EthikosModerationPage(): JSX.Element {
       if (failures.length === 0) {
         message.success(
           remove
-            ? 'Selected content removed and reports resolved.'
-            : 'Selected content approved and reports resolved.',
+            ? i18nT("ui.ethikos.admin.moderation.selectedContentRemovedAndReportsResolved")
+            : i18nT("ui.ethikos.admin.moderation.selectedContentApprovedAndReportsResolved"),
         );
       } else if (failures.length === selectedRowKeys.length) {
-        message.error('Bulk action failed for all selected reports.');
+        message.error(i18nT("ui.ethikos.admin.moderation.bulkActionFailedForAllSelectedReports"));
       } else {
         message.warning(
-          `${failures.length} report(s) could not be processed. The others were resolved.`,
+          i18nT("ui.ethikos.admin.moderation.reportSCouldNotBeProcessedThe", { length: failures.length }),
         );
       }
 
       setSelectedRowKeys([]);
       refresh();
     } catch {
-      message.error('Unable to complete bulk action. Please try again.');
+      message.error(i18nT("ui.ethikos.admin.moderation.unableToCompleteBulkActionPleaseTry"));
     } finally {
       setGlobalActionLoading(false);
     }
@@ -438,7 +440,7 @@ export default function EthikosModerationPage(): JSX.Element {
 
     const text =
       severity === 'high'
-        ? 'High severity'
+        ? i18nT("ui.ethikos.admin.moderation.highSeverity")
         : severity === 'medium'
           ? 'Medium'
           : 'Low';
@@ -453,10 +455,10 @@ export default function EthikosModerationPage(): JSX.Element {
   const targetTag = (record: ModerationQueueItem): ReactNode => {
     const label =
       record.targetType === 'topic'
-        ? 'Debate topic'
+        ? i18nT("ui.ethikos.admin.moderation.debateTopic_24a2d8")
         : record.targetType === 'user'
           ? 'Participant'
-          : 'Argument / post';
+          : i18nT("ui.ethikos.admin.moderation.argumentPost");
 
     return <Tag>{label}</Tag>;
   };
@@ -469,7 +471,7 @@ export default function EthikosModerationPage(): JSX.Element {
           text={
             <Space size={4}>
               <CheckCircleOutlined />
-              Resolved
+              {i18nT("ui.ethikos.admin.moderation.resolved")}
             </Space>
           }
         />
@@ -477,10 +479,10 @@ export default function EthikosModerationPage(): JSX.Element {
     }
 
     if (status === 'Escalated') {
-      return <Badge status="warning" text="Escalated" />;
+      return <Badge status="warning" text={i18nT("ui.ethikos.admin.moderation.escalated")} />;
     }
 
-    return <Badge status="processing" text="Pending review" />;
+    return <Badge status="processing" text={i18nT("ui.ethikos.admin.moderation.pendingReview")} />;
   };
 
   const statusFilterButtons = (
@@ -490,28 +492,28 @@ export default function EthikosModerationPage(): JSX.Element {
         onClick={() => setActiveStatusFilter('Pending')}
         type={activeStatusFilter === 'Pending' ? 'primary' : 'default'}
       >
-        Pending
+        {i18nT("ui.ethikos.admin.moderation.pending")}
       </Button>
       <Button
         size="small"
         onClick={() => setActiveStatusFilter('Escalated')}
         type={activeStatusFilter === 'Escalated' ? 'primary' : 'default'}
       >
-        Escalated
+        {i18nT("ui.ethikos.admin.moderation.escalated")}
       </Button>
       <Button
         size="small"
         onClick={() => setActiveStatusFilter('Resolved')}
         type={activeStatusFilter === 'Resolved' ? 'primary' : 'default'}
       >
-        Resolved
+        {i18nT("ui.ethikos.admin.moderation.resolved")}
       </Button>
       <Button
         size="small"
         onClick={() => setActiveStatusFilter('all')}
         type={activeStatusFilter === 'all' ? 'primary' : 'default'}
       >
-        All
+        {i18nT("ui.ethikos.admin.moderation.all")}
       </Button>
     </Space>
   );
@@ -525,14 +527,14 @@ export default function EthikosModerationPage(): JSX.Element {
         loading={loading || globalActionLoading}
         disabled={unauthorized}
       >
-        Refresh queue
+        {i18nT("ui.ethikos.admin.moderation.refreshQueue")}
       </Button>
     </Space>
   );
 
   const columns: ProColumns<ModerationQueueItem>[] = [
     {
-      title: 'Content',
+      title: i18nT("ui.ethikos.admin.moderation.content"),
       dataIndex: 'contentPreview',
       ellipsis: true,
       render: (_dom, record) => (
@@ -543,32 +545,32 @@ export default function EthikosModerationPage(): JSX.Element {
             </Text>
           )}
           <Text type="secondary" ellipsis>
-            {record.contentPreview ?? 'No preview available.'}
+            {record.contentPreview ?? i18nT("ui.ethikos.admin.moderation.noPreviewAvailable")}
           </Text>
         </Space>
       ),
     },
     {
-      title: 'People',
+      title: i18nT("ui.ethikos.admin.moderation.people"),
       dataIndex: 'authorName',
       width: 220,
       render: (_dom, record) => (
         <Space direction="vertical" size={2}>
           {record.authorName && (
             <Text ellipsis>
-              Author: <Text strong>{record.authorName}</Text>
+              {i18nT("ui.ethikos.admin.moderation.author")} <Text strong>{record.authorName}</Text>
             </Text>
           )}
           {record.reporterName && (
             <Text type="secondary" ellipsis>
-              Reporter: {record.reporterName}
+              {i18nT("ui.ethikos.admin.moderation.reporter")} {record.reporterName}
             </Text>
           )}
         </Space>
       ),
     },
     {
-      title: 'Reason',
+      title: i18nT("ui.ethikos.admin.moderation.reason"),
       dataIndex: 'reason',
       width: 210,
       render: (_dom, record) => (
@@ -576,25 +578,25 @@ export default function EthikosModerationPage(): JSX.Element {
           {severityTag(record.severity)}
           {record.reason && <Tag>{record.reason}</Tag>}
           {typeof record.reportCount === 'number' && record.reportCount > 1 && (
-            <Tag>{record.reportCount} reports</Tag>
+            <Tag>{record.reportCount} {i18nT("ui.ethikos.admin.moderation.reports")}</Tag>
           )}
         </Space>
       ),
     },
     {
-      title: 'Status',
+      title: i18nT("ui.ethikos.admin.moderation.status"),
       dataIndex: 'status',
       width: 170,
       filters: [
-        { text: 'Pending', value: 'Pending' },
-        { text: 'Escalated', value: 'Escalated' },
-        { text: 'Resolved', value: 'Resolved' },
+        { text: i18nT("ui.ethikos.admin.moderation.pending"), value: 'Pending' },
+        { text: i18nT("ui.ethikos.admin.moderation.escalated"), value: 'Escalated' },
+        { text: i18nT("ui.ethikos.admin.moderation.resolved"), value: 'Resolved' },
       ],
       onFilter: (value, record) => record.status === String(value),
       render: (_dom, record) => statusBadge(record.status),
     },
     {
-      title: 'Timeline',
+      title: i18nT("ui.ethikos.admin.moderation.timeline"),
       dataIndex: 'createdAt',
       width: 220,
       render: (_dom, record) => {
@@ -605,18 +607,18 @@ export default function EthikosModerationPage(): JSX.Element {
           <Text type="secondary">
             {createdAt && (
               <>
-                Reported: {createdAt}
+                {i18nT("ui.ethikos.admin.moderation.reported")} {createdAt}
                 <br />
               </>
             )}
-            {lastActionAt && <>Last action: {lastActionAt}</>}
-            {!createdAt && !lastActionAt && 'No timestamp'}
+            {lastActionAt && <>{i18nT("ui.ethikos.admin.moderation.lastAction")} {lastActionAt}</>}
+            {!createdAt && !lastActionAt && i18nT("ui.ethikos.admin.moderation.noTimestamp")}
           </Text>
         );
       },
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.ethikos.admin.moderation.actions"),
       key: 'actions',
       width: 240,
       fixed: 'right',
@@ -626,7 +628,7 @@ export default function EthikosModerationPage(): JSX.Element {
 
         return (
           <Space size="small" wrap>
-            <Tooltip title="View details">
+            <Tooltip title={i18nT("ui.ethikos.admin.moderation.viewDetails")}>
               <Button
                 size="small"
                 icon={<EyeOutlined />}
@@ -634,34 +636,34 @@ export default function EthikosModerationPage(): JSX.Element {
               />
             </Tooltip>
 
-            <Tooltip title="Approve content and resolve report">
+            <Tooltip title={i18nT("ui.ethikos.admin.moderation.approveContentAndResolveReport")}>
               <Button
                 size="small"
                 icon={<CheckCircleOutlined />}
                 onClick={() => onSingleAction(record, 'approve')}
                 disabled={disabled}
               >
-                Approve
+                {i18nT("ui.ethikos.admin.moderation.approve")}
               </Button>
             </Tooltip>
 
             <Popconfirm
-              title="Remove content?"
-              description="This will remove the content for everyone and resolve all associated reports."
-              okText="Remove"
+              title={i18nT("ui.ethikos.admin.moderation.removeContent")}
+              description={i18nT("ui.ethikos.admin.moderation.thisWillRemoveTheContentForEveryone")}
+              okText={i18nT("ui.ethikos.admin.moderation.remove")}
               okType="danger"
               icon={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
               disabled={disabled}
               onConfirm={() => onSingleAction(record, 'remove')}
             >
-              <Tooltip title="Remove content and resolve report">
+              <Tooltip title={i18nT("ui.ethikos.admin.moderation.removeContentAndResolveReport")}>
                 <Button
                   size="small"
                   icon={<StopOutlined />}
                   danger
                   disabled={disabled}
                 >
-                  Remove
+                  {i18nT("ui.ethikos.admin.moderation.remove")}
                 </Button>
               </Tooltip>
             </Popconfirm>
@@ -673,9 +675,9 @@ export default function EthikosModerationPage(): JSX.Element {
 
   return (
     <EthikosPageShell
-      title="Moderation queue"
-      sectionLabel="Admin"
-      subtitle="Review and act on reports for debate arguments, topics, and participant behaviour."
+      title={i18nT("ui.ethikos.admin.moderation.moderationQueue")}
+      sectionLabel={i18nT("ui.ethikos.admin.moderation.admin")}
+      subtitle={i18nT("ui.ethikos.admin.moderation.reviewAndActOnReportsForDebate")}
       secondaryActions={headerActions}
     >
       <PageContainer ghost loading={loading}>
@@ -684,8 +686,8 @@ export default function EthikosModerationPage(): JSX.Element {
             <Alert
               type="error"
               showIcon
-              message="You do not have permission to moderate Ethikos debates."
-              description="If you believe this is an error, ask an administrator to grant you an Ethikos moderator or admin role."
+              message={i18nT("ui.ethikos.admin.moderation.youDoNotHavePermissionToModerate")}
+              description={i18nT("ui.ethikos.admin.moderation.ifYouBelieveThisIsAnError")}
             />
           )}
 
@@ -693,8 +695,8 @@ export default function EthikosModerationPage(): JSX.Element {
             <Alert
               type="info"
               showIcon
-              message="Ethikos moderation guidelines"
-              description="Arguments that receive multiple independent reports may be hidden until review. Approve content that fits the Ethikos charter, remove content that clearly violates it, and escalate borderline or sensitive cases."
+              message={i18nT("ui.ethikos.admin.moderation.ethikosModerationGuidelines")}
+              description={i18nT("ui.ethikos.admin.moderation.argumentsThatReceiveMultipleIndependentReportsMay")}
             />
           )}
 
@@ -702,8 +704,8 @@ export default function EthikosModerationPage(): JSX.Element {
             <Alert
               type="error"
               showIcon
-              message="Unable to load the moderation queue."
-              description="Check your connection or try again. If the problem persists, the Ethikos moderation service may be temporarily unavailable."
+              message={i18nT("ui.ethikos.admin.moderation.unableToLoadTheModerationQueue")}
+              description={i18nT("ui.ethikos.admin.moderation.checkYourConnectionOrTryAgainIf")}
             />
           )}
 
@@ -711,8 +713,8 @@ export default function EthikosModerationPage(): JSX.Element {
             <Alert
               type="success"
               showIcon
-              message="No open reports."
-              description="There are currently no unresolved reports on Ethikos debates."
+              message={i18nT("ui.ethikos.admin.moderation.noOpenReports")}
+              description={i18nT("ui.ethikos.admin.moderation.thereAreCurrentlyNoUnresolvedReportsOn")}
             />
           )}
 
@@ -726,7 +728,7 @@ export default function EthikosModerationPage(): JSX.Element {
             pagination={{
               pageSize: 10,
               showSizeChanger: true,
-              showTotal: (total) => `${total} reports`,
+              showTotal: (total) => i18nT("ui.ethikos.admin.moderation.reportsCount", { count: total }),
             }}
             rowSelection={{
               selectedRowKeys,
@@ -741,12 +743,12 @@ export default function EthikosModerationPage(): JSX.Element {
             tableAlertRender={({ selectedRowKeys: keys }) => (
               <Space size={8}>
                 <Text strong>{keys.length}</Text>
-                <Text>selected</Text>
+                <Text>{i18nT("ui.ethikos.admin.moderation.selected")}</Text>
               </Space>
             )}
             tableAlertOptionRender={() => (
               <Space wrap>
-                <Tooltip title="Content is acceptable; resolve reports and keep the debate visible.">
+                <Tooltip title={i18nT("ui.ethikos.admin.moderation.contentIsAcceptableResolveReportsAndKeep")}>
                   <Button
                     size="small"
                     icon={<CheckCircleOutlined />}
@@ -755,14 +757,14 @@ export default function EthikosModerationPage(): JSX.Element {
                       unauthorized || globalActionLoading || selectedCount === 0
                     }
                   >
-                    Bulk approve
+                    {i18nT("ui.ethikos.admin.moderation.bulkApprove")}
                   </Button>
                 </Tooltip>
 
                 <Popconfirm
-                  title="Remove selected content?"
-                  description="This will remove content for all selected reports and resolve them."
-                  okText="Remove"
+                  title={i18nT("ui.ethikos.admin.moderation.removeSelectedContent")}
+                  description={i18nT("ui.ethikos.admin.moderation.thisWillRemoveContentForAllSelected")}
+                  okText={i18nT("ui.ethikos.admin.moderation.remove")}
                   okType="danger"
                   icon={
                     <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />
@@ -772,7 +774,7 @@ export default function EthikosModerationPage(): JSX.Element {
                   }
                   onConfirm={() => onBulkAction('remove')}
                 >
-                  <Tooltip title="Remove content and resolve selected reports">
+                  <Tooltip title={i18nT("ui.ethikos.admin.moderation.removeContentAndResolveSelectedReports")}>
                     <Button
                       size="small"
                       danger
@@ -783,7 +785,7 @@ export default function EthikosModerationPage(): JSX.Element {
                         selectedCount === 0
                       }
                     >
-                      Bulk remove
+                      {i18nT("ui.ethikos.admin.moderation.bulkRemove")}
                     </Button>
                   </Tooltip>
                 </Popconfirm>
@@ -793,7 +795,7 @@ export default function EthikosModerationPage(): JSX.Element {
           />
 
           <Drawer
-            title="Report details"
+            title={i18nT("ui.ethikos.admin.moderation.reportDetails")}
             width={480}
             open={!!detailDrawerItem}
             onClose={() => setDetailDrawerItem(null)}
@@ -815,73 +817,73 @@ export default function EthikosModerationPage(): JSX.Element {
 
                 {detailDrawerItem.contextTitle && (
                   <div>
-                    <Text strong>Debate / topic</Text>
+                    <Text strong>{i18nT("ui.ethikos.admin.moderation.debateTopic")}</Text>
                     <Paragraph>{detailDrawerItem.contextTitle}</Paragraph>
                   </div>
                 )}
 
                 {detailDrawerItem.contentPreview && (
                   <div>
-                    <Text strong>Argument / message</Text>
+                    <Text strong>{i18nT("ui.ethikos.admin.moderation.argumentMessage")}</Text>
                     <Paragraph>{detailDrawerItem.contentPreview}</Paragraph>
                   </div>
                 )}
 
                 <div>
-                  <Text strong>People</Text>
+                  <Text strong>{i18nT("ui.ethikos.admin.moderation.people")}</Text>
                   <Paragraph>
                     {detailDrawerItem.authorName && (
                       <>
-                        Author:{' '}
+                        {i18nT("ui.ethikos.admin.moderation.author")}{' '}
                         <Text strong>{detailDrawerItem.authorName}</Text>
                         <br />
                       </>
                     )}
                     {detailDrawerItem.reporterName && (
                       <>
-                        Reporter: <Text>{detailDrawerItem.reporterName}</Text>
+                        {i18nT("ui.ethikos.admin.moderation.reporter")} <Text>{detailDrawerItem.reporterName}</Text>
                         <br />
                       </>
                     )}
                     {detailDrawerItem.reportCount && (
-                      <>Reports merged: {detailDrawerItem.reportCount}</>
+                      <>{i18nT("ui.ethikos.admin.moderation.reportsMerged")} {detailDrawerItem.reportCount}</>
                     )}
                   </Paragraph>
                 </div>
 
                 {detailDrawerItem.reporterMessage && (
                   <div>
-                    <Text strong>Reporter note</Text>
+                    <Text strong>{i18nT("ui.ethikos.admin.moderation.reporterNote")}</Text>
                     <Paragraph>{detailDrawerItem.reporterMessage}</Paragraph>
                   </div>
                 )}
 
                 <div>
-                  <Text strong>Timeline</Text>
+                  <Text strong>{i18nT("ui.ethikos.admin.moderation.timeline")}</Text>
                   <Paragraph type="secondary">
                     {formatDate(detailDrawerItem.createdAt) && (
                       <>
-                        Reported: {formatDate(detailDrawerItem.createdAt)}
+                        {i18nT("ui.ethikos.admin.moderation.reported")} {formatDate(detailDrawerItem.createdAt)}
                         <br />
                       </>
                     )}
                     {formatDate(detailDrawerItem.lastActionAt) && (
                       <>
-                        Last action:{' '}
+                        {i18nT("ui.ethikos.admin.moderation.lastAction")}{' '}
                         {formatDate(detailDrawerItem.lastActionAt)}
                       </>
                     )}
                     {!formatDate(detailDrawerItem.createdAt) &&
                       !formatDate(detailDrawerItem.lastActionAt) &&
-                      'No timestamp available.'}
+                      i18nT("ui.ethikos.admin.moderation.noTimestampAvailable")}
                   </Paragraph>
                 </div>
 
                 <Alert
                   type="info"
                   showIcon
-                  message="Next steps"
-                  description="Use the actions in the table to approve or remove this content. For borderline arguments or repeat offenders, escalate via your internal Ethikos governance process."
+                  message={i18nT("ui.ethikos.admin.moderation.nextSteps")}
+                  description={i18nT("ui.ethikos.admin.moderation.useTheActionsInTheTableTo")}
                 />
               </Space>
             )}

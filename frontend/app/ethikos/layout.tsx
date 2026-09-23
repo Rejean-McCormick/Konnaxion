@@ -3,6 +3,7 @@
 // app/ethikos/layout.tsx
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { App as AntdApp } from 'antd'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { ReactNode } from 'react'
@@ -71,8 +72,9 @@ function EthikosShell({ children }: SegmentLayoutProps): JSX.Element {
 export default function SegmentLayout({
   children,
 }: SegmentLayoutProps): JSX.Element {
+  const { t: i18nT } = useLanguage();
   return (
-    <Suspense fallback={<Loading fullscreen message="Loading ethiKos…" />}>
+    <Suspense fallback={<Loading fullscreen message={i18nT("ui.ethikos.layout.loadingEthikos")} />}>
       <EthikosShell>{children}</EthikosShell>
     </Suspense>
   )

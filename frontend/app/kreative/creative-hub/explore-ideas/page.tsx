@@ -3,6 +3,7 @@
 
 // File: C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\explore-ideas\page.tsx
 
+import { useLanguage } from '@/context/LanguageContext';
 import { SearchOutlined } from '@ant-design/icons';
 import {
   Button,
@@ -82,6 +83,7 @@ const creativeIdeasData: CreativeIdea[] = [
 ];
 
 export default function ExploreIdeasPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -129,8 +131,8 @@ export default function ExploreIdeasPage(): JSX.Element {
 
   return (
     <KreativePageShell
-      title="Explore Ideas"
-      subtitle="Browse curated prompts and articles across creative domains."
+      title={i18nT("ui.kreative.creativeHub.exploreIdeas.exploreIdeas")}
+      subtitle={i18nT("ui.kreative.creativeHub.exploreIdeas.browseCuratedPromptsAndArticlesAcrossCreative")}
       primaryAction={
         <Button
           type="primary"
@@ -138,14 +140,14 @@ export default function ExploreIdeasPage(): JSX.Element {
             router.push('/kreative/idea-incubator/create-new-idea')
           }
         >
-          Create New Idea
+          {i18nT("ui.kreative.creativeHub.exploreIdeas.createNewIdea")}
         </Button>
       }
     >
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         <Space wrap>
           <Input
-            placeholder="Search ideas"
+            placeholder={i18nT("ui.kreative.creativeHub.exploreIdeas.searchIdeas")}
             prefix={<SearchOutlined />}
             value={searchQuery}
             onChange={(e) => {
@@ -163,10 +165,10 @@ export default function ExploreIdeasPage(): JSX.Element {
               setCurrentPage(1);
             }}
             options={[
-              { value: 'All', label: 'All Domains' },
-              { value: 'Art', label: 'Art' },
-              { value: 'Music', label: 'Music' },
-              { value: 'Writing', label: 'Writing' },
+              { value: 'All', label: i18nT("ui.kreative.creativeHub.exploreIdeas.allDomains") },
+              { value: 'Art', label: i18nT("ui.kreative.creativeHub.exploreIdeas.art") },
+              { value: 'Music', label: i18nT("ui.kreative.creativeHub.exploreIdeas.music") },
+              { value: 'Writing', label: i18nT("ui.kreative.creativeHub.exploreIdeas.writing") },
             ]}
             style={{ width: 180 }}
           />
@@ -178,8 +180,8 @@ export default function ExploreIdeasPage(): JSX.Element {
               setCurrentPage(1);
             }}
             options={[
-              { value: 'newest', label: 'Newest' },
-              { value: 'popular', label: 'Most Popular' },
+              { value: 'newest', label: i18nT("ui.kreative.creativeHub.exploreIdeas.newest") },
+              { value: 'popular', label: i18nT("ui.kreative.creativeHub.exploreIdeas.mostPopular") },
             ]}
             style={{ width: 180 }}
           />
@@ -218,7 +220,7 @@ export default function ExploreIdeasPage(): JSX.Element {
                   {idea.excerpt}
                 </Paragraph>
 
-                <Text strong>By: </Text>
+                <Text strong>{i18nT("ui.kreative.creativeHub.exploreIdeas.by")} </Text>
                 <Text>{idea.author}</Text>
               </Card>
             </Col>
@@ -236,19 +238,7 @@ export default function ExploreIdeasPage(): JSX.Element {
         </div>
       </Space>
 
-      <style jsx>{`
-        .clamp-1 {
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-        }
-        .clamp-2 {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-      `}</style>
+      <style jsx>{`.clamp-1 { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; } .clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }`}</style>
     </KreativePageShell>
   );
 }

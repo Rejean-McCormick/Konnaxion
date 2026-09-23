@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Button, Card, Slider, Space, Tag, Typography } from 'antd'
 
 import type { TopicStanceValue } from '@/services/deliberate'
@@ -23,20 +24,20 @@ export default function StanceComposerCard({
   onChange: (value: TopicStanceValue) => void
   onSave: () => void
 }): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const currentLabel = stanceLabel(value)
   const currentColor = stanceColor(value)
 
   return (
     <Card
-      title="Set your position"
+      title={i18nT("ui.ethikos.deliberate.topic.stancecomposercard.setYourPosition")}
       extra={<Tag color={currentColor}>{currentLabel}</Tag>}
     >
       <Space direction="vertical" size={16} style={{ width: '100%' }}>
         <div>
-          <Text strong>Where do you stand on this topic?</Text>
+          <Text strong>{i18nT("ui.ethikos.deliberate.topic.stancecomposercard.whereDoYouStandOnThisTopic")}</Text>
           <Paragraph type="secondary" style={{ marginBottom: 0, marginTop: 4 }}>
-            Choose a topic-level stance before adding or reviewing arguments.
-            You can update it as the deliberation evolves.
+            {i18nT("ui.ethikos.deliberate.topic.stancecomposercard.chooseATopicLevelStanceBeforeAdding")}
           </Paragraph>
         </div>
 
@@ -67,9 +68,9 @@ export default function StanceComposerCard({
             gap: 12,
           }}
         >
-          <Text type="secondary">Oppose</Text>
-          <Text type="secondary">Neutral</Text>
-          <Text type="secondary">Support</Text>
+          <Text type="secondary">{i18nT("ui.ethikos.deliberate.topic.stancecomposercard.oppose")}</Text>
+          <Text type="secondary">{i18nT("ui.ethikos.deliberate.topic.stancecomposercard.neutral")}</Text>
+          <Text type="secondary">{i18nT("ui.ethikos.deliberate.topic.stancecomposercard.support")}</Text>
         </div>
 
         <Button
@@ -78,12 +79,11 @@ export default function StanceComposerCard({
           onClick={onSave}
           block
         >
-          Save topic stance
+          {i18nT("ui.ethikos.deliberate.topic.stancecomposercard.saveTopicStance")}
         </Button>
 
         <Text type="secondary">
-          This is your position on the topic. Impact votes belong to individual
-          arguments.
+          {i18nT("ui.ethikos.deliberate.topic.stancecomposercard.thisIsYourPositionOnTheTopic")}
         </Text>
       </Space>
     </Card>

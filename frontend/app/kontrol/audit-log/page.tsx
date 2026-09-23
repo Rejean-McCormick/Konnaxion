@@ -1,6 +1,7 @@
 // FILE: frontend/app/kontrol/audit-log/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   CloudDownloadOutlined,
   ReloadOutlined,
@@ -54,6 +55,7 @@ type AuditLogApiResponse = {
 };
 
 export default function AuditLogPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const actionRef = useRef<ActionType>();
 
   // Helper for Actor Icons
@@ -79,7 +81,7 @@ export default function AuditLogPage(): JSX.Element {
 
   const columns: ProColumns<LogItem>[] = [
     {
-      title: 'Log ID',
+      title: i18nT("ui.kontrol.auditLog.logId"),
       dataIndex: 'id',
       copyable: true,
       width: 100,
@@ -87,7 +89,7 @@ export default function AuditLogPage(): JSX.Element {
       fixed: 'left',
     },
     {
-      title: 'Actor',
+      title: i18nT("ui.kontrol.auditLog.actor"),
       dataIndex: 'actor',
       width: 140,
       render: (dom, entity) => (
@@ -98,26 +100,26 @@ export default function AuditLogPage(): JSX.Element {
       ),
     },
     {
-      title: 'Module',
+      title: i18nT("ui.kontrol.auditLog.module"),
       dataIndex: 'module',
       width: 160,
       valueType: 'select',
       valueEnum: {
-        all: { text: 'All modules' },
-        Ekoh: { text: 'EkoH' },
-        Ethikos: { text: 'EthiKos' },
-        KeenKonnect: { text: 'keenKonnect' },
-        KonnectED: { text: 'KonnectED' },
-        Kreative: { text: 'Kreative' },
-        TeamBuilder: { text: 'Team Builder' },
-        System: { text: 'System / Platform' },
+        all: { text: i18nT("ui.kontrol.auditLog.allModules") },
+        Ekoh: { text: i18nT("ui.kontrol.auditLog.ekoh") },
+        Ethikos: { text: i18nT("ui.kontrol.auditLog.ethikos") },
+        KeenKonnect: { text: i18nT("ui.kontrol.auditLog.keenkonnect") },
+        KonnectED: { text: i18nT("ui.kontrol.auditLog.konnected") },
+        Kreative: { text: i18nT("ui.kontrol.auditLog.kreative") },
+        TeamBuilder: { text: i18nT("ui.kontrol.auditLog.teamBuilder") },
+        System: { text: i18nT("ui.kontrol.auditLog.systemPlatform") },
       },
       fieldProps: {
-        placeholder: 'Filter by module',
+        placeholder: i18nT("ui.kontrol.auditLog.filterByModule"),
       },
     },
     {
-      title: 'Action',
+      title: i18nT("ui.kontrol.auditLog.action"),
       dataIndex: 'action',
       width: 160,
       render: (_, entity) => (
@@ -127,21 +129,21 @@ export default function AuditLogPage(): JSX.Element {
       ),
     },
     {
-      title: 'Target / Details',
+      title: i18nT("ui.kontrol.auditLog.targetDetails"),
       dataIndex: 'target',
       ellipsis: true,
     },
     {
-      title: 'Status',
+      title: i18nT("ui.kontrol.auditLog.status"),
       dataIndex: 'status',
       width: 100,
       valueEnum: {
-        success: { text: 'Success', status: 'Success' },
-        failure: { text: 'Failure', status: 'Error' },
+        success: { text: i18nT("ui.kontrol.auditLog.success"), status: 'Success' },
+        failure: { text: i18nT("ui.kontrol.auditLog.failure"), status: 'Error' },
       },
     },
     {
-      title: 'IP Address',
+      title: i18nT("ui.kontrol.auditLog.ipAddress"),
       dataIndex: 'ip',
       valueType: 'text',
       width: 120,
@@ -149,7 +151,7 @@ export default function AuditLogPage(): JSX.Element {
       search: false,
     },
     {
-      title: 'Timestamp',
+      title: i18nT("ui.kontrol.auditLog.timestamp"),
       dataIndex: 'timestamp',
       valueType: 'dateTime',
       sorter: true,
@@ -159,20 +161,20 @@ export default function AuditLogPage(): JSX.Element {
 
   const handleExport = () => {
     message.warning(
-      'CSV export is unavailable because the audit endpoint currently exposes JSON only.',
+      i18nT("ui.kontrol.auditLog.csvExportIsUnavailableBecauseTheAudit"),
     );
   };
 
-  const title = 'System audit log';
+  const title = i18nT("ui.kontrol.auditLog.systemAuditLog");
   const subtitle =
-    'Platform-wide record of administrative and system actions. Use the Module filter to focus on a specific module (Ethikos, KonnectED, etc.).';
+    i18nT("ui.kontrol.auditLog.platformWideRecordOfAdministrativeAndSystem");
 
   const secondaryActions = (
     <Button
       icon={<ReloadOutlined />}
       onClick={() => actionRef.current?.reload()}
     >
-      Refresh
+      {i18nT("ui.kontrol.auditLog.refresh")}
     </Button>
   );
 
@@ -182,9 +184,9 @@ export default function AuditLogPage(): JSX.Element {
       icon={<CloudDownloadOutlined />}
       onClick={handleExport}
       disabled
-      title="No CSV export endpoint is exposed."
+      title={i18nT("ui.kontrol.auditLog.noCsvExportEndpointIsExposed")}
     >
-      Export unavailable
+      {i18nT("ui.kontrol.auditLog.exportUnavailable")}
     </Button>
   );
 
@@ -192,7 +194,7 @@ export default function AuditLogPage(): JSX.Element {
     <KontrolPageShell
       title={title}
       subtitle={subtitle}
-      metaTitle="Kontrol · Platform · System audit log"
+      metaTitle={i18nT("ui.kontrol.auditLog.kontrolPlatformSystemAuditLog")}
       scope="platform"
       primaryAction={primaryAction}
       secondaryActions={secondaryActions}
@@ -204,8 +206,7 @@ export default function AuditLogPage(): JSX.Element {
         style={{ width: '100%' }}
       >
         <Tag>
-          Modules: EkoH · EthiKos · KonnectED · keenKonnect · Kreative · Team
-          Builder
+          {i18nT("ui.kontrol.auditLog.modulesEkohEthikosKonnectedKeenkonnectKreativeTeam")}
         </Tag>
 
         <ProTable<LogItem>
@@ -226,7 +227,7 @@ export default function AuditLogPage(): JSX.Element {
             setting: true,
           }}
           dateFormatter="string"
-          headerTitle="Recent activity"
+          headerTitle={i18nT("ui.kontrol.auditLog.recentActivity")}
           /**
            * WIRED: Fetch from Django API
            * The return type is fully annotated to keep TypeScript happy.
@@ -308,7 +309,7 @@ export default function AuditLogPage(): JSX.Element {
             } catch (error) {
                
               console.error('Audit log fetch error:', error);
-              message.error('Failed to load audit logs');
+              message.error(i18nT("ui.kontrol.auditLog.failedToLoadAuditLogs"));
               return {
                 data: [],
                 success: false,

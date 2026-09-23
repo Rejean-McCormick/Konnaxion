@@ -22,25 +22,30 @@ export const EKOH_ROUTES = {
 const overview: Route = {
   path: EKOH_ROUTES.dashboard,
   name: 'Overview',
+  labelKey: 'navigation.overview',
   icon: <DashboardOutlined />,
 };
 
 const reputationGroup: Route = {
   name: 'Reputation',
+  labelKey: 'navigation.reputation',
   views: [
     {
       path: EKOH_ROUTES.score,
       name: 'Profile analytics',
+      labelKey: 'navigation.profileAnalytics',
       icon: <LineChartOutlined />,
     },
     {
       path: EKOH_ROUTES.expertise,
       name: 'Expertise areas',
+      labelKey: 'navigation.expertiseAreas',
       icon: <DeploymentUnitOutlined />,
     },
     {
       path: EKOH_ROUTES.badges,
       name: 'Achievements & badges',
+      labelKey: 'navigation.achievementsBadges',
       icon: <StarOutlined />,
     },
   ],
@@ -48,10 +53,12 @@ const reputationGroup: Route = {
 
 const influenceGroup: Route = {
   name: 'Influence',
+  labelKey: 'navigation.influence',
   views: [
     {
       path: EKOH_ROUTES.contextualInfluence,
       name: 'Contextual influence',
+      labelKey: 'navigation.contextualInfluence',
       icon: <BorderOutlined />,
     },
   ],

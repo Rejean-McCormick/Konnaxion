@@ -2,6 +2,7 @@
 // C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\UserCard.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import type { ColumnConfig } from '@ant-design/plots';
 import { Card, Skeleton, Statistic } from 'antd';
 import dynamic from 'next/dynamic';
@@ -21,11 +22,13 @@ export interface UserCardProps {
 }
 
 const UserCard: React.FC<UserCardProps> = ({
-  title = 'New Users',
+  title: titleProp,
   total,
   trend = [],
   loading = false,
 }) => {
+  const { t: i18nT } = useLanguage();
+  const title = titleProp ?? i18nT("ui.dashboardComponents.usercard.newUsers");
   const series: number[] = Array.isArray(trend) ? trend : [];
   const data = series.map((y, i) => ({
     idx: String(i + 1),

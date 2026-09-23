@@ -1,5 +1,6 @@
 // FILE: frontend/modules/insights/pages/SmartVoteDashboard.tsx
 "use client"; 
+import { useLanguage } from '@/context/LanguageContext';
 import dayjs from "dayjs";
 import { useState } from "react";
 
@@ -11,6 +12,7 @@ import TimeRangePicker from "../components/TimeRangePicker";
 import { useReport } from "../hooks/useReport";
 
 export default function SmartVoteDashboard() {
+  const { t: i18nT } = useLanguage();
   const [range, setRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([
     dayjs().subtract(30, "day"),
     dayjs(),
@@ -27,7 +29,7 @@ export default function SmartVoteDashboard() {
       </div>
 
       {isLoading || !data ? (
-        <p>Loading…</p>
+        <p>{i18nT("ui.insights.pages.smartvotedashboard.loading")}</p>
       ) : (
         <SmartVoteChart
           labels={data.labels}

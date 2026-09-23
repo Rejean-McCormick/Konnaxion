@@ -110,6 +110,7 @@ class Command(BaseCommand):
                 "category": category,
                 "created_by": user,
                 "status": EthikosTopic.OPEN,
+                "expertise_category": None,
             },
         )
 

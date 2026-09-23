@@ -1,5 +1,7 @@
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   LineChartOutlined,
   PlayCircleOutlined,
@@ -110,24 +112,24 @@ type ChartPoint = {
   value: number;
 };
 
-const DIMENSION_OPTIONS = [
-  { label: 'Module (Ekoh / Ethikos / …)', value: 'module' },
-  { label: 'Country / region', value: 'region' },
-  { label: 'Ekoh domain', value: 'ekoh_domain' },
-  { label: 'User segment (role)', value: 'segment' },
-  { label: 'Device type', value: 'device' },
-] as const;
+const DIMENSION_OPTIONS = (i18nT: TranslateFunction) => ([
+  { label: i18nT("ui.reports.custom.moduleEkohEthikos"), value: 'module' },
+  { label: i18nT("ui.reports.custom.countryRegion"), value: 'region' },
+  { label: i18nT("ui.reports.custom.ekohDomain"), value: 'ekoh_domain' },
+  { label: i18nT("ui.reports.custom.userSegmentRole"), value: 'segment' },
+  { label: i18nT("ui.reports.custom.deviceType"), value: 'device' },
+] as const);
 
-function getMetricLabel(metric?: BackendMetric): string {
+function getMetricLabel(i18nT: TranslateFunction, metric?: BackendMetric): string {
   switch (metric) {
     case 'smart-vote':
-      return 'Smart Vote score';
+      return i18nT("ui.reports.custom.smartVoteScore");
     case 'usage':
-      return 'Active users';
+      return i18nT("ui.reports.custom.activeUsers");
     case 'perf':
-      return 'Latency P95 (ms)';
+      return i18nT("ui.reports.custom.latencyP95Ms");
     default:
-      return 'Metric';
+      return i18nT("ui.reports.custom.metric");
   }
 }
 
@@ -187,6 +189,7 @@ function statusColor(status: StreamStatus): string {
 }
 
 export default function CustomReportBuilderPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const formRef = useRef<ProFormInstance<ReportConfig>>();
   const wsRef = useRef<WebSocket | null>(null);
   const pendingPayloadRef = useRef<string | null>(null);
@@ -289,7 +292,7 @@ export default function CustomReportBuilderPage(): JSX.Element {
 
     socket.onerror = () => {
       setStreamStatus('error');
-      setStreamError('WebSocket error');
+      setStreamError(i18nT("ui.reports.custom.websocketError"));
     };
 
     socket.onclose = () => {
@@ -303,7 +306,7 @@ export default function CustomReportBuilderPage(): JSX.Element {
         wsRef.current = null;
       }
     };
-  }, []);
+  }, [i18nT]);
 
   useEffect(() => {
     if (!config?.autoRefreshSeconds) return;
@@ -340,33 +343,32 @@ export default function CustomReportBuilderPage(): JSX.Element {
 
   return (
     <ReportsPageShell
-      title="Custom report builder"
-      subtitle="Compose your own Insights view by picking metrics, dimensions, filters, and layout."
-      metaTitle="Reports · Custom report builder"
+      title={i18nT("ui.reports.custom.customReportBuilder")}
+      subtitle={i18nT("ui.reports.custom.composeYourOwnInsightsViewByPicking")}
+      metaTitle={i18nT("ui.reports.custom.reportsCustomReportBuilder")}
       primaryAction={
         <Button
           type="primary"
           icon={<PlayCircleOutlined />}
           onClick={() => formRef.current?.submit?.()}
         >
-          Run once
+          {i18nT("ui.reports.custom.runOnce")}
         </Button>
       }
       secondaryActions={
         <Space wrap>
-          <Button icon={<SaveOutlined />}>Save as preset</Button>
-          <Button icon={<SettingOutlined />}>Manage presets</Button>
+          <Button icon={<SaveOutlined />}>{i18nT("ui.reports.custom.saveAsPreset")}</Button>
+          <Button icon={<SettingOutlined />}>{i18nT("ui.reports.custom.managePresets")}</Button>
         </Space>
       }
     >
       <ProCard gutter={[16, 16]} split="vertical">
         <ProCard
           colSpan={{ xs: 24, lg: 11, xxl: 10 }}
-          title="Configure report"
+          title={i18nT("ui.reports.custom.configureReport")}
           extra={
             <Text type="secondary">
-              Choose metrics, groupings, and filters. Then stream a backend
-              preview.
+              {i18nT("ui.reports.custom.chooseMetricsGroupingsAndFiltersThenStream")}
             </Text>
           }
         >
@@ -392,44 +394,44 @@ export default function CustomReportBuilderPage(): JSX.Element {
           >
             <ProFormText
               name="name"
-              label="Report name"
-              placeholder="e.g. Smart Vote vs adoption (last 30 days)"
+              label={i18nT("ui.reports.custom.reportName")}
+              placeholder={i18nT("ui.reports.custom.eGSmartVoteVsAdoptionLast")}
               rules={[
-                { required: true, message: 'Please provide a report name' },
+                { required: true, message: i18nT("ui.reports.custom.pleaseProvideAReportName") },
               ]}
             />
 
             <ProFormSelect
               name="primaryMetric"
-              label="Primary metric"
-              placeholder="Select the main metric"
+              label={i18nT("ui.reports.custom.primaryMetric")}
+              placeholder={i18nT("ui.reports.custom.selectTheMainMetric")}
               rules={[
-                { required: true, message: 'Please choose a primary metric' },
+                { required: true, message: i18nT("ui.reports.custom.pleaseChooseAPrimaryMetric") },
               ]}
               options={[
-                { label: 'Smart Vote score', value: 'smart-vote' },
-                { label: 'Usage / active users', value: 'usage' },
-                { label: 'API latency (P95)', value: 'perf' },
+                { label: i18nT("ui.reports.custom.smartVoteScore"), value: 'smart-vote' },
+                { label: i18nT("ui.reports.custom.usageActiveUsers"), value: 'usage' },
+                { label: i18nT("ui.reports.custom.apiLatencyP95"), value: 'perf' },
               ]}
             />
 
             <ProFormSelect
               name="timeGrain"
-              label="Time grain"
-              placeholder="Select the aggregation grain"
+              label={i18nT("ui.reports.custom.timeGrain")}
+              placeholder={i18nT("ui.reports.custom.selectTheAggregationGrain")}
               options={[
-                { label: 'Day', value: 'day' },
-                { label: 'Week', value: 'week' },
+                { label: i18nT("ui.reports.custom.day"), value: 'day' },
+                { label: i18nT("ui.reports.custom.week"), value: 'week' },
               ]}
             />
 
             <ProFormSelect
               name="dimensions"
-              label="Context dimensions"
-              placeholder="Select dimensions"
+              label={i18nT("ui.reports.custom.contextDimensions")}
+              placeholder={i18nT("ui.reports.custom.selectDimensions")}
               mode="multiple"
               allowClear
-              options={DIMENSION_OPTIONS.map((item) => ({
+              options={DIMENSION_OPTIONS(i18nT).map((item) => ({
                 label: item.label,
                 value: item.value,
               }))}
@@ -437,7 +439,7 @@ export default function CustomReportBuilderPage(): JSX.Element {
 
             <ProFormDateRangePicker
               name="range"
-              label="Date range"
+              label={i18nT("ui.reports.custom.dateRange")}
               fieldProps={{
                 allowClear: true,
               }}
@@ -445,17 +447,17 @@ export default function CustomReportBuilderPage(): JSX.Element {
 
             <ProFormCheckbox.Group
               name="dimensions"
-              label="Highlight dimensions"
+              label={i18nT("ui.reports.custom.highlightDimensions")}
               options={[
-                { label: 'Module', value: 'module' },
-                { label: 'Region', value: 'region' },
-                { label: 'Segment', value: 'segment' },
+                { label: i18nT("ui.reports.custom.module"), value: 'module' },
+                { label: i18nT("ui.reports.custom.region"), value: 'region' },
+                { label: i18nT("ui.reports.custom.segment"), value: 'segment' },
               ]}
             />
 
             <ProFormSwitch
               name="includeRawSamples"
-              label="Include raw samples"
+              label={i18nT("ui.reports.custom.includeRawSamples")}
               fieldProps={{
                 checkedChildren: 'Raw on',
                 unCheckedChildren: 'Raw off',
@@ -464,7 +466,7 @@ export default function CustomReportBuilderPage(): JSX.Element {
 
             <ProFormSlider
               name="autoRefreshSeconds"
-              label="Auto-refresh interval (seconds)"
+              label={i18nT("ui.reports.custom.autoRefreshIntervalSeconds")}
               min={0}
               max={120}
               tooltip={{ open: true }}
@@ -480,7 +482,7 @@ export default function CustomReportBuilderPage(): JSX.Element {
 
             <ProFormSwitch
               name="isPublic"
-              label="Shareable link"
+              label={i18nT("ui.reports.custom.shareableLink")}
               fieldProps={{
                 checkedChildren: 'Public preset',
                 unCheckedChildren: 'Private',
@@ -491,36 +493,35 @@ export default function CustomReportBuilderPage(): JSX.Element {
 
         <ProCard
           colSpan="auto"
-          title="Live preview"
+          title={i18nT("ui.reports.custom.livePreview")}
           extra={
             <Space>
               <Tag color={statusColor(streamStatus)}>
-                WS: {streamStatus.toUpperCase()}
+                {i18nT("ui.reports.custom.ws")} {streamStatus.toUpperCase()}
               </Tag>
               {config?.name ? (
                 <Tag color="geekblue">{config.name}</Tag>
               ) : (
-                <Text type="secondary">No configuration yet</Text>
+                <Text type="secondary">{i18nT("ui.reports.custom.noConfigurationYet")}</Text>
               )}
             </Space>
           }
         >
           {!config ? (
-            <Empty description="Configure your report on the left, then click “Update preview” to stream a backend preview." />
+            <Empty description={i18nT("ui.reports.custom.configureYourReportOnTheLeftThen")} />
           ) : (
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
               <Alert
                 type={streamError ? 'error' : 'info'}
                 showIcon
-                message={streamError ? 'Preview stream error' : 'Backend preview'}
+                message={streamError ? i18nT("ui.reports.custom.previewStreamError") : i18nT("ui.reports.custom.backendPreview")}
                 description={
                   streamError ? (
                     <Text>{streamError}</Text>
                   ) : (
                     <Text>
-                      This panel is now wired to the backend websocket at{' '}
-                      <code>/ws/reports/custom</code>. Current data is still a
-                      preview stream, not final analytics.
+                      {i18nT("ui.reports.custom.thisPanelIsNowWiredToThe")}{' '}
+                      <code>/ws/reports/custom</code>{i18nT("ui.reports.custom.currentDataIsStillAPreviewStream")}
                     </Text>
                   )
                 }
@@ -532,16 +533,16 @@ export default function CustomReportBuilderPage(): JSX.Element {
                 style={{ width: '100%', justifyContent: 'space-between' }}
               >
                 <Statistic
-                  title={getMetricLabel(config.primaryMetric)}
+                  title={getMetricLabel(i18nT, config.primaryMetric)}
                   value={latestValue}
                   suffix={config.primaryMetric === 'perf' ? ' ms' : ''}
                 />
                 <Statistic
-                  title="Samples"
+                  title={i18nT("ui.reports.custom.samples")}
                   value={summary?.sampleCount ?? samples.length}
                 />
                 <Statistic
-                  title="Duration"
+                  title={i18nT("ui.reports.custom.duration")}
                   value={summary?.durationMs ?? 0}
                   suffix="ms"
                 />
@@ -551,8 +552,8 @@ export default function CustomReportBuilderPage(): JSX.Element {
 
               <List
                 size="small"
-                header={<Text strong>Aggregates</Text>}
-                locale={{ emptyText: 'No summary yet' }}
+                header={<Text strong>{i18nT("ui.reports.custom.aggregates")}</Text>}
+                locale={{ emptyText: i18nT("ui.reports.custom.noSummaryYet") }}
                 dataSource={aggregateEntries}
                 renderItem={([key, value]) => (
                   <List.Item>
@@ -568,11 +569,11 @@ export default function CustomReportBuilderPage(): JSX.Element {
 
               <ProCard
                 ghost
-                title="Trend visualization"
-                extra={<Tag icon={<LineChartOutlined />}>WS stream</Tag>}
+                title={i18nT("ui.reports.custom.trendVisualization")}
+                extra={<Tag icon={<LineChartOutlined />}>{i18nT("ui.reports.custom.wsStream")}</Tag>}
               >
                 {chartData.length === 0 ? (
-                  <Empty description="No sample points received yet." />
+                  <Empty description={i18nT("ui.reports.custom.noSamplePointsReceivedYet")} />
                 ) : (
                   <div style={{ width: '100%', height: 300 }}>
                     <ResponsiveContainer>
@@ -600,13 +601,13 @@ export default function CustomReportBuilderPage(): JSX.Element {
 
               <List
                 size="small"
-                header={<Text strong>Last samples</Text>}
-                locale={{ emptyText: 'No streamed samples yet' }}
+                header={<Text strong>{i18nT("ui.reports.custom.lastSamples")}</Text>}
+                locale={{ emptyText: i18nT("ui.reports.custom.noStreamedSamplesYet") }}
                 dataSource={samples.slice(-5).reverse()}
                 renderItem={(item, index) => (
                   <List.Item key={`${item?.ts ?? 'sample'}-${index}`}>
                     <Space split={<Divider type="vertical" />} wrap>
-                      <Text>{item?.label ?? item?.ts ?? 'sample'}</Text>
+                      <Text>{item?.label ?? item?.ts ?? i18nT("ui.reports.custom.sample")}</Text>
                       <Text type="secondary">
                         {String(
                           item?.metrics?.[metricValueKey(config.primaryMetric)] ??
@@ -624,7 +625,7 @@ export default function CustomReportBuilderPage(): JSX.Element {
                   <Alert
                     type="success"
                     showIcon
-                    message="Last backend message received"
+                    message={i18nT("ui.reports.custom.lastBackendMessageReceived")}
                     description={
                       <pre
                         style={{

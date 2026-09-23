@@ -1,6 +1,8 @@
 // FILE: frontend/app/ethikos/admin/roles/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import { ReloadOutlined } from '@ant-design/icons';
 import {
   PageContainer,
@@ -33,13 +35,14 @@ const { Text } = Typography;
 
 type StatusFilter = 'all' | 'enabled' | 'disabled';
 
-const STATUS_FILTER_OPTIONS: { label: string; value: StatusFilter }[] = [
-  { label: 'All', value: 'all' },
-  { label: 'Enabled', value: 'enabled' },
-  { label: 'Disabled', value: 'disabled' },
-];
+const STATUS_FILTER_OPTIONS = (i18nT: TranslateFunction): { label: string; value: StatusFilter }[] => ([
+  { label: i18nT("ui.ethikos.admin.roles.all"), value: 'all' },
+  { label: i18nT("ui.ethikos.admin.roles.enabled"), value: 'enabled' },
+  { label: i18nT("ui.ethikos.admin.roles.disabled"), value: 'disabled' },
+]);
 
 export default function RoleManagement(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [updatingRoleId, setUpdatingRoleId] = useState<string | null>(null);
 
@@ -91,12 +94,12 @@ export default function RoleManagement(): JSX.Element {
       await toggleRole(role.id, checked);
 
       message.success(
-        checked ? `${role.name} enabled.` : `${role.name} disabled.`,
+        checked ? i18nT("ui.ethikos.admin.roles.enabled_2bb24b", { name: role.name }) : i18nT("ui.ethikos.admin.roles.disabled_c47717", { name: role.name }),
       );
 
       refresh();
     } catch {
-      message.error('Unable to update this role. Please try again.');
+      message.error(i18nT("ui.ethikos.admin.roles.unableToUpdateThisRolePleaseTry"));
     } finally {
       setUpdatingRoleId(null);
     }
@@ -104,7 +107,7 @@ export default function RoleManagement(): JSX.Element {
 
   const columns: ProColumns<RoleRow>[] = [
     {
-      title: 'Role',
+      title: i18nT("ui.ethikos.admin.roles.role"),
       dataIndex: 'name',
       width: 260,
       ellipsis: true,
@@ -114,27 +117,27 @@ export default function RoleManagement(): JSX.Element {
 
           {row.role && (
             <Text type="secondary" ellipsis>
-              Permission role: {row.role}
+              {i18nT("ui.ethikos.admin.roles.permissionRole")} {row.role}
             </Text>
           )}
 
           {row.topicTitle && (
             <Text type="secondary" ellipsis>
-              Topic: {row.topicTitle}
+              {i18nT("ui.ethikos.admin.roles.topic")} {row.topicTitle}
             </Text>
           )}
         </Space>
       ),
     },
     {
-      title: 'Users',
+      title: i18nT("ui.ethikos.admin.roles.users"),
       dataIndex: 'userCount',
       width: 120,
       align: 'right',
       render: (_dom, row) => <Tag>{row.userCount ?? 0}</Tag>,
     },
     {
-      title: 'Enabled',
+      title: i18nT("ui.ethikos.admin.roles.enabled"),
       dataIndex: 'enabled',
       width: 140,
       render: (_dom, row) => (
@@ -152,9 +155,9 @@ export default function RoleManagement(): JSX.Element {
 
   return (
     <EthikosPageShell
-      title="Role management"
-      sectionLabel="Admin"
-      subtitle="Configure who can moderate debates, manage consultations, or access sensitive impact dashboards in Ethikos."
+      title={i18nT("ui.ethikos.admin.roles.roleManagement")}
+      sectionLabel={i18nT("ui.ethikos.admin.roles.admin")}
+      subtitle={i18nT("ui.ethikos.admin.roles.configureWhoCanModerateDebatesManageConsultations")}
     >
       <PageContainer ghost loading={loading}>
         <Space
@@ -165,12 +168,10 @@ export default function RoleManagement(): JSX.Element {
           <Alert
             type="info"
             showIcon
-            message="Role-based access for Ethikos"
+            message={i18nT("ui.ethikos.admin.roles.roleBasedAccessForEthikos")}
             description={
               <Text type="secondary">
-                Use roles to control who can moderate debates, manage
-                consultations, or access sensitive impact dashboards. Toggling a
-                role updates access for all users in that group.
+                {i18nT("ui.ethikos.admin.roles.useRolesToControlWhoCanModerate")}
               </Text>
             }
           />
@@ -179,8 +180,8 @@ export default function RoleManagement(): JSX.Element {
             <Alert
               type="error"
               showIcon
-              message="Unable to load Ethikos roles."
-              description="Check your connection or try again. If the problem persists, the Ethikos admin service may be temporarily unavailable."
+              message={i18nT("ui.ethikos.admin.roles.unableToLoadEthikosRoles")}
+              description={i18nT("ui.ethikos.admin.roles.checkYourConnectionOrTryAgainIf")}
             />
           )}
 
@@ -193,16 +194,16 @@ export default function RoleManagement(): JSX.Element {
             }}
           >
             <Space size="large" wrap>
-              <Statistic title="Defined roles" value={stats.totalRoles} />
-              <Statistic title="Enabled roles" value={stats.enabledRoles} />
-              <Statistic title="Assigned users" value={stats.totalUsers} />
+              <Statistic title={i18nT("ui.ethikos.admin.roles.definedRoles")} value={stats.totalRoles} />
+              <Statistic title={i18nT("ui.ethikos.admin.roles.enabledRoles")} value={stats.enabledRoles} />
+              <Statistic title={i18nT("ui.ethikos.admin.roles.assignedUsers")} value={stats.totalUsers} />
             </Space>
 
             <Space wrap>
               <Segmented<StatusFilter>
                 value={statusFilter}
                 onChange={(value) => setStatusFilter(value)}
-                options={STATUS_FILTER_OPTIONS}
+                options={STATUS_FILTER_OPTIONS(i18nT)}
               />
 
               <Button
@@ -212,7 +213,7 @@ export default function RoleManagement(): JSX.Element {
                 loading={loading}
                 disabled={updatingRoleId !== null}
               >
-                Refresh
+                {i18nT("ui.ethikos.admin.roles.refresh")}
               </Button>
             </Space>
           </Space>
@@ -228,8 +229,7 @@ export default function RoleManagement(): JSX.Element {
           options={false}
           toolBarRender={() => [
             <Text key="hint" type="secondary">
-              Toggle a role to enable or disable its permissions
-              platform-wide.
+              {i18nT("ui.ethikos.admin.roles.toggleARoleToEnableOrDisable")}
             </Text>,
           ]}
         />

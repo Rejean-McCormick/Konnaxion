@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   BulbOutlined,
   PictureOutlined,
@@ -59,6 +60,7 @@ function artworkImage(artwork: KreativeArtwork): string | null {
 }
 
 export default function KreativeDashboardPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter()
   const [artworks, setArtworks] = useState<KreativeArtwork[]>([])
   const [loading, setLoading] = useState(true)
@@ -95,10 +97,10 @@ export default function KreativeDashboardPage(): JSX.Element {
 
   return (
     <KreativePageShell
-      title="Kreative Dashboard"
+      title={i18nT("ui.kreative.dashboard.kreativeDashboard")}
       primaryAction={
         <Button icon={<ReloadOutlined />} onClick={() => void load()}>
-          Refresh
+          {i18nT("ui.kreative.dashboard.refresh")}
         </Button>
       }
     >
@@ -106,7 +108,7 @@ export default function KreativeDashboardPage(): JSX.Element {
         <Alert
           type="error"
           showIcon
-          message="Kreative data could not be loaded"
+          message={i18nT("ui.kreative.dashboard.kreativeDataCouldNotBeLoaded")}
           description={loadError}
           style={{ marginBottom: 16 }}
         />
@@ -116,9 +118,9 @@ export default function KreativeDashboardPage(): JSX.Element {
         <div>
           <Row gutter={[24, 24]}>
           <Col xs={24} md={16}>
-            <Card title="Featured creative work">
+            <Card title={i18nT("ui.kreative.dashboard.featuredCreativeWork")}>
               {!featured ? (
-                <Empty description="No creative work has been submitted yet." />
+                <Empty description={i18nT("ui.kreative.dashboard.noCreativeWorkHasBeenSubmittedYet")} />
               ) : (
                 <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                   {artworkImage(featured) ? (
@@ -137,8 +139,8 @@ export default function KreativeDashboardPage(): JSX.Element {
                     <Alert
                       type="info"
                       showIcon
-                      message="Media unavailable"
-                      description="The artwork record exists, but no readable media file is available."
+                      message={i18nT("ui.kreative.dashboard.mediaUnavailable")}
+                      description={i18nT("ui.kreative.dashboard.theArtworkRecordExistsButNoReadable")}
                     />
                   )}
                   <div>
@@ -155,9 +157,9 @@ export default function KreativeDashboardPage(): JSX.Element {
           </Col>
 
           <Col xs={24} md={8}>
-            <Card title="Top creator">
+            <Card title={i18nT("ui.kreative.dashboard.topCreator")}>
               {!topCreator ? (
-                <Empty description="No creator activity yet." />
+                <Empty description={i18nT("ui.kreative.dashboard.noCreatorActivityYet")} />
               ) : (
                 <Space direction="vertical" align="center" style={{ width: '100%' }}>
                   <Avatar size={80}>
@@ -167,7 +169,7 @@ export default function KreativeDashboardPage(): JSX.Element {
                     {topCreator[0]}
                   </Title>
                   <Text type="secondary">
-                    {topCreator[1]} submitted work{topCreator[1] === 1 ? '' : 's'}
+                    {topCreator[1]} {i18nT("ui.kreative.dashboard.submittedWork")}{topCreator[1] === 1 ? '' : 's'}
                   </Text>
                 </Space>
               )}
@@ -177,9 +179,9 @@ export default function KreativeDashboardPage(): JSX.Element {
 
         <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
           <Col xs={24} md={16}>
-            <Card title="Recent image works">
+            <Card title={i18nT("ui.kreative.dashboard.recentImageWorks")}>
               {gallery.length === 0 ? (
-                <Empty description="No readable image media is available." />
+                <Empty description={i18nT("ui.kreative.dashboard.noReadableImageMediaIsAvailable")} />
               ) : (
                 <Row gutter={[12, 12]}>
                   {gallery.map((item) => (
@@ -205,7 +207,7 @@ export default function KreativeDashboardPage(): JSX.Element {
           </Col>
 
           <Col xs={24} md={8}>
-            <Card title="Quick Links">
+            <Card title={i18nT("ui.kreative.dashboard.quickLinks")}>
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                 {quickLinks.map((link) => (
                   <Button
@@ -225,14 +227,14 @@ export default function KreativeDashboardPage(): JSX.Element {
 
         <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
           <Col xs={24}>
-            <Card title="Recent activity">
+            <Card title={i18nT("ui.kreative.dashboard.recentActivity")}>
               <List
                 dataSource={artworks.slice(0, 6)}
-                locale={{ emptyText: 'No creative activity recorded yet.' }}
+                locale={{ emptyText: i18nT("ui.kreative.dashboard.noCreativeActivityRecordedYet") }}
                 renderItem={(item) => (
                   <List.Item>
                     <List.Item.Meta
-                      title={`${item.artist} submitted “${item.title}”`}
+                      title={i18nT("ui.kreative.dashboard.submitted", { artist: item.artist, title: item.title })}
                       description={new Date(item.created_at).toLocaleString()}
                     />
                   </List.Item>

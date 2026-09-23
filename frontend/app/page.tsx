@@ -3,10 +3,15 @@ import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import Image from 'next/image';
 
-export const metadata: Metadata = {
-  title: 'Home',
-  description: 'Konnaxion entry point – choose your space or sign in.',
-};
+import { getServerI18n } from '@/i18n/server';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerI18n();
+  return {
+    title: t('home.metadataTitle'),
+    description: t('home.metadataDescription'),
+  };
+}
 
 type SuiteKey = 'ekoh' | 'ethikos' | 'keenkonnect' | 'konnected' | 'kreative';
 
@@ -93,6 +98,7 @@ const BACKEND_SIGNUP_URL = BACKEND_ROOT
   : '/accounts/signup/';
 
 export default async function Page() {
+  const { t } = await getServerI18n();
   const store = await cookies();
   const rawPref = store.get(HOME_SUITE_COOKIE)?.value ?? null;
 
@@ -107,7 +113,7 @@ export default async function Page() {
           <div className="flex justify-center">
             <Image
               src="/LogoK.svg"
-              alt="Konnaxion logo"
+              alt={t("ui.home.konnaxionLogo")}
               width={48}
               height={48}
               priority
@@ -116,11 +122,10 @@ export default async function Page() {
           </div>
           <div className="space-y-3">
             <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
-              Welcome to Konnaxion
+              {t('home.welcome')}
             </h1>
             <p className="text-sm md:text-base text-gray-500">
-              A unified ecosystem for learning, collaboration, ethical choices,
-              and creative expression.
+              {t('home.tagline')}
             </p>
           </div>
         </header>
@@ -132,17 +137,17 @@ export default async function Page() {
               href={BACKEND_LOGIN_URL}
               className="inline-flex items-center justify-center rounded-full border border-[var(--brand)] px-5 py-2.5 text-sm font-medium text-[var(--brand)] transition-colors hover:bg-[var(--brand)] hover:text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
             >
-              Sign in
+              {t('home.signIn')}
             </a>
             <a
               href={BACKEND_SIGNUP_URL}
               className="inline-flex items-center justify-center rounded-full border border-[var(--brand)] px-5 py-2.5 text-sm font-medium text-[var(--brand)] transition-colors hover:bg-[var(--brand)] hover:text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
             >
-              Create an account
+              {t('home.createAccount')}
             </a>
           </div>
           <p className="text-xs text-gray-400">
-            You&apos;ll be redirected back to Konnaxion after signing in.
+            {t('home.signInReturn')}
           </p>
         </section>
 
@@ -152,10 +157,10 @@ export default async function Page() {
             href={preferredPath}
             className="inline-flex items-center justify-center rounded-full border border-[var(--brand)] px-5 py-2.5 text-sm font-medium text-[var(--brand)] transition-colors hover:bg-[var(--brand)] hover:text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
           >
-            Go straight to your preferred space ({preferredLabel})
+            {t('home.preferredSpace', { suite: preferredLabel })}
           </a>
           <p className="text-xs text-gray-400">
-            You can switch space at any time from the navigation.
+            {t('home.switchSpaceHint')}
           </p>
         </section>
 
@@ -165,10 +170,9 @@ export default async function Page() {
             href={HOME_BY_SUITE.ekoh}
             className="group border border-[var(--brand)] rounded-xl px-4 py-5 transition-colors flex flex-col gap-1 md:col-span-2 hover:bg-[var(--brand)] hover:text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
           >
-            <h2 className="font-semibold text-[var(--brand)] transition-colors group-hover:text-[var(--brand-text)]">Distribute influence with EkoH</h2>
+            <h2 className="font-semibold text-[var(--brand)] transition-colors group-hover:text-[var(--brand-text)]">{t('home.ekohTitle')}</h2>
             <p className="text-xs text-gray-500 transition-colors group-hover:text-[var(--brand-text)]">
-              Use merit-based, ethics-aware weighting to surface the most
-              trustworthy expertise across Konnaxion.
+              {t('home.ekohDescription')}
             </p>
           </a>
 
@@ -176,10 +180,9 @@ export default async function Page() {
             href={HOME_BY_SUITE.ethikos}
             className="group border border-[var(--brand)] rounded-xl px-4 py-5 transition-colors flex flex-col gap-1 hover:bg-[var(--brand)] hover:text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
           >
-            <h2 className="font-semibold text-[var(--brand)] transition-colors group-hover:text-[var(--brand-text)]">Take positions with ethiKos</h2>
+            <h2 className="font-semibold text-[var(--brand)] transition-colors group-hover:text-[var(--brand-text)]">{t('home.ethikosTitle')}</h2>
             <p className="text-xs text-gray-500 transition-colors group-hover:text-[var(--brand-text)]">
-              Explore structured ethical questions, see how different groups
-              position themselves, and ground decisions in shared values.
+              {t('home.ethikosDescription')}
             </p>
           </a>
 
@@ -187,10 +190,9 @@ export default async function Page() {
             href={HOME_BY_SUITE.keenkonnect}
             className="group border border-[var(--brand)] rounded-xl px-4 py-5 transition-colors flex flex-col gap-1 hover:bg-[var(--brand)] hover:text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
           >
-            <h2 className="font-semibold text-[var(--brand)] transition-colors group-hover:text-[var(--brand-text)]">Build solutions with keenKonnect</h2>
+            <h2 className="font-semibold text-[var(--brand)] transition-colors group-hover:text-[var(--brand-text)]">{t('home.keenkonnectTitle')}</h2>
             <p className="text-xs text-gray-500 transition-colors group-hover:text-[var(--brand-text)]">
-              Co-create practical, technological projects to solve common
-              problems, from clean energy to health and resilience.
+              {t('home.keenkonnectDescription')}
             </p>
           </a>
 
@@ -198,10 +200,9 @@ export default async function Page() {
             href={HOME_BY_SUITE.konnected}
             className="group border border-[var(--brand)] rounded-xl px-4 py-5 transition-colors flex flex-col gap-1 hover:bg-[var(--brand)] hover:text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
           >
-            <h2 className="font-semibold text-[var(--brand)] transition-colors group-hover:text-[var(--brand-text)]">Learn together with KonnectED</h2>
+            <h2 className="font-semibold text-[var(--brand)] transition-colors group-hover:text-[var(--brand-text)]">{t('home.konnectedTitle')}</h2>
             <p className="text-xs text-gray-500 transition-colors group-hover:text-[var(--brand-text)]">
-              Share foundational knowledge, practical skills, and inclusive
-              learning paths for communities around the world.
+              {t('home.konnectedDescription')}
             </p>
           </a>
 
@@ -209,10 +210,9 @@ export default async function Page() {
             href={HOME_BY_SUITE.kreative}
             className="group border border-[var(--brand)] rounded-xl px-4 py-5 transition-colors flex flex-col gap-1 hover:bg-[var(--brand)] hover:text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
           >
-            <h2 className="font-semibold text-[var(--brand)] transition-colors group-hover:text-[var(--brand-text)]">Create and curate with Kreative</h2>
+            <h2 className="font-semibold text-[var(--brand)] transition-colors group-hover:text-[var(--brand-text)]">{t('home.kreativeTitle')}</h2>
             <p className="text-xs text-gray-500 transition-colors group-hover:text-[var(--brand-text)]">
-              Showcase art, preserve cultural heritage, and co-create immersive
-              experiences through digital galleries and collaborations.
+              {t('home.kreativeDescription')}
             </p>
           </a>
         </section>

@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { ProCard } from '@ant-design/pro-components'
 import { Progress, Space, Statistic, Tag, Typography } from 'antd'
 
@@ -17,6 +18,7 @@ export default function TopicSummaryPanel({
   topic?: TopicDetailResponse
   stats: StanceStats
 }): JSX.Element {
+  const { t: i18nT } = useLanguage();
   return (
     <ProCard split="vertical" gutter={16}>
       <ProCard colSpan="70%">
@@ -27,9 +29,9 @@ export default function TopicSummaryPanel({
             </Title>
             <Space wrap>
               {topic?.category && <Tag>{topic.category}</Tag>}
-              <Tag color="blue">Deliberate</Tag>
+              <Tag color="blue">{i18nT("ui.ethikos.deliberate.topic.topicsummarypanel.deliberate")}</Tag>
               <Text type="secondary">
-                Created {formatRelativeDate(topic?.createdAt)}
+                {i18nT("ui.ethikos.deliberate.topic.topicsummarypanel.created")} {formatRelativeDate(topic?.createdAt)}
               </Text>
             </Space>
           </div>
@@ -37,15 +39,15 @@ export default function TopicSummaryPanel({
           {topic?.description ? (
             <Paragraph style={{ marginBottom: 0 }}>{topic.description}</Paragraph>
           ) : (
-            <Text type="secondary">No topic description provided.</Text>
+            <Text type="secondary">{i18nT("ui.ethikos.deliberate.topic.topicsummarypanel.noTopicDescriptionProvided")}</Text>
           )}
         </Space>
       </ProCard>
 
-      <ProCard colSpan="30%" title="Topic stance">
+      <ProCard colSpan="30%" title={i18nT("ui.ethikos.deliberate.topic.topicsummarypanel.topicStance")}>
         <Space direction="vertical" size={16} style={{ width: '100%' }}>
           <Statistic
-            title="Average stance"
+            title={i18nT("ui.ethikos.deliberate.topic.topicsummarypanel.averageStance")}
             value={stats.average}
             precision={2}
             suffix="/ 3"
@@ -60,9 +62,9 @@ export default function TopicSummaryPanel({
           />
 
           <Space wrap>
-            <Tag color="green">Support {stats.support}</Tag>
-            <Tag>Neutral {stats.neutral}</Tag>
-            <Tag color="red">Oppose {stats.oppose}</Tag>
+            <Tag color="green">{i18nT("ui.ethikos.deliberate.topic.topicsummarypanel.support")} {stats.support}</Tag>
+            <Tag>{i18nT("ui.ethikos.deliberate.topic.topicsummarypanel.neutral")} {stats.neutral}</Tag>
+            <Tag color="red">{i18nT("ui.ethikos.deliberate.topic.topicsummarypanel.oppose")} {stats.oppose}</Tag>
           </Space>
         </Space>
       </ProCard>

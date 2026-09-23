@@ -1,6 +1,7 @@
 // app/keenkonnect/projects/my-projects/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   EditOutlined,
   EyeOutlined,
@@ -57,6 +58,7 @@ interface Project {
 }
 
 export default function MyProjectsPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
 
   const [projects, setProjects] = useState<Project[]>([]);
@@ -124,38 +126,38 @@ export default function MyProjectsPage(): JSX.Element {
 
   const columns: ProColumns<Project>[] = [
     {
-      title: 'Project',
+      title: i18nT("ui.keenkonnect.projects.myProjects.project"),
       dataIndex: 'name',
       key: 'name',
       render: (_, record) => (
         <Space direction="vertical" size={0}>
           <Text strong>{record.name}</Text>
           <Space size="small">
-            <Tag icon={<TeamOutlined />}>Owner: {record.owner || 'Unknown'}</Tag>
+            <Tag icon={<TeamOutlined />}>{i18nT("ui.keenkonnect.projects.myProjects.owner")} {record.owner || i18nT("ui.keenkonnect.projects.myProjects.unknown")}</Tag>
             <Tag>{record.category}</Tag>
           </Space>
         </Space>
       ),
     },
     {
-      title: 'Status',
+      title: i18nT("ui.keenkonnect.projects.myProjects.status"),
       dataIndex: 'status',
       key: 'status',
       valueType: 'select',
       valueEnum: {
-        idea: { text: 'Idea' },
-        progress: { text: 'In progress' },
-        completed: { text: 'Completed' },
-        validated: { text: 'Validated' },
+        idea: { text: i18nT("ui.keenkonnect.projects.myProjects.idea") },
+        progress: { text: i18nT("ui.keenkonnect.projects.myProjects.inProgress") },
+        completed: { text: i18nT("ui.keenkonnect.projects.myProjects.completed") },
+        validated: { text: i18nT("ui.keenkonnect.projects.myProjects.validated") },
       },
       render: (_, record) => (
         <Tag color={statusColors[record.status]}>
-          {record.status === 'progress' ? 'In progress' : record.status}
+          {record.status === 'progress' ? i18nT("ui.keenkonnect.projects.myProjects.inProgress") : record.status}
         </Tag>
       ),
     },
     {
-      title: 'Progress',
+      title: i18nT("ui.keenkonnect.projects.myProjects.progress"),
       dataIndex: 'progress',
       key: 'progress',
       width: 200,
@@ -168,13 +170,13 @@ export default function MyProjectsPage(): JSX.Element {
       ),
     },
     {
-      title: 'Created',
+      title: i18nT("ui.keenkonnect.projects.myProjects.created"),
       dataIndex: 'createdAt',
       key: 'createdAt',
       valueType: 'date',
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.keenkonnect.projects.myProjects.actions"),
       key: 'actions',
       valueType: 'option',
       render: (_, record) => [
@@ -190,7 +192,7 @@ export default function MyProjectsPage(): JSX.Element {
                 label: (
                   <span>
                     <EyeOutlined style={{ marginRight: 8 }} />
-                    View
+                    {i18nT("ui.keenkonnect.projects.myProjects.view")}
                   </span>
                 ),
               },
@@ -199,7 +201,7 @@ export default function MyProjectsPage(): JSX.Element {
                 label: (
                   <span>
                     <EditOutlined style={{ marginRight: 8 }} />
-                    Edit
+                    {i18nT("ui.keenkonnect.projects.myProjects.edit")}
                   </span>
                 ),
               },
@@ -208,7 +210,7 @@ export default function MyProjectsPage(): JSX.Element {
                 label: (
                   <span>
                     <RocketOutlined style={{ marginRight: 8 }} />
-                    Launch
+                    {i18nT("ui.keenkonnect.projects.myProjects.launch")}
                   </span>
                 ),
               },
@@ -224,7 +226,7 @@ export default function MyProjectsPage(): JSX.Element {
             },
           }}
         >
-          Launch
+          {i18nT("ui.keenkonnect.projects.myProjects.launch")}
         </Dropdown.Button>,
       ],
     },
@@ -232,9 +234,9 @@ export default function MyProjectsPage(): JSX.Element {
 
   return (
     <KeenPage
-      title="My Projects"
-      description="Browse and manage your KeenKonnect projects."
-      metaTitle="KeenKonnect · My Projects"
+      title={i18nT("ui.keenkonnect.projects.myProjects.myProjects")}
+      description={i18nT("ui.keenkonnect.projects.myProjects.browseAndManageYourKeenkonnectProjects")}
+      metaTitle={i18nT("ui.keenkonnect.projects.myProjects.keenkonnectMyProjects")}
     >
       <>
         {loading && (
@@ -245,7 +247,7 @@ export default function MyProjectsPage(): JSX.Element {
 
         <ProTable<Project>
           rowKey="id"
-          headerTitle="My Projects"
+          headerTitle={i18nT("ui.keenkonnect.projects.myProjects.myProjects")}
           columns={columns}
           dataSource={filtered}
           pagination={{ pageSize: 10 }}
@@ -255,17 +257,17 @@ export default function MyProjectsPage(): JSX.Element {
           cardBordered
           toolBarRender={() => [
             <Space key="filters" align="center">
-              <Text>Status:</Text>
+              <Text>{i18nT("ui.keenkonnect.projects.myProjects.status_11dc9e")}</Text>
               <Select<ProjectStatus | 'all'>
                 value={statusFilter}
                 onChange={(value) => setStatusFilter(value)}
                 style={{ width: 220 }}
               >
-                <Option value="all">All</Option>
-                <Option value="idea">Idea</Option>
-                <Option value="progress">In progress</Option>
-                <Option value="completed">Completed</Option>
-                <Option value="validated">Validated</Option>
+                <Option value="all">{i18nT("ui.keenkonnect.projects.myProjects.all")}</Option>
+                <Option value="idea">{i18nT("ui.keenkonnect.projects.myProjects.idea")}</Option>
+                <Option value="progress">{i18nT("ui.keenkonnect.projects.myProjects.inProgress")}</Option>
+                <Option value="completed">{i18nT("ui.keenkonnect.projects.myProjects.completed")}</Option>
+                <Option value="validated">{i18nT("ui.keenkonnect.projects.myProjects.validated")}</Option>
               </Select>
             </Space>,
             <Button
@@ -276,7 +278,7 @@ export default function MyProjectsPage(): JSX.Element {
                 router.push('/keenkonnect/projects/create-new-project')
               }
             >
-              Create New Project
+              {i18nT("ui.keenkonnect.projects.myProjects.createNewProject")}
             </Button>,
           ]}
         />

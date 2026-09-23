@@ -2,6 +2,7 @@
 ﻿// frontend/modules/konsultations/pages/SuggestionPage.tsx
 "use client";
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   BulbOutlined,
   FilterOutlined,
@@ -56,6 +57,7 @@ const INITIAL_SUGGESTIONS: BoardSuggestion[] = [
 ];
 
 export default function SuggestionPage() {
+  const { t: i18nT } = useLanguage();
   const [suggestions, setSuggestions] =
     React.useState<BoardSuggestion[]>(INITIAL_SUGGESTIONS);
 
@@ -100,18 +102,17 @@ export default function SuggestionPage() {
         <Space align="baseline" size="middle">
           <BulbOutlined />
           <Title level={3} className="!mb-0">
-            Consultation suggestions
+            {i18nT("ui.konsultations.pages.suggestionpage.consultationSuggestions")}
           </Title>
         </Space>
 
         <Paragraph type="secondary" className="!mb-0">
-          Collect, cluster, and prioritise suggestions before moving them into a
-          formal consultation or Smart‑Vote ballot.
+          {i18nT("ui.konsultations.pages.suggestionpage.collectClusterAndPrioritiseSuggestionsBeforeMoving")}
         </Paragraph>
 
         <Space wrap>
-          <Tag color="blue">Suggestion flow</Tag>
-          <Tag color="purple">Pre‑decision stage</Tag>
+          <Tag color="blue">{i18nT("ui.konsultations.pages.suggestionpage.suggestionFlow")}</Tag>
+          <Tag color="purple">{i18nT("ui.konsultations.pages.suggestionpage.preDecisionStage")}</Tag>
         </Space>
       </header>
 
@@ -120,12 +121,10 @@ export default function SuggestionPage() {
           type="info"
           showIcon
           icon={<InfoCircleOutlined />}
-          message="How this board works"
+          message={i18nT("ui.konsultations.pages.suggestionpage.howThisBoardWorks")}
           description={
             <Text type="secondary">
-              Each card represents a suggestion from participants. Use the
-              board below to triage new ideas, merge duplicates, and surface
-              candidates for the next voting round.
+              {i18nT("ui.konsultations.pages.suggestionpage.eachCardRepresentsASuggestionFromParticipants")}
             </Text>
           }
         />
@@ -133,9 +132,9 @@ export default function SuggestionPage() {
 
       <section className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <Space wrap>
-          <Button icon={<FilterOutlined />}>Filter &amp; sort</Button>
+          <Button icon={<FilterOutlined />}>{i18nT("ui.konsultations.pages.suggestionpage.filterSort")}</Button>
           <Text type="secondary">
-            Focus on new, high‑support, or controversial suggestions.
+            {i18nT("ui.konsultations.pages.suggestionpage.focusOnNewHighSupportOrControversial")}
           </Text>
         </Space>
       </section>

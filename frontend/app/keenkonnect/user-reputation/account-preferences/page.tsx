@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Alert, Button, Card, Form, Input, Space, Spin, Tabs, Typography } from 'antd'
 import type { TabsProps } from 'antd'
 import React, { useEffect, useState } from 'react'
@@ -17,6 +18,7 @@ const { Text, Paragraph } = Typography
 type ProfileValues = { name: string }
 
 export default function AccountPreferencesPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [form] = Form.useForm<ProfileValues>()
   const [user, setUser] = useState<CurrentUser | null>(null)
   const [loading, setLoading] = useState(true)
@@ -64,7 +66,7 @@ export default function AccountPreferencesPage(): JSX.Element {
     <Alert
       type="info"
       showIcon
-      message={`${title} is read-only in this build`}
+      message={i18nT("ui.keenkonnect.userReputation.accountPreferences.isReadOnlyInThisBuild", { title: title })}
       description={detail}
     />
   )
@@ -72,38 +74,38 @@ export default function AccountPreferencesPage(): JSX.Element {
   const items: TabsProps['items'] = [
     {
       key: 'profile',
-      label: 'Profile Info',
+      label: i18nT("ui.keenkonnect.userReputation.accountPreferences.profileInfo"),
       children: (
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           <Alert
             type="info"
             showIcon
-            message="Only the canonical display name is writable"
-            description="The current user serializer supports a real display-name update. Avatar, headline, biography and discoverability writes are not exposed, so they are not presented as successful mutations."
+            message={i18nT("ui.keenkonnect.userReputation.accountPreferences.onlyTheCanonicalDisplayNameIsWritable")}
+            description={i18nT("ui.keenkonnect.userReputation.accountPreferences.theCurrentUserSerializerSupportsAReal")}
           />
-          {error ? <Alert type="error" showIcon message="Profile operation failed" description={error} /> : null}
-          {saved ? <Alert type="success" showIcon message="Display name saved" /> : null}
+          {error ? <Alert type="error" showIcon message={i18nT("ui.keenkonnect.userReputation.accountPreferences.profileOperationFailed")} description={error} /> : null}
+          {saved ? <Alert type="success" showIcon message={i18nT("ui.keenkonnect.userReputation.accountPreferences.displayNameSaved")} /> : null}
           <Spin spinning={loading}>
             <Card>
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                 {user ? (
                   <img
                     src={resolveAvatarUrl(user)}
-                    alt="Current profile"
+                    alt={i18nT("ui.keenkonnect.userReputation.accountPreferences.currentProfile")}
                     style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover' }}
                   />
                 ) : null}
-                <Text type="secondary">Username: {user?.username ?? '—'}</Text>
+                <Text type="secondary">{i18nT("ui.keenkonnect.userReputation.accountPreferences.username")} {user?.username ?? '—'}</Text>
                 <Form<ProfileValues> form={form} layout="vertical" onFinish={saveProfile}>
                   <Form.Item
                     name="name"
-                    label="Display name"
-                    rules={[{ required: true, whitespace: true, message: 'Please enter a display name.' }]}
+                    label={i18nT("ui.keenkonnect.userReputation.accountPreferences.displayName")}
+                    rules={[{ required: true, whitespace: true, message: i18nT("ui.keenkonnect.userReputation.accountPreferences.pleaseEnterADisplayName") }]}
                   >
                     <Input disabled={!user || loading} />
                   </Form.Item>
                   <Button type="primary" htmlType="submit" loading={saving} disabled={!user || loading}>
-                    Save display name
+                    {i18nT("ui.keenkonnect.userReputation.accountPreferences.saveDisplayName")}
                   </Button>
                 </Form>
               </Space>
@@ -114,7 +116,7 @@ export default function AccountPreferencesPage(): JSX.Element {
     },
     {
       key: 'security',
-      label: 'Security',
+      label: i18nT("ui.keenkonnect.userReputation.accountPreferences.security"),
       children: readOnlyPanel(
         'Security preferences',
         'Password change, two-factor authentication and login-alert mutation contracts are not exposed by the current Konnaxion user API.',
@@ -122,7 +124,7 @@ export default function AccountPreferencesPage(): JSX.Element {
     },
     {
       key: 'notifications',
-      label: 'Notifications',
+      label: i18nT("ui.keenkonnect.userReputation.accountPreferences.notifications"),
       children: readOnlyPanel(
         'Notification preferences',
         'Notification preference persistence is a declared deferred surface until a dedicated user-preferences contract exists.',
@@ -130,7 +132,7 @@ export default function AccountPreferencesPage(): JSX.Element {
     },
     {
       key: 'privacy',
-      label: 'Privacy',
+      label: i18nT("ui.keenkonnect.userReputation.accountPreferences.privacy"),
       children: readOnlyPanel(
         'Privacy preferences',
         'KeenKonnect-specific discoverability and sharing preferences are not persisted by the current user API.',
@@ -138,13 +140,13 @@ export default function AccountPreferencesPage(): JSX.Element {
     },
     {
       key: 'danger',
-      label: 'Danger Zone',
+      label: i18nT("ui.keenkonnect.userReputation.accountPreferences.dangerZone"),
       children: (
         <Card>
           <Paragraph>
-            Account deletion is intentionally unavailable from this surface because no supported account-deletion contract is exposed.
+            {i18nT("ui.keenkonnect.userReputation.accountPreferences.accountDeletionIsIntentionallyUnavailableFromThis")}
           </Paragraph>
-          <Button danger disabled>Delete account unavailable</Button>
+          <Button danger disabled>{i18nT("ui.keenkonnect.userReputation.accountPreferences.deleteAccountUnavailable")}</Button>
         </Card>
       ),
     },
@@ -152,8 +154,8 @@ export default function AccountPreferencesPage(): JSX.Element {
 
   return (
     <KeenPage
-      title="Account & Preferences"
-      description="Manage the parts of your account that are backed by current Konnaxion contracts."
+      title={i18nT("ui.keenkonnect.userReputation.accountPreferences.accountPreferences")}
+      description={i18nT("ui.keenkonnect.userReputation.accountPreferences.manageThePartsOfYourAccountThat")}
     >
       <Tabs defaultActiveKey="profile" items={items} />
     </KeenPage>

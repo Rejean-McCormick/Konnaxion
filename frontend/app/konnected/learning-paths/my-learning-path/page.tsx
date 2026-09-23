@@ -1,6 +1,7 @@
 // FILE: frontend/app/konnected/learning-paths/my-learning-path/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { ClockCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import {
   Alert,
@@ -300,6 +301,7 @@ async function fetchMyLearningPaths(): Promise<FetchResult> {
 }
 
 export default function MyLearningPathsPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
   const { message } = AntdApp.useApp();
 
@@ -367,13 +369,13 @@ export default function MyLearningPathsPage(): JSX.Element {
           : p,
       ),
     );
-    message.success('Learning path marked as completed.');
+    message.success(i18nT("ui.konnected.learningPaths.myLearningPath.learningPathMarkedAsCompleted"));
   };
 
   const handleLeavePath = (pathId: string) => {
     // TODO: POST /api/konnected/learning-paths/{id}/leave (leave learning path)
     setPaths((prev) => (prev ?? []).filter((p) => p.id !== pathId));
-    message.success('Learning path removed from your list.');
+    message.success(i18nT("ui.konnected.learningPaths.myLearningPath.learningPathRemovedFromYourList"));
   };
 
   const handleBrowseCatalog = () => {
@@ -448,39 +450,39 @@ export default function MyLearningPathsPage(): JSX.Element {
   const tabsItems: TabsProps['items'] = [
     {
       key: 'active',
-      label: `Active (${activeCount})`,
+      label: i18nT("ui.konnected.learningPaths.myLearningPath.active", { activeCount: activeCount }),
     },
     {
       key: 'completed',
-      label: `Completed (${completedCount})`,
+      label: i18nT("ui.konnected.learningPaths.myLearningPath.completed", { completedCount: completedCount }),
     },
     {
       key: 'all',
-      label: `All (${paths?.length ?? 0})`,
+      label: i18nT("ui.konnected.learningPaths.myLearningPath.all", { value1: paths?.length ?? 0 }),
     },
   ];
 
   return (
     <KonnectedPageShell
-      title="My Learning Paths"
-      subtitle="Track your in-progress and completed learning paths across the KonnectED Knowledge Library."
+      title={i18nT("ui.konnected.learningPaths.myLearningPath.myLearningPaths")}
+      subtitle={i18nT("ui.konnected.learningPaths.myLearningPath.trackYourInProgressAndCompletedLearning")}
       primaryAction={
         <Button type="primary" onClick={handleBrowseCatalog}>
-          Browse new learning paths
+          {i18nT("ui.konnected.learningPaths.myLearningPath.browseNewLearningPaths")}
         </Button>
       }
       secondaryActions={
         <Space>
-          <Text type="secondary">Sort by</Text>
+          <Text type="secondary">{i18nT("ui.konnected.learningPaths.myLearningPath.sortBy")}</Text>
           <Select<SortKey>
             value={sortKey}
             size="small"
             style={{ width: 160 }}
             onChange={handleSortChange}
           >
-            <Option value="recent">Most recent activity</Option>
-            <Option value="progress">Highest completion</Option>
-            <Option value="title">Title (A–Z)</Option>
+            <Option value="recent">{i18nT("ui.konnected.learningPaths.myLearningPath.mostRecentActivity")}</Option>
+            <Option value="progress">{i18nT("ui.konnected.learningPaths.myLearningPath.highestCompletion")}</Option>
+            <Option value="title">{i18nT("ui.konnected.learningPaths.myLearningPath.titleAZ")}</Option>
           </Select>
         </Space>
       }
@@ -490,7 +492,7 @@ export default function MyLearningPathsPage(): JSX.Element {
         <Col xs={24} sm={12} md={6}>
           <Card>
             <Space direction="vertical" size={4}>
-              <Text type="secondary">Active paths</Text>
+              <Text type="secondary">{i18nT("ui.konnected.learningPaths.myLearningPath.activePaths")}</Text>
               <Title level={3} style={{ margin: 0 }}>
                 {stats.active}
               </Title>
@@ -500,7 +502,7 @@ export default function MyLearningPathsPage(): JSX.Element {
         <Col xs={24} sm={12} md={6}>
           <Card>
             <Space direction="vertical" size={4}>
-              <Text type="secondary">Completed paths</Text>
+              <Text type="secondary">{i18nT("ui.konnected.learningPaths.myLearningPath.completedPaths")}</Text>
               <Title level={3} style={{ margin: 0 }}>
                 {stats.completed}
               </Title>
@@ -510,7 +512,7 @@ export default function MyLearningPathsPage(): JSX.Element {
         <Col xs={24} sm={12} md={6}>
           <Card>
             <Space direction="vertical" size={4}>
-              <Text type="secondary">Total enrolled</Text>
+              <Text type="secondary">{i18nT("ui.konnected.learningPaths.myLearningPath.totalEnrolled")}</Text>
               <Title level={3} style={{ margin: 0 }}>
                 {stats.total}
               </Title>
@@ -520,7 +522,7 @@ export default function MyLearningPathsPage(): JSX.Element {
         <Col xs={24} sm={12} md={6}>
           <Card>
             <Space direction="vertical" size={4} style={{ width: '100%' }}>
-              <Text type="secondary">Average completion</Text>
+              <Text type="secondary">{i18nT("ui.konnected.learningPaths.myLearningPath.averageCompletion")}</Text>
               <Progress
                 percent={stats.avgCompletion}
                 size="small"
@@ -537,12 +539,10 @@ export default function MyLearningPathsPage(): JSX.Element {
           showIcon
           closable
           style={{ marginBottom: 16 }}
-          message="Unable to fully sync with the learning backend."
+          message={i18nT("ui.konnected.learningPaths.myLearningPath.unableToFullySyncWithTheLearning")}
           description={
             <span>
-              Showing locally cached / mock data for now. Once the KonnectED
-              Learning Paths API is wired, this page will refresh
-              automatically.
+              {i18nT("ui.konnected.learningPaths.myLearningPath.showingLocallyCachedMockDataForNow")}
             </span>
           }
         />
@@ -552,16 +552,15 @@ export default function MyLearningPathsPage(): JSX.Element {
       {!loading && !hasAnyPaths && (
         <Card>
           <Empty
-            description="You are not enrolled in any learning paths yet."
+            description={i18nT("ui.konnected.learningPaths.myLearningPath.youAreNotEnrolledInAnyLearning")}
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           >
             <Space direction="vertical">
               <Button type="primary" onClick={handleBrowseCatalog}>
-                Explore the Knowledge Library
+                {i18nT("ui.konnected.learningPaths.myLearningPath.exploreTheKnowledgeLibrary")}
               </Button>
               <Text type="secondary">
-                Browse curated learning paths or assemble your own from
-                KonnectED resources.
+                {i18nT("ui.konnected.learningPaths.myLearningPath.browseCuratedLearningPathsOrAssembleYour")}
               </Text>
             </Space>
           </Empty>
@@ -593,28 +592,26 @@ export default function MyLearningPathsPage(): JSX.Element {
               <Empty
                 description={
                   activeTab === 'active'
-                    ? 'No active learning paths in this view.'
+                    ? i18nT("ui.konnected.learningPaths.myLearningPath.noActiveLearningPathsInThisView")
                     : activeTab === 'completed'
-                    ? 'You have not completed any learning paths yet.'
-                    : 'No learning paths match the current filters.'
+                    ? i18nT("ui.konnected.learningPaths.myLearningPath.youHaveNotCompletedAnyLearningPaths")
+                    : i18nT("ui.konnected.learningPaths.myLearningPath.noLearningPathsMatchTheCurrentFilters")
                 }
               >
                 {activeTab === 'active' && completedCount > 0 && (
                   <Text type="secondary">
-                    You do have completed paths – switch to the
-                    &quot;Completed&quot; tab to review them.
+                    {i18nT("ui.konnected.learningPaths.myLearningPath.youDoHaveCompletedPathsSwitchTo")}
                   </Text>
                 )}
                 {activeTab === 'completed' && activeCount > 0 && (
                   <Text type="secondary">
-                    You still have active paths in progress – check the
-                    &quot;Active&quot; tab to resume.
+                    {i18nT("ui.konnected.learningPaths.myLearningPath.youStillHaveActivePathsInProgress")}
                   </Text>
                 )}
                 {stats.total === 0 && (
                   <Space direction="vertical" style={{ marginTop: 8 }}>
                     <Button type="primary" onClick={handleBrowseCatalog}>
-                      Explore the Knowledge Library
+                      {i18nT("ui.konnected.learningPaths.myLearningPath.exploreTheKnowledgeLibrary")}
                     </Button>
                   </Space>
                 )}
@@ -637,7 +634,7 @@ export default function MyLearningPathsPage(): JSX.Element {
                           <span>{path.title}</span>
                           {path.level && <Tag color="blue">{path.level}</Tag>}
                           {isCompleted && (
-                            <Tag color="green">Completed</Tag>
+                            <Tag color="green">{i18nT("ui.konnected.learningPaths.myLearningPath.completed_1798b3")}</Tag>
                           )}
                         </Space>
                       }
@@ -646,7 +643,7 @@ export default function MyLearningPathsPage(): JSX.Element {
                           <Space size={4}>
                             <ClockCircleOutlined />
                             <Text type="secondary">
-                              Last activity{' '}
+                              {i18nT("ui.konnected.learningPaths.myLearningPath.lastActivity")}{' '}
                               {new Date(
                                 path.progress.lastActivityAt,
                               ).toLocaleDateString()}
@@ -661,7 +658,7 @@ export default function MyLearningPathsPage(): JSX.Element {
                           icon={<PlayCircleOutlined />}
                           onClick={() => handleResume(path)}
                         >
-                          {isCompleted ? 'Review path' : 'Resume'}
+                          {isCompleted ? i18nT("ui.konnected.learningPaths.myLearningPath.reviewPath") : i18nT("ui.konnected.learningPaths.myLearningPath.resume")}
                         </Button>,
                         !isCompleted && (
                           <Button
@@ -669,7 +666,7 @@ export default function MyLearningPathsPage(): JSX.Element {
                             type="default"
                             onClick={() => handleMarkComplete(path.id)}
                           >
-                            Mark complete
+                            {i18nT("ui.konnected.learningPaths.myLearningPath.markComplete")}
                           </Button>
                         ),
                         <Button
@@ -678,7 +675,7 @@ export default function MyLearningPathsPage(): JSX.Element {
                           danger
                           onClick={() => handleLeavePath(path.id)}
                         >
-                          Leave path
+                          {i18nT("ui.konnected.learningPaths.myLearningPath.leavePath")}
                         </Button>,
                       ].filter(Boolean)}
                     >
@@ -717,16 +714,16 @@ export default function MyLearningPathsPage(): JSX.Element {
                             }}
                           >
                             <Text type="secondary">
-                              {path.progress?.completedItems ?? 0} of{' '}
-                              {path.progress?.totalItems ?? 0} items completed
+                              {path.progress?.completedItems ?? 0} {i18nT("ui.konnected.learningPaths.myLearningPath.of")}{' '}
+                              {path.progress?.totalItems ?? 0} {i18nT("ui.konnected.learningPaths.myLearningPath.itemsCompleted")}
                             </Text>
                             {minutes > 0 && (
                               <Text type="secondary">
                                 ~
                                 {hours >= 1
-                                  ? `${hours.toFixed(1)} h`
-                                  : `${minutes} min`}{' '}
-                                total
+                                  ? i18nT("ui.konnected.learningPaths.myLearningPath.h", { value1: hours.toFixed(1) })
+                                  : i18nT("ui.konnected.learningPaths.myLearningPath.min", { minutes: minutes })}{' '}
+                                {i18nT("ui.konnected.learningPaths.myLearningPath.total")}
                               </Text>
                             )}
                           </Space>

@@ -3,6 +3,8 @@
 'use client';
 
 
+import TranslatedText from '@/components/i18n/TranslatedText';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ExclamationCircleOutlined,
   MailOutlined,
@@ -140,9 +142,11 @@ async function createTeamApi(payload: CreateTeamPayload): Promise<CreateTeamResp
  */
 const useMemberColumns = (
   onRemove: (key: string) => void,
-): ColumnsType<TeamMember> => [
+): ColumnsType<TeamMember> => {
+  const { t: i18nT } = useLanguage();
+  return [
   {
-    title: 'Member',
+    title: i18nT("ui.konnected.teamsCollaboration.teamBuilder.member"),
     dataIndex: 'email',
     key: 'email',
     render: (email: string) => (
@@ -153,7 +157,7 @@ const useMemberColumns = (
     ),
   },
   {
-    title: 'Role',
+    title: i18nT("ui.konnected.teamsCollaboration.teamBuilder.role"),
     dataIndex: 'role',
     key: 'role',
     render: (role: TeamRole) => {
@@ -163,25 +167,27 @@ const useMemberColumns = (
     },
   },
   {
-    title: 'Responsibility area',
+    title: i18nT("ui.konnected.teamsCollaboration.teamBuilder.responsibilityArea"),
     dataIndex: 'responsibilityArea',
     key: 'responsibilityArea',
     ellipsis: true,
-    render: (value?: string) => value || <Text type="secondary">Not specified</Text>,
+    render: (value?: string) => value || <Text type="secondary"><TranslatedText id="ui.konnected.teamsCollaboration.teamBuilder.notSpecified" /></Text>,
   },
   {
-    title: 'Actions',
+    title: i18nT("ui.konnected.teamsCollaboration.teamBuilder.actions"),
     key: 'actions',
     width: 120,
     render: (_: unknown, record: TeamMember) => (
       <Button danger size="small" onClick={() => onRemove(record.key)}>
-        Remove
+        <TranslatedText id="ui.konnected.teamsCollaboration.teamBuilder.remove" />
       </Button>
     ),
   },
-];
+  ];
+}
 
 export default function TeamBuilderPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
 
   /**
@@ -219,7 +225,7 @@ export default function TeamBuilderPage(): JSX.Element {
       const email = normalizeEmail(values.email);
 
       if (members.some((m) => m.email === email)) {
-        antdMessage.warning('This email is already in the team.');
+        antdMessage.warning(i18nT("ui.konnected.teamsCollaboration.teamBuilder.thisEmailIsAlreadyInTheTeam"));
         return;
       }
 
@@ -248,11 +254,11 @@ export default function TeamBuilderPage(): JSX.Element {
    */
   const handleFinish = async (): Promise<boolean> => {
     if (!teamInfo) {
-      antdMessage.error('Please complete team information first.');
+      antdMessage.error(i18nT("ui.konnected.teamsCollaboration.teamBuilder.pleaseCompleteTeamInformationFirst"));
       return false;
     }
     if (!members.length) {
-      antdMessage.error('Please add at least one member to the team.');
+      antdMessage.error(i18nT("ui.konnected.teamsCollaboration.teamBuilder.pleaseAddAtLeastOneMemberTo"));
       return false;
     }
 
@@ -270,7 +276,7 @@ export default function TeamBuilderPage(): JSX.Element {
     try {
       setSubmitting(true);
       const created = await createTeamApi(payload);
-      antdMessage.success('Team created successfully.');
+      antdMessage.success(i18nT("ui.konnected.teamsCollaboration.teamBuilder.teamCreatedSuccessfully"));
       // Redirect to “My teams” or to the created team if you have a slug
       if (created.slug) {
         router.push(`/konnected/teams-collaboration/my-teams/${created.slug}`);
@@ -283,12 +289,12 @@ export default function TeamBuilderPage(): JSX.Element {
         err instanceof Error ? err : new Error(String(err));
       if (error.message === 'PERMISSION_DENIED') {
         antdMessage.error(
-          'You do not have permission to create teams. Please contact an administrator.',
+          i18nT("ui.konnected.teamsCollaboration.teamBuilder.youDoNotHavePermissionToCreate"),
         );
       } else if (errorCode(error.details) === 'TEAM_NAME_ALREADY_EXISTS') {
-        antdMessage.error('A team with this name already exists. Please pick another name.');
+        antdMessage.error(i18nT("ui.konnected.teamsCollaboration.teamBuilder.aTeamWithThisNameAlreadyExists"));
       } else {
-        antdMessage.error('Could not create the team. Please try again or contact support.');
+        antdMessage.error(i18nT("ui.konnected.teamsCollaboration.teamBuilder.couldNotCreateTheTeamPleaseTry"));
       }
       return false;
     } finally {
@@ -298,11 +304,10 @@ export default function TeamBuilderPage(): JSX.Element {
 
   return (
     <KonnectedPageShell
-      title="Team Builder"
+      title={i18nT("ui.konnected.teamsCollaboration.teamBuilder.teamBuilder")}
       subtitle={
         <span>
-          Configure a collaboration-ready team for KonnectED: define the team, assign roles, and
-          confirm membership before you start collaborating.
+          {i18nT("ui.konnected.teamsCollaboration.teamBuilder.configureACollaborationReadyTeamForKonnected")}
         </span>
       }
       primaryAction={
@@ -312,12 +317,12 @@ export default function TeamBuilderPage(): JSX.Element {
           disabled={!isValidForSubmit || submitting}
           onClick={handleFinish}
         >
-          Create team
+          {i18nT("ui.konnected.teamsCollaboration.teamBuilder.createTeam")}
         </Button>
       }
       secondaryActions={
         <Text type="secondary">
-          <UserOutlined /> You will be automatically added as a member.
+          <UserOutlined /> {i18nT("ui.konnected.teamsCollaboration.teamBuilder.youWillBeAutomaticallyAddedAsA")}
         </Text>
       }
     >
@@ -337,11 +342,11 @@ export default function TeamBuilderPage(): JSX.Element {
           {/* Step 1 – Team information */}
           <StepsForm.StepForm<TeamInfo>
             name="teamInfo"
-            title="Team details"
+            title={i18nT("ui.konnected.teamsCollaboration.teamBuilder.teamDetails")}
             onFinish={async (values) => {
               const trimmedName = values.name?.trim();
               if (!trimmedName) {
-                antdMessage.error('Team name is required.');
+                antdMessage.error(i18nT("ui.konnected.teamsCollaboration.teamBuilder.teamNameIsRequired"));
                 return false;
               }
               setTeamInfo({
@@ -353,16 +358,16 @@ export default function TeamBuilderPage(): JSX.Element {
             }}
           >
             <Paragraph type="secondary" style={{ marginBottom: 16 }}>
-              Give your team a clear identity and choose whether new members can request to join.
+              {i18nT("ui.konnected.teamsCollaboration.teamBuilder.giveYourTeamAClearIdentityAnd")}
             </Paragraph>
 
             <ProFormText
               name="name"
-              label="Team name"
-              placeholder="e.g. Robotics Innovation Squad"
+              label={i18nT("ui.konnected.teamsCollaboration.teamBuilder.teamName")}
+              placeholder={i18nT("ui.konnected.teamsCollaboration.teamBuilder.eGRoboticsInnovationSquad")}
               rules={[
-                { required: true, message: 'Please enter a team name.' },
-                { min: 3, message: 'Name should be at least 3 characters long.' },
+                { required: true, message: i18nT("ui.konnected.teamsCollaboration.teamBuilder.pleaseEnterATeamName") },
+                { min: 3, message: i18nT("ui.konnected.teamsCollaboration.teamBuilder.nameShouldBeAtLeast3Characters") },
               ]}
               fieldProps={{
                 maxLength: 120,
@@ -372,8 +377,8 @@ export default function TeamBuilderPage(): JSX.Element {
 
             <ProFormTextArea
               name="description"
-              label="Team description"
-              placeholder="Briefly describe the team’s purpose, focus areas, and who should join."
+              label={i18nT("ui.konnected.teamsCollaboration.teamBuilder.teamDescription")}
+              placeholder={i18nT("ui.konnected.teamsCollaboration.teamBuilder.brieflyDescribeTheTeamSPurposeFocus")}
               fieldProps={{
                 rows: 4,
                 maxLength: 500,
@@ -383,25 +388,25 @@ export default function TeamBuilderPage(): JSX.Element {
 
             <ProFormSwitch
               name="isOpenJoin"
-              label="Allow join requests"
-              tooltip="If enabled, learners can send join requests which team leaders can approve."
+              label={i18nT("ui.konnected.teamsCollaboration.teamBuilder.allowJoinRequests")}
+              tooltip={i18nT("ui.konnected.teamsCollaboration.teamBuilder.ifEnabledLearnersCanSendJoinRequests")}
             />
           </StepsForm.StepForm>
 
           {/* Step 2 – Members & roles */}
           <StepsForm.StepForm
             name="members"
-            title="Members & roles"
+            title={i18nT("ui.konnected.teamsCollaboration.teamBuilder.membersRoles")}
             onFinish={async () => {
               if (!members.length) {
-                antdMessage.error('Add at least one member to continue.');
+                antdMessage.error(i18nT("ui.konnected.teamsCollaboration.teamBuilder.addAtLeastOneMemberToContinue"));
                 return false;
               }
               return true;
             }}
           >
             <Paragraph type="secondary" style={{ marginBottom: 16 }}>
-              Add core team members now. You can invite more people later from “My teams”.
+              {i18nT("ui.konnected.teamsCollaboration.teamBuilder.addCoreTeamMembersNowYouCan")}
             </Paragraph>
 
             {/* Add-member mini-form */}
@@ -411,7 +416,7 @@ export default function TeamBuilderPage(): JSX.Element {
               title={
                 <Space>
                   <UserAddOutlined />
-                  <span>Add member</span>
+                  <span>{i18nT("ui.konnected.teamsCollaboration.teamBuilder.addMember")}</span>
                 </Space>
               }
             >
@@ -423,11 +428,11 @@ export default function TeamBuilderPage(): JSX.Element {
                 }}
               >
                 <Form.Item
-                  label="Email"
+                  label={i18nT("ui.konnected.teamsCollaboration.teamBuilder.email")}
                   name="email"
                   rules={[
-                    { required: true, message: 'Please enter an email address.' },
-                    { type: 'email', message: 'Please enter a valid email address.' },
+                    { required: true, message: i18nT("ui.konnected.teamsCollaboration.teamBuilder.pleaseEnterAnEmailAddress") },
+                    { type: 'email', message: i18nT("ui.konnected.teamsCollaboration.teamBuilder.pleaseEnterAValidEmailAddress") },
                   ]}
                 >
                   <Input
@@ -437,25 +442,25 @@ export default function TeamBuilderPage(): JSX.Element {
                   />
                 </Form.Item>
 
-                <Form.Item label="Role" name="role" rules={[{ required: true }]}>
+                <Form.Item label={i18nT("ui.konnected.teamsCollaboration.teamBuilder.role")} name="role" rules={[{ required: true }]}>
                   <Select>
-                    <Option value="leader">Team leader</Option>
-                    <Option value="coordinator">Coordinator</Option>
-                    <Option value="member">Member</Option>
+                    <Option value="leader">{i18nT("ui.konnected.teamsCollaboration.teamBuilder.teamLeader")}</Option>
+                    <Option value="coordinator">{i18nT("ui.konnected.teamsCollaboration.teamBuilder.coordinator")}</Option>
+                    <Option value="member">{i18nT("ui.konnected.teamsCollaboration.teamBuilder.member")}</Option>
                   </Select>
                 </Form.Item>
 
-                <Form.Item label="Responsibility area" name="responsibilityArea">
-                  <Input placeholder="e.g. Impact tracking, facilitation, content curation" />
+                <Form.Item label={i18nT("ui.konnected.teamsCollaboration.teamBuilder.responsibilityArea")} name="responsibilityArea">
+                  <Input placeholder={i18nT("ui.konnected.teamsCollaboration.teamBuilder.eGImpactTrackingFacilitationContentCuration")} />
                 </Form.Item>
 
                 <Form.Item>
                   <Space>
                     <Button type="primary" onClick={handleAddMember}>
-                      Add to team
+                      {i18nT("ui.konnected.teamsCollaboration.teamBuilder.addToTeam")}
                     </Button>
                     <Text type="secondary">
-                      You can adjust roles later from “My teams”.
+                      {i18nT("ui.konnected.teamsCollaboration.teamBuilder.youCanAdjustRolesLaterFromMy")}
                     </Text>
                   </Space>
                 </Form.Item>
@@ -471,40 +476,39 @@ export default function TeamBuilderPage(): JSX.Element {
               dataSource={members}
               pagination={false}
               locale={{
-                emptyText: 'No members added yet.',
+                emptyText: i18nT("ui.konnected.teamsCollaboration.teamBuilder.noMembersAddedYet"),
               }}
             />
           </StepsForm.StepForm>
 
           {/* Step 3 – Review & confirm */}
-          <StepsForm.StepForm name="review" title="Review & confirm">
+          <StepsForm.StepForm name="review" title={i18nT("ui.konnected.teamsCollaboration.teamBuilder.reviewConfirm")}>
             <Paragraph style={{ marginBottom: 16 }}>
-              Review your team configuration before creating it. You can still adjust details later
-              in “My teams”.
+              {i18nT("ui.konnected.teamsCollaboration.teamBuilder.reviewYourTeamConfigurationBeforeCreatingIt")}
             </Paragraph>
 
-            <Card size="small" style={{ marginBottom: 24 }} title="Team summary">
+            <Card size="small" style={{ marginBottom: 24 }} title={i18nT("ui.konnected.teamsCollaboration.teamBuilder.teamSummary")}>
               {teamInfo ? (
                 <>
                   <Paragraph>
-                    <Text strong>Name:</Text> {teamInfo.name}
+                    <Text strong>{i18nT("ui.konnected.teamsCollaboration.teamBuilder.name")}</Text> {teamInfo.name}
                   </Paragraph>
                   <Paragraph>
-                    <Text strong>Description:</Text>{' '}
-                    {teamInfo.description || <Text type="secondary">Not provided</Text>}
+                    <Text strong>{i18nT("ui.konnected.teamsCollaboration.teamBuilder.description")}</Text>{' '}
+                    {teamInfo.description || <Text type="secondary">{i18nT("ui.konnected.teamsCollaboration.teamBuilder.notProvided")}</Text>}
                   </Paragraph>
                   <Paragraph>
-                    <Text strong>Join policy:</Text>{' '}
+                    <Text strong>{i18nT("ui.konnected.teamsCollaboration.teamBuilder.joinPolicy")}</Text>{' '}
                     {teamInfo.isOpenJoin ? (
-                      <Tag color="success">Requests allowed</Tag>
+                      <Tag color="success">{i18nT("ui.konnected.teamsCollaboration.teamBuilder.requestsAllowed")}</Tag>
                     ) : (
-                      <Tag>Invite-only</Tag>
+                      <Tag>{i18nT("ui.konnected.teamsCollaboration.teamBuilder.inviteOnly")}</Tag>
                     )}
                   </Paragraph>
                 </>
               ) : (
                 <Paragraph type="secondary">
-                  Team information is incomplete. Go back to the first step to fill it in.
+                  {i18nT("ui.konnected.teamsCollaboration.teamBuilder.teamInformationIsIncompleteGoBackTo")}
                 </Paragraph>
               )}
             </Card>
@@ -512,7 +516,7 @@ export default function TeamBuilderPage(): JSX.Element {
             <Card
               size="small"
               style={{ marginBottom: 24 }}
-              title={`Members (${members.length})`}
+              title={i18nT("ui.konnected.teamsCollaboration.teamBuilder.members", { length: members.length })}
             >
               {members.length ? (
                 <Table<TeamMember>
@@ -524,7 +528,7 @@ export default function TeamBuilderPage(): JSX.Element {
                   pagination={false}
                 />
               ) : (
-                <Paragraph type="secondary">No members added yet.</Paragraph>
+                <Paragraph type="secondary">{i18nT("ui.konnected.teamsCollaboration.teamBuilder.noMembersAddedYet")}</Paragraph>
               )}
             </Card>
 
@@ -534,19 +538,18 @@ export default function TeamBuilderPage(): JSX.Element {
               title={
                 <Space>
                   <ExclamationCircleOutlined />
-                  <span>Before you create the team</span>
+                  <span>{i18nT("ui.konnected.teamsCollaboration.teamBuilder.beforeYouCreateTheTeam")}</span>
                 </Space>
               }
             >
               <ul className="list-disc pl-5">
-                <li>You will be added as a member of the team automatically.</li>
+                <li>{i18nT("ui.konnected.teamsCollaboration.teamBuilder.youWillBeAddedAsAMember")}</li>
                 <li>
-                  Team leaders can manage roles, approve join requests (if enabled), and archive
-                  the team.
+                  {i18nT("ui.konnected.teamsCollaboration.teamBuilder.teamLeadersCanManageRolesApproveJoin")}
                 </li>
                 <li>
-                  You can always modify membership later from{' '}
-                  <Text strong>Teams Collaboration → My teams</Text>.
+                  {i18nT("ui.konnected.teamsCollaboration.teamBuilder.youCanAlwaysModifyMembershipLaterFrom")}{' '}
+                  <Text strong>{i18nT("ui.konnected.teamsCollaboration.teamBuilder.teamsCollaborationMyTeams")}</Text>.
                 </li>
               </ul>
             </Card>

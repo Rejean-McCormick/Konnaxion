@@ -1,6 +1,7 @@
 // frontend/app/teambuilder/create/CreateSessionClient.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ArrowLeftOutlined,
   BranchesOutlined,
@@ -37,6 +38,7 @@ const { Paragraph, Text } = Typography;
 const { TextArea } = Input;
 
 export default function CreateSessionClient(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   const problemId = searchParams.get('problemId');
@@ -73,25 +75,25 @@ export default function CreateSessionClient(): JSX.Element {
       } catch (err) {
          
         console.error('Failed to fetch users', err);
-        setError('Could not load candidate list.');
+        setError(i18nT("ui.teambuilder.create.createsessionclient.couldNotLoadCandidateList"));
       } finally {
         setUsersLoading(false);
       }
     };
 
     fetchUsers();
-  }, []);
+  }, [i18nT]);
 
   // ---------------------------------------------------------------------------
   // Handlers
   // ---------------------------------------------------------------------------
   const handleCreateSession = async () => {
     if (!sessionName.trim()) {
-      setError('Session name is required.');
+      setError(i18nT("ui.teambuilder.create.createsessionclient.sessionNameIsRequired"));
       return;
     }
     if (selectedCandidateIds.length < 2) {
-      setError('Please select at least 2 candidates.');
+      setError(i18nT("ui.teambuilder.create.createsessionclient.pleaseSelectAtLeast2Candidates"));
       return;
     }
 
@@ -113,7 +115,7 @@ export default function CreateSessionClient(): JSX.Element {
     } catch (err) {
        
       console.error(err);
-      setError('Failed to create session. Please try again.');
+      setError(i18nT("ui.teambuilder.create.createsessionclient.failedToCreateSessionPleaseTryAgain"));
       setLoading(false);
     }
   };
@@ -138,12 +140,12 @@ export default function CreateSessionClient(): JSX.Element {
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <div>
         <Space align="baseline">
-          <Text strong>Session Name</Text>
+          <Text strong>{i18nT("ui.teambuilder.create.createsessionclient.sessionName")}</Text>
           <Text type="danger">*</Text>
         </Space>
         <Input
           style={{ marginTop: 8 }}
-          placeholder="e.g. Q3 Hackathon Teams"
+          placeholder={i18nT("ui.teambuilder.create.createsessionclient.eGQ3HackathonTeams")}
           value={sessionName}
           onChange={(e) => setSessionName(e.target.value)}
           maxLength={200}
@@ -151,11 +153,11 @@ export default function CreateSessionClient(): JSX.Element {
       </div>
 
       <div>
-        <Text strong>Description</Text>
+        <Text strong>{i18nT("ui.teambuilder.create.createsessionclient.description")}</Text>
         <TextArea
           style={{ marginTop: 8 }}
           rows={3}
-          placeholder="Optional context about this team formation..."
+          placeholder={i18nT("ui.teambuilder.create.createsessionclient.optionalContextAboutThisTeamFormation")}
           value={sessionDescription}
           onChange={(e) => setSessionDescription(e.target.value)}
         />
@@ -166,7 +168,7 @@ export default function CreateSessionClient(): JSX.Element {
   const renderStep2 = () => (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
       <Paragraph type="secondary">
-        Select the pool of users you want to organize into teams.
+        {i18nT("ui.teambuilder.create.createsessionclient.selectThePoolOfUsersYouWant")}
       </Paragraph>
 
       {usersLoading ? (
@@ -188,7 +190,7 @@ export default function CreateSessionClient(): JSX.Element {
       )}
 
       <Text type="secondary" style={{ textAlign: 'right', display: 'block' }}>
-        {selectedCandidateIds.length} candidates selected
+        {selectedCandidateIds.length} {i18nT("ui.teambuilder.create.createsessionclient.candidatesSelected")}
       </Text>
     </Space>
   );
@@ -196,7 +198,7 @@ export default function CreateSessionClient(): JSX.Element {
   const renderStep3 = () => (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
       <Paragraph type="secondary">
-        Configure how the engine should distribute the selected candidates.
+        {i18nT("ui.teambuilder.create.createsessionclient.configureHowTheEngineShouldDistributeThe")}
       </Paragraph>
 
       <AlgorithmConfig config={algorithmConfig} onChange={setAlgorithmConfig} />
@@ -207,14 +209,14 @@ export default function CreateSessionClient(): JSX.Element {
         style={{ marginTop: 8 }}
         message={
           <span>
-            <strong>Summary:</strong> Creating teams of approximately{' '}
-            <strong>{algorithmConfig.target_team_size}</strong> people using the{' '}
+            <strong>{i18nT("ui.teambuilder.create.createsessionclient.summary")}</strong> {i18nT("ui.teambuilder.create.createsessionclient.creatingTeamsOfApproximately")}{' '}
+            <strong>{algorithmConfig.target_team_size}</strong> {i18nT("ui.teambuilder.create.createsessionclient.peopleUsingThe")}{' '}
             <strong>
               {algorithmConfig.strategy === 'random'
-                ? 'Random'
-                : 'Balanced Expertise'}
+                ? i18nT("ui.teambuilder.create.createsessionclient.random")
+                : i18nT("ui.teambuilder.create.createsessionclient.balancedExpertise")}
             </strong>{' '}
-            strategy.
+            {i18nT("ui.teambuilder.create.createsessionclient.strategy")}
           </span>
         }
       />
@@ -240,16 +242,16 @@ export default function CreateSessionClient(): JSX.Element {
 
   return (
     <TeamBuilderPageShell
-      title="Create Team Session"
-      subtitle="Set up a new team building session: define basics, pick candidates, and configure the matching algorithm."
-      sectionLabel="Sessions"
+      title={i18nT("ui.teambuilder.create.createsessionclient.createTeamSession")}
+      subtitle={i18nT("ui.teambuilder.create.createsessionclient.setUpANewTeamBuildingSession")}
+      sectionLabel={i18nT("ui.teambuilder.create.createsessionclient.sessions")}
       maxWidth={960}
       secondaryActions={
         <Button
           icon={<ArrowLeftOutlined />}
           onClick={() => router.push('/teambuilder')}
         >
-          Back to sessions
+          {i18nT("ui.teambuilder.create.createsessionclient.backToSessions")}
         </Button>
       }
     >
@@ -259,15 +261,15 @@ export default function CreateSessionClient(): JSX.Element {
             current={step - 1}
             items={[
               {
-                title: 'Basics',
+                title: i18nT("ui.teambuilder.create.createsessionclient.basics"),
                 icon: <FileTextOutlined />,
               },
               {
-                title: 'Candidates',
+                title: i18nT("ui.teambuilder.create.createsessionclient.candidates"),
                 icon: <TeamOutlined />,
               },
               {
-                title: 'Logic',
+                title: i18nT("ui.teambuilder.create.createsessionclient.logic"),
                 icon: <BranchesOutlined />,
               },
             ]}
@@ -277,7 +279,7 @@ export default function CreateSessionClient(): JSX.Element {
             <Alert
               type="error"
               showIcon
-              message="There was a problem"
+              message={i18nT("ui.teambuilder.create.createsessionclient.thereWasAProblem")}
               description={error}
             />
           )}
@@ -295,7 +297,7 @@ export default function CreateSessionClient(): JSX.Element {
               icon={<ArrowLeftOutlined />}
               onClick={handleBack}
             >
-              {step > 1 ? 'Back' : 'Cancel'}
+              {step > 1 ? i18nT("ui.teambuilder.create.createsessionclient.back") : i18nT("ui.teambuilder.create.createsessionclient.cancel")}
             </Button>
 
             {step < 3 ? (
@@ -304,7 +306,7 @@ export default function CreateSessionClient(): JSX.Element {
                 onClick={handleNext}
                 disabled={step === 1 && !sessionName.trim()}
               >
-                Next: {step === 1 ? 'Select Candidates' : 'Configure Algorithm'}
+                {i18nT("ui.teambuilder.create.createsessionclient.next")} {step === 1 ? i18nT("ui.teambuilder.create.createsessionclient.selectCandidates") : i18nT("ui.teambuilder.create.createsessionclient.configureAlgorithm")}
               </Button>
             ) : (
               <Button
@@ -313,7 +315,7 @@ export default function CreateSessionClient(): JSX.Element {
                 onClick={handleCreateSession}
                 loading={loading}
               >
-                Create &amp; View Session
+                {i18nT("ui.teambuilder.create.createsessionclient.createViewSession")}
               </Button>
             )}
           </Space>

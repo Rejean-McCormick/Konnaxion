@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { ReloadOutlined } from '@ant-design/icons'
 import { Alert, Button, Card, Empty, List, Space, Spin, Tag, Typography } from 'antd'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
@@ -11,6 +12,7 @@ import { fetchCurrentUser, type CurrentUser } from '@/services/user'
 const { Text } = Typography
 
 export default function MySpacesPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [sessions, setSessions] = useState<KreativeCollabSession[]>([])
   const [user, setUser] = useState<CurrentUser | null>(null)
   const [loading, setLoading] = useState(true)
@@ -46,16 +48,16 @@ export default function MySpacesPage(): JSX.Element {
 
   return (
     <KreativePageShell
-      title="My Collaborative Spaces"
-      subtitle="Sessions hosted by the authenticated user, derived from the real CollabSession API."
-      primaryAction={<Button icon={<ReloadOutlined />} onClick={() => void load()}>Refresh</Button>}
+      title={i18nT("ui.kreative.collaborativeSpaces.mySpaces.myCollaborativeSpaces")}
+      subtitle={i18nT("ui.kreative.collaborativeSpaces.mySpaces.sessionsHostedByTheAuthenticatedUserDerived")}
+      primaryAction={<Button icon={<ReloadOutlined />} onClick={() => void load()}>{i18nT("ui.kreative.collaborativeSpaces.mySpaces.refresh")}</Button>}
     >
-      {error ? <Alert type="error" showIcon message="My spaces could not be loaded" description={error} style={{ marginBottom: 16 }} /> : null}
+      {error ? <Alert type="error" showIcon message={i18nT("ui.kreative.collaborativeSpaces.mySpaces.mySpacesCouldNotBeLoaded")} description={error} style={{ marginBottom: 16 }} /> : null}
       <Spin spinning={loading}>
         <Card>
           <List
             dataSource={mine}
-            locale={{ emptyText: <Empty description="You do not currently host a collaboration session." /> }}
+            locale={{ emptyText: <Empty description={i18nT("ui.kreative.collaborativeSpaces.mySpaces.youDoNotCurrentlyHostACollaboration")} /> }}
             renderItem={(session) => (
               <List.Item>
                 <List.Item.Meta
@@ -63,7 +65,7 @@ export default function MySpacesPage(): JSX.Element {
                   description={
                     <Space wrap>
                       <Tag>{session.session_type}</Tag>
-                      <Text type="secondary">Started {new Date(session.started_at).toLocaleString()}</Text>
+                      <Text type="secondary">{i18nT("ui.kreative.collaborativeSpaces.mySpaces.started")} {new Date(session.started_at).toLocaleString()}</Text>
                     </Space>
                   }
                 />

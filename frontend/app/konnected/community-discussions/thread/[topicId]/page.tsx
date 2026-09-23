@@ -1,6 +1,7 @@
 // FILE: frontend/app/konnected/community-discussions/thread/[topicId]/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ArrowLeftOutlined,
   MessageOutlined,
@@ -50,6 +51,7 @@ type ForumPostApi = {
 };
 
 export default function KonnectedThreadDetailPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const params = useParams<{ topicId: string }>();
   const router = useRouter();
   const topicId = String(params.topicId ?? '');
@@ -78,11 +80,11 @@ export default function KonnectedThreadDetailPage(): JSX.Element {
       setPosts(postRows);
     } catch (loadError) {
       console.error('Failed to load KonnectED discussion thread', loadError);
-      setError('Unable to load this discussion thread.');
+      setError(i18nT("ui.konnected.communityDiscussions.thread.topicid.unableToLoadThisDiscussionThread"));
     } finally {
       setLoading(false);
     }
-  }, [topicId]);
+  }, [topicId, i18nT]);
 
   useEffect(() => {
     void loadThread();
@@ -100,7 +102,7 @@ export default function KonnectedThreadDetailPage(): JSX.Element {
   const submitReply = async () => {
     const content = reply.trim();
     if (!content) {
-      message.warning('Write a reply before posting.');
+      message.warning(i18nT("ui.konnected.communityDiscussions.thread.topicid.writeAReplyBeforePosting"));
       return;
     }
 
@@ -112,10 +114,10 @@ export default function KonnectedThreadDetailPage(): JSX.Element {
       });
       setPosts((current) => [...current, created]);
       setReply('');
-      message.success('Reply posted.');
+      message.success(i18nT("ui.konnected.communityDiscussions.thread.topicid.replyPosted"));
     } catch (postError) {
       console.error('Failed to post KonnectED reply', postError);
-      message.error('Unable to post the reply.');
+      message.error(i18nT("ui.konnected.communityDiscussions.thread.topicid.unableToPostTheReply"));
     } finally {
       setSubmitting(false);
     }
@@ -123,8 +125,8 @@ export default function KonnectedThreadDetailPage(): JSX.Element {
 
   return (
     <KonnectedPageShell
-      title={topic?.title ?? 'Discussion thread'}
-      subtitle="Community discussion backed by the KonnectED forum API."
+      title={topic?.title ?? i18nT("ui.konnected.communityDiscussions.thread.topicid.discussionThread")}
+      subtitle={i18nT("ui.konnected.communityDiscussions.thread.topicid.communityDiscussionBackedByTheKonnectedForum")}
       primaryAction={
         <Button
           icon={<ArrowLeftOutlined />}
@@ -132,7 +134,7 @@ export default function KonnectedThreadDetailPage(): JSX.Element {
             router.push('/konnected/community-discussions/active-threads')
           }
         >
-          Active threads
+          {i18nT("ui.konnected.communityDiscussions.thread.topicid.activeThreads")}
         </Button>
       }
       secondaryActions={
@@ -141,7 +143,7 @@ export default function KonnectedThreadDetailPage(): JSX.Element {
           onClick={() => void loadThread()}
           loading={loading}
         >
-          Reload
+          {i18nT("ui.konnected.communityDiscussions.thread.topicid.reload")}
         </Button>
       }
     >
@@ -149,18 +151,18 @@ export default function KonnectedThreadDetailPage(): JSX.Element {
         <Card>
           <Space style={{ width: '100%', justifyContent: 'center' }}>
             <Spin />
-            <Text>Loading discussion…</Text>
+            <Text>{i18nT("ui.konnected.communityDiscussions.thread.topicid.loadingDiscussion")}</Text>
           </Space>
         </Card>
       ) : error ? (
         <Alert
           type="error"
           showIcon
-          message="Discussion unavailable"
+          message={i18nT("ui.konnected.communityDiscussions.thread.topicid.discussionUnavailable")}
           description={error}
           action={
             <Button size="small" onClick={() => void loadThread()}>
-              Retry
+              {i18nT("ui.konnected.communityDiscussions.thread.topicid.retry")}
             </Button>
           }
         />
@@ -171,19 +173,19 @@ export default function KonnectedThreadDetailPage(): JSX.Element {
               <Space wrap>
                 {topic.category && <Tag color="blue">{topic.category}</Tag>}
                 <Tag icon={<MessageOutlined />}>
-                  {orderedPosts.length} post{orderedPosts.length === 1 ? '' : 's'}
+                  {orderedPosts.length} {i18nT("ui.konnected.communityDiscussions.thread.topicid.post")}{orderedPosts.length === 1 ? '' : 's'}
                 </Tag>
               </Space>
               <Text type="secondary">
-                Started by {topic.creator || 'Unknown'} ·{' '}
+                {i18nT("ui.konnected.communityDiscussions.thread.topicid.startedBy")} {topic.creator || i18nT("ui.konnected.communityDiscussions.thread.topicid.unknown")} ·{' '}
                 {new Date(topic.created_at).toLocaleString()}
               </Text>
             </Space>
           </Card>
 
-          <Card title="Posts">
+          <Card title={i18nT("ui.konnected.communityDiscussions.thread.topicid.posts")}>
             {orderedPosts.length === 0 ? (
-              <Empty description="No posts yet." />
+              <Empty description={i18nT("ui.konnected.communityDiscussions.thread.topicid.noPostsYet")} />
             ) : (
               <List
                 dataSource={orderedPosts}
@@ -194,7 +196,7 @@ export default function KonnectedThreadDetailPage(): JSX.Element {
                       avatar={<Avatar>{item.author?.charAt(0) ?? '?'}</Avatar>}
                       title={
                         <Space>
-                          <Text strong>{item.author || 'Unknown'}</Text>
+                          <Text strong>{item.author || i18nT("ui.konnected.communityDiscussions.thread.topicid.unknown")}</Text>
                           <Text type="secondary" style={{ fontSize: 12 }}>
                             {new Date(item.created_at).toLocaleString()}
                           </Text>
@@ -212,14 +214,14 @@ export default function KonnectedThreadDetailPage(): JSX.Element {
             )}
           </Card>
 
-          <Card title="Reply">
+          <Card title={i18nT("ui.konnected.communityDiscussions.thread.topicid.reply")}>
             <Space direction="vertical" style={{ width: '100%' }}>
               <TextArea
                 value={reply}
                 onChange={(event) => setReply(event.target.value)}
                 rows={4}
                 maxLength={5000}
-                placeholder="Add a constructive reply…"
+                placeholder={i18nT("ui.konnected.communityDiscussions.thread.topicid.addAConstructiveReply")}
               />
               <Button
                 type="primary"
@@ -227,7 +229,7 @@ export default function KonnectedThreadDetailPage(): JSX.Element {
                 loading={submitting}
                 onClick={() => void submitReply()}
               >
-                Post reply
+                {i18nT("ui.konnected.communityDiscussions.thread.topicid.postReply")}
               </Button>
             </Space>
           </Card>

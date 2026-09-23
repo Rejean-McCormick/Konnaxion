@@ -1,6 +1,7 @@
 // FILE: frontend/components/TagsList.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Tag as AntdTag, Card, Empty, List, Typography } from 'antd';
 import React from 'react';
 
@@ -38,12 +39,13 @@ function toTagsArray(input: TagsInput): TagItem[] {
 }
 
 const TagsList: React.FC<TagsListProps> = ({ data, onSelectTag }) => {
+  const { t: i18nT } = useLanguage();
   const tags = React.useMemo<TagItem[]>(() => toTagsArray(data), [data]);
 
   return (
-    <Card title="Tags">
+    <Card title={i18nT("ui.tagslist.tags")}>
       {tags.length === 0 ? (
-        <Empty description="No tags" />
+        <Empty description={i18nT("ui.tagslist.noTags")} />
       ) : (
         <List<TagItem>
           dataSource={tags}

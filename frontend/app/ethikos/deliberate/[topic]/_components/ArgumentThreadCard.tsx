@@ -1,5 +1,8 @@
 'use client'
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import TranslatedText from '@/components/i18n/TranslatedText';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   BranchesOutlined,
   InfoCircleOutlined,
@@ -61,8 +64,8 @@ function narrativeKind(argument: ArgumentTreeNode): NarrativeKind {
   return null
 }
 
-function selectedArgumentLabel(argument: ArgumentTreeItem | null): string {
-  if (!argument) return 'No argument selected'
+function selectedArgumentLabel(i18nT: TranslateFunction, argument: ArgumentTreeItem | null): string {
+  if (!argument) return i18nT("ui.ethikos.deliberate.topic.argumentthreadcard.noArgumentSelected")
   const side = sideLabel(argument.side)
   const preview = argument.body?.trim()
   if (!preview) return `${side} argument selected`
@@ -76,31 +79,31 @@ function narrativeMeta(argument: ArgumentTreeNode): JSX.Element | null {
   if (kind === 'announcement') {
     return (
       <Space size={4} wrap>
-        <Tag color="purple">DEMO FICTION</Tag>
-        <Tag color="blue">Public announcement</Tag>
+        <Tag color="purple"><TranslatedText id="ui.ethikos.deliberate.topic.argumentthreadcard.demoFiction" /></Tag>
+        <Tag color="blue"><TranslatedText id="ui.ethikos.deliberate.topic.argumentthreadcard.publicAnnouncement" /></Tag>
       </Space>
     )
   }
   if (kind === 'moderation') {
     return (
       <Space size={4} wrap>
-        <Tag color="purple">DEMO FICTION</Tag>
-        <Tag color="orange">Moderation event</Tag>
+        <Tag color="purple"><TranslatedText id="ui.ethikos.deliberate.topic.argumentthreadcard.demoFiction" /></Tag>
+        <Tag color="orange"><TranslatedText id="ui.ethikos.deliberate.topic.argumentthreadcard.moderationEvent" /></Tag>
       </Space>
     )
   }
   if (kind === 'conflict') {
     return (
       <Space size={4} wrap>
-        <Tag color="purple">DEMO FICTION</Tag>
-        <Tag color="gold">Declared conflict</Tag>
+        <Tag color="purple"><TranslatedText id="ui.ethikos.deliberate.topic.argumentthreadcard.demoFiction" /></Tag>
+        <Tag color="gold"><TranslatedText id="ui.ethikos.deliberate.topic.argumentthreadcard.declaredConflict" /></Tag>
       </Space>
     )
   }
   return (
     <Space size={4} wrap>
-      <Tag color="purple">DEMO FICTION</Tag>
-      <Tag color="cyan">Advisory recusal</Tag>
+      <Tag color="purple"><TranslatedText id="ui.ethikos.deliberate.topic.argumentthreadcard.demoFiction" /></Tag>
+      <Tag color="cyan"><TranslatedText id="ui.ethikos.deliberate.topic.argumentthreadcard.advisoryRecusal" /></Tag>
     </Space>
   )
 }
@@ -113,7 +116,7 @@ function narrativeBody(argument: ArgumentTreeNode): JSX.Element {
       <Alert
         type="info"
         showIcon
-        message="Public announcement — fictional demo scenario"
+        message={<TranslatedText id="ui.ethikos.deliberate.topic.argumentthreadcard.publicAnnouncementFictionalDemoScenario" />}
         description={<strong style={{ whiteSpace: 'pre-wrap' }}>{argument.body}</strong>}
         style={{ marginBottom: 8 }}
       />
@@ -124,7 +127,7 @@ function narrativeBody(argument: ArgumentTreeNode): JSX.Element {
       <Alert
         type="warning"
         showIcon
-        message="Moderation event"
+        message={<TranslatedText id="ui.ethikos.deliberate.topic.argumentthreadcard.moderationEvent" />}
         description={argument.body}
         style={{ marginBottom: 8 }}
       />
@@ -135,7 +138,7 @@ function narrativeBody(argument: ArgumentTreeNode): JSX.Element {
       <Alert
         type="warning"
         showIcon
-        message="Declared participant context"
+        message={<TranslatedText id="ui.ethikos.deliberate.topic.argumentthreadcard.declaredParticipantContext" />}
         description={argument.body}
         style={{ marginBottom: 8 }}
       />
@@ -146,7 +149,7 @@ function narrativeBody(argument: ArgumentTreeNode): JSX.Element {
       <Alert
         type="success"
         showIcon
-        message="Voluntary advisory recusal"
+        message={<TranslatedText id="ui.ethikos.deliberate.topic.argumentthreadcard.voluntaryAdvisoryRecusal" />}
         description={argument.body}
         style={{ marginBottom: 8 }}
       />
@@ -177,33 +180,34 @@ export default function ArgumentThreadCard({
   onRefresh: () => void
   onOpenParticipant: (target: ParticipantContextTarget) => void
 }): JSX.Element {
+  const { t: i18nT } = useLanguage();
   return (
     <ProCard
       title={
         <Space>
           <BranchesOutlined />
-          <span>Arguments and replies</span>
+          <span>{i18nT("ui.ethikos.deliberate.topic.argumentthreadcard.argumentsAndReplies")}</span>
         </Space>
       }
       extra={
         <Space wrap>
-          <Tag>{items.length} statements</Tag>
+          <Tag>{items.length} {i18nT("ui.ethikos.deliberate.topic.argumentthreadcard.statements")}</Tag>
           {selectedArgument ? (
-            <Tooltip title={selectedArgumentLabel(selectedArgument)}>
-              <Tag color="blue">Argument selected</Tag>
+            <Tooltip title={selectedArgumentLabel(i18nT, selectedArgument)}>
+              <Tag color="blue">{i18nT("ui.ethikos.deliberate.topic.argumentthreadcard.argumentSelected")}</Tag>
             </Tooltip>
           ) : (
-            <Tag>Choose an argument</Tag>
+            <Tag>{i18nT("ui.ethikos.deliberate.topic.argumentthreadcard.chooseAnArgument")}</Tag>
           )}
-          <Tooltip title="Refresh the argument thread">
-            <Button icon={<ReloadOutlined />} onClick={onRefresh}>Refresh</Button>
+          <Tooltip title={i18nT("ui.ethikos.deliberate.topic.argumentthreadcard.refreshTheArgumentThread")}>
+            <Button icon={<ReloadOutlined />} onClick={onRefresh}>{i18nT("ui.ethikos.deliberate.topic.argumentthreadcard.refresh")}</Button>
           </Tooltip>
         </Space>
       }
     >
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         <Text type="secondary">
-          Read the argument thread, inspect evidence and participant context, or reply to continue the deliberation.
+          {i18nT("ui.ethikos.deliberate.topic.argumentthreadcard.readTheArgumentThreadInspectEvidenceAnd")}
         </Text>
 
         <ArgumentTree
@@ -246,7 +250,7 @@ export default function ArgumentThreadCard({
                       onOpenParticipant(participant)
                     }}
                   >
-                    EkoH context
+                    {i18nT("ui.ethikos.deliberate.topic.argumentthreadcard.ekohContext")}
                   </Button>
                 )}
                 <Button
@@ -258,7 +262,7 @@ export default function ArgumentThreadCard({
                     onSelect(argument)
                   }}
                 >
-                  {isSelected ? 'Viewing details' : 'View details'}
+                  {isSelected ? i18nT("ui.ethikos.deliberate.topic.argumentthreadcard.viewingDetails") : i18nT("ui.ethikos.deliberate.topic.argumentthreadcard.viewDetails")}
                 </Button>
               </Space>
             )

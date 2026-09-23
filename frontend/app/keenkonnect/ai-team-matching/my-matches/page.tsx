@@ -1,6 +1,7 @@
 // FILE: frontend/app/keenkonnect/ai-team-matching/my-matches/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { ProCard, type ProColumns, ProTable } from '@ant-design/pro-components';
 import { Badge, Button, Drawer, Progress, Space, Tag, Typography } from 'antd';
 import React from 'react';
@@ -103,6 +104,7 @@ const partnerMatches: MatchRow[] = [
 ];
 
 export default function MyMatchesPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [selectedMatch, setSelectedMatch] = React.useState<MatchRow | null>(null);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
@@ -117,22 +119,22 @@ export default function MyMatchesPage(): JSX.Element {
 
   const columns: ProColumns<MatchRow>[] = [
     {
-      title: 'Type',
+      title: i18nT("ui.keenkonnect.aiTeamMatching.myMatches.type"),
       dataIndex: 'type',
       width: 140,
       filters: [
-        { text: 'Teams', value: 'team' },
-        { text: 'Partners', value: 'partner' },
+        { text: i18nT("ui.keenkonnect.aiTeamMatching.myMatches.teams"), value: 'team' },
+        { text: i18nT("ui.keenkonnect.aiTeamMatching.myMatches.partners"), value: 'partner' },
       ],
       onFilter: (value, row) => row.type === String(value),
       render: (_, row) => (
         <Tag color={row.type === 'team' ? 'blue' : 'purple'}>
-          {row.type === 'team' ? 'Team match' : 'Partner match'}
+          {row.type === 'team' ? i18nT("ui.keenkonnect.aiTeamMatching.myMatches.teamMatch") : i18nT("ui.keenkonnect.aiTeamMatching.myMatches.partnerMatch")}
         </Tag>
       ),
     },
     {
-      title: 'Nom',
+      title: i18nT("ui.keenkonnect.aiTeamMatching.myMatches.nom"),
       dataIndex: 'name',
       width: 240,
       render: (_, row) => (
@@ -143,7 +145,7 @@ export default function MyMatchesPage(): JSX.Element {
       ),
     },
     {
-      title: 'Match',
+      title: i18nT("ui.keenkonnect.aiTeamMatching.myMatches.match"),
       dataIndex: 'matchScore',
       width: 220,
       sorter: (a, b) => a.matchScore - b.matchScore,
@@ -160,30 +162,30 @@ export default function MyMatchesPage(): JSX.Element {
                 : 'normal'
             }
           />
-          <Text type="secondary">{row.matchScore}% de compatibilité globale</Text>
+          <Text type="secondary">{row.matchScore}{i18nT("ui.keenkonnect.aiTeamMatching.myMatches.deCompatibiliteGlobale")}</Text>
         </Space>
       ),
     },
     {
-      title: 'Points communs',
+      title: i18nT("ui.keenkonnect.aiTeamMatching.myMatches.pointsCommuns"),
       dataIndex: 'commonInterests',
       ellipsis: true,
     },
     {
-      title: 'Rôle / Besoin',
+      title: i18nT("ui.keenkonnect.aiTeamMatching.myMatches.roleBesoin"),
       dataIndex: 'roleOrNeed',
       ellipsis: true,
       width: 260,
     },
     {
-      title: 'Localisation',
+      title: i18nT("ui.keenkonnect.aiTeamMatching.myMatches.localisation"),
       dataIndex: 'location',
       width: 180,
       render: (_, row) =>
         row.location ? <Text>{row.location}</Text> : <Text type="secondary">—</Text>,
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.keenkonnect.aiTeamMatching.myMatches.actions"),
       valueType: 'option',
       width: 200,
       render: (_, row) => [
@@ -195,10 +197,10 @@ export default function MyMatchesPage(): JSX.Element {
             setDrawerOpen(true);
           }}
         >
-          Voir le détail
+          {i18nT("ui.keenkonnect.aiTeamMatching.myMatches.voirLeDetail")}
         </Button>,
         <Button key="connect" type="link">
-          Proposer une connexion
+          {i18nT("ui.keenkonnect.aiTeamMatching.myMatches.proposerUneConnexion")}
         </Button>,
       ],
     },
@@ -206,22 +208,22 @@ export default function MyMatchesPage(): JSX.Element {
 
   return (
     <KeenPage
-      title="Mes correspondances"
-      description="Résumé de tes matches générés par l’AI Team Matching : équipes, partenaires potentiels et niveau de compatibilité."
-      metaTitle="KeenKonnect · Mes correspondances"
+      title={i18nT("ui.keenkonnect.aiTeamMatching.myMatches.mesCorrespondances")}
+      description={i18nT("ui.keenkonnect.aiTeamMatching.myMatches.resumeDeTesMatchesGeneresParL")}
+      metaTitle={i18nT("ui.keenkonnect.aiTeamMatching.myMatches.keenkonnectMesCorrespondances")}
     >
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         {/* Bandeau de KPIs / résumé */}
         <ProCard ghost gutter={[16, 16]} wrap>
           <ProCard colSpan={{ xs: 24, sm: 12, md: 6 }} bordered>
-            <Text type="secondary">Total de matches</Text>
+            <Text type="secondary">{i18nT("ui.keenkonnect.aiTeamMatching.myMatches.totalDeMatches")}</Text>
             <Title level={3} style={{ marginTop: 8, marginBottom: 0 }}>
               {total}
             </Title>
           </ProCard>
 
           <ProCard colSpan={{ xs: 24, sm: 12, md: 6 }} bordered>
-            <Text type="secondary">Nouveaux matches</Text>
+            <Text type="secondary">{i18nT("ui.keenkonnect.aiTeamMatching.myMatches.nouveauxMatches")}</Text>
             <Space align="baseline">
               <Title level={3} style={{ marginTop: 8, marginBottom: 0 }}>
                 {newCount}
@@ -236,7 +238,7 @@ export default function MyMatchesPage(): JSX.Element {
           </ProCard>
 
           <ProCard colSpan={{ xs: 24, sm: 12, md: 6 }} bordered>
-            <Text type="secondary">Compatibilité moyenne</Text>
+            <Text type="secondary">{i18nT("ui.keenkonnect.aiTeamMatching.myMatches.compatibiliteMoyenne")}</Text>
             <Title level={3} style={{ marginTop: 8, marginBottom: 0 }}>
               {avgScore}%
             </Title>
@@ -251,7 +253,7 @@ export default function MyMatchesPage(): JSX.Element {
           </ProCard>
 
           <ProCard colSpan={{ xs: 24, sm: 12, md: 6 }} bordered>
-            <Text type="secondary">Matches forts (≥ 80%)</Text>
+            <Text type="secondary">{i18nT("ui.keenkonnect.aiTeamMatching.myMatches.matchesForts80")}</Text>
             <Title level={3} style={{ marginTop: 8, marginBottom: 0 }}>
               {strongMatches}
             </Title>
@@ -276,7 +278,7 @@ export default function MyMatchesPage(): JSX.Element {
 
         {/* Drawer de détail d’un match */}
         <Drawer
-          title={selectedMatch ? selectedMatch.name : 'Détail du match'}
+          title={selectedMatch ? selectedMatch.name : i18nT("ui.keenkonnect.aiTeamMatching.myMatches.detailDuMatch")}
           open={drawerOpen}
           width={520}
           onClose={() => {
@@ -288,7 +290,7 @@ export default function MyMatchesPage(): JSX.Element {
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
               <Space>
                 <Tag color={selectedMatch.type === 'team' ? 'blue' : 'purple'}>
-                  {selectedMatch.type === 'team' ? 'Team match' : 'Partner match'}
+                  {selectedMatch.type === 'team' ? i18nT("ui.keenkonnect.aiTeamMatching.myMatches.teamMatch") : i18nT("ui.keenkonnect.aiTeamMatching.myMatches.partnerMatch")}
                 </Tag>
                 {selectedMatch.new && (
                   <Badge count="Nouveau" style={{ backgroundColor: '#52c41a' }} />
@@ -310,47 +312,46 @@ export default function MyMatchesPage(): JSX.Element {
                 />
                 <div>
                   <Text strong>
-                    {selectedMatch.matchScore}% de compatibilité globale
+                    {selectedMatch.matchScore}{i18nT("ui.keenkonnect.aiTeamMatching.myMatches.deCompatibiliteGlobale")}
                   </Text>
                   <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                    Calculé à partir des intérêts, compétences, disponibilité et
-                    style de collaboration.
+                    {i18nT("ui.keenkonnect.aiTeamMatching.myMatches.calculeAPartirDesInteretsCompetencesDisponibilite")}
                   </Paragraph>
                 </div>
               </Space>
 
               <div>
-                <Title level={5}>Ce que vous avez en commun</Title>
+                <Title level={5}>{i18nT("ui.keenkonnect.aiTeamMatching.myMatches.ceQueVousAvezEnCommun")}</Title>
                 <Paragraph>{selectedMatch.commonInterests}</Paragraph>
               </div>
 
               <div>
-                <Title level={5}>Rôle &amp; attentes</Title>
+                <Title level={5}>{i18nT("ui.keenkonnect.aiTeamMatching.myMatches.roleAttentes")}</Title>
                 <Paragraph>{selectedMatch.roleOrNeed}</Paragraph>
               </div>
 
               {selectedMatch.location && (
                 <Paragraph>
-                  <Text strong>Localisation :</Text> {selectedMatch.location}
+                  <Text strong>{i18nT("ui.keenkonnect.aiTeamMatching.myMatches.localisation_97af08")}</Text> {selectedMatch.location}
                 </Paragraph>
               )}
 
               {selectedMatch.availability && (
                 <Paragraph>
-                  <Text strong>Disponibilité :</Text> {selectedMatch.availability}
+                  <Text strong>{i18nT("ui.keenkonnect.aiTeamMatching.myMatches.disponibilite")}</Text> {selectedMatch.availability}
                 </Paragraph>
               )}
 
               {selectedMatch.membersCount != null && (
                 <Paragraph>
-                  <Text strong>Taille de l’équipe :</Text>{' '}
-                  {selectedMatch.membersCount} membres
+                  <Text strong>{i18nT("ui.keenkonnect.aiTeamMatching.myMatches.tailleDeLEquipe")}</Text>{' '}
+                  {selectedMatch.membersCount} {i18nT("ui.keenkonnect.aiTeamMatching.myMatches.membres")}
                 </Paragraph>
               )}
 
               <Space>
-                <Button type="primary">Proposer une connexion</Button>
-                <Button>Voir le profil complet</Button>
+                <Button type="primary">{i18nT("ui.keenkonnect.aiTeamMatching.myMatches.proposerUneConnexion")}</Button>
+                <Button>{i18nT("ui.keenkonnect.aiTeamMatching.myMatches.voirLeProfilComplet")}</Button>
               </Space>
             </Space>
           )}

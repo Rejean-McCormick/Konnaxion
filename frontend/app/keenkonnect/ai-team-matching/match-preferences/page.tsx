@@ -1,6 +1,7 @@
 // C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\ai-team-matching\match-preferences\page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ProFormSelect,
   ProFormSlider,
@@ -14,16 +15,17 @@ import React from 'react';
 import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const MatchPreferencesPage: React.FC = () => {
+  const { t: i18nT } = useLanguage();
   return (
     <KeenPage
-      title="Préférences de matching"
-      description="Configure tes préférences pour que KeenKonnect puisse te proposer des équipes et coéquipier·ères qui te correspondent vraiment."
+      title={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.preferencesDeMatching")}
+      description={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.configureTesPreferencesPourQueKeenkonnectPuisse")}
     >
       <Alert
         type="info"
         showIcon
-        message="Matching preferences are a declared preview"
-        description="You can explore the preference model, but these values are read-only in this build because no AI matching-preferences persistence contract is exposed."
+        message={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.matchingPreferencesAreADeclaredPreview")}
+        description={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.youCanExploreThePreferenceModelBut")}
         style={{ marginBottom: 16 }}
       />
       <Card>
@@ -43,32 +45,32 @@ const MatchPreferencesPage: React.FC = () => {
           {/* Étape 1 — Profil & objectifs */}
           <StepsForm.StepForm
             name="profile"
-            title="Profil & objectifs"
+            title={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.profilObjectifs")}
             stepProps={{
-              description: 'Ce que tu cherches dans l’équipe',
+              description: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.ceQueTuCherchesDansLEquipe"),
             }}
           >
             <ProFormSelect
               name="matchGoal"
-              label="Objectif principal"
-              placeholder="Choisis ton objectif principal"
+              label={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.objectifPrincipal")}
+              placeholder={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.choisisTonObjectifPrincipal")}
               rules={[
                 {
                   required: true,
-                  message: 'Merci de préciser ton objectif principal.',
+                  message: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.merciDePreciserTonObjectifPrincipal"),
                 },
               ]}
               options={[
-                { label: 'Trouver un·e cofondateur·rice', value: 'cofounder' },
-                { label: 'Trouver une équipe pour un projet', value: 'join_team' },
-                { label: 'Trouver des freelances / experts', value: 'freelance' },
-                { label: 'Brainstorm / networking uniquement', value: 'networking' },
+                { label: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.trouverUnECofondateurRice"), value: 'cofounder' },
+                { label: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.trouverUneEquipePourUnProjet"), value: 'join_team' },
+                { label: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.trouverDesFreelancesExperts"), value: 'freelance' },
+                { label: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.brainstormNetworkingUniquement"), value: 'networking' },
               ]}
             />
 
             <ProFormSlider
               name="seniorityPreference"
-              label="Niveau d’expérience souhaité dans l’équipe"
+              label={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.niveauDExperienceSouhaiteDansLEquipe")}
               min={1}
               max={10}
               marks={{
@@ -84,19 +86,19 @@ const MatchPreferencesPage: React.FC = () => {
 
             <ProFormSelect
               name="timeCommitment"
-              label="Disponibilité souhaitée des membres"
-              placeholder="Sélectionne une option"
+              label={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.disponibiliteSouhaiteeDesMembres")}
+              placeholder={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.selectionneUneOption")}
               allowClear
               options={[
-                { label: 'Side project (3–5 h / semaine)', value: 'side' },
-                { label: 'Engagement modéré (5–10 h / semaine)', value: 'medium' },
-                { label: 'Engagement élevé (10h+ / semaine)', value: 'high' },
+                { label: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.sideProject35HSemaine"), value: 'side' },
+                { label: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.engagementModere510HSemaine"), value: 'medium' },
+                { label: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.engagementEleve10hSemaine"), value: 'high' },
               ]}
             />
 
             <ProFormSwitch
               name="remoteOnly"
-              label="Je veux uniquement des collaborations 100% à distance"
+              label={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.jeVeuxUniquementDesCollaborations100A")}
               fieldProps={{
                 checkedChildren: 'Oui',
                 unCheckedChildren: 'Non',
@@ -107,14 +109,14 @@ const MatchPreferencesPage: React.FC = () => {
           {/* Étape 2 — Style d’équipe */}
           <StepsForm.StepForm
             name="team"
-            title="Style d’équipe"
+            title={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.styleDEquipe")}
             stepProps={{
-              description: 'Comment tu aimes travailler',
+              description: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.commentTuAimesTravailler"),
             }}
           >
             <ProFormSlider
               name="teamSize"
-              label="Taille d’équipe idéale"
+              label={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.tailleDEquipeIdeale")}
               min={2}
               max={12}
               marks={{
@@ -126,21 +128,21 @@ const MatchPreferencesPage: React.FC = () => {
 
             <ProFormSelect
               name="communicationStyle"
-              label="Style de communication préféré"
-              placeholder="Sélectionne ce qui te ressemble le plus"
+              label={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.styleDeCommunicationPrefere")}
+              placeholder={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.selectionneCeQuiTeRessembleLePlus")}
               options={[
                 {
-                  label: 'Très structuré (notes, comptes-rendus, suivi serré)',
+                  label: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.tresStructureNotesComptesRendusSuiviSerre"),
                   value: 'structured',
                 },
-                { label: 'Flexible mais réactif', value: 'flexible' },
-                { label: 'Informel, au feeling', value: 'casual' },
+                { label: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.flexibleMaisReactif"), value: 'flexible' },
+                { label: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.informelAuFeeling"), value: 'casual' },
               ]}
             />
 
             <ProFormSlider
               name="asyncPreference"
-              label="Préférence pour le travail asynchrone"
+              label={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.preferencePourLeTravailAsynchrone")}
               min={0}
               max={10}
               marks={{
@@ -152,7 +154,7 @@ const MatchPreferencesPage: React.FC = () => {
 
             <ProFormSwitch
               name="needsFacilitator"
-              label="Je préfère qu’il y ait un·e facilitateur·rice / PM dans l’équipe"
+              label={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.jePrefereQuIlYAitUn")}
               fieldProps={{
                 checkedChildren: 'Oui',
                 unCheckedChildren: 'Pas nécessaire',
@@ -161,7 +163,7 @@ const MatchPreferencesPage: React.FC = () => {
 
             <ProFormSwitch
               name="preferDiverseBackgrounds"
-              label="Je souhaite une équipe avec des profils très variés"
+              label={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.jeSouhaiteUneEquipeAvecDesProfils")}
               fieldProps={{
                 checkedChildren: 'Oui',
                 unCheckedChildren: 'Peu importe',
@@ -172,14 +174,14 @@ const MatchPreferencesPage: React.FC = () => {
           {/* Étape 3 — Contraintes & priorités */}
           <StepsForm.StepForm
             name="constraints"
-            title="Contraintes & priorités"
+            title={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.contraintesPriorites")}
             stepProps={{
-              description: 'Ce qui est non négociable pour toi',
+              description: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.ceQuiEstNonNegociablePourToi"),
             }}
           >
             <ProFormSlider
               name="timeZoneOverlap"
-              label="Chevauchement horaire minimum souhaité"
+              label={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.chevauchementHoraireMinimumSouhaite")}
               min={0}
               max={8}
               marks={{
@@ -197,20 +199,20 @@ const MatchPreferencesPage: React.FC = () => {
 
             <ProFormSelect
               name="meetingFrequency"
-              label="Fréquence de réunions souhaitée"
-              placeholder="Sélectionne une option"
+              label={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.frequenceDeReunionsSouhaitee")}
+              placeholder={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.selectionneUneOption")}
               allowClear
               options={[
-                { label: '1 fois par semaine', value: 'weekly' },
-                { label: '2–3 fois par semaine', value: 'twice_week' },
-                { label: 'Quotidien stand-up court', value: 'daily' },
-                { label: 'Au besoin uniquement', value: 'on_demand' },
+                { label: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.text1FoisParSemaine"), value: 'weekly' },
+                { label: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.text23FoisParSemaine"), value: 'twice_week' },
+                { label: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.quotidienStandUpCourt"), value: 'daily' },
+                { label: i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.auBesoinUniquement"), value: 'on_demand' },
               ]}
             />
 
             <ProFormSwitch
               name="openToWeekend"
-              label="Ok pour travailler ponctuellement le week-end"
+              label={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.okPourTravaillerPonctuellementLeWeekEnd")}
               fieldProps={{
                 checkedChildren: 'Oui',
                 unCheckedChildren: 'Non',
@@ -219,7 +221,7 @@ const MatchPreferencesPage: React.FC = () => {
 
             <ProFormSwitch
               name="openToNightSessions"
-              label="Ok pour des sessions tard le soir si nécessaire"
+              label={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.okPourDesSessionsTardLeSoir")}
               fieldProps={{
                 checkedChildren: 'Oui',
                 unCheckedChildren: 'Non',
@@ -228,8 +230,8 @@ const MatchPreferencesPage: React.FC = () => {
 
             <ProFormTextArea
               name="notes"
-              label="Détails complémentaires pour l’algorithme de matching"
-              placeholder="Ex.: je préfère les équipes qui prototypent rapidement, j’évite les projets blockchain, etc."
+              label={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.detailsComplementairesPourLAlgorithmeDeMatching")}
+              placeholder={i18nT("ui.keenkonnect.aiTeamMatching.matchPreferences.exJePrefereLesEquipesQuiPrototypent")}
               fieldProps={{
                 autoSize: { minRows: 3, maxRows: 6 },
                 showCount: true,

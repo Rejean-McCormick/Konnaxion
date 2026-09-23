@@ -1,6 +1,8 @@
 // FILE: frontend/app/konsensus/leaderboards/LeaderboardsClient.tsx
 'use client';
 
+import TranslatedText from '@/components/i18n/TranslatedText';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   CrownOutlined,
   FireOutlined,
@@ -194,19 +196,19 @@ function trustLevelTag(level: TrustLevel) {
 
   return (
     <Tag color={color} bordered={false}>
-      {level} tier
+      {level} <TranslatedText id="ui.konsensus.leaderboards.leaderboardsclient.tier" />
     </Tag>
   );
 }
 
 function trendBadge(trend: LeaderboardRow['trend']) {
   if (trend === 'up') {
-    return <Tag color="success">▲ Rising</Tag>;
+    return <Tag color="success"><TranslatedText id="ui.konsensus.leaderboards.leaderboardsclient.rising" /></Tag>;
   }
   if (trend === 'down') {
-    return <Tag color="error">▼ Dropping</Tag>;
+    return <Tag color="error"><TranslatedText id="ui.konsensus.leaderboards.leaderboardsclient.dropping" /></Tag>;
   }
-  return <Tag>• Stable</Tag>;
+  return <Tag><TranslatedText id="ui.konsensus.leaderboards.leaderboardsclient.stable" /></Tag>;
 }
 
 /**
@@ -234,6 +236,7 @@ function getInitials(name: string) {
 }
 
 export default function LeaderboardsClient(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [timeframe, setTimeframe] = useState<Timeframe>('30d');
   const [domainFilter, setDomainFilter] = useState<string>('all');
   const [regionFilter, setRegionFilter] = useState<string>('global');
@@ -252,7 +255,7 @@ export default function LeaderboardsClient(): JSX.Element {
 
   const columns: ProColumns<LeaderboardRow>[] = [
     {
-      title: 'Rank',
+      title: i18nT("ui.konsensus.leaderboards.leaderboardsclient.rank"),
       dataIndex: 'rank',
       width: 70,
       align: 'center',
@@ -271,7 +274,7 @@ export default function LeaderboardsClient(): JSX.Element {
       ),
     },
     {
-      title: 'Contributor',
+      title: i18nT("ui.konsensus.leaderboards.leaderboardsclient.contributor"),
       dataIndex: 'user',
       render: (_, row) => (
         <Space>
@@ -292,13 +295,13 @@ export default function LeaderboardsClient(): JSX.Element {
       ),
     },
     {
-      title: 'Domain',
+      title: i18nT("ui.konsensus.leaderboards.leaderboardsclient.domain"),
       dataIndex: 'domain',
       responsive: ['md'],
       render: (value) => <Tag>{value}</Tag>,
     },
     {
-      title: 'Region',
+      title: i18nT("ui.konsensus.leaderboards.leaderboardsclient.region"),
       dataIndex: 'region',
       responsive: ['lg'],
       render: (value) => (
@@ -309,7 +312,7 @@ export default function LeaderboardsClient(): JSX.Element {
       ),
     },
     {
-      title: 'Ekoh score',
+      title: i18nT("ui.konsensus.leaderboards.leaderboardsclient.ekohScore"),
       dataIndex: 'ekohScore',
       sorter: (a, b) => a.ekohScore - b.ekohScore,
       defaultSortOrder: 'descend',
@@ -317,14 +320,14 @@ export default function LeaderboardsClient(): JSX.Element {
       render: (_, row) => <Text strong>{row.ekohScore.toFixed(1)}</Text>,
     },
     {
-      title: 'Weighted votes',
+      title: i18nT("ui.konsensus.leaderboards.leaderboardsclient.weightedVotes"),
       dataIndex: 'votesWeighted',
       sorter: (a, b) => a.votesWeighted - b.votesWeighted,
       align: 'right',
       render: (_, row) => row.votesWeighted.toLocaleString('en-US'),
     },
     {
-      title: 'Trust',
+      title: i18nT("ui.konsensus.leaderboards.leaderboardsclient.trust"),
       dataIndex: 'trustLevel',
       render: (_, row) => (
         <Space size={4}>
@@ -352,20 +355,20 @@ export default function LeaderboardsClient(): JSX.Element {
           title: (
             <Space>
               <TrophyOutlined />
-              <span>Konsensus leaderboards</span>
+              <span>{i18nT("ui.konsensus.leaderboards.leaderboardsclient.konsensusLeaderboards")}</span>
             </Space>
           ),
           subTitle:
-            'Krowd highlights – top Ekoh contributors by domain and region.',
+            i18nT("ui.konsensus.leaderboards.leaderboardsclient.krowdHighlightsTopEkohContributorsByDomain"),
           ghost: false,
           extra: [
             <Segmented<Timeframe>
               key="timeframe"
               size="middle"
               options={[
-                { label: '7 days', value: '7d' },
-                { label: '30 days', value: '30d' },
-                { label: '90 days', value: '90d' },
+                { label: i18nT("ui.konsensus.leaderboards.leaderboardsclient.text7Days"), value: '7d' },
+                { label: i18nT("ui.konsensus.leaderboards.leaderboardsclient.text30Days"), value: '30d' },
+                { label: i18nT("ui.konsensus.leaderboards.leaderboardsclient.text90Days"), value: '90d' },
               ]}
               value={timeframe}
               onChange={(value) => setTimeframe(value as Timeframe)}
@@ -378,36 +381,36 @@ export default function LeaderboardsClient(): JSX.Element {
           <Col xs={24} md={8}>
             <Card size="small">
               <Statistic
-                title="Active contributors in this period"
+                title={i18nT("ui.konsensus.leaderboards.leaderboardsclient.activeContributorsInThisPeriod")}
                 value={totalContributors}
                 prefix={<TeamOutlined />}
               />
               <Text type="secondary" style={{ fontSize: 12 }}>
-                Based on Ekoh-weighted activity across modules.
+                {i18nT("ui.konsensus.leaderboards.leaderboardsclient.basedOnEkohWeightedActivityAcrossModules")}
               </Text>
             </Card>
           </Col>
           <Col xs={24} md={8}>
             <Card size="small">
               <Statistic
-                title="Domains tracked"
+                title={i18nT("ui.konsensus.leaderboards.leaderboardsclient.domainsTracked")}
                 value={trackedDomains}
                 prefix={<FireOutlined />}
               />
               <Text type="secondary" style={{ fontSize: 12 }}>
-                Science, ethics, governance, environment, and more.
+                {i18nT("ui.konsensus.leaderboards.leaderboardsclient.scienceEthicsGovernanceEnvironmentAndMore")}
               </Text>
             </Card>
           </Col>
           <Col xs={24} md={8}>
             <Card size="small">
               <Statistic
-                title="Last refresh"
+                title={i18nT("ui.konsensus.leaderboards.leaderboardsclient.lastRefresh")}
                 value={lastRefresh}
                 prefix={<GlobalOutlined />}
               />
               <Text type="secondary" style={{ fontSize: 12 }}>
-                Mock data – wire up to Konsensus API later.
+                {i18nT("ui.konsensus.leaderboards.leaderboardsclient.mockDataWireUpToKonsensusApi")}
               </Text>
             </Card>
           </Col>
@@ -419,18 +422,18 @@ export default function LeaderboardsClient(): JSX.Element {
         <ProCard gutter={16} wrap>
           <ProCard
             colSpan={{ xs: 24, xl: 16 }}
-            title="Global leaderboard"
+            title={i18nT("ui.konsensus.leaderboards.leaderboardsclient.globalLeaderboard")}
             extra={
               <Space size="middle" wrap>
                 <Space size={4}>
-                  <Text type="secondary">Domain</Text>
+                  <Text type="secondary">{i18nT("ui.konsensus.leaderboards.leaderboardsclient.domain")}</Text>
                   <Select
                     size="small"
                     style={{ minWidth: 180 }}
                     value={domainFilter}
                     onChange={setDomainFilter}
                   >
-                    <Option value="all">All domains</Option>
+                    <Option value="all">{i18nT("ui.konsensus.leaderboards.leaderboardsclient.allDomains")}</Option>
                     {domains.map((domain) => (
                       <Option key={domain} value={domain}>
                         {domain}
@@ -439,14 +442,14 @@ export default function LeaderboardsClient(): JSX.Element {
                   </Select>
                 </Space>
                 <Space size={4}>
-                  <Text type="secondary">Region</Text>
+                  <Text type="secondary">{i18nT("ui.konsensus.leaderboards.leaderboardsclient.region")}</Text>
                   <Select
                     size="small"
                     style={{ minWidth: 220 }}
                     value={regionFilter}
                     onChange={setRegionFilter}
                   >
-                    <Option value="global">Global</Option>
+                    <Option value="global">{i18nT("ui.konsensus.leaderboards.leaderboardsclient.global")}</Option>
                     {regions.map((region) => (
                       <Option key={region} value={region}>
                         {region}
@@ -477,12 +480,12 @@ export default function LeaderboardsClient(): JSX.Element {
             title={
               <Space>
                 <CrownOutlined />
-                <span>Domain highlights</span>
+                <span>{i18nT("ui.konsensus.leaderboards.leaderboardsclient.domainHighlights")}</span>
               </Space>
             }
             extra={
-              <Tooltip title="Snapshot of top Ekoh leaders by domain.">
-                <Badge status="processing" text="Live preview" />
+              <Tooltip title={i18nT("ui.konsensus.leaderboards.leaderboardsclient.snapshotOfTopEkohLeadersByDomain")}>
+                <Badge status="processing" text={i18nT("ui.konsensus.leaderboards.leaderboardsclient.livePreview")} />
               </Tooltip>
             }
           >
@@ -501,7 +504,7 @@ export default function LeaderboardsClient(): JSX.Element {
                       <Space direction="vertical" size={2}>
                         <Text strong>{item.topUser}</Text>
                         <Text type="secondary" style={{ fontSize: 12 }}>
-                          Ekoh score {item.topScore.toFixed(1)} · {item.change}
+                          {i18nT("ui.konsensus.leaderboards.leaderboardsclient.ekohScore")} {item.topScore.toFixed(1)} · {item.change}
                         </Text>
                       </Space>
                     }
@@ -521,43 +524,35 @@ export default function LeaderboardsClient(): JSX.Element {
         {/* Explanation / how this works */}
         <Row gutter={16} style={{ marginTop: 16 }}>
           <Col xs={24} md={16}>
-            <Card title="How Konsensus leaderboards work" size="small">
+            <Card title={i18nT("ui.konsensus.leaderboards.leaderboardsclient.howKonsensusLeaderboardsWork")} size="small">
               <Paragraph>
-                Leaderboards are driven by Ekoh-weighted contributions across
-                the platform. Votes, arguments, validated projects, and other
-                actions are aggregated and normalized so that:
+                {i18nT("ui.konsensus.leaderboards.leaderboardsclient.leaderboardsAreDrivenByEkohWeightedContributions")}
               </Paragraph>
               <ul className="list-disc pl-5">
                 <li>
-                  High-quality, ethically aligned contributions are rewarded
-                  more than sheer volume.
+                  {i18nT("ui.konsensus.leaderboards.leaderboardsclient.highQualityEthicallyAlignedContributionsAreRewarded")}
                 </li>
                 <li>
-                  Domain tags (e.g. “Public Health”, “AI Governance”) determine
-                  which expertise scores influence a given leaderboard.
+                  {i18nT("ui.konsensus.leaderboards.leaderboardsclient.domainTagsEGPublicHealthAi")}
                 </li>
                 <li>
-                  Regional filters let you surface local leaders while keeping a
-                  global baseline for comparison.
+                  {i18nT("ui.konsensus.leaderboards.leaderboardsclient.regionalFiltersLetYouSurfaceLocalLeaders")}
                 </li>
               </ul>
               <Paragraph style={{ marginTop: 12 }}>
-                This page currently uses mock data. When wired to the backend,
-                filters above should call the Konsensus analytics API and update
-                the tables and tiles in real time.
+                {i18nT("ui.konsensus.leaderboards.leaderboardsclient.thisPageCurrentlyUsesMockDataWhen")}
               </Paragraph>
             </Card>
           </Col>
           <Col xs={24} md={8}>
-            <Card title="Next steps" size="small">
+            <Card title={i18nT("ui.konsensus.leaderboards.leaderboardsclient.nextSteps")} size="small">
               <ul className="list-disc pl-5">
-                <li>Connect to Konsensus leaderboard endpoint.</li>
+                <li>{i18nT("ui.konsensus.leaderboards.leaderboardsclient.connectToKonsensusLeaderboardEndpoint")}</li>
                 <li>
-                  Add “My position” indicator for the logged-in user (e.g.
-                  highlight their row and show rank offset).
+                  {i18nT("ui.konsensus.leaderboards.leaderboardsclient.addMyPositionIndicatorForTheLogged")}
                 </li>
                 <li>
-                  Support export as CSV / image for reporting and research.
+                  {i18nT("ui.konsensus.leaderboards.leaderboardsclient.supportExportAsCsvImageForReporting")}
                 </li>
               </ul>
             </Card>

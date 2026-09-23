@@ -1,6 +1,12 @@
+'use client';
+
 // FILE: frontend/modules/konsultations/hooks/useImpact.ts
 ﻿// modules/konsultations/hooks/useImpact.ts
 import { useQuery } from '@tanstack/react-query';
+
+import { useLanguage } from '@/context/LanguageContext';
+import type { TranslateFunction } from '@/i18n/runtime';
+import { impactStatusLabel } from '@/i18n/uiModelLabels';
 
 import api from '@/api';
 import type { ImpactStatus } from '@/services/impact';
@@ -149,6 +155,7 @@ function toNumberId(id: string | number): number {
  * Build a small, human-friendly event timeline from topic + activity.
  */
 function buildTimeline(
+  i18nT: TranslateFunction,
   topic: EthikosTopicApi,
   stances: EthikosStanceApi[],
   args: EthikosArgumentApi[],
@@ -160,8 +167,8 @@ function buildTimeline(
   events.push({
     id: `topic-created-${topic.id}`,
     date: topic.created_at,
-    label: 'Consultation created',
-    description: `Debate opened in category “${topic.category?.name ?? 'Uncategorised'}”.`,
+    label: i18nT('ui.konsultations.impact.consultationCreated'),
+    description: i18nT('ui.konsultations.impact.debateOpenedCategory', { category: topic.category?.name ?? i18nT('ui.common.uncategorised') }),
   });
 
   // Status / closing
@@ -173,14 +180,14 @@ function buildTimeline(
     date: closesAt,
     label:
       impactStatus === 'Completed'
-        ? 'Decision closed'
+        ? i18nT('ui.konsultations.impact.decisionClosed')
         : impactStatus === 'Blocked'
-        ? 'Consultation archived'
-        : 'Consultation is open',
+        ? i18nT('ui.konsultations.impact.consultationArchived')
+        : i18nT('ui.konsultations.impact.consultationOpen'),
     description:
       impactStatus === 'In-Progress'
-        ? 'Participants can still submit stances and arguments.'
-        : `Status: ${impactStatus}.`,
+        ? i18nT('ui.konsultations.impact.participantsCanSubmit')
+        : i18nT('ui.konsultations.impact.statusLabel', { status: impactStatusLabel(i18nT, impactStatus) }),
   });
 
   // Stance activity
@@ -195,8 +202,8 @@ function buildTimeline(
       events.push({
         id: `stance-first-${topic.id}`,
         date: first.timestamp,
-        label: 'First stance submitted',
-        description: 'The first participant expressed a position on this question.',
+        label: i18nT('ui.konsultations.impact.firstStanceSubmitted'),
+        description: i18nT('ui.konsultations.impact.firstStanceDescription'),
       });
     }
 
@@ -204,10 +211,10 @@ function buildTimeline(
       events.push({
         id: `stance-latest-${topic.id}`,
         date: last.timestamp,
-        label: 'Latest stance activity',
+        label: i18nT('ui.konsultations.impact.latestStanceActivity'),
         description: [
-          `${stances.length} total stances recorded.`,
-          support != null ? `Approx. ${support}% agreement so far.` : undefined,
+          i18nT('ui.konsultations.impact.totalStancesRecorded', { count: stances.length }),
+          support != null ? i18nT('ui.konsultations.impact.approxAgreement', { support }) : undefined,
         ]
           .filter(Boolean)
           .join(' '),
@@ -227,8 +234,8 @@ function buildTimeline(
       events.push({
         id: `argument-first-${topic.id}`,
         date: first.created_at,
-        label: 'First argument posted',
-        description: `${first.user} started the written debate.`,
+        label: i18nT('ui.konsultations.impact.firstArgumentPosted'),
+        description: i18nT('ui.konsultations.impact.userStartedDebate', { user: first.user }),
       });
     }
 
@@ -236,8 +243,8 @@ function buildTimeline(
       events.push({
         id: `argument-latest-${topic.id}`,
         date: last.created_at,
-        label: 'Latest argument activity',
-        description: `${args.length} arguments exchanged so far.`,
+        label: i18nT('ui.konsultations.impact.latestArgumentActivity'),
+        description: i18nT('ui.konsultations.impact.argumentsExchanged', { count: args.length }),
       });
     }
   }
@@ -254,6 +261,7 @@ function buildTimeline(
  * Fetch and aggregate everything needed for the impact view of one consultation.
  */
 async function loadConsultationImpact(
+  i18nT: TranslateFunction,
   consultationId: string | number,
 ): Promise<ConsultationImpactResult> {
   const topicId = toNumberId(consultationId);
@@ -294,7 +302,7 @@ async function loadConsultationImpact(
     support,
   };
 
-  const timeline = buildTimeline(topic, stances, args, support);
+  const timeline = buildTimeline(i18nT, topic, stances, args, support);
 
   return { summary, timeline };
 }
@@ -323,20 +331,21 @@ export default function useImpact(
   consultationId: string | number | null | undefined,
   options?: UseImpactOptions,
 ) {
+  const { language, t: i18nT } = useLanguage();
   const enabled =
     (options?.enabled ?? true) &&
     consultationId !== null &&
     consultationId !== undefined;
 
   return useQuery<ConsultationImpactResult>({
-    queryKey: ['konsultations-impact', consultationId],
+    queryKey: ['konsultations-impact', consultationId, language],
     enabled,
     staleTime: 60_000,
     queryFn: () => {
       if (consultationId === null || consultationId === undefined) {
         throw new Error('Missing consultation id for impact view');
       }
-      return loadConsultationImpact(consultationId);
+      return loadConsultationImpact(i18nT, consultationId);
     },
   });
 }

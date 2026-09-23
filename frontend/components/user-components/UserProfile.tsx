@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Alert, Card, Empty, List, Typography } from 'antd';
 import { isAxiosError } from 'axios';
 import { useSearchParams } from 'next/navigation';
@@ -34,6 +35,7 @@ interface RequestError {
 }
 
 const UserProfile: React.FC = () => {
+  const { t: i18nT } = useLanguage();
   const searchParams = useSearchParams();
   const userId = searchParams.get('id') ?? '';
 
@@ -66,7 +68,7 @@ const UserProfile: React.FC = () => {
         setComments(c);
       } catch (e: unknown) {
         let statusCode = 500;
-        let message = 'Request failed';
+        let message = i18nT("ui.userComponents.userprofile.requestFailed");
         if (isAxiosError<{ statusCode?: number; message?: string }>(e)) {
           statusCode = e.response?.data?.statusCode ?? e.response?.status ?? 500;
           message = e.response?.data?.message ?? e.message ?? 'Request failed';
@@ -83,17 +85,17 @@ const UserProfile: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, [userId, i18nT]);
 
   return (
     <div className="p-6">
-      <Title level={2}>User Profile</Title>
+      <Title level={2}>{i18nT("ui.userComponents.userprofile.userProfile")}</Title>
 
       {!userId && (
         <Alert
           type="warning"
-          message="Missing user id"
-          description="Ajoutez ?id=<USER_ID> à l’URL pour charger le profil."
+          message={i18nT("ui.userComponents.userprofile.missingUserId")}
+          description={i18nT("ui.userComponents.userprofile.ajoutezIdUserIdALUrl")}
           className="mb-4"
         />
       )}
@@ -103,7 +105,7 @@ const UserProfile: React.FC = () => {
           type="error"
           showIcon
           className="mb-4"
-          message={`Erreur ${error.statusCode}`}
+          message={i18nT("ui.userComponents.userprofile.erreur", { statusCode: error.statusCode })}
           description={error.message}
         />
       )}
@@ -114,16 +116,16 @@ const UserProfile: React.FC = () => {
             <Title level={4} className="mb-1">
               {profile.name}
             </Title>
-            {profile.bio ? <Text type="secondary">{profile.bio}</Text> : <Text type="secondary">No bio</Text>}
+            {profile.bio ? <Text type="secondary">{profile.bio}</Text> : <Text type="secondary">{i18nT("ui.userComponents.userprofile.noBio")}</Text>}
           </>
         ) : (
-          <Empty description="No profile loaded" />
+          <Empty description={i18nT("ui.userComponents.userprofile.noProfileLoaded")} />
         )}
       </Card>
 
-      <Card title="Recent comments" loading={loading}>
+      <Card title={i18nT("ui.userComponents.userprofile.recentComments")} loading={loading}>
         {comments.length === 0 ? (
-          <Empty description="No comments" />
+          <Empty description={i18nT("ui.userComponents.userprofile.noComments")} />
         ) : (
           <List
             dataSource={comments}
@@ -135,9 +137,9 @@ const UserProfile: React.FC = () => {
                     key="delete"
                     onClick={() => deleteComment(item.commentId)}
                     className="text-red-600"
-                    aria-label={`Delete comment ${item.commentId}`}
+                    aria-label={i18nT("ui.userComponents.userprofile.deleteComment", { commentId: item.commentId })}
                   >
-                    Delete
+                    {i18nT("ui.userComponents.userprofile.delete")}
                   </button>,
                 ]}
               >

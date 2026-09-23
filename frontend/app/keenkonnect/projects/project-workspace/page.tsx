@@ -1,6 +1,7 @@
 // FILE: frontend/app/keenkonnect/projects/project-workspace/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { ProCard } from '@ant-design/pro-components';
 import type { MenuProps, TabsProps } from 'antd';
 import {
@@ -92,10 +93,11 @@ interface WorkspaceViewModel {
 }
 
 export default function ProjectWorkspacePage() {
+  const { t: i18nT } = useLanguage();
   return (
     <KeenPageShell
-      title="Project Workspace"
-      description="Central hub for coordinating your project, tracking tasks, and collaborating with your team in KeenKonnect."
+      title={i18nT("ui.keenkonnect.projects.projectWorkspace.projectWorkspace")}
+      description={i18nT("ui.keenkonnect.projects.projectWorkspace.centralHubForCoordinatingYourProjectTracking")}
     >
       <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
         <Content />
@@ -105,6 +107,7 @@ export default function ProjectWorkspacePage() {
 }
 
 function Content(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const searchParams = useSearchParams();
   const projectIdParam =
     searchParams.get('projectId') || searchParams.get('id');
@@ -121,7 +124,7 @@ function Content(): JSX.Element {
   useEffect(() => {
     if (!projectId) {
       setError(
-        'No project selected. Open this workspace from the projects list or pass ?projectId=<id>.',
+        i18nT("ui.keenkonnect.projects.projectWorkspace.noProjectSelectedOpenThisWorkspaceFrom"),
       );
       setLoading(false);
       return;
@@ -156,7 +159,7 @@ function Content(): JSX.Element {
          
         console.error('Failed to load project workspace', err);
         setError(
-          'Error loading workspace. Some information may be unavailable.',
+          i18nT("ui.keenkonnect.projects.projectWorkspace.errorLoadingWorkspaceSomeInformationMayBe"),
         );
       } finally {
         setLoading(false);
@@ -164,7 +167,7 @@ function Content(): JSX.Element {
     };
 
     void fetchWorkspace();
-  }, [projectId]);
+  }, [projectId, i18nT]);
 
   // Safely derive arrays from the workspace payload
   const tasks = workspace?.tasks ?? [];
@@ -205,19 +208,19 @@ function Content(): JSX.Element {
   const menuItems: MenuProps['items'] = [
     {
       key: 'overview',
-      label: 'Overview',
+      label: i18nT("ui.keenkonnect.projects.projectWorkspace.overview"),
     },
     {
       key: 'tasks',
-      label: 'Tasks & Sprints',
+      label: i18nT("ui.keenkonnect.projects.projectWorkspace.tasksSprints"),
     },
     {
       key: 'timeline',
-      label: 'Timeline',
+      label: i18nT("ui.keenkonnect.projects.projectWorkspace.timeline"),
     },
     {
       key: 'discussion',
-      label: 'Discussion',
+      label: i18nT("ui.keenkonnect.projects.projectWorkspace.discussion"),
     },
   ];
 
@@ -238,12 +241,12 @@ function Content(): JSX.Element {
   const tabsItems: TabsProps['items'] = [
     {
       key: 'overview',
-      label: 'Overview',
+      label: i18nT("ui.keenkonnect.projects.projectWorkspace.overview"),
       children: (
         <>
           <ProCard
             bordered
-            title="Highlights"
+            title={i18nT("ui.keenkonnect.projects.projectWorkspace.highlights")}
             style={{ marginBottom: 16 }}
             bodyStyle={{ padding: 16 }}
           >
@@ -252,18 +255,18 @@ function Content(): JSX.Element {
               dataSource={[
                 {
                   key: 'status',
-                  label: 'Current status',
+                  label: i18nT("ui.keenkonnect.projects.projectWorkspace.currentStatus"),
                   value: statusText,
                 },
                 {
                   key: 'sprint',
-                  label: 'Active sprint',
+                  label: i18nT("ui.keenkonnect.projects.projectWorkspace.activeSprint"),
                   value:
                     workspace?.currentSprint || 'No active sprint configured',
                 },
                 {
                   key: 'deadline',
-                  label: 'Next deadline',
+                  label: i18nT("ui.keenkonnect.projects.projectWorkspace.nextDeadline"),
                   value: workspace?.deadline || 'No deadline set',
                 },
               ]}
@@ -280,7 +283,7 @@ function Content(): JSX.Element {
 
           <ProCard
             bordered
-            title="Recent activity"
+            title={i18nT("ui.keenkonnect.projects.projectWorkspace.recentActivity")}
             bodyStyle={{ padding: 16 }}
             extra={
               <Button
@@ -288,12 +291,12 @@ function Content(): JSX.Element {
                 size="small"
                 onClick={() => setActiveKey('timeline')}
               >
-                View full timeline
+                {i18nT("ui.keenkonnect.projects.projectWorkspace.viewFullTimeline")}
               </Button>
             }
           >
             {derivedActivity.length === 0 ? (
-              <Empty description="No recent activity yet." />
+              <Empty description={i18nT("ui.keenkonnect.projects.projectWorkspace.noRecentActivityYet")} />
             ) : (
               <Timeline
                 style={{ marginTop: 8 }}
@@ -328,13 +331,13 @@ function Content(): JSX.Element {
     },
     {
       key: 'tasks',
-      label: 'Tasks & Sprints',
+      label: i18nT("ui.keenkonnect.projects.projectWorkspace.tasksSprints"),
       children: (
         <List
           itemLayout="horizontal"
           dataSource={tasks}
           locale={{
-            emptyText: 'No tasks configured for this workspace yet.',
+            emptyText: i18nT("ui.keenkonnect.projects.projectWorkspace.noTasksConfiguredForThisWorkspaceYet"),
           }}
           renderItem={(task) => (
             <List.Item
@@ -357,13 +360,13 @@ function Content(): JSX.Element {
                     <Space size="small">
                       {task.assignee && (
                         <Text type="secondary">
-                          Owner:&nbsp;
+                          {i18nT("ui.keenkonnect.projects.projectWorkspace.owner")}
                           <Text>{task.assignee}</Text>
                         </Text>
                       )}
                       {task.dueDate && (
                         <Text type="secondary">
-                          · Due:&nbsp;
+                          {i18nT("ui.keenkonnect.projects.projectWorkspace.due")}
                           <Text>{task.dueDate}</Text>
                         </Text>
                       )}
@@ -378,10 +381,10 @@ function Content(): JSX.Element {
     },
     {
       key: 'timeline',
-      label: 'Timeline',
+      label: i18nT("ui.keenkonnect.projects.projectWorkspace.timeline"),
       children:
         derivedActivity.length === 0 ? (
-          <Empty description="No timeline events to show yet." />
+          <Empty description={i18nT("ui.keenkonnect.projects.projectWorkspace.noTimelineEventsToShowYet")} />
         ) : (
           <Timeline
             style={{ marginTop: 8 }}
@@ -413,13 +416,13 @@ function Content(): JSX.Element {
     },
     {
       key: 'discussion',
-      label: 'Discussion',
+      label: i18nT("ui.keenkonnect.projects.projectWorkspace.discussion"),
       children: (
         <List
           dataSource={comments}
           locale={{
             emptyText:
-              'No discussion yet. Start the conversation with your team.',
+              i18nT("ui.keenkonnect.projects.projectWorkspace.noDiscussionYetStartTheConversationWith"),
           }}
           renderItem={(comment) => (
             <List.Item key={comment.id}>
@@ -433,7 +436,7 @@ function Content(): JSX.Element {
                 }
                 title={
                   <Space size="small">
-                    <Text strong>{comment.author ?? 'Unknown participant'}</Text>
+                    <Text strong>{comment.author ?? i18nT("ui.keenkonnect.projects.projectWorkspace.unknownParticipant")}</Text>
                     {comment.datetime ? (
                       <Text type="secondary">{comment.datetime}</Text>
                     ) : null}
@@ -459,7 +462,7 @@ function Content(): JSX.Element {
   return (
     <>
       <Title level={3} style={{ marginBottom: 8 }}>
-        {workspace?.name || 'Project Workspace'}
+        {workspace?.name || i18nT("ui.keenkonnect.projects.projectWorkspace.projectWorkspace")}
       </Title>
 
       <Paragraph
@@ -467,7 +470,7 @@ function Content(): JSX.Element {
         style={{ marginBottom: 24, maxWidth: 720 }}
       >
         {workspace?.description ||
-          'Central hub for coordinating your project, tracking tasks, and collaborating with your team in KeenKonnect.'}
+          i18nT("ui.keenkonnect.projects.projectWorkspace.centralHubForCoordinatingYourProjectTracking")}
       </Paragraph>
 
       {error && (
@@ -480,7 +483,7 @@ function Content(): JSX.Element {
         {/* Left column: context + menu + team */}
         <ProCard
           colSpan={{ xs: 24, sm: 24, md: 8, lg: 7, xl: 6 }}
-          title="Workspace overview"
+          title={i18nT("ui.keenkonnect.projects.projectWorkspace.workspaceOverview")}
           bordered={false}
         >
           <Space
@@ -489,20 +492,20 @@ function Content(): JSX.Element {
             style={{ width: '100%' }}
           >
             <div>
-              <Text strong>Status:&nbsp;</Text>
+              <Text strong>{i18nT("ui.keenkonnect.projects.projectWorkspace.status")}</Text>
               <Tag color={statusTagColor}>{statusText}</Tag>
             </div>
 
             {workspace?.currentSprint && (
               <div>
-                <Text strong>Current sprint:&nbsp;</Text>
+                <Text strong>{i18nT("ui.keenkonnect.projects.projectWorkspace.currentSprint")}</Text>
                 <Text>{workspace.currentSprint}</Text>
               </div>
             )}
 
             {workspace?.deadline && (
               <div>
-                <Text strong>Deadline:&nbsp;</Text>
+                <Text strong>{i18nT("ui.keenkonnect.projects.projectWorkspace.deadline")}</Text>
                 <Text>{workspace.deadline}</Text>
               </div>
             )}
@@ -512,7 +515,7 @@ function Content(): JSX.Element {
                 color="blue"
                 text={
                   <span>
-                    Total tasks:&nbsp;
+                    {i18nT("ui.keenkonnect.projects.projectWorkspace.totalTasks")}
                     <Text strong>{totalTasks}</Text>
                   </span>
                 }
@@ -521,7 +524,7 @@ function Content(): JSX.Element {
                 color="green"
                 text={
                   <span>
-                    Completed:&nbsp;
+                    {i18nT("ui.keenkonnect.projects.projectWorkspace.completed")}
                     <Text strong>{completedTasks}</Text>
                   </span>
                 }
@@ -530,7 +533,7 @@ function Content(): JSX.Element {
                 color="gold"
                 text={
                   <span>
-                    In progress:&nbsp;
+                    {i18nT("ui.keenkonnect.projects.projectWorkspace.inProgress")}
                     <Text strong>{inProgressTasks}</Text>
                   </span>
                 }
@@ -539,7 +542,7 @@ function Content(): JSX.Element {
 
             <div style={{ marginTop: 8 }}>
               <Text strong style={{ display: 'block', marginBottom: 8 }}>
-                Sections
+                {i18nT("ui.keenkonnect.projects.projectWorkspace.sections")}
               </Text>
               <Menu
                 mode="inline"
@@ -552,14 +555,14 @@ function Content(): JSX.Element {
 
             <div style={{ marginTop: 16 }}>
               <Text strong style={{ display: 'block', marginBottom: 8 }}>
-                Team members
+                {i18nT("ui.keenkonnect.projects.projectWorkspace.teamMembers")}
               </Text>
               <List
                 size="small"
                 dataSource={members}
                 locale={{
                   emptyText:
-                    'No team members linked to this workspace yet.',
+                    i18nT("ui.keenkonnect.projects.projectWorkspace.noTeamMembersLinkedToThisWorkspace"),
                 }}
                 renderItem={(member) => (
                   <List.Item key={member.id || member.name}>
@@ -575,7 +578,7 @@ function Content(): JSX.Element {
                       }
                       title={member.name}
                       description={
-                        member.role || member.title || 'Contributor'
+                        member.role || member.title || i18nT("ui.keenkonnect.projects.projectWorkspace.contributor")
                       }
                     />
                   </List.Item>
@@ -610,24 +613,24 @@ function Content(): JSX.Element {
             style={{ width: '100%' }}
           >
             <div>
-              <Text strong>Status:</Text>{' '}
-              {selectedTask.status || 'N/A'}
+              <Text strong>{i18nT("ui.keenkonnect.projects.projectWorkspace.status_11dc9e")}</Text>{' '}
+              {selectedTask.status || i18nT("ui.keenkonnect.projects.projectWorkspace.nA")}
             </div>
             {selectedTask.description && (
               <Paragraph>{selectedTask.description}</Paragraph>
             )}
             <div>
-              <Text strong>Owner:</Text>{' '}
-              {selectedTask.assignee || 'Unassigned'}
+              <Text strong>{i18nT("ui.keenkonnect.projects.projectWorkspace.owner_719379")}</Text>{' '}
+              {selectedTask.assignee || i18nT("ui.keenkonnect.projects.projectWorkspace.unassigned")}
             </div>
             {selectedTask.dueDate && (
               <div>
-                <Text strong>Due date:</Text> {selectedTask.dueDate}
+                <Text strong>{i18nT("ui.keenkonnect.projects.projectWorkspace.dueDate")}</Text> {selectedTask.dueDate}
               </div>
             )}
           </Space>
         ) : (
-          <Empty description="No task selected." />
+          <Empty description={i18nT("ui.keenkonnect.projects.projectWorkspace.noTaskSelected")} />
         )}
       </Drawer>
     </>

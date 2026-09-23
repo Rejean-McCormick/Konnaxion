@@ -1,6 +1,8 @@
 // FILE: frontend/app/ethikos/learn/guides/page.tsx
 'use client'
 
+import TranslatedText from '@/components/i18n/TranslatedText';
+import { useLanguage } from '@/context/LanguageContext';
 import { LinkOutlined, ReadOutlined, SyncOutlined } from '@ant-design/icons'
 import { Pie } from '@ant-design/plots'
 import {
@@ -59,17 +61,18 @@ async function copySectionLink(id: string): Promise<void> {
   try {
     if (navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(absoluteUrl)
-      message.success('Section link copied')
+      message.success(<TranslatedText id="ui.ethikos.learn.guides.sectionLinkCopied" />)
       return
     }
 
-    message.info('Clipboard is not available in this browser context')
+    message.info(<TranslatedText id="ui.ethikos.learn.guides.clipboardIsNotAvailableInThisBrowser" />)
   } catch {
-    message.error('Unable to copy the section link')
+    message.error(<TranslatedText id="ui.ethikos.learn.guides.unableToCopyTheSectionLink" />)
   }
 }
 
 export default function Guides(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [query, setQuery] = useState('')
 
   const { data, loading, error, refresh } = useRequest<GuidesPayload, []>(
@@ -139,7 +142,7 @@ export default function Guides(): JSX.Element {
       colorField: 'type',
       radius: 0.8,
       label: {
-        text: 'type',
+        text: i18nT("ui.ethikos.learn.guides.type"),
         position: 'outside' as const,
       },
       legend: {
@@ -148,14 +151,14 @@ export default function Guides(): JSX.Element {
         },
       },
     }),
-    [computed.pieData],
+    [computed.pieData, i18nT],
   )
 
   const shellProps = {
-    title: 'Guides',
-    sectionLabel: 'Learn',
+    title: i18nT("ui.ethikos.learn.guides.guides"),
+    sectionLabel: i18nT("ui.ethikos.learn.guides.learn"),
     subtitle:
-      'Practical walkthroughs for using ethiKos: when to launch a debate, choosing Elite vs Public, and how outcomes flow into impact.',
+      i18nT("ui.ethikos.learn.guides.practicalWalkthroughsForUsingEthikosWhenTo"),
   } as const
 
   if (error) {
@@ -163,7 +166,7 @@ export default function Guides(): JSX.Element {
       <EthikosPageShell {...shellProps}>
         <PageContainer ghost>
           <Empty
-            description="Failed to load guides"
+            description={i18nT("ui.ethikos.learn.guides.failedToLoadGuides")}
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           >
             <Button
@@ -171,7 +174,7 @@ export default function Guides(): JSX.Element {
               icon={<SyncOutlined />}
               onClick={() => refresh()}
             >
-              Retry
+              {i18nT("ui.ethikos.learn.guides.retry")}
             </Button>
           </Empty>
         </PageContainer>
@@ -181,9 +184,9 @@ export default function Guides(): JSX.Element {
 
   const headerStats = (
     <Space wrap>
-      <Tag icon={<ReadOutlined />}>{sections.length} sections</Tag>
-      <Tag>{computed.totals.words} words</Tag>
-      <Tag>{computed.totals.minutes} min reading</Tag>
+      <Tag icon={<ReadOutlined />}>{sections.length} {i18nT("ui.ethikos.learn.guides.sections")}</Tag>
+      <Tag>{computed.totals.words} {i18nT("ui.ethikos.learn.guides.words")}</Tag>
+      <Tag>{computed.totals.minutes} {i18nT("ui.ethikos.learn.guides.minReading")}</Tag>
     </Space>
   )
 
@@ -193,10 +196,10 @@ export default function Guides(): JSX.Element {
         <ProCard gutter={16} wrap>
           <ProCard
             colSpan={{ xs: 24, sm: 24, md: 7, lg: 6, xl: 6 }}
-            title="Navigate guides"
+            title={i18nT("ui.ethikos.learn.guides.navigateGuides")}
           >
             <Input.Search
-              placeholder="Filter guides…"
+              placeholder={i18nT("ui.ethikos.learn.guides.filterGuides")}
               allowClear
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -213,31 +216,31 @@ export default function Guides(): JSX.Element {
               type="secondary"
               style={{ marginTop: 16, marginBottom: 0 }}
             >
-              {computed.filtered.length} guide
-              {computed.filtered.length === 1 ? '' : 's'} match your filter.
+              {computed.filtered.length} {i18nT("ui.ethikos.learn.guides.guide")}
+              {computed.filtered.length === 1 ? '' : 's'} {i18nT("ui.ethikos.learn.guides.matchYourFilter")}
             </Typography.Paragraph>
           </ProCard>
 
           <ProCard
             colSpan={{ xs: 24, sm: 24, md: 17, lg: 18, xl: 18 }}
-            title="Guided flows"
+            title={i18nT("ui.ethikos.learn.guides.guidedFlows")}
           >
             <StatisticCard.Group style={{ marginBottom: 16 }}>
               <StatisticCard
                 statistic={{
-                  title: 'Sections',
+                  title: i18nT("ui.ethikos.learn.guides.sections_7ff5a6"),
                   value: computed.filtered.length,
                 }}
               />
               <StatisticCard
                 statistic={{
-                  title: 'Words',
+                  title: i18nT("ui.ethikos.learn.guides.words_d26d55"),
                   value: computed.totals.words,
                 }}
               />
               <StatisticCard
                 statistic={{
-                  title: 'Estimated reading time',
+                  title: i18nT("ui.ethikos.learn.guides.estimatedReadingTime"),
                   value: computed.totals.minutes,
                   suffix: 'min',
                 }}
@@ -245,15 +248,15 @@ export default function Guides(): JSX.Element {
             </StatisticCard.Group>
 
             {sections.length === 0 && !loading ? (
-              <Empty description="No guides available yet." />
+              <Empty description={i18nT("ui.ethikos.learn.guides.noGuidesAvailableYet")} />
             ) : computed.filtered.length === 0 ? (
-              <Empty description="No guides match your query." />
+              <Empty description={i18nT("ui.ethikos.learn.guides.noGuidesMatchYourQuery")} />
             ) : (
               <>
                 <ProCard
                   ghost
                   style={{ marginBottom: 16 }}
-                  title="Guide size breakdown"
+                  title={i18nT("ui.ethikos.learn.guides.guideSizeBreakdown")}
                 >
                   <Pie {...pieConfig} />
                 </ProCard>
@@ -269,7 +272,7 @@ export default function Guides(): JSX.Element {
                         {section.title}
                       </Typography.Title>
 
-                      <Tag>{section.minutes} min</Tag>
+                      <Tag>{section.minutes} {i18nT("ui.ethikos.learn.guides.min")}</Tag>
 
                       <Button
                         type="text"
@@ -277,7 +280,7 @@ export default function Guides(): JSX.Element {
                         icon={<LinkOutlined />}
                         onClick={() => void copySectionLink(section.id)}
                       >
-                        Copy link
+                        {i18nT("ui.ethikos.learn.guides.copyLink")}
                       </Button>
                     </Space>
 

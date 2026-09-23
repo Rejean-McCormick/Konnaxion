@@ -1,5 +1,6 @@
 // FILE: frontend/modules/konsensus/components/PollBarChart.tsx
 "use client";
+import { useLanguage } from '@/context/LanguageContext';
 import {
   BarElement,
   CategoryScale,
@@ -19,6 +20,7 @@ export default function PollBarChart({
   labels: string[];
   votes: number[];
 }) {
-  const data = { labels, datasets: [{ label: "Votes", data: votes }] };
+  const { t: i18nT } = useLanguage();
+  const data = { labels, datasets: [{ label: i18nT("ui.konsensus.pollbarchart.votes"), data: votes }] };
   return <Bar data={data} options={{ responsive: true }} />;
 }

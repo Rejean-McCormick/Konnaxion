@@ -2,6 +2,7 @@
 ﻿// app/konnected/certifications/certification-programs/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ArrowRightOutlined,
   InfoCircleOutlined,
@@ -157,7 +158,8 @@ async function fetchCertificationPrograms(): Promise<ProgramsResponse> {
 }
 
 export default function CertificationProgramsPage(): JSX.Element {
-  usePageTitle('KonnectED · Certification Programs');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.konnected.certifications.certificationPrograms.konnectedCertificationPrograms"));
   const router = useRouter();
 
   const [search, setSearch] = useState('');
@@ -273,15 +275,15 @@ export default function CertificationProgramsPage(): JSX.Element {
     const progress = program.userProgress;
 
     if (!progress || progress.status === 'not_started') {
-      return <Tag>Not started</Tag>;
+      return <Tag>{i18nT("ui.konnected.certifications.certificationPrograms.notStarted")}</Tag>;
     }
 
     if (progress.status === 'in_progress') {
-      return <Tag color="blue">In progress</Tag>;
+      return <Tag color="blue">{i18nT("ui.konnected.certifications.certificationPrograms.inProgress")}</Tag>;
     }
 
     if (progress.status === 'completed') {
-      return <Tag color="green">Completed</Tag>;
+      return <Tag color="green">{i18nT("ui.konnected.certifications.certificationPrograms.completed")}</Tag>;
     }
 
     return null;
@@ -290,13 +292,13 @@ export default function CertificationProgramsPage(): JSX.Element {
   const renderDifficultyTag = (difficulty: ProgramDifficulty) => {
     switch (difficulty) {
       case 'beginner':
-        return <Tag color="green">Beginner</Tag>;
+        return <Tag color="green">{i18nT("ui.konnected.certifications.certificationPrograms.beginner")}</Tag>;
       case 'intermediate':
-        return <Tag color="blue">Intermediate</Tag>;
+        return <Tag color="blue">{i18nT("ui.konnected.certifications.certificationPrograms.intermediate")}</Tag>;
       case 'advanced':
-        return <Tag color="orange">Advanced</Tag>;
+        return <Tag color="orange">{i18nT("ui.konnected.certifications.certificationPrograms.advanced")}</Tag>;
       case 'expert':
-        return <Tag color="red">Expert</Tag>;
+        return <Tag color="red">{i18nT("ui.konnected.certifications.certificationPrograms.expert")}</Tag>;
       default:
         return null;
     }
@@ -307,8 +309,8 @@ export default function CertificationProgramsPage(): JSX.Element {
 
   return (
     <KonnectedPageShell
-      title="Certification Programs"
-      subtitle="Browse certification paths, track your progress, and launch formal evaluations."
+      title={i18nT("ui.konnected.certifications.certificationPrograms.certificationPrograms")}
+      subtitle={i18nT("ui.konnected.certifications.certificationPrograms.browseCertificationPathsTrackYourProgressAnd")}
       primaryAction={
         <Button
           type="primary"
@@ -325,7 +327,7 @@ export default function CertificationProgramsPage(): JSX.Element {
           }}
           disabled={!programs.length}
         >
-          Go to my next certification
+          {i18nT("ui.konnected.certifications.certificationPrograms.goToMyNextCertification")}
         </Button>
       }
     >
@@ -335,26 +337,26 @@ export default function CertificationProgramsPage(): JSX.Element {
           <Col xs={24} md={10} lg={8}>
             <ProCard
               ghost
-              title="My CertifiKation overview"
+              title={i18nT("ui.konnected.certifications.certificationPrograms.myCertifikationOverview")}
               extra={
-                <Tooltip title={`Global pass threshold is ${CERT_PASS_PERCENT}% for most exams.`}>
+                <Tooltip title={i18nT("ui.konnected.certifications.certificationPrograms.globalPassThresholdIsForMostExams", { CERT_PASS_PERCENT: CERT_PASS_PERCENT })}>
                   <InfoCircleOutlined />
                 </Tooltip>
               }
             >
               <Row gutter={[16, 16]}>
                 <Col span={12}>
-                  <Statistic title="Total programs" value={stats.totalPrograms} />
+                  <Statistic title={i18nT("ui.konnected.certifications.certificationPrograms.totalPrograms")} value={stats.totalPrograms} />
                 </Col>
                 <Col span={12}>
-                  <Statistic title="Active" value={stats.activePrograms} />
+                  <Statistic title={i18nT("ui.konnected.certifications.certificationPrograms.active")} value={stats.activePrograms} />
                 </Col>
                 <Col span={12}>
-                  <Statistic title="Completed" value={stats.completedPrograms} />
+                  <Statistic title={i18nT("ui.konnected.certifications.certificationPrograms.completed")} value={stats.completedPrograms} />
                 </Col>
                 <Col span={12}>
                   <Statistic
-                    title="Avg. completion"
+                    title={i18nT("ui.konnected.certifications.certificationPrograms.avgCompletion")}
                     value={stats.averageCompletion}
                     suffix="%"
                   />
@@ -368,7 +370,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                     justifyContent: 'space-between',
                   }}
                 >
-                  <span>Overall progress toward certifications</span>
+                  <span>{i18nT("ui.konnected.certifications.certificationPrograms.overallProgressTowardCertifications")}</span>
                   <span>{stats.averageCompletion}%</span>
                 </div>
                 <Progress percent={stats.averageCompletion} size="small" />
@@ -378,13 +380,13 @@ export default function CertificationProgramsPage(): JSX.Element {
 
           {/* Filters */}
           <Col xs={24} md={14} lg={16}>
-            <ProCard ghost title="Filter programs">
+            <ProCard ghost title={i18nT("ui.konnected.certifications.certificationPrograms.filterPrograms")}>
               <Row gutter={[12, 12]}>
                 <Col span={24}>
                   <Input
                     allowClear
                     prefix={<SearchOutlined />}
-                    placeholder="Search by name, code, tag, or description"
+                    placeholder={i18nT("ui.konnected.certifications.certificationPrograms.searchByNameCodeTagOrDescription")}
                     value={search}
                     onChange={(e) => {
                       setSearch(e.target.value);
@@ -395,7 +397,7 @@ export default function CertificationProgramsPage(): JSX.Element {
 
                 <Col xs={24} sm={8}>
                   <Space direction="vertical" size={4} style={{ width: '100%' }}>
-                    <span>Difficulty</span>
+                    <span>{i18nT("ui.konnected.certifications.certificationPrograms.difficulty")}</span>
                     <Space wrap>
                       <Button
                         size="small"
@@ -405,7 +407,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                           setCurrentPage(1);
                         }}
                       >
-                        All
+                        {i18nT("ui.konnected.certifications.certificationPrograms.all")}
                       </Button>
                       <Button
                         size="small"
@@ -415,7 +417,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                           setCurrentPage(1);
                         }}
                       >
-                        Beginner
+                        {i18nT("ui.konnected.certifications.certificationPrograms.beginner")}
                       </Button>
                       <Button
                         size="small"
@@ -425,7 +427,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                           setCurrentPage(1);
                         }}
                       >
-                        Intermediate
+                        {i18nT("ui.konnected.certifications.certificationPrograms.intermediate")}
                       </Button>
                       <Button
                         size="small"
@@ -435,7 +437,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                           setCurrentPage(1);
                         }}
                       >
-                        Advanced
+                        {i18nT("ui.konnected.certifications.certificationPrograms.advanced")}
                       </Button>
                       <Button
                         size="small"
@@ -445,7 +447,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                           setCurrentPage(1);
                         }}
                       >
-                        Expert
+                        {i18nT("ui.konnected.certifications.certificationPrograms.expert")}
                       </Button>
                     </Space>
                   </Space>
@@ -453,7 +455,7 @@ export default function CertificationProgramsPage(): JSX.Element {
 
                 <Col xs={24} sm={8}>
                   <Space direction="vertical" size={4} style={{ width: '100%' }}>
-                    <span>Status</span>
+                    <span>{i18nT("ui.konnected.certifications.certificationPrograms.status")}</span>
                     <Space wrap>
                       <Button
                         size="small"
@@ -463,7 +465,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                           setCurrentPage(1);
                         }}
                       >
-                        All
+                        {i18nT("ui.konnected.certifications.certificationPrograms.all")}
                       </Button>
                       <Button
                         size="small"
@@ -473,7 +475,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                           setCurrentPage(1);
                         }}
                       >
-                        Not started
+                        {i18nT("ui.konnected.certifications.certificationPrograms.notStarted")}
                       </Button>
                       <Button
                         size="small"
@@ -483,7 +485,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                           setCurrentPage(1);
                         }}
                       >
-                        In progress
+                        {i18nT("ui.konnected.certifications.certificationPrograms.inProgress")}
                       </Button>
                       <Button
                         size="small"
@@ -493,7 +495,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                           setCurrentPage(1);
                         }}
                       >
-                        Completed
+                        {i18nT("ui.konnected.certifications.certificationPrograms.completed")}
                       </Button>
                     </Space>
                   </Space>
@@ -501,7 +503,7 @@ export default function CertificationProgramsPage(): JSX.Element {
 
                 <Col xs={24} sm={8}>
                   <Space direction="vertical" size={4} style={{ width: '100%' }}>
-                    <span>Category</span>
+                    <span>{i18nT("ui.konnected.certifications.certificationPrograms.category")}</span>
                     <Space wrap>
                       <Button
                         size="small"
@@ -511,7 +513,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                           setCurrentPage(1);
                         }}
                       >
-                        All
+                        {i18nT("ui.konnected.certifications.certificationPrograms.all")}
                       </Button>
                       {categories.map((cat) => (
                         <Button
@@ -540,12 +542,12 @@ export default function CertificationProgramsPage(): JSX.Element {
             type="error"
             showIcon
             style={{ marginTop: 16 }}
-            message="Unable to load certification programs"
+            message={i18nT("ui.konnected.certifications.certificationPrograms.unableToLoadCertificationPrograms")}
             description={
               <Space align="start">
                 <span>{errorMessage}</span>
                 <Button size="small" onClick={() => refresh()}>
-                  Retry
+                  {i18nT("ui.konnected.certifications.certificationPrograms.retry")}
                 </Button>
               </Space>
             }
@@ -563,8 +565,8 @@ export default function CertificationProgramsPage(): JSX.Element {
                     difficultyFilter !== 'all' ||
                     statusFilter !== 'all' ||
                     categoryFilter !== 'all'
-                      ? 'No certification programs match your filters.'
-                      : 'No certification programs are available yet.'
+                      ? i18nT("ui.konnected.certifications.certificationPrograms.noCertificationProgramsMatchYourFilters")
+                      : i18nT("ui.konnected.certifications.certificationPrograms.noCertificationProgramsAreAvailableYet")
                   }
                 >
                   {(search ||
@@ -580,7 +582,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                         setCurrentPage(1);
                       }}
                     >
-                      Clear filters
+                      {i18nT("ui.konnected.certifications.certificationPrograms.clearFilters")}
                     </Button>
                   )}
                 </Empty>
@@ -595,7 +597,7 @@ export default function CertificationProgramsPage(): JSX.Element {
               return (
                 <Col key={program.id} xs={24} md={12} lg={8}>
                   <Badge.Ribbon
-                    text={program.isFeatured ? 'Featured' : undefined}
+                    text={program.isFeatured ? i18nT("ui.konnected.certifications.certificationPrograms.featured") : undefined}
                     color={program.isFeatured ? 'gold' : undefined}
                   >
                     <Card
@@ -619,7 +621,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                                 <Tag color="default">{program.category}</Tag>
                               )}
                               {program.requiresProctoring && (
-                                <Tag color="purple">Proctored</Tag>
+                                <Tag color="purple">{i18nT("ui.konnected.certifications.certificationPrograms.proctored")}</Tag>
                               )}
                             </Space>
                           </div>
@@ -637,7 +639,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                               justifyContent: 'space-between',
                             }}
                           >
-                            <span>My progress</span>
+                            <span>{i18nT("ui.konnected.certifications.certificationPrograms.myProgress")}</span>
                             <span>{percent}%</span>
                           </div>
                           <Progress
@@ -665,10 +667,10 @@ export default function CertificationProgramsPage(): JSX.Element {
                             }}
                           >
                             {program.userProgress?.status === 'completed'
-                              ? 'View results'
+                              ? i18nT("ui.konnected.certifications.certificationPrograms.viewResults")
                               : program.userProgress?.status === 'in_progress'
-                              ? 'Continue'
-                              : 'Start'}
+                              ? i18nT("ui.konnected.certifications.certificationPrograms.continue")
+                              : i18nT("ui.konnected.certifications.certificationPrograms.start")}
                           </Button>
                         </Space>
                       </Space>
@@ -716,19 +718,19 @@ export default function CertificationProgramsPage(): JSX.Element {
                     <Tag color="default">{selectedProgram.category}</Tag>
                   )}
                   {selectedProgram.requiresProctoring && (
-                    <Tag color="purple">Proctored</Tag>
+                    <Tag color="purple">{i18nT("ui.konnected.certifications.certificationPrograms.proctored")}</Tag>
                   )}
                 </Space>
               </Space>
 
               <div>
-                <h3>Description</h3>
+                <h3>{i18nT("ui.konnected.certifications.certificationPrograms.description")}</h3>
                 <p>{selectedProgram.description}</p>
               </div>
 
               {!!selectedProgram.skills?.length && (
                 <div>
-                  <h3>Key skills verified</h3>
+                  <h3>{i18nT("ui.konnected.certifications.certificationPrograms.keySkillsVerified")}</h3>
                   <Space wrap>
                     {selectedProgram.skills.map((skill) => (
                       <Tag key={skill.id}>{skill.name}</Tag>
@@ -738,24 +740,24 @@ export default function CertificationProgramsPage(): JSX.Element {
               )}
 
               <div>
-                <h3>Assessment rules</h3>
+                <h3>{i18nT("ui.konnected.certifications.certificationPrograms.assessmentRules")}</h3>
                 <ul style={{ paddingLeft: 20 }}>
                   <li>
-                    Passing threshold:{' '}
+                    {i18nT("ui.konnected.certifications.certificationPrograms.passingThreshold")}{' '}
                     <strong>
                       {selectedProgram.passPercent ?? CERT_PASS_PERCENT}%
                     </strong>
                   </li>
                   {selectedProgram.attemptsAllowed && (
                     <li>
-                      Attempts allowed:{' '}
+                      {i18nT("ui.konnected.certifications.certificationPrograms.attemptsAllowed")}{' '}
                       <strong>{selectedProgram.attemptsAllowed}</strong>
                     </li>
                   )}
                   {typeof selectedProgram.estimatedHours === 'number' && (
                     <li>
-                      Estimated learning time:{' '}
-                      <strong>~{selectedProgram.estimatedHours} hours</strong>
+                      {i18nT("ui.konnected.certifications.certificationPrograms.estimatedLearningTime")}{' '}
+                      <strong>~{selectedProgram.estimatedHours} {i18nT("ui.konnected.certifications.certificationPrograms.hours")}</strong>
                     </li>
                   )}
                 </ul>
@@ -763,7 +765,7 @@ export default function CertificationProgramsPage(): JSX.Element {
 
               {selectedProgram.userProgress && (
                 <div>
-                  <h3>My current status</h3>
+                  <h3>{i18nT("ui.konnected.certifications.certificationPrograms.myCurrentStatus")}</h3>
                   <Space direction="vertical" size={8} style={{ width: '100%' }}>
                     <Space>
                       {renderStatusTag(selectedProgram)}
@@ -771,7 +773,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                         'number' && (
                         <span>
                           {selectedProgram.userProgress.completionPercent}
-                          % complete
+                          {i18nT("ui.konnected.certifications.certificationPrograms.complete")}
                         </span>
                       )}
                     </Space>
@@ -787,7 +789,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                       <Alert
                         type="info"
                         showIcon
-                        message="Next recommended step"
+                        message={i18nT("ui.konnected.certifications.certificationPrograms.nextRecommendedStep")}
                         description={selectedProgram.userProgress.nextRecommendedStep}
                       />
                     )}
@@ -802,10 +804,10 @@ export default function CertificationProgramsPage(): JSX.Element {
                   onClick={() => handleStartOrContinue(selectedProgram)}
                 >
                   {selectedProgram.userProgress?.status === 'completed'
-                    ? 'View results'
+                    ? i18nT("ui.konnected.certifications.certificationPrograms.viewResults")
                     : selectedProgram.userProgress?.status === 'in_progress'
-                    ? 'Continue certification'
-                    : 'Start certification'}
+                    ? i18nT("ui.konnected.certifications.certificationPrograms.continueCertification")
+                    : i18nT("ui.konnected.certifications.certificationPrograms.startCertification")}
                 </Button>
               </Space>
             </Space>

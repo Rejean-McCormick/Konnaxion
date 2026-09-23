@@ -1,6 +1,7 @@
 // FILE: frontend/modules/konsultations/components/ImpactTimeline.tsx
 ﻿'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import { Empty, Space, Tag, Timeline, Typography } from 'antd';
 import dayjs from 'dayjs';
@@ -64,6 +65,7 @@ export default function ImpactTimeline({
   events,
   className,
 }: ImpactTimelineProps) {
+  const { t: i18nT } = useLanguage();
   const sorted = [...(events ?? [])].sort((a, b) => {
     const ta = Date.parse(a.when);
     const tb = Date.parse(b.when);
@@ -79,7 +81,7 @@ export default function ImpactTimeline({
       <div className={className}>
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="No impact events recorded for this consultation yet."
+          description={i18nT("ui.konsultations.impacttimeline.noImpactEventsRecordedForThisConsultation")}
         />
       </div>
     );

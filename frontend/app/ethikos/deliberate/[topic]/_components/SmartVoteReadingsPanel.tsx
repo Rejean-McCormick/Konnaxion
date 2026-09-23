@@ -1,5 +1,7 @@
 'use client'
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   BarChartOutlined,
   SafetyCertificateOutlined,
@@ -37,14 +39,14 @@ function pct(value?: number): number {
   return Math.max(0, Math.min(100, Math.round(value * 100)))
 }
 
-function stanceLabel(score: number): string {
-  if (score >= 2.25) return 'Strong support'
-  if (score >= 0.75) return 'Support'
-  if (score > 0.15) return 'Lean support'
-  if (score <= -2.25) return 'Strong oppose'
-  if (score <= -0.75) return 'Oppose'
-  if (score < -0.15) return 'Lean oppose'
-  return 'Near neutral'
+function stanceLabel(i18nT: TranslateFunction, score: number): string {
+  if (score >= 2.25) return i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.strongSupport")
+  if (score >= 0.75) return i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.support")
+  if (score > 0.15) return i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.leanSupport")
+  if (score <= -2.25) return i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.strongOppose")
+  if (score <= -0.75) return i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.oppose")
+  if (score < -0.15) return i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.leanOppose")
+  return i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.nearNeutral")
 }
 
 function ReadingDistribution({
@@ -56,23 +58,24 @@ function ReadingDistribution({
   neutral?: number
   oppose?: number
 }): JSX.Element {
+  const { t: i18nT } = useLanguage();
   return (
     <Space direction="vertical" size={6} style={{ width: '100%' }}>
       <div>
         <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-          <Text>Support</Text><Text>{pct(support)}%</Text>
+          <Text>{i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.support")}</Text><Text>{pct(support)}%</Text>
         </Space>
         <Progress percent={pct(support)} showInfo={false} />
       </div>
       <div>
         <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-          <Text>Neutral</Text><Text>{pct(neutral)}%</Text>
+          <Text>{i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.neutral")}</Text><Text>{pct(neutral)}%</Text>
         </Space>
         <Progress percent={pct(neutral)} showInfo={false} />
       </div>
       <div>
         <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-          <Text>Oppose</Text><Text>{pct(oppose)}%</Text>
+          <Text>{i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.oppose")}</Text><Text>{pct(oppose)}%</Text>
         </Space>
         <Progress percent={pct(oppose)} showInfo={false} />
       </div>
@@ -94,6 +97,7 @@ export default function SmartVoteReadingsPanel({
   topicId: string | number
   onOpenParticipant: (target: ParticipantContextTarget) => void
 }): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [expanded, setExpanded] = useState(false)
 
   const { data, loading, refresh } = useRequest(
@@ -127,20 +131,20 @@ export default function SmartVoteReadingsPanel({
       title={
         <Space>
           <BarChartOutlined />
-          <span>Decision-support readings</span>
+          <span>{i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.decisionSupportReadings")}</span>
         </Space>
       }
-      subTitle="Single source truth, multiple declared readings"
+      subTitle={i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.singleSourceMultipleReadings")}
       data-testid="smart-vote-readings-panel"
       extra={
         <Space wrap>
-          <Tag>Baseline always preserved</Tag>
+          <Tag>{i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.baselineAlwaysPreserved")}</Tag>
           <Button
             type={expanded ? 'default' : 'primary'}
             data-testid="view-readings-button"
             onClick={() => setExpanded((value) => !value)}
           >
-            {expanded ? 'Hide readings' : 'View readings'}
+            {expanded ? i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.hideReadings") : i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.viewReadings")}
           </Button>
         </Space>
       }
@@ -149,35 +153,35 @@ export default function SmartVoteReadingsPanel({
         <Alert
           type="info"
           showIcon
-          message="Compare the public baseline with a declared relevant-expertise lens"
-          description="Opening the panel does not change any stance. Smart Vote derives an advisory interpretation from the same source facts using the EkoH context relevant to this question."
+          message={i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.compareThePublicBaselineWithADeclared")}
+          description={i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.openingThePanelDoesNotChangeAny")}
         />
       ) : loading ? (
         <Card loading />
       ) : !data || !baseline || !reading ? (
-        <Empty description="No Smart Vote reading is bound to this topic yet">
-          <Button onClick={() => refresh()}>Retry</Button>
+        <Empty description={i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.noSmartVoteReadingIsBoundTo")}>
+          <Button onClick={() => refresh()}>{i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.retry")}</Button>
         </Empty>
       ) : (
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           <Alert
             type="warning"
             showIcon
-            message="Advisory reading — not a transfer of sovereignty"
-            description="Expertise informs judgment. It does not silently acquire political sovereignty. The baseline below keeps every canonical Ethikos stance unweighted."
+            message={i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.advisoryReadingNotATransferOfSovereignty")}
+            description={i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.expertiseInformsJudgmentItDoesNotSilently")}
           />
 
           <Row gutter={[16, 16]}>
             <Col xs={24} lg={12}>
-              <Card title="Public baseline" data-testid="baseline-reading-card">
+              <Card title={i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.publicBaseline")} data-testid="baseline-reading-card">
                 <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                   <Statistic
-                    title={stanceLabel(baseline.score)}
+                    title={stanceLabel(i18nT, baseline.score)}
                     value={baseline.score}
                     precision={2}
                     suffix="/ 3"
                   />
-                  <Text type="secondary">{baseline.participant_count} source stances · no weighting</Text>
+                  <Text type="secondary">{baseline.participant_count} {i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.sourceStancesNoWeighting")}</Text>
                   <ReadingDistribution
                     support={baseline.support_share}
                     neutral={baseline.neutral_share}
@@ -188,18 +192,18 @@ export default function SmartVoteReadingsPanel({
             </Col>
 
             <Col xs={24} lg={12}>
-              <Card title="Relevant-expertise reading" data-testid="expertise-reading-card">
+              <Card title={i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.relevantExpertiseReading")} data-testid="expertise-reading-card">
                 <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                   <Statistic
-                    title={stanceLabel(reading.score)}
+                    title={stanceLabel(i18nT, reading.score)}
                     value={reading.score}
                     precision={2}
                     suffix="/ 3"
                   />
                   <Space wrap>
-                    <Tag>{reading.advisory_participant_count ?? reading.participant_count} advisory participants</Tag>
+                    <Tag>{reading.advisory_participant_count ?? reading.participant_count} {i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.advisoryParticipants")}</Tag>
                     {(reading.excluded_participant_count ?? 0) > 0 && (
-                      <Tag color="orange">{reading.excluded_participant_count} declared recusal</Tag>
+                      <Tag color="orange">{reading.excluded_participant_count} {i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.declaredRecusal")}</Tag>
                     )}
                   </Space>
                   <ReadingDistribution
@@ -215,22 +219,22 @@ export default function SmartVoteReadingsPanel({
           <Row gutter={[16, 16]}>
             <Col xs={24} md={8}>
               <Card size="small">
-                <Statistic title="Divergence" value={divergence} precision={2} suffix=" stance pts" />
+                <Statistic title={i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.divergence")} value={divergence} precision={2} suffix=" stance pts" />
               </Card>
             </Col>
             <Col xs={24} md={8}>
               <Card size="small">
-                <Statistic title="Expertise coverage" value={pct(reading.expertise_coverage)} suffix="%" />
+                <Statistic title={i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.expertiseCoverage")} value={pct(reading.expertise_coverage)} suffix="%" />
               </Card>
             </Col>
             <Col xs={24} md={8}>
               <Card size="small">
-                <Statistic title="Average contextual alignment" value={pct(reading.average_expertise_alignment)} suffix="%" />
+                <Statistic title={i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.averageContextualAlignment")} value={pct(reading.average_expertise_alignment)} suffix="%" />
               </Card>
             </Col>
           </Row>
 
-          <ProCard title="Relevant domains" bordered>
+          <ProCard title={i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.relevantDomains")} bordered>
             <Space wrap>
               {(reading.domains ?? []).map((domain) => (
                 <Tag key={domain.domain_code}>
@@ -241,8 +245,8 @@ export default function SmartVoteReadingsPanel({
           </ProCard>
 
           <ProCard
-            title="Participant relevance in this lens"
-            subTitle="No one becomes more important everywhere. Expertise follows the question."
+            title={i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.participantRelevanceInThisLens")}
+            subTitle={i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.expertiseFollowsQuestion")}
             bordered
           >
             {(reading.participant_detail_visible_count ?? participants.length) < reading.participant_count ? (
@@ -250,8 +254,8 @@ export default function SmartVoteReadingsPanel({
                 type="info"
                 showIcon
                 style={{ marginBottom: 16 }}
-                message="Some participant-level EkoH details are restricted"
-                description={`${reading.participant_detail_visible_count ?? participants.length} of ${reading.participant_count} participant detail records are visible in your current EkoH access scope. Aggregate baseline and advisory readings remain unchanged.`}
+                message={i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.someParticipantLevelEkohDetailsAreRestricted")}
+                description={i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.ofParticipantDetailRecordsAreVisibleIn", { length: reading.participant_detail_visible_count ?? participants.length, participant_count: reading.participant_count })}
               />
             ) : null}
             <List<SmartVoteReadingParticipant>
@@ -266,7 +270,7 @@ export default function SmartVoteReadingsPanel({
                       icon={<SafetyCertificateOutlined />}
                       onClick={() => onOpenParticipant(participantTarget(participant))}
                     >
-                      EkoH context
+                      {i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.ekohContext")}
                     </Button>,
                   ]}
                 >
@@ -274,18 +278,18 @@ export default function SmartVoteReadingsPanel({
                     title={
                       <Space wrap>
                         <Text strong>{participant.display_name}</Text>
-                        <Tag>stance {participant.stance_value > 0 ? '+' : ''}{participant.stance_value}</Tag>
+                        <Tag>{i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.stance")} {participant.stance_value > 0 ? '+' : ''}{participant.stance_value}</Tag>
                         {participant.included_in_advisory ? (
-                          <Tag color="green">Included</Tag>
+                          <Tag color="green">{i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.included")}</Tag>
                         ) : (
-                          <Tag color="orange">Recused</Tag>
+                          <Tag color="orange">{i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.recused")}</Tag>
                         )}
                       </Space>
                     }
                     description={
                       <Space direction="vertical" size={2}>
                         <Text type="secondary">
-                          Contextual alignment {pct(participant.expertise_alignment)}% · advisory weight {participant.advisory_weight.toFixed(2)}×
+                          {i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.contextualAlignment")} {pct(participant.expertise_alignment)}{i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.advisoryWeight")} {participant.advisory_weight.toFixed(2)}×
                         </Text>
                         {participant.exclusion_reason && (
                           <Text type="secondary">{participant.exclusion_reason}</Text>
@@ -299,7 +303,7 @@ export default function SmartVoteReadingsPanel({
           </ProCard>
 
           <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-            Lens hash: {advisory?.lens_hash ?? 'n/a'} · snapshot: {advisory?.snapshot_ref ?? 'n/a'}
+            {i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.lensHash")} {advisory?.lens_hash ?? i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.nA")} {i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.snapshot")} {advisory?.snapshot_ref ?? i18nT("ui.ethikos.deliberate.topic.smartvotereadingspanel.nA")}
           </Paragraph>
         </Space>
       )}

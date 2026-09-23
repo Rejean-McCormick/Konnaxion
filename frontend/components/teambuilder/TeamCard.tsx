@@ -1,4 +1,7 @@
+'use client';
+
 // frontend/components/teambuilder/TeamCard.tsx
+import { useLanguage } from '@/context/LanguageContext';
 import Image from 'next/image';
 import React from 'react';
 
@@ -9,6 +12,7 @@ interface TeamCardProps {
 }
 
 export const TeamCard: React.FC<TeamCardProps> = ({ team }) => {
+  const { t: i18nT } = useLanguage();
   // Helper to get initials if no avatar
   const getInitials = (name: string) => {
     return name.substring(0, 2).toUpperCase();
@@ -29,7 +33,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({ team }) => {
       <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
         <h4 className="font-semibold text-gray-800">{team.name}</h4>
         <span className="text-xs font-medium text-gray-500 bg-white px-2 py-1 rounded border border-gray-200">
-          {team.members.length} members
+          {team.members.length} {i18nT("ui.teambuilder.teamcard.members")}
         </span>
       </div>
 
@@ -37,10 +41,10 @@ export const TeamCard: React.FC<TeamCardProps> = ({ team }) => {
       {(team.metrics.avg_skill || team.metrics.diversity_score) && (
         <div className="px-4 py-2 border-b border-gray-100 bg-slate-50 flex gap-4 text-xs text-gray-600">
           {team.metrics.avg_skill && (
-            <span>Avg Skill: <strong>{team.metrics.avg_skill}</strong></span>
+            <span>{i18nT("ui.teambuilder.teamcard.avgSkill")} <strong>{team.metrics.avg_skill}</strong></span>
           )}
           {team.metrics.diversity_score && (
-            <span>Diversity: <strong>{team.metrics.diversity_score}</strong></span>
+            <span>{i18nT("ui.teambuilder.teamcard.diversity")} <strong>{team.metrics.diversity_score}</strong></span>
           )}
         </div>
       )}
@@ -99,7 +103,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({ team }) => {
       {/* Footer / Actions (Placeholder) */}
       <div className="p-3 bg-gray-50 border-t border-gray-200 text-center">
          <button className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
-            View Details
+            {i18nT("ui.teambuilder.teamcard.viewDetails")}
          </button>
       </div>
     </div>

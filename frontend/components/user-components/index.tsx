@@ -8,6 +8,7 @@
  */
 
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Comment } from '@ant-design/compatible'
 import { SearchOutlined } from '@ant-design/icons'
 import { Button, Input, Row, Spin } from 'antd'
@@ -73,6 +74,7 @@ const Loading: React.FC = () => (
 )
 
 const UserList: React.FC = () => {
+  const { t: i18nT } = useLanguage();
   const router = useRouter()
 
   const [userList, setUserList] = useState<UserRow[]>([])
@@ -137,7 +139,7 @@ const UserList: React.FC = () => {
       <div style={{ padding: 8 }}>
         <Input
           ref={searchInput}
-          placeholder="Search user"
+          placeholder={i18nT("ui.userComponents.index.searchUser")}
           value={(selectedKeys[0] as string) ?? ''}
           onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
           onPressEnter={() => handleSearch(selectedKeys, confirm)}
@@ -148,10 +150,10 @@ const UserList: React.FC = () => {
           onClick={() => handleSearch(selectedKeys, confirm)}
           style={{ width: 90, marginRight: 8 }}
         >
-          Search
+          {i18nT("ui.userComponents.index.search")}
         </Button>
         <Button onClick={() => handleReset(clearFilters)} style={{ width: 90 }}>
-          Reset
+          {i18nT("ui.userComponents.index.reset")}
         </Button>
       </div>
     ),
@@ -174,7 +176,7 @@ const UserList: React.FC = () => {
 
   const columns = [
     {
-      title: 'User',
+      title: i18nT("ui.userComponents.index.user"),
       key: 'user',
       render: (_: unknown, record: UserRow) => {
         const { email, name, nickname, picture, userId } = record
@@ -202,7 +204,7 @@ const UserList: React.FC = () => {
       ...getUserSearchProps(),
     },
     {
-      title: 'Connection type',
+      title: i18nT("ui.userComponents.index.connectionType"),
       key: 'connection',
       render: (_: unknown, record: UserRow) => {
         const id = record.userId
@@ -214,16 +216,16 @@ const UserList: React.FC = () => {
         return <span>{connection}</span>
       },
       filters: [
-        { text: 'Email', value: 'auth0' },
-        { text: 'Google', value: 'google' },
-        { text: 'Facebook', value: 'facebook' },
+        { text: i18nT("ui.userComponents.index.email"), value: 'auth0' },
+        { text: i18nT("ui.userComponents.index.google"), value: 'google' },
+        { text: i18nT("ui.userComponents.index.facebook"), value: 'facebook' },
       ],
       onFilter: (value: string | number | boolean, record: UserRow) =>
         record.userId.includes(String(value)),
       width: '15%',
     },
     {
-      title: 'Join date',
+      title: i18nT("ui.userComponents.index.joinDate"),
       key: 'joinDate',
       render: (_: unknown, record: UserRow) => (
         <span>{dayjs(record.joinDate).format('D MMMM YYYY')}</span>
@@ -234,21 +236,21 @@ const UserList: React.FC = () => {
       width: '15%',
     },
     {
-      title: 'Likes',
+      title: i18nT("ui.userComponents.index.likes"),
       dataIndex: 'totalLikes',
       sorter: (a: UserRow, b: UserRow) => a.totalLikes - b.totalLikes,
       sortDirections: ['descend', 'ascend'] as const,
       width: '13.33%',
     },
     {
-      title: 'Comments',
+      title: i18nT("ui.userComponents.index.comments"),
       dataIndex: 'totalComments',
       sorter: (a: UserRow, b: UserRow) => a.totalComments - b.totalComments,
       sortDirections: ['descend', 'ascend'] as const,
       width: '13.33%',
     },
     {
-      title: 'Visits',
+      title: i18nT("ui.userComponents.index.visits"),
       dataIndex: 'totalVisits',
       sorter: (a: UserRow, b: UserRow) => a.totalVisits - b.totalVisits,
       sortDirections: ['descend', 'ascend'] as const,
@@ -262,7 +264,7 @@ const UserList: React.FC = () => {
   return (
     <Row gutter={16}>
       <ColStyled xs={24}>
-        <CardStyled title="User Management">
+        <CardStyled title={i18nT("ui.userComponents.index.userManagement")}>
           <StyledTable
             dataSource={userList}
             columns={columns as React.ComponentProps<typeof StyledTable>['columns']}

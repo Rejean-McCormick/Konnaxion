@@ -6,7 +6,9 @@ import Link from 'next/link';
 import type { CSSProperties } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { useWorld } from '@/context/WorldContext';
+import type { TranslateFunction } from '@/i18n/runtime';
 import type { Route } from '@/routes/types';
 
 import './Menu.css';
@@ -55,22 +57,23 @@ function findActiveSection(
   return undefined;
 }
 
-function buildSectionLabel(route: Route): React.ReactNode {
+function buildSectionLabel(
+  route: Route,
+  t: TranslateFunction,
+): React.ReactNode {
   return (
     <div className="k-sidebar-section-header">
       {route.icon ? (
         <span className="k-sidebar-section-header-icon">{route.icon}</span>
       ) : null}
-      <span className="k-sidebar-section-header-text">{route.name}</span>
+      <span className="k-sidebar-section-header-text">
+        {route.labelKey ? t(route.labelKey, undefined, route.name) : route.name}
+      </span>
       {route.scope ? (
         <span
           className={`k-sidebar-section-scope k-sidebar-section-scope-${route.scope}`}
         >
-          {route.scope === 'platform'
-            ? 'Platform'
-            : route.scope === 'module'
-              ? 'Module'
-              : 'Org'}
+          {t(`navigationScope.${route.scope}`, undefined, route.scope)}
         </span>
       ) : null}
       {route.moduleKey ? (
@@ -85,6 +88,7 @@ function toMenuItems(
   selectedSidebar: string,
   closeDrawer: () => void,
   href: (path: string) => string,
+  t: TranslateFunction,
 ): MenuItem[] {
   const usedPaths = new Set<string>();
 
@@ -107,7 +111,7 @@ function toMenuItems(
                 }}
                 onClick={closeDrawer}
               >
-                {child.name}
+                {child.labelKey ? t(child.labelKey, undefined, child.name) : child.name}
               </Link>
             ),
           } as MenuItem,
@@ -119,7 +123,7 @@ function toMenuItems(
       return [
         {
           key: sectionKey(routeIndex, route.name),
-          label: buildSectionLabel(route),
+          label: buildSectionLabel(route, t),
           className: 'k-sidebar-section-submenu',
           children,
         } as MenuItem,
@@ -141,7 +145,7 @@ function toMenuItems(
             }}
             onClick={closeDrawer}
           >
-            {route.name}
+            {route.labelKey ? t(route.labelKey, undefined, route.name) : route.name}
           </Link>
         ),
       } as MenuItem,
@@ -155,6 +159,7 @@ const MenuComponent: React.FC<MenuComponentProps> = ({
   closeDrawer,
   selectedSidebar,
 }) => {
+  const { t } = useLanguage();
   const { appPath, href } = useWorld();
   const flat = useMemo(() => flattenRoutes(routes), [routes]);
 
@@ -186,8 +191,8 @@ const MenuComponent: React.FC<MenuComponentProps> = ({
   }, [activeSection]);
 
   const items = useMemo(
-    () => toMenuItems(routes, selectedSidebar, closeDrawer, href),
-    [routes, selectedSidebar, closeDrawer, href],
+    () => toMenuItems(routes, selectedSidebar, closeDrawer, href, t),
+    [routes, selectedSidebar, closeDrawer, href, t],
   );
 
   const handleOpenChange: MenuProps['onOpenChange'] = (keys) => {

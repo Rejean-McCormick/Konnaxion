@@ -1,6 +1,7 @@
 // FILE: frontend/app/konsensus/dashboard/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   BellOutlined,
   FireOutlined,
@@ -163,6 +164,7 @@ const recentEvents: EventItem[] = [
 /* ------------------------------------------------------------------ */
 
 export default function KonsensusDashboardPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const activeDebates = 42;
   const todayVotes = 1180;
   const avgConsensus = 72;
@@ -170,19 +172,18 @@ export default function KonsensusDashboardPage(): JSX.Element {
   return (
     <>
       <Head>
-        <title>Konsensus · Kollective Dashboard</title>
+        <title>{i18nT("ui.konsensus.dashboard.konsensusKollectiveDashboard")}</title>
         <meta
           name="description"
-          content="Cross-module Konsensus dashboard aggregating Smart Vote, debates and participation across Konnaxion."
+          content={i18nT("ui.konsensus.dashboard.crossModuleKonsensusDashboardAggregatingSmartVote")}
         />
       </Head>
 
       <EkohPageShell
-        title="Konsensus Dashboard"
+        title={i18nT("ui.konsensus.dashboard.konsensusDashboard")}
         subtitle={
           <>
-            Cross-module snapshot of collective decisions, Smart Vote signals and
-            participation across all Konnaxion suites.
+            {i18nT("ui.konsensus.dashboard.crossModuleSnapshotOfCollectiveDecisionsSmart")}
           </>
         }
       >
@@ -191,7 +192,7 @@ export default function KonsensusDashboardPage(): JSX.Element {
           <Col xs={24} md={8}>
             <Card>
               <Statistic
-                title="Active debates"
+                title={i18nT("ui.konsensus.dashboard.activeDebates")}
                 value={activeDebates}
                 suffix="ongoing"
                 prefix={<FireOutlined />}
@@ -201,7 +202,7 @@ export default function KonsensusDashboardPage(): JSX.Element {
           <Col xs={24} md={8}>
             <Card>
               <Statistic
-                title="Votes cast today"
+                title={i18nT("ui.konsensus.dashboard.votesCastToday")}
                 value={todayVotes}
                 prefix={<TeamOutlined />}
               />
@@ -210,7 +211,7 @@ export default function KonsensusDashboardPage(): JSX.Element {
           <Col xs={24} md={8}>
             <Card>
               <Statistic
-                title="Average consensus index"
+                title={i18nT("ui.konsensus.dashboard.averageConsensusIndex")}
                 value={avgConsensus}
                 suffix="%"
                 prefix={<RadarChartOutlined />}
@@ -220,7 +221,7 @@ export default function KonsensusDashboardPage(): JSX.Element {
         </Row>
 
         {/* Trend chart */}
-        <Card className="mb-6" title="Consensus & participation (last 7 days)">
+        <Card className="mb-6" title={i18nT("ui.konsensus.dashboard.consensusParticipationLast7Days")}>
           <div style={{ width: '100%', height: 280 }}>
             <ResponsiveContainer>
               <ReLineChart data={consensusTrendData}>
@@ -247,7 +248,7 @@ export default function KonsensusDashboardPage(): JSX.Element {
         </Card>
 
         {/* Top topics */}
-        <Card className="mb-6" title="Top consensus topics">
+        <Card className="mb-6" title={i18nT("ui.konsensus.dashboard.topConsensusTopics")}>
           <List
             itemLayout="horizontal"
             dataSource={topTopics}
@@ -259,12 +260,12 @@ export default function KonsensusDashboardPage(): JSX.Element {
                 <List.Item key={topic.id}>
                   <List.Item.Meta
                     title={topic.title}
-                    description={`${topic.module} · Consensus ${topic.consensus}%`}
+                    description={i18nT("ui.konsensus.dashboard.consensus", { module: topic.module, consensus: topic.consensus })}
                   />
                   <Tag color={color}>
                     {topic.status === 'aligned'
-                      ? 'High alignment'
-                      : 'Contested'}
+                      ? i18nT("ui.konsensus.dashboard.highAlignment")
+                      : i18nT("ui.konsensus.dashboard.contested")}
                   </Tag>
                 </List.Item>
               );
@@ -275,7 +276,7 @@ export default function KonsensusDashboardPage(): JSX.Element {
         {/* Module breakdown + recent events */}
         <Row gutter={16}>
           <Col xs={24} md={12}>
-            <Card title="Consensus by module" className="mb-6">
+            <Card title={i18nT("ui.konsensus.dashboard.consensusByModule")} className="mb-6">
               <List
                 itemLayout="horizontal"
                 dataSource={moduleBreakdown}
@@ -288,7 +289,7 @@ export default function KonsensusDashboardPage(): JSX.Element {
                           <Tag>{item.primaryDomain}</Tag>
                         </>
                       }
-                      description={`Consensus ${item.consensus}% · Participation ${item.participation}%`}
+                      description={i18nT("ui.konsensus.dashboard.consensusParticipation", { consensus: item.consensus, participation: item.participation })}
                     />
                     <div style={{ minWidth: 160 }}>
                       <Progress
@@ -304,7 +305,7 @@ export default function KonsensusDashboardPage(): JSX.Element {
 
           <Col xs={24} md={12}>
             <Card
-              title="Recent Kollective events"
+              title={i18nT("ui.konsensus.dashboard.recentKollectiveEvents")}
               className="mb-6"
               extra={<BellOutlined />}
             >

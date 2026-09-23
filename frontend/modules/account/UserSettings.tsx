@@ -2,6 +2,7 @@
 // frontend/modules/account/UserSettings.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   LockOutlined,
   MailOutlined,
@@ -57,6 +58,7 @@ function fakeSubmit(message: string) {
 }
 
 const ProfileSettingsTab: React.FC = () => {
+  const { t: i18nT } = useLanguage();
   const [form] = Form.useForm<ProfileSettingsValues>();
 
   const onFinish = (values: ProfileSettingsValues) => {
@@ -65,9 +67,9 @@ const ProfileSettingsTab: React.FC = () => {
 
   return (
     <>
-      <Title level={4}>Profile</Title>
+      <Title level={4}>{i18nT("ui.account.usersettings.profile")}</Title>
       <Paragraph type="secondary">
-        Update your basic account information. This is how other users will see you.
+        {i18nT("ui.account.usersettings.updateYourBasicAccountInformationThisIs")}
       </Paragraph>
 
       <Form<ProfileSettingsValues>
@@ -82,30 +84,30 @@ const ProfileSettingsTab: React.FC = () => {
       >
         <Form.Item
           name="displayName"
-          label="Display name"
-          rules={[{ required: true, message: 'Please enter a display name' }]}
+          label={i18nT("ui.account.usersettings.displayName")}
+          rules={[{ required: true, message: i18nT("ui.account.usersettings.pleaseEnterADisplayName") }]}
         >
-          <Input prefix={<UserOutlined />} placeholder="Your name" />
+          <Input prefix={<UserOutlined />} placeholder={i18nT("ui.account.usersettings.yourName")} />
         </Form.Item>
 
         <Form.Item
           name="username"
-          label="Username"
-          rules={[{ required: true, message: 'Please enter a username' }]}
+          label={i18nT("ui.account.usersettings.username")}
+          rules={[{ required: true, message: i18nT("ui.account.usersettings.pleaseEnterAUsername") }]}
         >
-          <Input addonBefore="@" placeholder="handle" />
+          <Input addonBefore="@" placeholder={i18nT("ui.account.usersettings.handle")} />
         </Form.Item>
 
-        <Form.Item name="bio" label="Bio">
-          <Input.TextArea rows={3} placeholder="Short bio shown on your public profile" />
+        <Form.Item name="bio" label={i18nT("ui.account.usersettings.bio")}>
+          <Input.TextArea rows={3} placeholder={i18nT("ui.account.usersettings.shortBioShownOnYourPublicProfile")} />
         </Form.Item>
 
         <Form.Item>
           <Space>
             <Button type="primary" htmlType="submit">
-              Save changes
+              {i18nT("ui.account.usersettings.saveChanges")}
             </Button>
-            <Text type="secondary">Changes may take a few seconds to propagate.</Text>
+            <Text type="secondary">{i18nT("ui.account.usersettings.changesMayTakeAFewSecondsTo")}</Text>
           </Space>
         </Form.Item>
       </Form>
@@ -114,6 +116,7 @@ const ProfileSettingsTab: React.FC = () => {
 };
 
 const SecuritySettingsTab: React.FC = () => {
+  const { t: i18nT } = useLanguage();
   const [form] = Form.useForm<SecuritySettingsValues>();
 
   const onFinish = (values: SecuritySettingsValues) => {
@@ -122,9 +125,9 @@ const SecuritySettingsTab: React.FC = () => {
 
   return (
     <>
-      <Title level={4}>Security</Title>
+      <Title level={4}>{i18nT("ui.account.usersettings.security")}</Title>
       <Paragraph type="secondary">
-        Change your password and review basic security settings.
+        {i18nT("ui.account.usersettings.changeYourPasswordAndReviewBasicSecurity")}
       </Paragraph>
 
       <Form<SecuritySettingsValues>
@@ -134,26 +137,26 @@ const SecuritySettingsTab: React.FC = () => {
       >
         <Form.Item
           name="currentPassword"
-          label="Current password"
-          rules={[{ required: true, message: 'Please enter your current password' }]}
+          label={i18nT("ui.account.usersettings.currentPassword")}
+          rules={[{ required: true, message: i18nT("ui.account.usersettings.pleaseEnterYourCurrentPassword") }]}
         >
           <Input.Password prefix={<LockOutlined />} />
         </Form.Item>
 
         <Form.Item
           name="newPassword"
-          label="New password"
-          rules={[{ required: true, message: 'Please enter a new password' }]}
+          label={i18nT("ui.account.usersettings.newPassword")}
+          rules={[{ required: true, message: i18nT("ui.account.usersettings.pleaseEnterANewPassword") }]}
         >
           <Input.Password prefix={<LockOutlined />} />
         </Form.Item>
 
         <Form.Item
           name="confirmPassword"
-          label="Confirm new password"
+          label={i18nT("ui.account.usersettings.confirmNewPassword")}
           dependencies={['newPassword']}
           rules={[
-            { required: true, message: 'Please confirm your new password' },
+            { required: true, message: i18nT("ui.account.usersettings.pleaseConfirmYourNewPassword") },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue('newPassword') === value) {
@@ -172,7 +175,7 @@ const SecuritySettingsTab: React.FC = () => {
         <Form.Item>
           <Space>
             <Button type="primary" htmlType="submit">
-              Update password
+              {i18nT("ui.account.usersettings.updatePassword")}
             </Button>
           </Space>
         </Form.Item>
@@ -180,8 +183,8 @@ const SecuritySettingsTab: React.FC = () => {
         <Alert
           type="info"
           showIcon
-          message="Two-factor authentication"
-          description="When ready, you can extend this section with 2FA / WebAuthn configuration."
+          message={i18nT("ui.account.usersettings.twoFactorAuthentication")}
+          description={i18nT("ui.account.usersettings.whenReadyYouCanExtendThisSection")}
         />
       </Form>
     </>
@@ -189,15 +192,16 @@ const SecuritySettingsTab: React.FC = () => {
 };
 
 const NotificationSettingsTab: React.FC = () => {
+  const { t: i18nT } = useLanguage();
   const onFinish = (values: NotificationSettingsValues) => {
     fakeSubmit(`Notifications updated: ${JSON.stringify(values)}`);
   };
 
   return (
     <>
-      <Title level={4}>Notifications</Title>
+      <Title level={4}>{i18nT("ui.account.usersettings.notifications")}</Title>
       <Paragraph type="secondary">
-        Choose how you want to be notified about activity related to your account.
+        {i18nT("ui.account.usersettings.chooseHowYouWantToBeNotified")}
       </Paragraph>
 
       <Form<NotificationSettingsValues>
@@ -212,7 +216,7 @@ const NotificationSettingsTab: React.FC = () => {
         <Form.Item
           name="emailActivity"
           valuePropName="checked"
-          label="Email me about new activity"
+          label={i18nT("ui.account.usersettings.emailMeAboutNewActivity")}
         >
           <Switch />
         </Form.Item>
@@ -220,7 +224,7 @@ const NotificationSettingsTab: React.FC = () => {
         <Form.Item
           name="emailDigest"
           valuePropName="checked"
-          label="Send a weekly summary digest"
+          label={i18nT("ui.account.usersettings.sendAWeeklySummaryDigest")}
         >
           <Switch />
         </Form.Item>
@@ -228,14 +232,14 @@ const NotificationSettingsTab: React.FC = () => {
         <Form.Item
           name="pushImportant"
           valuePropName="checked"
-          label="Show in-app alerts for important events"
+          label={i18nT("ui.account.usersettings.showInAppAlertsForImportantEvents")}
         >
           <Switch />
         </Form.Item>
 
         <Form.Item>
           <Button type="primary" htmlType="submit" icon={<NotificationOutlined />}>
-            Save notification settings
+            {i18nT("ui.account.usersettings.saveNotificationSettings")}
           </Button>
         </Form.Item>
       </Form>
@@ -244,15 +248,16 @@ const NotificationSettingsTab: React.FC = () => {
 };
 
 const PrivacySettingsTab: React.FC = () => {
+  const { t: i18nT } = useLanguage();
   const onFinish = (values: PrivacySettingsValues) => {
     fakeSubmit(`Privacy updated: ${JSON.stringify(values)}`);
   };
 
   return (
     <>
-      <Title level={4}>Privacy</Title>
+      <Title level={4}>{i18nT("ui.account.usersettings.privacy")}</Title>
       <Paragraph type="secondary">
-        Control how your profile and activity appear to other users.
+        {i18nT("ui.account.usersettings.controlHowYourProfileAndActivityAppear")}
       </Paragraph>
 
       <Form<PrivacySettingsValues>
@@ -267,7 +272,7 @@ const PrivacySettingsTab: React.FC = () => {
         <Form.Item
           name="publicProfile"
           valuePropName="checked"
-          label="Make my profile discoverable"
+          label={i18nT("ui.account.usersettings.makeMyProfileDiscoverable")}
         >
           <Switch />
         </Form.Item>
@@ -275,7 +280,7 @@ const PrivacySettingsTab: React.FC = () => {
         <Form.Item
           name="showBadges"
           valuePropName="checked"
-          label="Show my badges on my public profile"
+          label={i18nT("ui.account.usersettings.showMyBadgesOnMyPublicProfile")}
         >
           <Switch />
         </Form.Item>
@@ -283,7 +288,7 @@ const PrivacySettingsTab: React.FC = () => {
         <Form.Item
           name="showActivity"
           valuePropName="checked"
-          label="Show my recent activity on my profile"
+          label={i18nT("ui.account.usersettings.showMyRecentActivityOnMyProfile")}
         >
           <Switch />
         </Form.Item>
@@ -291,10 +296,10 @@ const PrivacySettingsTab: React.FC = () => {
         <Form.Item>
           <Space>
             <Button type="primary" htmlType="submit">
-              Save privacy settings
+              {i18nT("ui.account.usersettings.savePrivacySettings")}
             </Button>
             <Text type="secondary">
-              These settings only affect what other users see in the product.
+              {i18nT("ui.account.usersettings.theseSettingsOnlyAffectWhatOtherUsers")}
             </Text>
           </Space>
         </Form.Item>
@@ -304,7 +309,8 @@ const PrivacySettingsTab: React.FC = () => {
 };
 
 const UserSettings: React.FC = () => {
-  usePageTitle('Account · Settings');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.account.usersettings.accountSettings"));
 
   const items: TabsProps['items'] = [
     {
@@ -312,7 +318,7 @@ const UserSettings: React.FC = () => {
       label: (
         <Space>
           <UserOutlined />
-          <span>Profile</span>
+          <span>{i18nT("ui.account.usersettings.profile")}</span>
         </Space>
       ),
       children: <ProfileSettingsTab />,
@@ -322,7 +328,7 @@ const UserSettings: React.FC = () => {
       label: (
         <Space>
           <LockOutlined />
-          <span>Security</span>
+          <span>{i18nT("ui.account.usersettings.security")}</span>
         </Space>
       ),
       children: <SecuritySettingsTab />,
@@ -332,7 +338,7 @@ const UserSettings: React.FC = () => {
       label: (
         <Space>
           <NotificationOutlined />
-          <span>Notifications</span>
+          <span>{i18nT("ui.account.usersettings.notifications")}</span>
         </Space>
       ),
       children: <NotificationSettingsTab />,
@@ -342,7 +348,7 @@ const UserSettings: React.FC = () => {
       label: (
         <Space>
           <MailOutlined />
-          <span>Privacy</span>
+          <span>{i18nT("ui.account.usersettings.privacy")}</span>
         </Space>
       ),
       children: <PrivacySettingsTab />,
@@ -352,8 +358,8 @@ const UserSettings: React.FC = () => {
   return (
     <PageContainer
       header={{
-        title: 'User settings',
-        subTitle: 'Manage your profile, security, notifications, and privacy preferences.',
+        title: i18nT("ui.account.usersettings.userSettings"),
+        subTitle: i18nT("ui.account.usersettings.manageYourProfileSecurityNotificationsAndPrivacy"),
       }}
     >
       <Tabs defaultActiveKey="profile" items={items} />

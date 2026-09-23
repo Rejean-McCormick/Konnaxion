@@ -2,6 +2,7 @@
 ﻿// frontend/modules/kontact/components/OpportunityList.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ClockCircleOutlined,
   EnvironmentOutlined,
@@ -54,18 +55,19 @@ export default function OpportunityList({
   loading = false,
   onSelect,
 }: OpportunityListProps): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const items = opportunities ?? [];
 
   return (
     <Card
-      title="Opportunities"
+      title={i18nT("ui.kontact.opportunitylist.opportunities")}
       loading={loading && !items.length}
       bodyStyle={{ padding: items.length ? 0 : undefined }}
     >
       {!items.length && !loading ? (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="No opportunities are available at the moment."
+          description={i18nT("ui.kontact.opportunitylist.noOpportunitiesAreAvailableAtTheMoment")}
         />
       ) : (
         <List
@@ -105,7 +107,7 @@ export default function OpportunityList({
 
                       {typeof item.participantsNeeded === 'number' && (
                         <Tag icon={<TeamOutlined />}>
-                          {item.participantsNeeded} needed
+                          {item.participantsNeeded} {i18nT("ui.kontact.opportunitylist.needed")}
                         </Tag>
                       )}
 

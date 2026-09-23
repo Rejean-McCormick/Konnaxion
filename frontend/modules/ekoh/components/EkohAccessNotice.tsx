@@ -1,24 +1,27 @@
 'use client'
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import { Alert, Space, Tag, Typography } from 'antd'
 
 import type { EkohProfile } from '@/services/ekoh'
 
 const { Text } = Typography
 
-function reasonLabel(reason: string): string {
+function reasonLabel(i18nT: TranslateFunction, reason: string): string {
   switch (reason) {
-    case 'self': return 'Self access'
-    case 'staff': return 'Staff access'
-    case 'public_policy': return 'Public rating policy'
-    case 'scope_grant': return 'Scoped access grant'
-    case 'private_policy': return 'Private rating policy'
-    case 'outside_authorized_scope': return 'Outside authorized scope'
+    case 'self': return i18nT("ui.ekoh.ekohaccessnotice.selfAccess")
+    case 'staff': return i18nT("ui.ekoh.ekohaccessnotice.staffAccess")
+    case 'public_policy': return i18nT("ui.ekoh.ekohaccessnotice.publicRatingPolicy")
+    case 'scope_grant': return i18nT("ui.ekoh.ekohaccessnotice.scopedAccessGrant")
+    case 'private_policy': return i18nT("ui.ekoh.ekohaccessnotice.privateRatingPolicy")
+    case 'outside_authorized_scope': return i18nT("ui.ekoh.ekohaccessnotice.outsideAuthorizedScope")
     default: return reason || 'Access policy'
   }
 }
 
 export default function EkohAccessNotice({ profile }: { profile: EkohProfile }): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const access = profile.ratingAccess
 
   if (!access.allowed) {
@@ -26,12 +29,12 @@ export default function EkohAccessNotice({ profile }: { profile: EkohProfile }):
       <Alert
         type="warning"
         showIcon
-        message="EkoH ratings are not visible in your current scope"
+        message={i18nT("ui.ekoh.ekohaccessnotice.ekohRatingsAreNotVisibleInYour")}
         description={
           <Space direction="vertical" size={4}>
-            <Text>{reasonLabel(access.reason)}</Text>
+            <Text>{reasonLabel(i18nT, access.reason)}</Text>
             <Text type="secondary">
-              Identity visibility and EkoH rating visibility are separate policies.
+              {i18nT("ui.ekoh.ekohaccessnotice.identityVisibilityAndEkohRatingVisibilityAre")}
             </Text>
           </Space>
         }
@@ -45,15 +48,15 @@ export default function EkohAccessNotice({ profile }: { profile: EkohProfile }):
       showIcon
       message={
         <Space wrap>
-          <span>EkoH rating access</span>
+          <span>{i18nT("ui.ekoh.ekohaccessnotice.ekohRatingAccess")}</span>
           <Tag>{profile.ratingVisibility}</Tag>
-          <Tag>{access.level ?? 'ratings'}</Tag>
+          <Tag>{access.level ?? i18nT("ui.ekoh.ekohaccessnotice.ratings")}</Tag>
           {access.scope?.name ? <Tag>{access.scope.name}</Tag> : null}
         </Space>
       }
       description={
         <Space direction="vertical" size={4}>
-          <Text>{reasonLabel(access.reason)}</Text>
+          <Text>{reasonLabel(i18nT, access.reason)}</Text>
           {profile.ratingPublicationBasis ? (
             <Text type="secondary">{profile.ratingPublicationBasis}</Text>
           ) : null}

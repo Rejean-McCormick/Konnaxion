@@ -1,5 +1,7 @@
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ArrowRightOutlined,
   BarChartOutlined,
@@ -42,41 +44,41 @@ type Shortcut = {
   tags: string[];
 };
 
-const QUICK_RANGES: { label: string; value: QuickRange }[] = [
-  { label: '7 days', value: '7d' },
-  { label: '30 days', value: '30d' },
-  { label: '90 days', value: '90d' },
-];
+const QUICK_RANGES = (i18nT: TranslateFunction): { label: string; value: QuickRange }[] => ([
+  { label: i18nT("ui.reports.text7Days"), value: '7d' },
+  { label: i18nT("ui.reports.text30Days"), value: '30d' },
+  { label: i18nT("ui.reports.text90Days"), value: '90d' },
+]);
 
-const shortcuts: Shortcut[] = [
+const shortcuts = (i18nT: TranslateFunction): Shortcut[] => ([
   {
     key: 'smart-vote',
-    title: 'Smart Vote · Impact overview',
+    title: i18nT("ui.reports.smartVoteImpactOverview"),
     description:
-      'See weighted participation, consensus patterns, and expert vs public deltas.',
+      i18nT("ui.reports.seeWeightedParticipationConsensusPatternsAndExpert"),
     href: '/reports/smart-vote',
     icon: <LineChartOutlined style={{ fontSize: 24, color: '#1890ff' }} />,
     tags: ['Ekoh', 'Ethikos', 'Smart Vote'],
   },
   {
     key: 'usage',
-    title: 'Usage · Adoption & activity',
+    title: i18nT("ui.reports.usageAdoptionActivity"),
     description:
-      'Track monthly active users, active projects, and document growth across the platform.',
+      i18nT("ui.reports.trackMonthlyActiveUsersActiveProjectsAnd"),
     href: '/reports/usage',
     icon: <BarChartOutlined style={{ fontSize: 24, color: '#52c41a' }} />,
     tags: ['Usage', 'MAU', 'Projects'],
   },
   {
     key: 'perf',
-    title: 'API performance · Reliability',
+    title: i18nT("ui.reports.apiPerformanceReliability"),
     description:
-      'Monitor API latency, error rates, and SLO compliance for the core services.',
+      i18nT("ui.reports.monitorApiLatencyErrorRatesAndSlo"),
     href: '/reports/perf',
     icon: <ThunderboltOutlined style={{ fontSize: 24, color: '#faad14' }} />,
     tags: ['API', 'SLO', 'Reliability'],
   },
-];
+]);
 
 const MiniChartSkeleton = ({ color = '#eee' }: { color?: string }) => (
   <div
@@ -104,14 +106,15 @@ const MiniChartSkeleton = ({ color = '#eee' }: { color?: string }) => (
 );
 
 export default function ReportsHomePage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [quickRange, setQuickRange] = React.useState<QuickRange>('30d');
   const router = useRouter();
 
   return (
     <ReportsPageShell
-      title="Insights"
-      subtitle="Cross-module analytics for Smart Vote, usage, and performance."
-      metaTitle="Insights · Reports"
+      title={i18nT("ui.reports.insights")}
+      subtitle={i18nT("ui.reports.crossModuleAnalyticsForSmartVoteUsage")}
+      metaTitle={i18nT("ui.reports.insightsReports")}
     >
       <Space
         direction="vertical"
@@ -136,18 +139,17 @@ export default function ReportsHomePage(): JSX.Element {
               <Space direction="vertical" size={4}>
                 <Space>
                   <CalendarOutlined />
-                  <Text strong>Time range</Text>
+                  <Text strong>{i18nT("ui.reports.timeRange")}</Text>
                 </Space>
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  Choose a time window. Detailed dashboards can override this
-                  range.
+                  {i18nT("ui.reports.chooseATimeWindowDetailedDashboardsCan")}
                 </Paragraph>
               </Space>
 
               <Space direction="vertical" size={4}>
-                <Text strong>Quick ranges</Text>
+                <Text strong>{i18nT("ui.reports.quickRanges")}</Text>
                 <Segmented
-                  options={QUICK_RANGES.map((r) => ({
+                  options={QUICK_RANGES(i18nT).map((r) => ({
                     label: r.label,
                     value: r.value,
                   }))}
@@ -157,7 +159,7 @@ export default function ReportsHomePage(): JSX.Element {
               </Space>
 
               <Space direction="vertical" size={4}>
-                <Text strong>Custom range</Text>
+                <Text strong>{i18nT("ui.reports.customRange")}</Text>
                 <RangePicker allowClear />
               </Space>
             </Space>
@@ -165,8 +167,7 @@ export default function ReportsHomePage(): JSX.Element {
             <Space>
               <InfoCircleOutlined style={{ color: '#1890ff' }} />
               <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                This overview is read-only. Detailed dashboards on each report
-                page will use the same time range where possible.
+                {i18nT("ui.reports.thisOverviewIsReadOnlyDetailedDashboards")}
               </Paragraph>
             </Space>
           </Space>
@@ -180,10 +181,10 @@ export default function ReportsHomePage(): JSX.Element {
           <StatisticCard
             colSpan={{ xs: 24, sm: 24, md: 8 }}
             statistic={{
-              title: 'Smart Vote',
+              title: i18nT("ui.reports.smartVoteLabel"),
               value: 1245,
               suffix: 'votes',
-              description: 'Weighted decisions in the selected range.',
+              description: i18nT("ui.reports.weightedDecisionsInTheSelectedRange"),
             }}
             chart={
               <div style={{ height: 80, width: '100%' }}>
@@ -192,13 +193,13 @@ export default function ReportsHomePage(): JSX.Element {
             }
             footer={
               <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                <Text type="secondary">Last {quickRange}</Text>
+                <Text type="secondary">{i18nT("ui.reports.last")} {quickRange}</Text>
                 <Button
                   type="link"
                   size="small"
                   onClick={() => router.push('/reports/smart-vote')}
                 >
-                  View Report <ArrowRightOutlined />
+                  {i18nT("ui.reports.viewReport")} <ArrowRightOutlined />
                 </Button>
               </Space>
             }
@@ -207,10 +208,10 @@ export default function ReportsHomePage(): JSX.Element {
           <StatisticCard
             colSpan={{ xs: 24, sm: 24, md: 8 }}
             statistic={{
-              title: 'Usage',
+              title: i18nT("ui.reports.usageLabel"),
               value: 567,
               suffix: 'MAU',
-              description: 'Approximate monthly active users.',
+              description: i18nT("ui.reports.approximateMonthlyActiveUsers"),
             }}
             chart={
               <div style={{ height: 80, width: '100%' }}>
@@ -219,13 +220,13 @@ export default function ReportsHomePage(): JSX.Element {
             }
             footer={
               <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                <Text type="secondary">Includes projects & docs</Text>
+                <Text type="secondary">{i18nT("ui.reports.includesProjectsDocs")}</Text>
                 <Button
                   type="link"
                   size="small"
                   onClick={() => router.push('/reports/usage')}
                 >
-                  View Usage <ArrowRightOutlined />
+                  {i18nT("ui.reports.viewUsage")} <ArrowRightOutlined />
                 </Button>
               </Space>
             }
@@ -234,10 +235,10 @@ export default function ReportsHomePage(): JSX.Element {
           <StatisticCard
             colSpan={{ xs: 24, sm: 24, md: 8 }}
             statistic={{
-              title: 'API Performance',
+              title: i18nT("ui.reports.apiPerformance"),
               value: 240,
               suffix: 'ms p95',
-              description: 'Aggregated latency for public endpoints.',
+              description: i18nT("ui.reports.aggregatedLatencyForPublicEndpoints"),
             }}
             chart={
               <div style={{ height: 80, width: '100%' }}>
@@ -246,13 +247,13 @@ export default function ReportsHomePage(): JSX.Element {
             }
             footer={
               <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                <Text type="secondary">Target p95 &lt; 300 ms</Text>
+                <Text type="secondary">{i18nT("ui.reports.targetP95300Ms")}</Text>
                 <Button
                   type="link"
                   size="small"
                   onClick={() => router.push('/reports/perf')}
                 >
-                  Check Reliability <ArrowRightOutlined />
+                  {i18nT("ui.reports.checkReliability")} <ArrowRightOutlined />
                 </Button>
               </Space>
             }
@@ -263,17 +264,16 @@ export default function ReportsHomePage(): JSX.Element {
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             <Space direction="vertical" size={4}>
               <Typography.Title level={4} style={{ marginBottom: 0 }}>
-                Dashboards
+                {i18nT("ui.reports.dashboards")}
               </Typography.Title>
               <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                Jump directly to a dedicated Insights dashboard. These pages
-                provide charts, tables, and export options.
+                {i18nT("ui.reports.jumpDirectlyToADedicatedInsightsDashboard")}
               </Paragraph>
             </Space>
 
             <List<Shortcut>
               itemLayout="horizontal"
-              dataSource={shortcuts}
+              dataSource={shortcuts(i18nT)}
               renderItem={(item) => (
                 <List.Item
                   actions={[
@@ -282,7 +282,7 @@ export default function ReportsHomePage(): JSX.Element {
                       type="default"
                       onClick={() => router.push(item.href)}
                     >
-                      Open
+                      {i18nT("ui.reports.open")}
                     </Button>,
                   ]}
                 >
@@ -325,18 +325,14 @@ export default function ReportsHomePage(): JSX.Element {
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             <Space>
               <InfoCircleOutlined />
-              <Text strong>How to use Insights</Text>
+              <Text strong>{i18nT("ui.reports.howToUseInsights")}</Text>
             </Space>
             <Paragraph style={{ marginBottom: 0 }}>
-              Start from this overview to pick the dashboard that matches your
-              question: Smart Vote for collective decisions, Usage for adoption,
-              and API performance for reliability. Each dashboard lets you
-              refine the time range, inspect detailed metrics, and export data
-              where permitted.
+              {i18nT("ui.reports.startFromThisOverviewToPickThe")}
             </Paragraph>
-            <Tooltip title="Exports are limited to aggregated datasets; raw personal data never leaves the analytics service.">
+            <Tooltip title={i18nT("ui.reports.exportsAreLimitedToAggregatedDatasetsRaw")}>
               <Button type="default" icon={<InfoCircleOutlined />}>
-                Learn more about data safeguards
+                {i18nT("ui.reports.learnMoreAboutDataSafeguards")}
               </Button>
             </Tooltip>
           </Space>

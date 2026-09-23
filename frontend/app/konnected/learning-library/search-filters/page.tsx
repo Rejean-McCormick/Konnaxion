@@ -1,6 +1,8 @@
 // FILE: frontend/app/konnected/learning-library/search-filters/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import { FilterOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
 import {
   Alert,
@@ -136,7 +138,7 @@ function normalizeSearchResponse(raw: RawKnowledgeSearchResponse): KnowledgeSear
   return { count, results };
 }
 
-async function searchKnowledgeResources(query: QueryState): Promise<KnowledgeSearchResponse> {
+async function searchKnowledgeResources(i18nT: TranslateFunction, query: QueryState): Promise<KnowledgeSearchResponse> {
   const params = new URLSearchParams();
 
   // Text search: support both v14-style `q` and DRF SearchFilter's `search`
@@ -208,11 +210,12 @@ async function searchKnowledgeResources(query: QueryState): Promise<KnowledgeSea
   const message =
     lastError instanceof Error
       ? lastError.message
-      : 'Unable to reach any knowledge search endpoint.';
+      : i18nT("ui.konnected.learningLibrary.searchFilters.unableToReachKnowledgeSearchEndpoint");
   throw new Error(message);
 }
 
 export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
   const [form] = Form.useForm<SearchFormValues>();
 
@@ -226,7 +229,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
   const columns: ColumnsType<KnowledgeResource> = useMemo(
     () => [
       {
-        title: 'Title',
+        title: i18nT("ui.konnected.learningLibrary.searchFilters.title"),
         dataIndex: 'title',
         key: 'title',
         render: (value, record) => {
@@ -255,16 +258,16 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
         },
       },
       {
-        title: 'Type',
+        title: i18nT("ui.konnected.learningLibrary.searchFilters.type"),
         dataIndex: 'type',
         key: 'type',
         width: 140,
         render: (value: KnowledgeResource['type']) => (
-          <Tag>{String(value ?? '').toUpperCase() || 'UNKNOWN'}</Tag>
+          <Tag>{String(value ?? '').toUpperCase() || i18nT("ui.konnected.learningLibrary.searchFilters.unknown")}</Tag>
         ),
       },
       {
-        title: 'Tags',
+        title: i18nT("ui.konnected.learningLibrary.searchFilters.tags"),
         dataIndex: 'tags',
         key: 'tags',
         width: 220,
@@ -277,12 +280,12 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
             </Space>
           ) : (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              No tags
+              {i18nT("ui.konnected.learningLibrary.searchFilters.noTags")}
             </Text>
           ),
       },
       {
-        title: 'Added',
+        title: i18nT("ui.konnected.learningLibrary.searchFilters.added"),
         dataIndex: 'created_at',
         key: 'created_at',
         width: 140,
@@ -291,12 +294,12 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
             <Text>{dayjs(value).format('YYYY-MM-DD')}</Text>
           ) : (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Unknown
+              {i18nT("ui.konnected.learningLibrary.searchFilters.unknown_bc7819")}
             </Text>
           ),
       },
       {
-        title: 'Actions',
+        title: i18nT("ui.konnected.learningLibrary.searchFilters.actions"),
         key: 'actions',
         fixed: 'right',
         width: 160,
@@ -310,7 +313,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
                   window.open(record.url as string, '_blank', 'noopener');
                 }}
               >
-                Open
+                {i18nT("ui.konnected.learningLibrary.searchFilters.open")}
               </Button>
             )}
             <Button
@@ -319,13 +322,13 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
                 router.push(`/konnected/learning-library/resource/${record.id}`)
               }
             >
-              View details
+              {i18nT("ui.konnected.learningLibrary.searchFilters.viewDetails")}
             </Button>
           </Space>
         ),
       },
     ],
-    [router],
+    [router, i18nT],
   );
 
   const runSearch = async (overridePage?: number, overridePageSize?: number) => {
@@ -354,14 +357,14 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
     setError(null);
 
     try {
-      const response = await searchKnowledgeResources(query);
+      const response = await searchKnowledgeResources(i18nT, query);
       setResources(response.results || []);
       setTotal(response.count ?? response.results.length);
       setPage(pageToUse);
       setPageSize(pageSizeToUse);
     } catch (e) {
       const message =
-        e instanceof Error ? e.message : 'Unexpected error during search';
+        e instanceof Error ? e.message : i18nT("ui.konnected.learningLibrary.searchFilters.unexpectedErrorDuringSearch");
       setError(message);
       setResources([]);
       setTotal(0);
@@ -416,7 +419,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
   const secondaryActions = (
     <Space>
       <Search
-        placeholder="Quick search by title or description"
+        placeholder={i18nT("ui.konnected.learningLibrary.searchFilters.quickSearchByTitleOrDescription")}
         allowClear
         enterButton={<SearchOutlined />}
         onSearch={handleQuickSearch}
@@ -427,7 +430,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
         onClick={handleResetFilters}
         disabled={!hasActiveFilters}
       >
-        Reset filters
+        {i18nT("ui.konnected.learningLibrary.searchFilters.resetFilters")}
       </Button>
     </Space>
   );
@@ -438,14 +441,14 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
       icon={<FilterOutlined />}
       onClick={() => void runSearch(page, pageSize)}
     >
-      Apply filters
+      {i18nT("ui.konnected.learningLibrary.searchFilters.applyFilters")}
     </Button>
   );
 
   return (
     <KonnectedPageShell
-      title="Search the Learning Library"
-      subtitle="Run advanced searches across Knowledge resources using full-text and structured filters."
+      title={i18nT("ui.konnected.learningLibrary.searchFilters.searchTheLearningLibrary")}
+      subtitle={i18nT("ui.konnected.learningLibrary.searchFilters.runAdvancedSearchesAcrossKnowledgeResourcesUsing")}
       primaryAction={primaryAction}
       secondaryActions={secondaryActions}
     >
@@ -454,12 +457,12 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12} lg={8}>
               <Form.Item
-                label="Keywords"
+                label={i18nT("ui.konnected.learningLibrary.searchFilters.keywords")}
                 name="q"
-                tooltip="Searches over title and description using the PostgreSQL full-text backend."
+                tooltip={i18nT("ui.konnected.learningLibrary.searchFilters.searchesOverTitleAndDescriptionUsingThe")}
               >
                 <Input
-                  placeholder="e.g. data visualization, climate, robotics"
+                  placeholder={i18nT("ui.konnected.learningLibrary.searchFilters.eGDataVisualizationClimateRobotics")}
                   prefix={<SearchOutlined />}
                   allowClear
                 />
@@ -467,11 +470,11 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
             </Col>
 
             <Col xs={24} md={12} lg={8}>
-              <Form.Item label="Content type" name="types">
+              <Form.Item label={i18nT("ui.konnected.learningLibrary.searchFilters.contentType")} name="types">
                 <Select
                   mode="multiple"
                   allowClear
-                  placeholder="Select content types"
+                  placeholder={i18nT("ui.konnected.learningLibrary.searchFilters.selectContentTypes")}
                 >
                   {CONTENT_TYPES.map((t) => (
                     <Option key={t} value={t}>
@@ -483,11 +486,11 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
             </Col>
 
             <Col xs={24} md={12} lg={8}>
-              <Form.Item label="Subjects" name="subjects">
+              <Form.Item label={i18nT("ui.konnected.learningLibrary.searchFilters.subjects")} name="subjects">
                 <Select
                   mode="multiple"
                   allowClear
-                  placeholder="Filter by subject or theme"
+                  placeholder={i18nT("ui.konnected.learningLibrary.searchFilters.filterBySubjectOrTheme")}
                 >
                   {SUBJECT_OPTIONS.map((s) => (
                     <Option key={s} value={s}>
@@ -501,11 +504,11 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
 
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12} lg={8}>
-              <Form.Item label="Level" name="levels">
+              <Form.Item label={i18nT("ui.konnected.learningLibrary.searchFilters.level")} name="levels">
                 <Select
                   mode="multiple"
                   allowClear
-                  placeholder="Beginner, Intermediate, Advanced"
+                  placeholder={i18nT("ui.konnected.learningLibrary.searchFilters.beginnerIntermediateAdvanced")}
                 >
                   {LEVEL_OPTIONS.map((l) => (
                     <Option key={l} value={l}>
@@ -517,11 +520,11 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
             </Col>
 
             <Col xs={24} md={12} lg={8}>
-              <Form.Item label="Language" name="languages">
+              <Form.Item label={i18nT("ui.konnected.learningLibrary.searchFilters.language")} name="languages">
                 <Select
                   mode="multiple"
                   allowClear
-                  placeholder="Resource language"
+                  placeholder={i18nT("ui.konnected.learningLibrary.searchFilters.resourceLanguage")}
                 >
                   {LANGUAGE_OPTIONS.map((lang) => (
                     <Option key={lang} value={lang}>
@@ -533,7 +536,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
             </Col>
 
             <Col xs={24} md={12} lg={8}>
-              <Form.Item label="Added to library" name="createdAt">
+              <Form.Item label={i18nT("ui.konnected.learningLibrary.searchFilters.addedToLibrary")} name="createdAt">
                 <RangePicker style={{ width: '100%' }} allowEmpty={[true, true]} />
               </Form.Item>
             </Col>
@@ -542,13 +545,13 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
           <Row justify="end">
             <Col>
               <Space>
-                <Button onClick={handleResetFilters}>Clear all</Button>
+                <Button onClick={handleResetFilters}>{i18nT("ui.konnected.learningLibrary.searchFilters.clearAll")}</Button>
                 <Button
                   type="primary"
                   icon={<SearchOutlined />}
                   htmlType="submit"
                 >
-                  Search
+                  {i18nT("ui.konnected.learningLibrary.searchFilters.search")}
                 </Button>
               </Space>
             </Col>
@@ -560,7 +563,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
         <Alert
           type="error"
           showIcon
-          message="Unable to run search"
+          message={i18nT("ui.konnected.learningLibrary.searchFilters.unableToRunSearch")}
           description={error}
           style={{ marginBottom: 16 }}
         />
@@ -573,10 +576,8 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
           >
             <Text type="secondary">
               {loading
-                ? 'Searching…'
-                : `Showing ${resources.length} of ${total} result${
-                    total === 1 ? '' : 's'
-                  }`}
+                ? i18nT("ui.konnected.learningLibrary.searchFilters.searching")
+                : i18nT("ui.konnected.learningLibrary.searchFilters.showingOfResult", { length: resources.length, total: total, value1: total === 1 ? '' : 's' })}
             </Text>
           </Space>
 
@@ -592,13 +593,17 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
               pageSize,
               showSizeChanger: true,
               pageSizeOptions: [10, 20, 50],
-              showTotal: (t, range) =>
-                `${range[0]}–${range[1]} of ${t} resources`,
+              showTotal: (totalItems, range) =>
+                i18nT("ui.konnected.learningLibrary.searchFilters.resultsRange", {
+                  start: range[0],
+                  end: range[1],
+                  count: totalItems,
+                }),
             }}
             locale={{
               emptyText: loading
-                ? 'Loading resources…'
-                : 'No resources match your current filters.',
+                ? i18nT("ui.konnected.learningLibrary.searchFilters.loadingResources")
+                : i18nT("ui.konnected.learningLibrary.searchFilters.noResourcesMatchYourCurrentFilters"),
             }}
             scroll={{ x: 900 }}
             bordered

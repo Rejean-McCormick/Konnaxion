@@ -2,6 +2,8 @@
 ﻿// frontend/modules/konsultations/components/SuggestionBoard.tsx
 'use client';
 
+import TranslatedText from '@/components/i18n/TranslatedText';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   DislikeOutlined,
   FilterOutlined,
@@ -80,15 +82,15 @@ function statusTag(status?: SuggestionStatus) {
 
   switch (status) {
     case 'new':
-      return <Tag color="default">New</Tag>;
+      return <Tag color="default"><TranslatedText id="ui.konsultations.suggestionboard.new" /></Tag>;
     case 'under_review':
-      return <Tag color="processing">Under review</Tag>;
+      return <Tag color="processing"><TranslatedText id="ui.konsultations.suggestionboard.underReview" /></Tag>;
     case 'accepted':
-      return <Tag color="green">Accepted</Tag>;
+      return <Tag color="green"><TranslatedText id="ui.konsultations.suggestionboard.accepted" /></Tag>;
     case 'implemented':
-      return <Tag color="blue">Implemented</Tag>;
+      return <Tag color="blue"><TranslatedText id="ui.konsultations.suggestionboard.implemented" /></Tag>;
     case 'rejected':
-      return <Tag color="red">Rejected</Tag>;
+      return <Tag color="red"><TranslatedText id="ui.konsultations.suggestionboard.rejected" /></Tag>;
     default:
       return null;
   }
@@ -110,6 +112,7 @@ const SuggestionBoard: React.FC<SuggestionBoardProps> = ({
   onUpvote,
   onDownvote,
 }) => {
+  const { t: i18nT } = useLanguage();
   const [sortMode, setSortMode] = useState<SortMode>('top');
   const [statusFilter, setStatusFilter] = useState<'all' | SuggestionStatus>('all');
   const [search, setSearch] = useState('');
@@ -213,7 +216,7 @@ const SuggestionBoard: React.FC<SuggestionBoardProps> = ({
 
   return (
     <Card
-      title="Suggestions"
+      title={i18nT("ui.konsultations.suggestionboard.suggestions")}
       extra={
         <Space size="middle" wrap>
           <Space>
@@ -223,36 +226,36 @@ const SuggestionBoard: React.FC<SuggestionBoardProps> = ({
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
-              <Radio.Button value="all">All</Radio.Button>
-              <Radio.Button value="new">New</Radio.Button>
-              <Radio.Button value="under_review">Under review</Radio.Button>
-              <Radio.Button value="accepted">Accepted</Radio.Button>
-              <Radio.Button value="implemented">Implemented</Radio.Button>
-              <Radio.Button value="rejected">Rejected</Radio.Button>
+              <Radio.Button value="all">{i18nT("ui.konsultations.suggestionboard.all")}</Radio.Button>
+              <Radio.Button value="new">{i18nT("ui.konsultations.suggestionboard.new")}</Radio.Button>
+              <Radio.Button value="under_review">{i18nT("ui.konsultations.suggestionboard.underReview")}</Radio.Button>
+              <Radio.Button value="accepted">{i18nT("ui.konsultations.suggestionboard.accepted")}</Radio.Button>
+              <Radio.Button value="implemented">{i18nT("ui.konsultations.suggestionboard.implemented")}</Radio.Button>
+              <Radio.Button value="rejected">{i18nT("ui.konsultations.suggestionboard.rejected")}</Radio.Button>
             </Radio.Group>
           </Space>
 
           <Space>
             {sortMode === 'top' ? (
-              <Tooltip title="Sorted by highest support first">
+              <Tooltip title={i18nT("ui.konsultations.suggestionboard.sortedByHighestSupportFirst")}>
                 <Button
                   size="small"
                   type="text"
                   icon={<SortDescendingOutlined />}
                   onClick={() => setSortMode('recent')}
                 >
-                  Top
+                  {i18nT("ui.konsultations.suggestionboard.top")}
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip title="Sorted by most recent first">
+              <Tooltip title={i18nT("ui.konsultations.suggestionboard.sortedByMostRecentFirst")}>
                 <Button
                   size="small"
                   type="text"
                   icon={<SortAscendingOutlined />}
                   onClick={() => setSortMode('top')}
                 >
-                  Recent
+                  {i18nT("ui.konsultations.suggestionboard.recent")}
                 </Button>
               </Tooltip>
             )}
@@ -261,7 +264,7 @@ const SuggestionBoard: React.FC<SuggestionBoardProps> = ({
           <Input.Search
             allowClear
             size="small"
-            placeholder="Search suggestions…"
+            placeholder={i18nT("ui.konsultations.suggestionboard.searchSuggestions")}
             style={{ width: 220 }}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -281,22 +284,21 @@ const SuggestionBoard: React.FC<SuggestionBoardProps> = ({
         {allowNewSuggestions && (
           <div>
             <Paragraph type="secondary" style={{ marginBottom: 8 }}>
-              Propose a concrete change, amendment, or idea for this consultation. Be specific and
-              explain trade‑offs where possible.
+              {i18nT("ui.konsultations.suggestionboard.proposeAConcreteChangeAmendmentOrIdea")}
             </Paragraph>
             <Input.TextArea
               rows={4}
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              placeholder="Write your suggestion…"
+              placeholder={i18nT("ui.konsultations.suggestionboard.writeYourSuggestion")}
               maxLength={maxLength}
               showCount
             />
             <Space style={{ marginTop: 8, width: '100%', justifyContent: 'space-between' }}>
               <Text type="secondary">
                 {draft.trim().length === 0
-                  ? 'Suggestions may be moderated according to Ethikos guidelines.'
-                  : `${draft.length}/${maxLength} characters`}
+                  ? i18nT("ui.konsultations.suggestionboard.suggestionsMayBeModeratedAccordingToEthikos")
+                  : i18nT("ui.konsultations.suggestionboard.characters", { length: draft.length, maxLength: maxLength })}
               </Text>
               <Button
                 type="primary"
@@ -305,7 +307,7 @@ const SuggestionBoard: React.FC<SuggestionBoardProps> = ({
                 loading={submitting}
                 disabled={submitting || draft.trim().length === 0}
               >
-                Submit suggestion
+                {i18nT("ui.konsultations.suggestionboard.submitSuggestion")}
               </Button>
             </Space>
           </div>
@@ -314,7 +316,7 @@ const SuggestionBoard: React.FC<SuggestionBoardProps> = ({
         {!hasAnySuggestions && !isLoading && (
           <Empty
             image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description="No suggestions yet. Be the first to propose one."
+            description={i18nT("ui.konsultations.suggestionboard.noSuggestionsYetBeTheFirstTo")}
           />
         )}
 
@@ -334,7 +336,7 @@ const SuggestionBoard: React.FC<SuggestionBoardProps> = ({
                   extra={
                     allowVoting && (
                       <Space direction="vertical" align="center">
-                        <Tooltip title="I support this">
+                        <Tooltip title={i18nT("ui.konsultations.suggestionboard.iSupportThis")}>
                           <Button
                             size="small"
                             icon={<LikeOutlined />}
@@ -343,7 +345,7 @@ const SuggestionBoard: React.FC<SuggestionBoardProps> = ({
                             {item.upvotes}
                           </Button>
                         </Tooltip>
-                        <Tooltip title="I do not support this">
+                        <Tooltip title={i18nT("ui.konsultations.suggestionboard.iDoNotSupportThis")}>
                           <Button
                             size="small"
                             icon={<DislikeOutlined />}
@@ -353,7 +355,7 @@ const SuggestionBoard: React.FC<SuggestionBoardProps> = ({
                           </Button>
                         </Tooltip>
                         <Text type="secondary" style={{ fontSize: 11 }}>
-                          Net: {netScore}
+                          {i18nT("ui.konsultations.suggestionboard.net")} {netScore}
                         </Text>
                       </Space>
                     )
@@ -362,7 +364,7 @@ const SuggestionBoard: React.FC<SuggestionBoardProps> = ({
                   <List.Item.Meta
                     title={
                       <Space wrap>
-                        <Text strong>Suggestion</Text>
+                        <Text strong>{i18nT("ui.konsultations.suggestionboard.suggestion")}</Text>
                         {statusTag(item.status)}
                         {Array.isArray(item.tags) &&
                           item.tags.map((t) => (
@@ -375,7 +377,7 @@ const SuggestionBoard: React.FC<SuggestionBoardProps> = ({
                     description={
                       <Space direction="vertical" size={2}>
                         <Text type="secondary">
-                          {item.authorName || 'Anonymous'} ·{' '}
+                          {item.authorName || i18nT("ui.konsultations.suggestionboard.anonymous")} ·{' '}
                           {new Date(item.createdAt).toLocaleString()}
                         </Text>
                       </Space>

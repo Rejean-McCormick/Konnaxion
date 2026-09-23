@@ -1,6 +1,7 @@
 // frontend/app/teambuilder/humans/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   AimOutlined,
   EnvironmentOutlined,
@@ -32,6 +33,7 @@ import TeamBuilderPageShell from '@/components/teambuilder/TeamBuilderPageShell'
 const { Paragraph, Text } = Typography;
 
 export default function HumansOverviewPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   // For now, static placeholder metrics. Wire to real data later.
   const totalPeople = 128;
   const withLanguage = 104;
@@ -47,29 +49,29 @@ export default function HumansOverviewPage(): JSX.Element {
   const recentChanges = [
     {
       id: 1,
-      title: 'Updated languages for 12 people',
-      description: 'Added FR/EN bilingual profile for Paris-based cohort.',
+      title: i18nT("ui.teambuilder.humans.updatedLanguagesFor12People"),
+      description: i18nT("ui.teambuilder.humans.addedFrEnBilingualProfileForParis"),
       type: 'language',
       ts: '2 hours ago',
     },
     {
       id: 2,
-      title: 'New interpersonal conflict pair',
-      description: 'Flagged conflict between A. Smith and J. Doe (Project Alpha).',
+      title: i18nT("ui.teambuilder.humans.newInterpersonalConflictPair"),
+      description: i18nT("ui.teambuilder.humans.flaggedConflictBetweenASmithAndJ"),
       type: 'conflict',
       ts: 'Yesterday',
     },
     {
       id: 3,
-      title: 'Refined working hours',
-      description: 'Adjusted schedules for APAC team to avoid 3 a.m. meetings.',
+      title: i18nT("ui.teambuilder.humans.refinedWorkingHours"),
+      description: i18nT("ui.teambuilder.humans.adjustedSchedulesForApacTeamToAvoid"),
       type: 'schedule',
       ts: '2 days ago',
     },
     {
       id: 4,
-      title: 'Geo boundaries for EU-only projects',
-      description: 'Marked 34 people as “EU only” for data residency rules.',
+      title: i18nT("ui.teambuilder.humans.geoBoundariesForEuOnlyProjects"),
+      description: i18nT("ui.teambuilder.humans.marked34PeopleAsEuOnlyFor"),
       type: 'geo',
       ts: '3 days ago',
     },
@@ -79,7 +81,7 @@ export default function HumansOverviewPage(): JSX.Element {
     if (missingCritical === 0) {
       return (
         <Tag color="success" icon={<TeamOutlined />}>
-          All profiles ready
+          {i18nT("ui.teambuilder.humans.allProfilesReady")}
         </Tag>
       );
     }
@@ -87,14 +89,14 @@ export default function HumansOverviewPage(): JSX.Element {
     if (missingCritical < totalPeople * 0.1) {
       return (
         <Tag color="processing" icon={<TeamOutlined />}>
-          Mostly ready
+          {i18nT("ui.teambuilder.humans.mostlyReady")}
         </Tag>
       );
     }
 
     return (
       <Tag color="warning" icon={<WarningOutlined />}>
-        Needs attention
+        {i18nT("ui.teambuilder.humans.needsAttention")}
       </Tag>
     );
   };
@@ -102,23 +104,21 @@ export default function HumansOverviewPage(): JSX.Element {
   const secondaryActions = (
     <Space>
       <Button type="default" href="/teambuilder">
-        Back to sessions
+        {i18nT("ui.teambuilder.humans.backToSessions")}
       </Button>
     </Space>
   );
 
   return (
     <TeamBuilderPageShell
-      title="Humans · Constraints overview"
+      title={i18nT("ui.teambuilder.humans.humansConstraintsOverview")}
       subtitle={
         <Paragraph type="secondary">
-          Configure how people can be grouped into teams: languages, geography, interpersonal
-          conflicts, and schedules. These constraints are used by the engine to decide who can
-          safely be matched together.
+          {i18nT("ui.teambuilder.humans.configureHowPeopleCanBeGroupedInto")}
         </Paragraph>
       }
-      metaTitle="Team Builder · Humans"
-      sectionLabel="Humans"
+      metaTitle={i18nT("ui.teambuilder.humans.teamBuilderHumans")}
+      sectionLabel={i18nT("ui.teambuilder.humans.humans")}
       secondaryActions={secondaryActions}
       maxWidth={1200}
     >
@@ -133,18 +133,18 @@ export default function HumansOverviewPage(): JSX.Element {
                 style={{ width: '100%' }}
               >
                 <Space align="center" style={{ justifyContent: 'space-between', width: '100%' }}>
-                  <Text strong>Population readiness</Text>
+                  <Text strong>{i18nT("ui.teambuilder.humans.populationReadiness")}</Text>
                   <Badge status={missingCritical === 0 ? 'success' : 'warning'} />
                 </Space>
                 <Statistic
-                  title="People in scope"
+                  title={i18nT("ui.teambuilder.humans.peopleInScope")}
                   value={totalPeople}
                   prefix={<TeamOutlined />}
                 />
                 <Space size="small" direction="vertical">
                   <Text type="secondary">
-                    {withLanguage} with language profile · {withSchedule} with schedule ·{' '}
-                    {withGeo} with geo limits
+                    {withLanguage} {i18nT("ui.teambuilder.humans.withLanguageProfile")} {withSchedule} {i18nT("ui.teambuilder.humans.withSchedule")}{' '}
+                    {withGeo} {i18nT("ui.teambuilder.humans.withGeoLimits")}
                   </Text>
                   {renderStatusTag()}
                 </Space>
@@ -161,10 +161,10 @@ export default function HumansOverviewPage(): JSX.Element {
               >
                 <Space align="center">
                   <GlobalOutlined />
-                  <Text strong>Language & geography</Text>
+                  <Text strong>{i18nT("ui.teambuilder.humans.languageGeography")}</Text>
                 </Space>
                 <Statistic
-                  title="Language coverage"
+                  title={i18nT("ui.teambuilder.humans.languageCoverage")}
                   value={languageCoverage}
                   suffix="%"
                 />
@@ -174,7 +174,7 @@ export default function HumansOverviewPage(): JSX.Element {
                   status={languageCoverage > 80 ? 'active' : 'exception'}
                 />
                 <Statistic
-                  title="Geo coverage"
+                  title={i18nT("ui.teambuilder.humans.geoCoverage")}
                   value={geoCoverage}
                   suffix="%"
                 />
@@ -196,10 +196,10 @@ export default function HumansOverviewPage(): JSX.Element {
               >
                 <Space align="center">
                   <ScheduleOutlined />
-                  <Text strong>Schedules & conflicts</Text>
+                  <Text strong>{i18nT("ui.teambuilder.humans.schedulesConflicts")}</Text>
                 </Space>
                 <Statistic
-                  title="Schedule coverage"
+                  title={i18nT("ui.teambuilder.humans.scheduleCoverage")}
                   value={scheduleCoverage}
                   suffix="%"
                 />
@@ -209,8 +209,8 @@ export default function HumansOverviewPage(): JSX.Element {
                   status={scheduleCoverage > 80 ? 'active' : 'exception'}
                 />
                 <Space size="small">
-                  <Tag color="default">Conflict pairs</Tag>
-                  <Text type="secondary">Configured where needed.</Text>
+                  <Tag color="default">{i18nT("ui.teambuilder.humans.conflictPairs")}</Tag>
+                  <Text type="secondary">{i18nT("ui.teambuilder.humans.configuredWhereNeeded")}</Text>
                 </Space>
               </Space>
             </Card>
@@ -221,26 +221,24 @@ export default function HumansOverviewPage(): JSX.Element {
         <Alert
           type="info"
           showIcon
-          message="How human constraints are applied"
+          message={i18nT("ui.teambuilder.humans.howHumanConstraintsAreApplied")}
           description={
             <Space direction="vertical" size={4}>
               <Text>
-                These settings define <strong>who can be grouped together</strong> in the team
-                builder. The engine will:
+                {i18nT("ui.teambuilder.humans.theseSettingsDefine")} <strong>{i18nT("ui.teambuilder.humans.whoCanBeGroupedTogether")}</strong> {i18nT("ui.teambuilder.humans.inTheTeamBuilderTheEngineWill")}
               </Text>
               <ul style={{ paddingLeft: 18, marginBottom: 0 }}>
                 <li>
-                  Respect <strong>language compatibility</strong> when forming elite or learning
-                  teams.
+                  {i18nT("ui.teambuilder.humans.respect")} <strong>{i18nT("ui.teambuilder.humans.languageCompatibility")}</strong> {i18nT("ui.teambuilder.humans.whenFormingEliteOrLearningTeams")}
                 </li>
                 <li>
-                  Enforce <strong>geography / jurisdiction limits</strong> for sensitive projects.
+                  {i18nT("ui.teambuilder.humans.enforce")} <strong>{i18nT("ui.teambuilder.humans.geographyJurisdictionLimits")}</strong> {i18nT("ui.teambuilder.humans.forSensitiveProjects")}
                 </li>
                 <li>
-                  Avoid <strong>hard conflict pairs</strong> in all modes.
+                  {i18nT("ui.teambuilder.humans.avoid")} <strong>{i18nT("ui.teambuilder.humans.hardConflictPairs")}</strong> {i18nT("ui.teambuilder.humans.inAllModes")}
                 </li>
                 <li>
-                  Match <strong>overlapping schedules</strong> so teams can actually meet.
+                  {i18nT("ui.teambuilder.humans.match")} <strong>{i18nT("ui.teambuilder.humans.overlappingSchedules")}</strong> {i18nT("ui.teambuilder.humans.soTeamsCanActuallyMeet")}
                 </li>
               </ul>
             </Space>
@@ -256,31 +254,30 @@ export default function HumansOverviewPage(): JSX.Element {
               title={
                 <Space>
                   <GlobalOutlined />
-                  <span>Languages & communication</span>
+                  <span>{i18nT("ui.teambuilder.humans.languagesCommunication")}</span>
                 </Space>
               }
               extra={
                 <Button type="link" href="/teambuilder/humans/language">
-                  Open
+                  {i18nT("ui.teambuilder.humans.open")}
                 </Button>
               }
             >
               <Space direction="vertical" size="small" style={{ width: '100%' }}>
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  Define which languages each person can work in, and mark preferred communication
-                  modes (async, synchronous, written, spoken).
+                  {i18nT("ui.teambuilder.humans.defineWhichLanguagesEachPersonCanWork")}
                 </Paragraph>
                 <Space wrap>
-                  <Tag>Language profiles</Tag>
-                  <Tag>Preferred channels</Tag>
-                  <Tag>Multi-lingual support</Tag>
+                  <Tag>{i18nT("ui.teambuilder.humans.languageProfiles")}</Tag>
+                  <Tag>{i18nT("ui.teambuilder.humans.preferredChannels")}</Tag>
+                  <Tag>{i18nT("ui.teambuilder.humans.multiLingualSupport")}</Tag>
                 </Space>
                 <Space split={<Divider type="vertical" />} wrap>
                   <Text type="secondary">
                     <Badge status={languageCoverage > 80 ? 'success' : 'warning'} />{' '}
-                    {languageCoverage}% coverage
+                    {languageCoverage}{i18nT("ui.teambuilder.humans.coverage")}
                   </Text>
-                  <Text type="secondary">{withLanguage} / {totalPeople} people configured</Text>
+                  <Text type="secondary">{withLanguage} / {totalPeople} {i18nT("ui.teambuilder.humans.peopleConfigured")}</Text>
                 </Space>
               </Space>
             </Card>
@@ -291,32 +288,31 @@ export default function HumansOverviewPage(): JSX.Element {
               title={
                 <Space>
                   <EnvironmentOutlined />
-                  <span>Geography & legal limits</span>
+                  <span>{i18nT("ui.teambuilder.humans.geographyLegalLimits")}</span>
                 </Space>
               }
               extra={
                 <Button type="link" href="/teambuilder/humans/geo">
-                  Open
+                  {i18nT("ui.teambuilder.humans.open")}
                 </Button>
               }
             >
               <Space direction="vertical" size="small" style={{ width: '100%' }}>
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  Specify where each person can legally operate (regions, time zones, data
-                  residency constraints) and which projects require strict geo limits.
+                  {i18nT("ui.teambuilder.humans.specifyWhereEachPersonCanLegallyOperate")}
                 </Paragraph>
                 <Space wrap>
-                  <Tag>Time zones</Tag>
-                  <Tag>Regions</Tag>
-                  <Tag>Jurisdictions</Tag>
-                  <Tag>Data residency</Tag>
+                  <Tag>{i18nT("ui.teambuilder.humans.timeZones")}</Tag>
+                  <Tag>{i18nT("ui.teambuilder.humans.regions")}</Tag>
+                  <Tag>{i18nT("ui.teambuilder.humans.jurisdictions")}</Tag>
+                  <Tag>{i18nT("ui.teambuilder.humans.dataResidency")}</Tag>
                 </Space>
                 <Space split={<Divider type="vertical" />} wrap>
                   <Text type="secondary">
                     <Badge status={geoCoverage > 80 ? 'success' : 'warning'} />{' '}
-                    {geoCoverage}% coverage
+                    {geoCoverage}{i18nT("ui.teambuilder.humans.coverage")}
                   </Text>
-                  <Text type="secondary">{withGeo} / {totalPeople} people with geo data</Text>
+                  <Text type="secondary">{withGeo} / {totalPeople} {i18nT("ui.teambuilder.humans.peopleWithGeoData")}</Text>
                 </Space>
               </Space>
             </Card>
@@ -327,31 +323,30 @@ export default function HumansOverviewPage(): JSX.Element {
               title={
                 <Space>
                   <ScheduleOutlined />
-                  <span>Schedules & availability</span>
+                  <span>{i18nT("ui.teambuilder.humans.schedulesAvailability")}</span>
                 </Space>
               }
               extra={
                 <Button type="link" href="/teambuilder/humans/schedules">
-                  Open
+                  {i18nT("ui.teambuilder.humans.open")}
                 </Button>
               }
             >
               <Space direction="vertical" size="small" style={{ width: '100%' }}>
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  Capture working hours, blackout periods, and preferred meeting windows so teams
-                  share viable overlapping time.
+                  {i18nT("ui.teambuilder.humans.captureWorkingHoursBlackoutPeriodsAndPreferred")}
                 </Paragraph>
                 <Space wrap>
-                  <Tag>Working hours</Tag>
-                  <Tag>Blackout periods</Tag>
-                  <Tag>Preferred slots</Tag>
+                  <Tag>{i18nT("ui.teambuilder.humans.workingHours")}</Tag>
+                  <Tag>{i18nT("ui.teambuilder.humans.blackoutPeriods")}</Tag>
+                  <Tag>{i18nT("ui.teambuilder.humans.preferredSlots")}</Tag>
                 </Space>
                 <Space split={<Divider type="vertical" />} wrap>
                   <Text type="secondary">
                     <Badge status={scheduleCoverage > 80 ? 'success' : 'warning'} />{' '}
-                    {scheduleCoverage}% coverage
+                    {scheduleCoverage}{i18nT("ui.teambuilder.humans.coverage")}
                   </Text>
-                  <Text type="secondary">{withSchedule} / {totalPeople} people with schedule</Text>
+                  <Text type="secondary">{withSchedule} / {totalPeople} {i18nT("ui.teambuilder.humans.peopleWithSchedule")}</Text>
                 </Space>
               </Space>
             </Card>
@@ -362,31 +357,30 @@ export default function HumansOverviewPage(): JSX.Element {
               title={
                 <Space>
                   <WarningOutlined />
-                  <span>Interpersonal conflicts</span>
+                  <span>{i18nT("ui.teambuilder.humans.interpersonalConflicts")}</span>
                 </Space>
               }
               extra={
                 <Button type="link" href="/teambuilder/humans/conflicts">
-                  Open
+                  {i18nT("ui.teambuilder.humans.open")}
                 </Button>
               }
             >
               <Space direction="vertical" size="small" style={{ width: '100%' }}>
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  Flag hard “do not pair” conflicts and higher-risk combinations so the builder
-                  avoids unsafe team compositions by default.
+                  {i18nT("ui.teambuilder.humans.flagHardDoNotPairConflictsAnd")}
                 </Paragraph>
                 <Space wrap>
-                  <Tag color="red">Do-not-pair</Tag>
-                  <Tag>Risky combinations</Tag>
-                  <Tag>Leader safeguards</Tag>
+                  <Tag color="red">{i18nT("ui.teambuilder.humans.doNotPair")}</Tag>
+                  <Tag>{i18nT("ui.teambuilder.humans.riskyCombinations")}</Tag>
+                  <Tag>{i18nT("ui.teambuilder.humans.leaderSafeguards")}</Tag>
                 </Space>
                 <Alert
                   type="warning"
                   showIcon
                   style={{ marginTop: 4 }}
-                  message="Conflicts are treated as hard constraints."
-                  description="When set, these pairs will not appear in automatically generated teams, regardless of mode."
+                  message={i18nT("ui.teambuilder.humans.conflictsAreTreatedAsHardConstraints")}
+                  description={i18nT("ui.teambuilder.humans.whenSetThesePairsWillNotAppear")}
                 />
               </Space>
             </Card>
@@ -402,7 +396,7 @@ export default function HumansOverviewPage(): JSX.Element {
               title={
                 <Space>
                   <FlagOutlined />
-                  <span>Recent configuration changes</span>
+                  <span>{i18nT("ui.teambuilder.humans.recentConfigurationChanges")}</span>
                 </Space>
               }
             >
@@ -459,24 +453,23 @@ export default function HumansOverviewPage(): JSX.Element {
               title={
                 <Space>
                   <AimOutlined />
-                  <span>Next recommended actions</span>
+                  <span>{i18nT("ui.teambuilder.humans.nextRecommendedActions")}</span>
                 </Space>
               }
             >
               <Space direction="vertical" size="small" style={{ width: '100%' }}>
                 <Button type="primary" block href="/teambuilder/humans/language">
-                  Complete language profiles for missing people
+                  {i18nT("ui.teambuilder.humans.completeLanguageProfilesForMissingPeople")}
                 </Button>
                 <Button block href="/teambuilder/humans/schedules">
-                  Review schedules for night-heavy patterns
+                  {i18nT("ui.teambuilder.humans.reviewSchedulesForNightHeavyPatterns")}
                 </Button>
                 <Button block href="/teambuilder/humans/conflicts">
-                  Audit conflict list for outdated entries
+                  {i18nT("ui.teambuilder.humans.auditConflictListForOutdatedEntries")}
                 </Button>
                 <Divider />
                 <Text type="secondary">
-                  Once coverage is above ~90% on all axes, elite and learning team modes can rely
-                  almost entirely on these constraints.
+                  {i18nT("ui.teambuilder.humans.onceCoverageIsAbove90OnAll")}
                 </Text>
               </Space>
             </Card>

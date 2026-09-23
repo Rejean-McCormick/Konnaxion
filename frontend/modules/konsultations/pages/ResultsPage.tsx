@@ -1,6 +1,7 @@
 // FILE: frontend/modules/konsultations/pages/ResultsPage.tsx
 ﻿'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Alert, Spin } from 'antd';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -42,6 +43,7 @@ interface ResultsData {
 }
 
 export default function ConsultationResultsPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
   const { consultationId } = router.query;
 
@@ -106,14 +108,14 @@ export default function ConsultationResultsPage(): JSX.Element {
         });
       } catch (err) {
         console.error('Error loading consultation results:', err);
-        setError('Unable to load consultation results.');
+        setError(i18nT("ui.konsultations.pages.resultspage.unableToLoadConsultationResults"));
       } finally {
         setLoading(false);
       }
     };
 
     fetchResults();
-  }, [consultationId]);
+  }, [consultationId, i18nT]);
 
   const chartData = useMemo(
     () => [
@@ -127,7 +129,7 @@ export default function ConsultationResultsPage(): JSX.Element {
 
   return (
     <EkohPageShell
-      title="Consultation Results"
+      title={i18nT("ui.konsultations.pages.resultspage.consultationResults")}
       subtitle={consultationTitle || undefined}
     >
       {loading ? (
@@ -139,10 +141,10 @@ export default function ConsultationResultsPage(): JSX.Element {
       ) : (
         <>
           <div className="mb-4 flex flex-wrap items-baseline gap-4">
-            <span>Yes: {results.yes}</span>
-            <span>No: {results.no}</span>
-            <span>Total: {results.total}</span>
-            <span>Support: {results.supportPercent}%</span>
+            <span>{i18nT("ui.konsultations.pages.resultspage.yes")} {results.yes}</span>
+            <span>{i18nT("ui.konsultations.pages.resultspage.no")} {results.no}</span>
+            <span>{i18nT("ui.konsultations.pages.resultspage.total")} {results.total}</span>
+            <span>{i18nT("ui.konsultations.pages.resultspage.support")} {results.supportPercent}%</span>
           </div>
 
           <div className="mb-6 max-w-md">

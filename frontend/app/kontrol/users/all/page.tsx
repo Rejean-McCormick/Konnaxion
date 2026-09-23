@@ -1,6 +1,7 @@
 // FILE: frontend/app/kontrol/users/all/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   EllipsisOutlined,
   HistoryOutlined,
@@ -75,6 +76,7 @@ function isUsersApiResponse(data: unknown): data is UsersApiResponse {
 }
 
 export default function AllUsersPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [messageApi, messageContextHolder] = message.useMessage();
   const actionRef = useRef<ActionType>();
 
@@ -90,14 +92,14 @@ export default function AllUsersPage(): JSX.Element {
       setDrawerOpen(true);
     } else if (key === 'ban' || key === 'reset') {
       messageApi.warning(
-        'User mutations are unavailable because the current Kontrol user endpoint is read-only.',
+        i18nT("ui.kontrol.users.all.userMutationsAreUnavailableBecauseTheCurrent"),
       );
     }
   };
 
   const columns: ProColumns<UserItem>[] = [
     {
-      title: 'User',
+      title: i18nT("ui.kontrol.users.all.user"),
       dataIndex: 'username',
       copyable: true,
       width: 200,
@@ -117,25 +119,25 @@ export default function AllUsersPage(): JSX.Element {
           <Space direction="vertical" size={0}>
             <Text strong>{entity.username}</Text>
             <Text type="secondary" style={{ fontSize: 12 }}>
-              ID: {entity.id}
+              {i18nT("ui.kontrol.users.all.id")} {entity.id}
             </Text>
           </Space>
         </Space>
       ),
     },
     {
-      title: 'Email',
+      title: i18nT("ui.kontrol.users.all.email"),
       dataIndex: 'email',
       copyable: true,
     },
     {
-      title: 'Role',
+      title: i18nT("ui.kontrol.users.all.role"),
       dataIndex: 'role',
       valueType: 'select',
       valueEnum: {
-        admin: { text: 'Admin', status: 'Error' },
-        moderator: { text: 'Moderator', status: 'Warning' },
-        user: { text: 'User', status: 'Default' },
+        admin: { text: i18nT("ui.kontrol.users.all.admin"), status: 'Error' },
+        moderator: { text: i18nT("ui.kontrol.users.all.moderator"), status: 'Warning' },
+        user: { text: i18nT("ui.kontrol.users.all.user"), status: 'Default' },
       },
       render: (_, entity) => {
         let color: string = 'default';
@@ -145,7 +147,7 @@ export default function AllUsersPage(): JSX.Element {
       },
     },
     {
-      title: 'Reputation',
+      title: i18nT("ui.kontrol.users.all.reputation"),
       dataIndex: 'reputationScore',
       sorter: true,
       search: false,
@@ -162,34 +164,34 @@ export default function AllUsersPage(): JSX.Element {
       ),
     },
     {
-      title: 'Status',
+      title: i18nT("ui.kontrol.users.all.status"),
       dataIndex: 'status',
       valueEnum: {
-        active: { text: 'Active', status: 'Success' },
-        banned: { text: 'Banned', status: 'Error' },
-        pending: { text: 'Pending', status: 'Processing' },
+        active: { text: i18nT("ui.kontrol.users.all.active"), status: 'Success' },
+        banned: { text: i18nT("ui.kontrol.users.all.banned"), status: 'Error' },
+        pending: { text: i18nT("ui.kontrol.users.all.pending"), status: 'Processing' },
       },
       render: (_, entity) => {
         const statusMap: Record<
           UserItem['status'],
           { status: 'success' | 'error' | 'warning'; text: string }
         > = {
-          active: { status: 'success', text: 'Active' },
-          banned: { status: 'error', text: 'Banned' },
-          pending: { status: 'warning', text: 'Pending' },
+          active: { status: 'success', text: i18nT("ui.kontrol.users.all.active") },
+          banned: { status: 'error', text: i18nT("ui.kontrol.users.all.banned") },
+          pending: { status: 'warning', text: i18nT("ui.kontrol.users.all.pending") },
         };
         const s = statusMap[entity.status] ?? statusMap.active;
         return <Badge status={s.status} text={s.text} />;
       },
     },
     {
-      title: 'Joined',
+      title: i18nT("ui.kontrol.users.all.joined"),
       dataIndex: 'joinedAt',
       valueType: 'date',
       search: false,
     },
     {
-      title: 'Action',
+      title: i18nT("ui.kontrol.users.all.action"),
       valueType: 'option',
       width: 80,
       render: (_, record) => (
@@ -198,20 +200,20 @@ export default function AllUsersPage(): JSX.Element {
             items: [
               {
                 key: 'view',
-                label: 'View details',
+                label: i18nT("ui.kontrol.users.all.viewDetails"),
                 icon: <HistoryOutlined />,
                 onClick: () => handleAction('view', record),
               },
               {
                 key: 'reset',
-                label: 'Reset password',
+                label: i18nT("ui.kontrol.users.all.resetPassword"),
                 disabled: true,
                 onClick: () => handleAction('reset', record),
               },
               { type: 'divider' },
               {
                 key: 'ban',
-                label: 'Ban user',
+                label: i18nT("ui.kontrol.users.all.banUser"),
                 disabled: true,
                 danger: true,
                 icon: <StopOutlined />,
@@ -228,11 +230,10 @@ export default function AllUsersPage(): JSX.Element {
     },
   ];
 
-  const title = 'User management';
+  const title = i18nT("ui.kontrol.users.all.userManagement");
   const subtitle = (
     <>
-      Platform-wide view of all users and their access levels across
-      Konnaxion modules.
+      {i18nT("ui.kontrol.users.all.platformWideViewOfAllUsersAnd")}
     </>
   );
 
@@ -241,9 +242,9 @@ export default function AllUsersPage(): JSX.Element {
       type="primary"
       icon={<UserAddOutlined />}
       disabled
-      title="User creation is unavailable because the current admin user endpoint is read-only."
+      title={i18nT("ui.kontrol.users.all.userCreationIsUnavailableBecauseTheCurrent")}
     >
-      Add user unavailable
+      {i18nT("ui.kontrol.users.all.addUserUnavailable")}
     </Button>
   );
 
@@ -335,7 +336,7 @@ export default function AllUsersPage(): JSX.Element {
           } catch (error) {
              
             console.error(error);
-            messageApi.error('Error loading users list');
+            messageApi.error(i18nT("ui.kontrol.users.all.errorLoadingUsersList"));
             return { data: [], success: false };
           }
         }}
@@ -349,9 +350,9 @@ export default function AllUsersPage(): JSX.Element {
             type: 'tab',
             activeKey: activeTab,
             items: [
-              { key: 'all', label: 'All users' },
-              { key: 'banned', label: 'Banned only' },
-              { key: 'admin', label: 'Staff (admins)' },
+              { key: 'all', label: i18nT("ui.kontrol.users.all.allUsers") },
+              { key: 'banned', label: i18nT("ui.kontrol.users.all.bannedOnly") },
+              { key: 'admin', label: i18nT("ui.kontrol.users.all.staffAdmins") },
             ],
             onChange: (key) => {
               const k = key ?? 'all';
@@ -379,11 +380,11 @@ export default function AllUsersPage(): JSX.Element {
               icon={<UserOutlined />}
               src={currentRow?.avatar}
             />
-            <span>Profile: {currentRow?.username}</span>
+            <span>{i18nT("ui.kontrol.users.all.profile")} {currentRow?.username}</span>
           </Space>
         }
         extra={
-          <Button onClick={() => setDrawerOpen(false)}>Close</Button>
+          <Button onClick={() => setDrawerOpen(false)}>{i18nT("ui.kontrol.users.all.close")}</Button>
         }
       >
         {currentRow && (
@@ -392,7 +393,7 @@ export default function AllUsersPage(): JSX.Element {
             items={[
               {
                 key: '1',
-                label: 'Overview',
+                label: i18nT("ui.kontrol.users.all.overview"),
                 children: (
                   <Space
                     direction="vertical"
@@ -400,23 +401,23 @@ export default function AllUsersPage(): JSX.Element {
                     style={{ width: '100%' }}
                   >
                     <Descriptions
-                      title="Account info"
+                      title={i18nT("ui.kontrol.users.all.accountInfo")}
                       column={2}
                       bordered
                       size="small"
                     >
-                      <Descriptions.Item label="User ID">
+                      <Descriptions.Item label={i18nT("ui.kontrol.users.all.userId")}>
                         {currentRow.id}
                       </Descriptions.Item>
-                      <Descriptions.Item label="Email">
+                      <Descriptions.Item label={i18nT("ui.kontrol.users.all.email")}>
                         {currentRow.email}
                       </Descriptions.Item>
-                      <Descriptions.Item label="Role">
+                      <Descriptions.Item label={i18nT("ui.kontrol.users.all.role")}>
                         <Tag color="blue">
                           {currentRow.role.toUpperCase()}
                         </Tag>
                       </Descriptions.Item>
-                      <Descriptions.Item label="Status">
+                      <Descriptions.Item label={i18nT("ui.kontrol.users.all.status")}>
                         <Tag
                           color={
                             currentRow.status === 'active'
@@ -427,21 +428,21 @@ export default function AllUsersPage(): JSX.Element {
                           {currentRow.status.toUpperCase()}
                         </Tag>
                       </Descriptions.Item>
-                      <Descriptions.Item label="Joined date">
+                      <Descriptions.Item label={i18nT("ui.kontrol.users.all.joinedDate")}>
                         {currentRow.joinedAt}
                       </Descriptions.Item>
-                      <Descriptions.Item label="Last login">
+                      <Descriptions.Item label={i18nT("ui.kontrol.users.all.lastLogin")}>
                         {currentRow.lastLogin}
                       </Descriptions.Item>
                     </Descriptions>
 
                     <Descriptions
-                      title="Reputation & trust"
+                      title={i18nT("ui.kontrol.users.all.reputationTrust")}
                       column={1}
                       bordered
                       size="small"
                     >
-                      <Descriptions.Item label="Reputation score">
+                      <Descriptions.Item label={i18nT("ui.kontrol.users.all.reputationScore")}>
                         <Space>
                           <Text
                             strong
@@ -455,14 +456,14 @@ export default function AllUsersPage(): JSX.Element {
                             {currentRow.reputationScore}
                           </Text>
                           <Text type="secondary">
-                            (Top 15%)
+                            {i18nT("ui.kontrol.users.all.top15")}
                           </Text>
                         </Space>
                       </Descriptions.Item>
-                      <Descriptions.Item label="Trust level">
+                      <Descriptions.Item label={i18nT("ui.kontrol.users.all.trustLevel")}>
                         <Badge
                           status="success"
-                          text="Verified human"
+                          text={i18nT("ui.kontrol.users.all.verifiedHuman")}
                         />
                       </Descriptions.Item>
                     </Descriptions>
@@ -475,7 +476,7 @@ export default function AllUsersPage(): JSX.Element {
                       }}
                     >
                       <Text type="secondary">
-                        <SafetyCertificateOutlined /> Admin notes:
+                        <SafetyCertificateOutlined /> {i18nT("ui.kontrol.users.all.adminNotes")}
                       </Text>
                       <p
                         style={{
@@ -483,9 +484,7 @@ export default function AllUsersPage(): JSX.Element {
                           marginBottom: 0,
                         }}
                       >
-                        User has been flagged 2 times in the last
-                        month for minor spam. Monitoring
-                        recommended.
+                        {i18nT("ui.kontrol.users.all.userHasBeenFlagged2TimesIn")}
                       </p>
                     </div>
                   </Space>
@@ -493,24 +492,24 @@ export default function AllUsersPage(): JSX.Element {
               },
               {
                 key: '2',
-                label: 'Activity log',
+                label: i18nT("ui.kontrol.users.all.activityLog"),
                 children: (
                   <List
                     dataSource={[
                       {
-                        title: 'Posted a comment',
+                        title: i18nT("ui.kontrol.users.all.postedAComment"),
                         time: '2 hours ago',
                       },
                       {
-                        title: 'Voted on Proposal #42',
+                        title: i18nT("ui.kontrol.users.all.votedOnProposal42"),
                         time: '1 day ago',
                       },
                       {
-                        title: 'Logged in from new IP',
+                        title: i18nT("ui.kontrol.users.all.loggedInFromNewIp"),
                         time: '3 days ago',
                       },
                       {
-                        title: 'Password changed',
+                        title: i18nT("ui.kontrol.users.all.passwordChanged"),
                         time: '1 month ago',
                         icon: <LockOutlined />,
                       },
@@ -529,10 +528,10 @@ export default function AllUsersPage(): JSX.Element {
               },
               {
                 key: '3',
-                label: 'Permissions',
+                label: i18nT("ui.kontrol.users.all.permissions"),
                 children: (
                   <Empty
-                    description="No custom permissions overrides set for this user."
+                    description={i18nT("ui.kontrol.users.all.noCustomPermissionsOverridesSetForThis")}
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
                   />
                 ),

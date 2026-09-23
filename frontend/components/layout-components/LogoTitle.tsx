@@ -6,6 +6,7 @@ import type { MenuProps } from 'antd';
 import Link from 'next/link';
 import styled from 'styled-components';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { useWorld } from '@/context/WorldContext';
 import {
   DEFAULT_ENTRY,
@@ -87,6 +88,7 @@ export default function LogoTitle({
   variant = 'sider',
   className,
 }: LogoTitleProps) {
+  const { t } = useLanguage();
   const { href } = useWorld();
   const suite = normalizeSuite(selectedSidebar);
   const label = SUITE_LABELS[suite];
@@ -103,14 +105,14 @@ export default function LogoTitle({
     <TitleWrapper $variant={variant} className={className}>
       <Link
         href={{ pathname: homeHref, query: { sidebar: suite } }}
-        aria-label={`Go to ${label} home`}
+        aria-label={t('navigation.goToSuiteHome', { suite: label }, `Go to ${label} home`)}
         style={{
           display: 'inline-flex',
           alignItems: 'center',
           textDecoration: 'none',
         }}
       >
-        <Logo src="/LogoK.svg" alt="Konnaxion logo" />
+        <Logo src="/LogoK.svg" alt={t("ui.layoutComponents.logotitle.konnaxionLogo")} />
       </Link>
 
       <Dropdown
@@ -124,7 +126,14 @@ export default function LogoTitle({
           },
         }}
       >
-        <ModuleToggle type="button" aria-label={`Current space: ${label}`}>
+        <ModuleToggle
+          type="button"
+          aria-label={t(
+            'navigation.currentSuite',
+            { suite: label },
+            `Current space: ${label}`,
+          )}
+        >
           <span>{label}</span>
           <DownOutlined />
         </ModuleToggle>

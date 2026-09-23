@@ -1,6 +1,9 @@
 // FILE: frontend/app/ethikos/pulse/live/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
+import { pulseCounterLabel } from '@/i18n/uiModelLabels';
 import {
   ClockCircleOutlined,
   FireOutlined,
@@ -184,7 +187,7 @@ function toDateValue(value?: string | null): number {
   return parsed.isValid() ? parsed.valueOf() : 0;
 }
 
-function formatAuthor(argument: EthikosArgumentApi): string {
+function formatAuthor(i18nT: TranslateFunction, argument: EthikosArgumentApi): string {
   if (argument.user_display) {
     return argument.user_display;
   }
@@ -194,10 +197,10 @@ function formatAuthor(argument: EthikosArgumentApi): string {
   }
 
   if (typeof argument.user === 'number') {
-    return `User #${argument.user}`;
+    return i18nT("ui.ethikos.pulse.live.userNumber", { user: argument.user });
   }
 
-  return 'Someone';
+  return i18nT("ui.ethikos.pulse.live.someone");
 }
 
 function normalizeChartX(
@@ -253,7 +256,7 @@ function normalizeCounterHistory(counter: LiveCounter): PulseChartPoint[] {
 /*  Local data loaders                                                 */
 /* ------------------------------------------------------------------ */
 
-async function fetchRecentActivity(): Promise<FeedItem[]> {
+async function fetchRecentActivity(i18nT: TranslateFunction): Promise<FeedItem[]> {
   const [topicsRaw, stancesRaw, argsRaw] = await Promise.all([
     get<ApiMaybeList<EthikosTopicApi>>('ethikos/topics/'),
     get<ApiMaybeList<EthikosStanceApi>>('ethikos/stances/'),
@@ -276,8 +279,8 @@ async function fetchRecentActivity(): Promise<FeedItem[]> {
     title: topic.title,
     summary:
       topic.status === 'open'
-        ? 'New debate created'
-        : `Debate status changed to ${topic.status}`,
+        ? i18nT("ui.ethikos.pulse.live.newDebateCreated")
+        : i18nT("ui.ethikos.pulse.live.debateStatusChangedTo", { status: topic.status }),
   }));
 
   const stanceItems: FeedItem[] = stances.map((stance) => ({
@@ -287,10 +290,10 @@ async function fetchRecentActivity(): Promise<FeedItem[]> {
     topicId: stance.topic,
     title:
       topicById.get(toMapKey(stance.topic))?.title ??
-      `Topic #${String(stance.topic)}`,
-    summary: `New stance submitted: ${stance.value >= 0 ? '+' : ''}${
-      stance.value
-    }`,
+      i18nT("ui.ethikos.pulse.live.topicNumber", { topic: String(stance.topic) }),
+    summary: i18nT("ui.ethikos.pulse.live.newStanceSubmitted", {
+      value: `${stance.value >= 0 ? '+' : ''}${stance.value}`,
+    }),
     extra: { value: stance.value },
   }));
 
@@ -301,11 +304,8 @@ async function fetchRecentActivity(): Promise<FeedItem[]> {
     topicId: argument.topic,
     title:
       topicById.get(toMapKey(argument.topic))?.title ??
-      `Topic #${String(argument.topic)}`,
-    summary: `${formatAuthor(argument)} commented: ${truncate(
-      argument.content,
-      120,
-    )}`,
+      i18nT("ui.ethikos.pulse.live.topicNumber", { topic: String(argument.topic) }),
+    summary: i18nT("ui.ethikos.pulse.live.authorCommented", { author: formatAuthor(i18nT, argument), content: truncate(argument.content, 120) }),
   }));
 
   return [...topicItems, ...stanceItems, ...argumentItems]
@@ -331,6 +331,7 @@ async function fetchOpenTopics(): Promise<EthikosTopicApi[]> {
 /* ------------------------------------------------------------------ */
 
 export default function PulseLive(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [autoRefresh, setAutoRefresh] = React.useState(true);
   const [lastUpdated, setLastUpdated] = React.useState<string | null>(null);
 
@@ -339,8 +340,9 @@ export default function PulseLive(): JSX.Element {
     onSuccess: () => setLastUpdated(dayjs().format('HH:mm:ss')),
   });
 
-  const feedReq = useRequest<FeedItem[], []>(fetchRecentActivity, {
+  const feedReq = useRequest<FeedItem[], []>(() => fetchRecentActivity(i18nT), {
     pollingInterval: autoRefresh ? 20_000 : undefined,
+    refreshDeps: [i18nT],
   });
 
   const openReq = useRequest<EthikosTopicApi[], []>(fetchOpenTopics, {
@@ -358,7 +360,7 @@ export default function PulseLive(): JSX.Element {
   const openColumns = React.useMemo<ProColumns<EthikosTopicApi>[]>(() => {
     return [
       {
-        title: 'Debate',
+        title: i18nT("ui.ethikos.pulse.live.debate"),
         dataIndex: 'title',
         ellipsis: true,
         render: (_dom, row) => (
@@ -369,18 +371,18 @@ export default function PulseLive(): JSX.Element {
         ),
       },
       {
-        title: 'Status',
+        title: i18nT("ui.ethikos.pulse.live.status"),
         dataIndex: 'status',
         width: 120,
         render: (_dom, row) =>
           row.status === 'open' ? (
-            <Tag color="green">Open</Tag>
+            <Tag color="green">{i18nT("ui.ethikos.pulse.live.open")}</Tag>
           ) : (
             <Tag>{row.status}</Tag>
           ),
       },
       {
-        title: 'Last activity',
+        title: i18nT("ui.ethikos.pulse.live.lastActivity"),
         dataIndex: 'last_activity',
         width: 180,
         render: (_dom, row) => {
@@ -394,7 +396,7 @@ export default function PulseLive(): JSX.Element {
         },
       },
       {
-        title: 'Created',
+        title: i18nT("ui.ethikos.pulse.live.created"),
         dataIndex: 'created_at',
         width: 160,
         render: (_dom, row) => (
@@ -404,14 +406,14 @@ export default function PulseLive(): JSX.Element {
         ),
       },
     ];
-  }, []);
+  }, [i18nT]);
 
   const secondaryActions = (
     <Space wrap>
       {lastUpdated && (
         <Badge
           count={
-            <Tooltip title={`Last refreshed at ${lastUpdated}`}>
+            <Tooltip title={i18nT("ui.ethikos.pulse.live.lastRefreshedAt", { lastUpdated: lastUpdated })}>
               <ClockCircleOutlined style={{ color: '#52c41a' }} />
             </Tooltip>
           }
@@ -420,7 +422,7 @@ export default function PulseLive(): JSX.Element {
 
       <Space size="small" align="center">
         <ThunderboltOutlined />
-        <Text>Auto-refresh</Text>
+        <Text>{i18nT("ui.ethikos.pulse.live.autoRefresh")}</Text>
         <Switch
           checked={autoRefresh}
           onChange={(checked) => setAutoRefresh(checked)}
@@ -434,22 +436,22 @@ export default function PulseLive(): JSX.Element {
         size="small"
         loading={liveReq.loading || feedReq.loading || openReq.loading}
       >
-        Refresh
+        {i18nT("ui.ethikos.pulse.live.refresh")}
       </Button>
     </Space>
   );
 
   const primaryAction = (
     <Button href="/ethikos/pulse/trends" type="primary">
-      View opinion trends
+      {i18nT("ui.ethikos.pulse.live.viewOpinionTrends")}
     </Button>
   );
 
   return (
     <EthikosPageShell
-      title="Pulse · Live participation"
-      sectionLabel="Pulse"
-      subtitle="Real-time counters, latest activity, and currently open debates."
+      title={i18nT("ui.ethikos.pulse.live.pulseLiveParticipation")}
+      sectionLabel={i18nT("ui.ethikos.pulse.live.pulse")}
+      subtitle={i18nT("ui.ethikos.pulse.live.realTimeCountersLatestActivityAndCurrently")}
       primaryAction={primaryAction}
       secondaryActions={secondaryActions}
     >
@@ -458,8 +460,8 @@ export default function PulseLive(): JSX.Element {
           type="info"
           showIcon
           style={{ marginBottom: 16 }}
-          message="Live view"
-          description="This page auto-refreshes every 20 seconds while enabled. Use manual Refresh if needed."
+          message={i18nT("ui.ethikos.pulse.live.liveView")}
+          description={i18nT("ui.ethikos.pulse.live.thisPageAutoRefreshesEvery20Seconds")}
         />
 
         {liveReq.error && (
@@ -467,15 +469,15 @@ export default function PulseLive(): JSX.Element {
             type="error"
             showIcon
             style={{ marginBottom: 16 }}
-            message="Unable to load live Pulse counters."
-            description="The live Pulse service may be temporarily unavailable. Try refreshing the page."
+            message={i18nT("ui.ethikos.pulse.live.unableToLoadLivePulseCounters")}
+            description={i18nT("ui.ethikos.pulse.live.theLivePulseServiceMayBeTemporarily")}
           />
         )}
 
         <ProCard gutter={16} wrap>
           {counters.length === 0 && !liveReq.loading ? (
             <ProCard>
-              <Empty description="No live counters available yet" />
+              <Empty description={i18nT("ui.ethikos.pulse.live.noLiveCountersAvailableYet")} />
             </ProCard>
           ) : (
             counters.map((counter) => {
@@ -484,12 +486,12 @@ export default function PulseLive(): JSX.Element {
 
               return (
                 <StatisticCard
-                  key={counter.label}
+                  key={counter.key ?? counter.label}
                   colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
                   statistic={{
                     title: (
                       <Space>
-                        {counter.label}
+                        {pulseCounterLabel(i18nT, counter.key, counter.label)}
                         <Badge
                           status={
                             trend > 0
@@ -519,12 +521,12 @@ export default function PulseLive(): JSX.Element {
             title={
               <Space>
                 <MessageOutlined />
-                <span>Live activity</span>
+                <span>{i18nT("ui.ethikos.pulse.live.liveActivity")}</span>
               </Space>
             }
             extra={
               <Text type="secondary">
-                Latest 20 items across debates, stances, and comments
+                {i18nT("ui.ethikos.pulse.live.latest20ItemsAcrossDebatesStancesAnd")}
               </Text>
             }
             loading={feedReq.loading && !feedReq.data}
@@ -534,12 +536,12 @@ export default function PulseLive(): JSX.Element {
                 type="error"
                 showIcon
                 style={{ marginBottom: 16 }}
-                message="Unable to load recent activity."
+                message={i18nT("ui.ethikos.pulse.live.unableToLoadRecentActivity")}
               />
             )}
 
             {feedReq.data && feedReq.data.length === 0 ? (
-              <Empty description="No recent activity yet" />
+              <Empty description={i18nT("ui.ethikos.pulse.live.noRecentActivityYet")} />
             ) : (
               <List
                 itemLayout="horizontal"
@@ -597,7 +599,7 @@ export default function PulseLive(): JSX.Element {
             title={
               <Space>
                 <FireOutlined />
-                <span>Open debates</span>
+                <span>{i18nT("ui.ethikos.pulse.live.openDebates")}</span>
               </Space>
             }
             loading={openReq.loading && !openReq.data}
@@ -607,12 +609,12 @@ export default function PulseLive(): JSX.Element {
                 type="error"
                 showIcon
                 style={{ marginBottom: 16 }}
-                message="Unable to load open debates."
+                message={i18nT("ui.ethikos.pulse.live.unableToLoadOpenDebates")}
               />
             )}
 
             {openReq.data && openReq.data.length === 0 ? (
-              <Empty description="No open debates at the moment" />
+              <Empty description={i18nT("ui.ethikos.pulse.live.noOpenDebatesAtTheMoment")} />
             ) : (
               <ProTable<EthikosTopicApi>
                 rowKey={(row) => String(row.id)}

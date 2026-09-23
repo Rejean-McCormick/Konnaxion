@@ -45,25 +45,30 @@ export const KREATIVE_ROUTES = {
 const overview: Route = {
   path: KREATIVE_ROUTES.dashboard,
   name: 'Overview',
+  labelKey: 'navigation.overview',
   icon: <DashboardOutlined />,
 };
 
 const creativeHubGroup: Route = {
   name: 'Creative Hub',
+  labelKey: 'navigation.creativeHub',
   views: [
     {
       path: KREATIVE_ROUTES.creativeHub.exploreIdeas,
       name: 'Explore ideas',
+      labelKey: 'navigation.exploreIdeas',
       icon: <BulbOutlined />,
     },
     {
       path: KREATIVE_ROUTES.creativeHub.inspirationGallery,
       name: 'Inspiration gallery',
+      labelKey: 'navigation.inspirationGallery',
       icon: <PictureOutlined />,
     },
     {
       path: KREATIVE_ROUTES.creativeHub.submitCreativeWork,
       name: 'Submit creative work',
+      labelKey: 'navigation.submitCreativeWork',
       icon: <CloudUploadOutlined />,
     },
   ],
@@ -71,20 +76,24 @@ const creativeHubGroup: Route = {
 
 const ideaIncubatorGroup: Route = {
   name: 'Idea Incubator',
+  labelKey: 'navigation.ideaIncubator',
   views: [
     {
       path: KREATIVE_ROUTES.ideaIncubator.collaborateOnIdeas,
       name: 'Collaborate on ideas',
+      labelKey: 'navigation.collaborateOnIdeas',
       icon: <TeamOutlined />,
     },
     {
       path: KREATIVE_ROUTES.ideaIncubator.createNewIdea,
       name: 'Create new idea',
+      labelKey: 'navigation.createNewIdea',
       icon: <HighlightOutlined />,
     },
     {
       path: KREATIVE_ROUTES.ideaIncubator.myIdeas,
       name: 'My ideas',
+      labelKey: 'navigation.myIdeas',
       icon: <ProfileOutlined />,
     },
   ],
@@ -92,20 +101,24 @@ const ideaIncubatorGroup: Route = {
 
 const collaborativeSpacesGroup: Route = {
   name: 'Collaborative Spaces',
+  labelKey: 'navigation.collaborativeSpaces',
   views: [
     {
       path: KREATIVE_ROUTES.collaborativeSpaces.findSpaces,
       name: 'Find spaces',
+      labelKey: 'navigation.findSpaces',
       icon: <SearchOutlined />,
     },
     {
       path: KREATIVE_ROUTES.collaborativeSpaces.startNewSpace,
       name: 'Start new space',
+      labelKey: 'navigation.startNewSpace',
       icon: <HomeOutlined />,
     },
     {
       path: KREATIVE_ROUTES.collaborativeSpaces.mySpaces,
       name: 'My spaces',
+      labelKey: 'navigation.mySpaces',
       icon: <MessageOutlined />,
     },
   ],
@@ -113,20 +126,24 @@ const collaborativeSpacesGroup: Route = {
 
 const communityShowcasesGroup: Route = {
   name: 'Community Showcases',
+  labelKey: 'navigation.communityShowcases',
   views: [
     {
       path: KREATIVE_ROUTES.communityShowcases.featuredProjects,
       name: 'Featured projects',
+      labelKey: 'navigation.featuredProjects',
       icon: <StarOutlined />,
     },
     {
       path: KREATIVE_ROUTES.communityShowcases.topCreators,
       name: 'Top creators',
+      labelKey: 'navigation.topCreators',
       icon: <CrownOutlined />,
     },
     {
       path: KREATIVE_ROUTES.communityShowcases.submitToShowcase,
       name: 'Submit to showcase',
+      labelKey: 'navigation.submitToShowcase',
       icon: <CloudUploadOutlined />,
     },
   ],

@@ -1,6 +1,8 @@
 // FILE: frontend/app/teambuilder/humans/conflicts/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
@@ -70,11 +72,11 @@ type UserFlag = {
   active: boolean;
 };
 
-const SEVERITY_OPTIONS: { label: string; value: Severity }[] = [
-  { label: 'Soft', value: 'SOFT' },
-  { label: 'Medium', value: 'MEDIUM' },
-  { label: 'Hard', value: 'HARD' },
-];
+const SEVERITY_OPTIONS = (i18nT: TranslateFunction): { label: string; value: Severity }[] => ([
+  { label: i18nT("ui.teambuilder.humans.conflicts.soft"), value: 'SOFT' },
+  { label: i18nT("ui.teambuilder.humans.conflicts.medium"), value: 'MEDIUM' },
+  { label: i18nT("ui.teambuilder.humans.conflicts.hard"), value: 'HARD' },
+]);
 
 const SEVERITY_COLORS: Record<Severity, string> = {
   SOFT: 'gold',
@@ -98,6 +100,7 @@ const MOCK_USERS = [
 ];
 
 export default function HumansConflictsPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [activeTab, setActiveTab] = useState<'conflicts' | 'preferred' | 'flags'>(
     'conflicts',
   );
@@ -284,7 +287,7 @@ export default function HumansConflictsPage(): JSX.Element {
 
   const conflictColumns = [
     {
-      title: 'Pair',
+      title: i18nT("ui.teambuilder.humans.conflicts.pair"),
       dataIndex: 'pair',
       key: 'pair',
       render: (_: unknown, record: ConflictRule) => (
@@ -296,7 +299,7 @@ export default function HumansConflictsPage(): JSX.Element {
       ),
     },
     {
-      title: 'Severity',
+      title: i18nT("ui.teambuilder.humans.conflicts.severity"),
       dataIndex: 'severity',
       key: 'severity',
       render: (severity: Severity) => (
@@ -308,8 +311,8 @@ export default function HumansConflictsPage(): JSX.Element {
     {
       title: (
         <Space size={4}>
-          Weight
-          <Tooltip title="Relative strength of this constraint in the solver.">
+          {i18nT("ui.teambuilder.humans.conflicts.weight")}
+          <Tooltip title={i18nT("ui.teambuilder.humans.conflicts.relativeStrengthOfThisConstraintInThe")}>
             <InfoCircleOutlined />
           </Tooltip>
         </Space>
@@ -320,12 +323,12 @@ export default function HumansConflictsPage(): JSX.Element {
       render: (weight: number) => (
         <Badge
           status={weight >= 80 ? 'error' : weight >= 60 ? 'warning' : 'default'}
-          text={`${weight}%`}
+          text={i18nT("ui.teambuilder.humans.conflicts.text", { weight: weight })}
         />
       ),
     },
     {
-      title: 'Reason / notes',
+      title: i18nT("ui.teambuilder.humans.conflicts.reasonNotes"),
       dataIndex: 'reason',
       key: 'reason',
       ellipsis: true,
@@ -333,7 +336,7 @@ export default function HumansConflictsPage(): JSX.Element {
         reason ? <Text type="secondary">{reason}</Text> : <Text type="secondary">–</Text>,
     },
     {
-      title: 'Active',
+      title: i18nT("ui.teambuilder.humans.conflicts.active"),
       dataIndex: 'active',
       key: 'active',
       width: 120,
@@ -346,7 +349,7 @@ export default function HumansConflictsPage(): JSX.Element {
           />
           <Badge
             status={active ? 'processing' : 'default'}
-            text={active ? 'In use' : 'Disabled'}
+            text={active ? i18nT("ui.teambuilder.humans.conflicts.inUse") : i18nT("ui.teambuilder.humans.conflicts.disabled")}
           />
         </Space>
       ),
@@ -355,7 +358,7 @@ export default function HumansConflictsPage(): JSX.Element {
 
   const preferredColumns = [
     {
-      title: 'Pair',
+      title: i18nT("ui.teambuilder.humans.conflicts.pair"),
       dataIndex: 'pair',
       key: 'pair',
       render: (_: unknown, record: PreferredPairRule) => (
@@ -369,8 +372,8 @@ export default function HumansConflictsPage(): JSX.Element {
     {
       title: (
         <Space size={4}>
-          Weight
-          <Tooltip title="Higher weight = stronger preference to put them together.">
+          {i18nT("ui.teambuilder.humans.conflicts.weight")}
+          <Tooltip title={i18nT("ui.teambuilder.humans.conflicts.higherWeightStrongerPreferenceToPutThem")}>
             <InfoCircleOutlined />
           </Tooltip>
         </Space>
@@ -381,12 +384,12 @@ export default function HumansConflictsPage(): JSX.Element {
       render: (weight: number) => (
         <Badge
           status={weight >= 80 ? 'success' : weight >= 60 ? 'processing' : 'default'}
-          text={`${weight}%`}
+          text={i18nT("ui.teambuilder.humans.conflicts.text", { weight: weight })}
         />
       ),
     },
     {
-      title: 'Reason',
+      title: i18nT("ui.teambuilder.humans.conflicts.reason"),
       dataIndex: 'reason',
       key: 'reason',
       ellipsis: true,
@@ -394,7 +397,7 @@ export default function HumansConflictsPage(): JSX.Element {
         reason ? <Text type="secondary">{reason}</Text> : <Text type="secondary">–</Text>,
     },
     {
-      title: 'Active',
+      title: i18nT("ui.teambuilder.humans.conflicts.active"),
       dataIndex: 'active',
       key: 'active',
       width: 120,
@@ -407,7 +410,7 @@ export default function HumansConflictsPage(): JSX.Element {
           />
           <Badge
             status={active ? 'processing' : 'default'}
-            text={active ? 'In use' : 'Disabled'}
+            text={active ? i18nT("ui.teambuilder.humans.conflicts.inUse") : i18nT("ui.teambuilder.humans.conflicts.disabled")}
           />
         </Space>
       ),
@@ -416,13 +419,13 @@ export default function HumansConflictsPage(): JSX.Element {
 
   const flagColumns = [
     {
-      title: 'User',
+      title: i18nT("ui.teambuilder.humans.conflicts.user"),
       dataIndex: 'user',
       key: 'user',
       render: (user: string) => <Tag>{user}</Tag>,
     },
     {
-      title: 'Flag type',
+      title: i18nT("ui.teambuilder.humans.conflicts.flagType"),
       dataIndex: 'type',
       key: 'type',
       render: (type: UserFlag['type']) => {
@@ -430,19 +433,19 @@ export default function HumansConflictsPage(): JSX.Element {
           case 'RISK':
             return (
               <Tag color="red" icon={<ExclamationCircleOutlined />}>
-                Risk profile
+                {i18nT("ui.teambuilder.humans.conflicts.riskProfile")}
               </Tag>
             );
           case 'ANCHOR':
             return (
               <Tag color="green" icon={<CheckCircleOutlined />}>
-                Anchor
+                {i18nT("ui.teambuilder.humans.conflicts.anchor")}
               </Tag>
             );
           case 'MENTOR':
             return (
               <Tag color="blue" icon={<UserSwitchOutlined />}>
-                Mentor
+                {i18nT("ui.teambuilder.humans.conflicts.mentor")}
               </Tag>
             );
           default:
@@ -451,7 +454,7 @@ export default function HumansConflictsPage(): JSX.Element {
       },
     },
     {
-      title: 'Severity',
+      title: i18nT("ui.teambuilder.humans.conflicts.severity"),
       dataIndex: 'severity',
       key: 'severity',
       render: (severity: Severity) => (
@@ -459,7 +462,7 @@ export default function HumansConflictsPage(): JSX.Element {
       ),
     },
     {
-      title: 'Notes',
+      title: i18nT("ui.teambuilder.humans.conflicts.notes"),
       dataIndex: 'notes',
       key: 'notes',
       ellipsis: true,
@@ -467,7 +470,7 @@ export default function HumansConflictsPage(): JSX.Element {
         notes ? <Text type="secondary">{notes}</Text> : <Text type="secondary">–</Text>,
     },
     {
-      title: 'Active',
+      title: i18nT("ui.teambuilder.humans.conflicts.active"),
       dataIndex: 'active',
       key: 'active',
       width: 120,
@@ -480,7 +483,7 @@ export default function HumansConflictsPage(): JSX.Element {
           />
           <Badge
             status={active ? 'processing' : 'default'}
-            text={active ? 'In use' : 'Disabled'}
+            text={active ? i18nT("ui.teambuilder.humans.conflicts.inUse") : i18nT("ui.teambuilder.humans.conflicts.disabled")}
           />
         </Space>
       ),
@@ -494,16 +497,16 @@ export default function HumansConflictsPage(): JSX.Element {
           <Card
             title={
               <Space>
-                <Text strong>Conflict pairs</Text>
-                <Tooltip title="Pairs that should be avoided when building teams.">
+                <Text strong>{i18nT("ui.teambuilder.humans.conflicts.conflictPairs")}</Text>
+                <Tooltip title={i18nT("ui.teambuilder.humans.conflicts.pairsThatShouldBeAvoidedWhenBuilding")}>
                   <InfoCircleOutlined />
                 </Tooltip>
               </Space>
             }
             extra={
               <Space>
-                <Button icon={<ImportOutlined />}>Import</Button>
-                <Button icon={<ExportOutlined />}>Export</Button>
+                <Button icon={<ImportOutlined />}>{i18nT("ui.teambuilder.humans.conflicts.import")}</Button>
+                <Button icon={<ExportOutlined />}>{i18nT("ui.teambuilder.humans.conflicts.export")}</Button>
               </Space>
             }
           >
@@ -521,7 +524,7 @@ export default function HumansConflictsPage(): JSX.Element {
           <Card
             title={
               <Space>
-                <Text strong>Add / edit conflict</Text>
+                <Text strong>{i18nT("ui.teambuilder.humans.conflicts.addEditConflict")}</Text>
               </Space>
             }
           >
@@ -537,25 +540,25 @@ export default function HumansConflictsPage(): JSX.Element {
                 }}
               >
                 <Form.Item
-                  label="User A"
+                  label={i18nT("ui.teambuilder.humans.conflicts.userA")}
                   name="userA"
-                  rules={[{ required: true, message: 'Please select the first person.' }]}
+                  rules={[{ required: true, message: i18nT("ui.teambuilder.humans.conflicts.pleaseSelectTheFirstPerson") }]}
                 >
                   <Select
                     showSearch
-                    placeholder="Pick first person"
+                    placeholder={i18nT("ui.teambuilder.humans.conflicts.pickFirstPerson")}
                     options={MOCK_USERS.map(u => ({ label: u, value: u }))}
                   />
                 </Form.Item>
 
                 <Form.Item
-                  label="User B"
+                  label={i18nT("ui.teambuilder.humans.conflicts.userB")}
                   name="userB"
-                  rules={[{ required: true, message: 'Please select the second person.' }]}
+                  rules={[{ required: true, message: i18nT("ui.teambuilder.humans.conflicts.pleaseSelectTheSecondPerson") }]}
                 >
                   <Select
                     showSearch
-                    placeholder="Pick second person"
+                    placeholder={i18nT("ui.teambuilder.humans.conflicts.pickSecondPerson")}
                     options={MOCK_USERS.map(u => ({ label: u, value: u }))}
                   />
                 </Form.Item>
@@ -565,8 +568,8 @@ export default function HumansConflictsPage(): JSX.Element {
                     <Form.Item
                       label={
                         <Space size={4}>
-                          Severity
-                          <Tooltip title="Hard = never pair; Soft/Medium = avoid when possible.">
+                          {i18nT("ui.teambuilder.humans.conflicts.severity")}
+                          <Tooltip title={i18nT("ui.teambuilder.humans.conflicts.hardNeverPairSoftMediumAvoidWhen")}>
                             <InfoCircleOutlined />
                           </Tooltip>
                         </Space>
@@ -575,7 +578,7 @@ export default function HumansConflictsPage(): JSX.Element {
                       rules={[{ required: true }]}
                     >
                       <Select
-                        options={SEVERITY_OPTIONS.map(opt => ({
+                        options={SEVERITY_OPTIONS(i18nT).map(opt => ({
                           label: opt.label,
                           value: opt.value,
                         }))}
@@ -587,8 +590,8 @@ export default function HumansConflictsPage(): JSX.Element {
                     <Form.Item
                       label={
                         <Space size={4}>
-                          Weight
-                          <Tooltip title="How strongly the solver should respect this rule.">
+                          {i18nT("ui.teambuilder.humans.conflicts.weight")}
+                          <Tooltip title={i18nT("ui.teambuilder.humans.conflicts.howStronglyTheSolverShouldRespectThis")}>
                             <InfoCircleOutlined />
                           </Tooltip>
                         </Space>
@@ -600,15 +603,15 @@ export default function HumansConflictsPage(): JSX.Element {
                   </Col>
                 </Row>
 
-                <Form.Item label="Reason (optional)" name="reason">
+                <Form.Item label={i18nT("ui.teambuilder.humans.conflicts.reasonOptional")} name="reason">
                   <TextArea
                     rows={3}
-                    placeholder="Short explanation for future reference…"
+                    placeholder={i18nT("ui.teambuilder.humans.conflicts.shortExplanationForFutureReference")}
                   />
                 </Form.Item>
 
                 <Form.Item
-                  label="Rule active"
+                  label={i18nT("ui.teambuilder.humans.conflicts.ruleActive")}
                   name="active"
                   valuePropName="checked"
                 >
@@ -617,9 +620,9 @@ export default function HumansConflictsPage(): JSX.Element {
 
                 <Form.Item>
                   <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                    <Button onClick={() => conflictForm.resetFields()}>Reset</Button>
+                    <Button onClick={() => conflictForm.resetFields()}>{i18nT("ui.teambuilder.humans.conflicts.reset")}</Button>
                     <Button type="primary" htmlType="submit" icon={<PlusOutlined />}>
-                      Add conflict pair
+                      {i18nT("ui.teambuilder.humans.conflicts.addConflictPair")}
                     </Button>
                   </Space>
                 </Form.Item>
@@ -632,23 +635,20 @@ export default function HumansConflictsPage(): JSX.Element {
                 content={
                   <div style={{ maxWidth: 320 }}>
                     <Paragraph strong style={{ marginBottom: 8 }}>
-                      How conflicts are used
+                      {i18nT("ui.teambuilder.humans.conflicts.howConflictsAreUsed")}
                     </Paragraph>
                     <Paragraph type="secondary" style={{ marginBottom: 8 }}>
-                      Hard conflicts behave like “do not pair” constraints. Soft/medium
-                      conflicts are treated as penalties: the solver will still pair
-                      them only when necessary.
+                      {i18nT("ui.teambuilder.humans.conflicts.hardConflictsBehaveLikeDoNotPair")}
                     </Paragraph>
                     <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                      You can tune the global strategy in the session configuration
-                      (e.g. elite vs learning vs rehab teams).
+                      {i18nT("ui.teambuilder.humans.conflicts.youCanTuneTheGlobalStrategyIn")}
                     </Paragraph>
                   </div>
                 }
               >
                 <Space>
                   <InfoCircleOutlined />
-                  <Text type="secondary">Learn how conflict rules affect teams</Text>
+                  <Text type="secondary">{i18nT("ui.teambuilder.humans.conflicts.learnHowConflictRulesAffectTeams")}</Text>
                 </Space>
               </Popover>
             </Space>
@@ -661,18 +661,16 @@ export default function HumansConflictsPage(): JSX.Element {
           type="warning"
           showIcon
           icon={<ExclamationCircleOutlined />}
-          message="Your conflicts may be over-constraining the system"
+          message={i18nT("ui.teambuilder.humans.conflicts.yourConflictsMayBeOverConstrainingThe")}
           description={
             <Space direction="vertical">
               <Text>
-                More than 60% of your active rules are marked as{' '}
-                <Text strong>Hard</Text>. The solver might struggle to find feasible
-                teams, especially with small pools.
+                {i18nT("ui.teambuilder.humans.conflicts.moreThan60OfYourActiveRules")}{' '}
+                <Text strong>{i18nT("ui.teambuilder.humans.conflicts.hard")}</Text>{i18nT("ui.teambuilder.humans.conflicts.theSolverMightStruggleToFindFeasible")}
               </Text>
               <Text type="secondary">
-                Consider downgrading some rules to <strong>Soft</strong> or{' '}
-                <strong>Medium</strong>, or switching to a learning-oriented context
-                where more risk is acceptable.
+                {i18nT("ui.teambuilder.humans.conflicts.considerDowngradingSomeRulesTo")} <strong>{i18nT("ui.teambuilder.humans.conflicts.soft")}</strong> {i18nT("ui.teambuilder.humans.conflicts.or")}{' '}
+                <strong>{i18nT("ui.teambuilder.humans.conflicts.medium")}</strong>{i18nT("ui.teambuilder.humans.conflicts.orSwitchingToALearningOrientedContext")}
               </Text>
             </Space>
           }
@@ -688,16 +686,16 @@ export default function HumansConflictsPage(): JSX.Element {
           <Card
             title={
               <Space>
-                <Text strong>Preferred pairs</Text>
-                <Tooltip title="Pairs that are rewarded when they appear in the same team.">
+                <Text strong>{i18nT("ui.teambuilder.humans.conflicts.preferredPairs")}</Text>
+                <Tooltip title={i18nT("ui.teambuilder.humans.conflicts.pairsThatAreRewardedWhenTheyAppear")}>
                   <InfoCircleOutlined />
                 </Tooltip>
               </Space>
             }
             extra={
               <Space>
-                <Button icon={<ImportOutlined />}>Import</Button>
-                <Button icon={<ExportOutlined />}>Export</Button>
+                <Button icon={<ImportOutlined />}>{i18nT("ui.teambuilder.humans.conflicts.import")}</Button>
+                <Button icon={<ExportOutlined />}>{i18nT("ui.teambuilder.humans.conflicts.export")}</Button>
               </Space>
             }
           >
@@ -712,7 +710,7 @@ export default function HumansConflictsPage(): JSX.Element {
         </Col>
 
         <Col xs={24} md={10}>
-          <Card title="Add preferred pair">
+          <Card title={i18nT("ui.teambuilder.humans.conflicts.addPreferredPair")}>
             <Form
               layout="vertical"
               form={preferredForm}
@@ -723,25 +721,25 @@ export default function HumansConflictsPage(): JSX.Element {
               }}
             >
               <Form.Item
-                label="User A"
+                label={i18nT("ui.teambuilder.humans.conflicts.userA")}
                 name="userA"
-                rules={[{ required: true, message: 'Please select the first person.' }]}
+                rules={[{ required: true, message: i18nT("ui.teambuilder.humans.conflicts.pleaseSelectTheFirstPerson") }]}
               >
                 <Select
                   showSearch
-                  placeholder="Pick first person"
+                  placeholder={i18nT("ui.teambuilder.humans.conflicts.pickFirstPerson")}
                   options={MOCK_USERS.map(u => ({ label: u, value: u }))}
                 />
               </Form.Item>
 
               <Form.Item
-                label="User B"
+                label={i18nT("ui.teambuilder.humans.conflicts.userB")}
                 name="userB"
-                rules={[{ required: true, message: 'Please select the second person.' }]}
+                rules={[{ required: true, message: i18nT("ui.teambuilder.humans.conflicts.pleaseSelectTheSecondPerson") }]}
               >
                 <Select
                   showSearch
-                  placeholder="Pick second person"
+                  placeholder={i18nT("ui.teambuilder.humans.conflicts.pickSecondPerson")}
                   options={MOCK_USERS.map(u => ({ label: u, value: u }))}
                 />
               </Form.Item>
@@ -749,8 +747,8 @@ export default function HumansConflictsPage(): JSX.Element {
               <Form.Item
                 label={
                   <Space size={4}>
-                    Weight
-                    <Tooltip title="Higher weight = stronger incentive to keep them together.">
+                    {i18nT("ui.teambuilder.humans.conflicts.weight")}
+                    <Tooltip title={i18nT("ui.teambuilder.humans.conflicts.higherWeightStrongerIncentiveToKeepThem")}>
                       <InfoCircleOutlined />
                     </Tooltip>
                   </Space>
@@ -760,15 +758,15 @@ export default function HumansConflictsPage(): JSX.Element {
                 <Slider min={10} max={100} step={5} />
               </Form.Item>
 
-              <Form.Item label="Reason (optional)" name="reason">
+              <Form.Item label={i18nT("ui.teambuilder.humans.conflicts.reasonOptional")} name="reason">
                 <TextArea
                   rows={3}
-                  placeholder="Why should this pair be encouraged?"
+                  placeholder={i18nT("ui.teambuilder.humans.conflicts.whyShouldThisPairBeEncouraged")}
                 />
               </Form.Item>
 
               <Form.Item
-                label="Rule active"
+                label={i18nT("ui.teambuilder.humans.conflicts.ruleActive")}
                 name="active"
                 valuePropName="checked"
               >
@@ -777,9 +775,9 @@ export default function HumansConflictsPage(): JSX.Element {
 
               <Form.Item>
                 <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                  <Button onClick={() => preferredForm.resetFields()}>Reset</Button>
+                  <Button onClick={() => preferredForm.resetFields()}>{i18nT("ui.teambuilder.humans.conflicts.reset")}</Button>
                   <Button type="primary" htmlType="submit" icon={<PlusOutlined />}>
-                    Add preferred pair
+                    {i18nT("ui.teambuilder.humans.conflicts.addPreferredPair")}
                   </Button>
                 </Space>
               </Form.Item>
@@ -788,9 +786,8 @@ export default function HumansConflictsPage(): JSX.Element {
             <Divider />
 
             <Text type="secondary">
-              Preferred pairs are particularly useful in{' '}
-              <strong>learning</strong> or <strong>balanced</strong> contexts, where
-              you want to protect mentoring relationships or proven collaborations.
+              {i18nT("ui.teambuilder.humans.conflicts.preferredPairsAreParticularlyUsefulIn")}{' '}
+              <strong>{i18nT("ui.teambuilder.humans.conflicts.learning")}</strong> {i18nT("ui.teambuilder.humans.conflicts.or")} <strong>{i18nT("ui.teambuilder.humans.conflicts.balanced")}</strong> {i18nT("ui.teambuilder.humans.conflicts.contextsWhereYouWantToProtectMentoring")}
             </Text>
           </Card>
         </Col>
@@ -805,8 +802,8 @@ export default function HumansConflictsPage(): JSX.Element {
           <Card
             title={
               <Space>
-                <Text strong>User flags</Text>
-                <Tooltip title="Profiles that require special attention when composing teams.">
+                <Text strong>{i18nT("ui.teambuilder.humans.conflicts.userFlags")}</Text>
+                <Tooltip title={i18nT("ui.teambuilder.humans.conflicts.profilesThatRequireSpecialAttentionWhenComposing")}>
                   <InfoCircleOutlined />
                 </Tooltip>
               </Space>
@@ -823,7 +820,7 @@ export default function HumansConflictsPage(): JSX.Element {
         </Col>
 
         <Col xs={24} md={10}>
-          <Card title="Add user flag">
+          <Card title={i18nT("ui.teambuilder.humans.conflicts.addUserFlag")}>
             <Form
               layout="vertical"
               form={flagForm}
@@ -835,13 +832,13 @@ export default function HumansConflictsPage(): JSX.Element {
               }}
             >
               <Form.Item
-                label="User"
+                label={i18nT("ui.teambuilder.humans.conflicts.user")}
                 name="user"
-                rules={[{ required: true, message: 'Please select a person.' }]}
+                rules={[{ required: true, message: i18nT("ui.teambuilder.humans.conflicts.pleaseSelectAPerson") }]}
               >
                 <Select
                   showSearch
-                  placeholder="Pick user"
+                  placeholder={i18nT("ui.teambuilder.humans.conflicts.pickUser")}
                   options={MOCK_USERS.map(u => ({ label: u, value: u }))}
                 />
               </Form.Item>
@@ -849,15 +846,15 @@ export default function HumansConflictsPage(): JSX.Element {
               <Row gutter={12}>
                 <Col span={12}>
                   <Form.Item
-                    label="Flag type"
+                    label={i18nT("ui.teambuilder.humans.conflicts.flagType")}
                     name="type"
                     rules={[{ required: true }]}
                   >
                     <Select
                       options={[
-                        { label: 'Risk profile', value: 'RISK' },
-                        { label: 'Anchor', value: 'ANCHOR' },
-                        { label: 'Mentor', value: 'MENTOR' },
+                        { label: i18nT("ui.teambuilder.humans.conflicts.riskProfile"), value: 'RISK' },
+                        { label: i18nT("ui.teambuilder.humans.conflicts.anchor"), value: 'ANCHOR' },
+                        { label: i18nT("ui.teambuilder.humans.conflicts.mentor"), value: 'MENTOR' },
                       ]}
                     />
                   </Form.Item>
@@ -865,12 +862,12 @@ export default function HumansConflictsPage(): JSX.Element {
 
                 <Col span={12}>
                   <Form.Item
-                    label="Severity"
+                    label={i18nT("ui.teambuilder.humans.conflicts.severity")}
                     name="severity"
                     rules={[{ required: true }]}
                   >
                     <Select
-                      options={SEVERITY_OPTIONS.map(opt => ({
+                      options={SEVERITY_OPTIONS(i18nT).map(opt => ({
                         label: opt.label,
                         value: opt.value,
                       }))}
@@ -879,15 +876,15 @@ export default function HumansConflictsPage(): JSX.Element {
                 </Col>
               </Row>
 
-              <Form.Item label="Notes (optional)" name="notes">
+              <Form.Item label={i18nT("ui.teambuilder.humans.conflicts.notesOptional")} name="notes">
                 <TextArea
                   rows={3}
-                  placeholder="Context on how to use this flag in team composition…"
+                  placeholder={i18nT("ui.teambuilder.humans.conflicts.contextOnHowToUseThisFlag")}
                 />
               </Form.Item>
 
               <Form.Item
-                label="Flag active"
+                label={i18nT("ui.teambuilder.humans.conflicts.flagActive")}
                 name="active"
                 valuePropName="checked"
               >
@@ -896,9 +893,9 @@ export default function HumansConflictsPage(): JSX.Element {
 
               <Form.Item>
                 <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                  <Button onClick={() => flagForm.resetFields()}>Reset</Button>
+                  <Button onClick={() => flagForm.resetFields()}>{i18nT("ui.teambuilder.humans.conflicts.reset")}</Button>
                   <Button type="primary" htmlType="submit" icon={<PlusOutlined />}>
-                    Add flag
+                    {i18nT("ui.teambuilder.humans.conflicts.addFlag")}
                   </Button>
                 </Space>
               </Form.Item>
@@ -907,9 +904,7 @@ export default function HumansConflictsPage(): JSX.Element {
             <Divider />
 
             <Text type="secondary">
-              Flags are not conflicts by themselves. They inform how many “risk profiles”
-              can share a team, and which anchors/mentors should be added to stabilize
-              high-risk or learning-heavy configurations.
+              {i18nT("ui.teambuilder.humans.conflicts.flagsAreNotConflictsByThemselvesThey")}
             </Text>
           </Card>
         </Col>
@@ -920,17 +915,17 @@ export default function HumansConflictsPage(): JSX.Element {
   const tabItems = [
     {
       key: 'conflicts',
-      label: 'Conflicts',
+      label: i18nT("ui.teambuilder.humans.conflicts.conflicts"),
       children: conflictsTabContent,
     },
     {
       key: 'preferred',
-      label: 'Preferred pairs',
+      label: i18nT("ui.teambuilder.humans.conflicts.preferredPairs"),
       children: preferredPairsTabContent,
     },
     {
       key: 'flags',
-      label: 'Flags',
+      label: i18nT("ui.teambuilder.humans.conflicts.flags"),
       children: flagsTabContent,
     },
   ];
@@ -938,7 +933,7 @@ export default function HumansConflictsPage(): JSX.Element {
   const headerSummary = (
     <Space size="large" wrap>
       <Space direction="vertical" size={4}>
-        <Text type="secondary">Hard conflict rules</Text>
+        <Text type="secondary">{i18nT("ui.teambuilder.humans.conflicts.hardConflictRules")}</Text>
         <Space>
           <Badge status="error" />
           <Text strong>{hardRulesCount}</Text>
@@ -946,7 +941,7 @@ export default function HumansConflictsPage(): JSX.Element {
       </Space>
 
       <Space direction="vertical" size={4}>
-        <Text type="secondary">Soft / medium rules</Text>
+        <Text type="secondary">{i18nT("ui.teambuilder.humans.conflicts.softMediumRules")}</Text>
         <Space>
           <Badge status="warning" />
           <Text strong>{softRulesCount}</Text>
@@ -954,7 +949,7 @@ export default function HumansConflictsPage(): JSX.Element {
       </Space>
 
       <Space direction="vertical" size={4}>
-        <Text type="secondary">Inactive rules</Text>
+        <Text type="secondary">{i18nT("ui.teambuilder.humans.conflicts.inactiveRules")}</Text>
         <Space>
           <Badge status="default" />
           <Text strong>{inactiveRulesCount}</Text>
@@ -965,23 +960,22 @@ export default function HumansConflictsPage(): JSX.Element {
 
   return (
     <TeamBuilderPageShell
-      title="Conflicts & pairing rules"
+      title={i18nT("ui.teambuilder.humans.conflicts.conflictsPairingRules")}
       subtitle={
         <Space direction="vertical" size={8}>
           <Text type="secondary">
-            Manage who should or should not be paired together, and mark people who
-            require special handling when building teams.
+            {i18nT("ui.teambuilder.humans.conflicts.manageWhoShouldOrShouldNotBe")}
           </Text>
           {headerSummary}
         </Space>
       }
-      sectionLabel="Humans"
+      sectionLabel={i18nT("ui.teambuilder.humans.conflicts.humans")}
       maxWidth={1200}
       secondaryActions={
         <Space>
-          <Button>Reset all rules</Button>
+          <Button>{i18nT("ui.teambuilder.humans.conflicts.resetAllRules")}</Button>
           <Button type="primary" icon={<ExportOutlined />}>
-            Export configuration
+            {i18nT("ui.teambuilder.humans.conflicts.exportConfiguration")}
           </Button>
         </Space>
       }
@@ -1000,18 +994,15 @@ export default function HumansConflictsPage(): JSX.Element {
         type="info"
         showIcon
         icon={<InfoCircleOutlined />}
-        message="How this interacts with contexts"
+        message={i18nT("ui.teambuilder.humans.conflicts.howThisInteractsWithContexts")}
         description={
           <Space direction="vertical">
             <Text>
-              In <strong>elite / critical</strong> mode, hard conflicts are treated as
-              strict constraints. In <strong>learning</strong> or{' '}
-              <strong>rehab</strong> modes, the engine may allow some softer conflicts
-              when paired with strong anchors and mentors.
+              {i18nT("ui.teambuilder.humans.conflicts.in")} <strong>{i18nT("ui.teambuilder.humans.conflicts.eliteCritical")}</strong> {i18nT("ui.teambuilder.humans.conflicts.modeHardConflictsAreTreatedAsStrict")} <strong>{i18nT("ui.teambuilder.humans.conflicts.learning")}</strong> {i18nT("ui.teambuilder.humans.conflicts.or")}{' '}
+              <strong>{i18nT("ui.teambuilder.humans.conflicts.rehab")}</strong> {i18nT("ui.teambuilder.humans.conflicts.modesTheEngineMayAllowSomeSofter")}
             </Text>
             <Text type="secondary">
-              You can tune these behaviours in the session configuration screens; this
-              page only manages the underlying human relationships.
+              {i18nT("ui.teambuilder.humans.conflicts.youCanTuneTheseBehavioursInThe")}
             </Text>
           </Space>
         }

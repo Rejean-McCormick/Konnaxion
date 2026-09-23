@@ -2,6 +2,7 @@
 // C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\top-creators\page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { TrophyOutlined } from '@ant-design/icons';
 import { Avatar, Button, Select, Space, Table, Typography } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
@@ -61,6 +62,7 @@ const creatorsData: Creator[] = [
 ];
 
 export default function TopCreatorsPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
   const [timeFrame, setTimeFrame] = useState<TimeFrame>('all-time');
 
@@ -70,7 +72,7 @@ export default function TopCreatorsPage(): JSX.Element {
 
   const columns: ColumnsType<Creator> = [
     {
-      title: 'Rank',
+      title: i18nT("ui.kreative.communityShowcases.topCreators.rank"),
       key: 'rank',
       width: 80,
       render: (_value, _record, index) =>
@@ -81,7 +83,7 @@ export default function TopCreatorsPage(): JSX.Element {
         ),
     },
     {
-      title: 'Creator',
+      title: i18nT("ui.kreative.communityShowcases.topCreators.creator"),
       key: 'creator',
       width: 250,
       render: (_value, record) => (
@@ -97,14 +99,14 @@ export default function TopCreatorsPage(): JSX.Element {
       ),
     },
     {
-      title: 'Contributions',
+      title: i18nT("ui.kreative.communityShowcases.topCreators.contributions"),
       dataIndex: 'contributions',
       key: 'contributions',
       width: 150,
       render: (value: number) => <Text>{value}</Text>,
     },
     {
-      title: 'Specialty',
+      title: i18nT("ui.kreative.communityShowcases.topCreators.specialty"),
       dataIndex: 'specialty',
       key: 'specialty',
     },
@@ -112,14 +114,14 @@ export default function TopCreatorsPage(): JSX.Element {
 
   const timeframeSelector = (
     <Space>
-      <Text strong>Filter by timeframe:</Text>
+      <Text strong>{i18nT("ui.kreative.communityShowcases.topCreators.filterByTimeframe")}</Text>
       <Select
         value={timeFrame}
         onChange={(value: TimeFrame) => setTimeFrame(value)}
         style={{ width: 180 }}
         options={[
-          { value: 'all-time', label: 'All Time' },
-          { value: 'this-month', label: 'This Month' },
+          { value: 'all-time', label: i18nT("ui.kreative.communityShowcases.topCreators.allTime") },
+          { value: 'this-month', label: i18nT("ui.kreative.communityShowcases.topCreators.thisMonth") },
         ]}
       />
     </Space>
@@ -127,13 +129,13 @@ export default function TopCreatorsPage(): JSX.Element {
 
   return (
     <KreativePageShell
-      title="Top Creators"
-      subtitle="Leaderboard of creators with the most contributions across community showcases."
+      title={i18nT("ui.kreative.communityShowcases.topCreators.topCreators")}
+      subtitle={i18nT("ui.kreative.communityShowcases.topCreators.leaderboardOfCreatorsWithTheMostContributions")}
       secondaryActions={timeframeSelector}
     >
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         <Title level={4} style={{ margin: 0 }}>
-          Leaderboard
+          {i18nT("ui.kreative.communityShowcases.topCreators.leaderboard")}
         </Title>
 
         <Table<Creator>

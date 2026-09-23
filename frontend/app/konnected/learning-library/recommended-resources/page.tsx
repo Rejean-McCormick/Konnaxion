@@ -2,6 +2,7 @@
 // app/konnected/learning-library/recommended-resources/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ArrowRightOutlined,
   BookOutlined,
@@ -310,6 +311,7 @@ async function sendRecommendationFeedback(
 /* ------------------------------------------------------------------ */
 
 export default function RecommendedResourcesPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
 
   const [recommendations, setRecommendations] = useState<KnowledgeRecommendationItem[]>([]);
@@ -346,7 +348,7 @@ export default function RecommendedResourcesPage(): JSX.Element {
 
       if (!data.results.length) {
         message.info(
-          'No personalized recommendations yet. Try completing a few lessons or rating resources.',
+          i18nT("ui.konnected.learningLibrary.recommendedResources.noPersonalizedRecommendationsYetTryCompletingA"),
         );
       }
     } catch (err) {
@@ -359,7 +361,7 @@ export default function RecommendedResourcesPage(): JSX.Element {
     } finally {
       setLoading(false);
     }
-  }, [hasLoadedOnce]);
+  }, [hasLoadedOnce, i18nT]);
 
   useEffect(() => {
     void handleReload();
@@ -391,8 +393,8 @@ export default function RecommendedResourcesPage(): JSX.Element {
       await sendRecommendationFeedback(item, feedback);
       message.success(
         feedback === 'like'
-          ? 'Thanks! We will show you more content like this.'
-          : 'We will show you this type of content less often.',
+          ? i18nT("ui.konnected.learningLibrary.recommendedResources.thanksWeWillShowYouMoreContent")
+          : i18nT("ui.konnected.learningLibrary.recommendedResources.weWillShowYouThisTypeOf"),
       );
     } catch (err) {
       const msg =
@@ -412,13 +414,13 @@ export default function RecommendedResourcesPage(): JSX.Element {
   const renderHeaderTags = () => (
     <Space size={[8, 8]} wrap>
       <Tag icon={<StarFilled />} color="gold">
-        Personalized
+        {i18nT("ui.konnected.learningLibrary.recommendedResources.personalized")}
       </Tag>
       <Tag icon={<BookOutlined />} color="geekblue">
-        Knowledge Library
+        {i18nT("ui.konnected.learningLibrary.recommendedResources.knowledgeLibrary")}
       </Tag>
       <Tag icon={<FireOutlined />} color="volcano">
-        Early prototype
+        {i18nT("ui.konnected.learningLibrary.recommendedResources.earlyPrototype")}
       </Tag>
     </Space>
   );
@@ -426,19 +428,19 @@ export default function RecommendedResourcesPage(): JSX.Element {
   return (
     <>
       <Head>
-        <title>Recommended resources – KonnectED</title>
+        <title>{i18nT("ui.konnected.learningLibrary.recommendedResources.recommendedResourcesKonnected")}</title>
       </Head>
 
       <KonnectedPageShell
-        title="Recommended resources"
-        subtitle="Personalized learning suggestions based on your activity in the KonnectED Knowledge Library."
+        title={i18nT("ui.konnected.learningLibrary.recommendedResources.recommendedResources")}
+        subtitle={i18nT("ui.konnected.learningLibrary.recommendedResources.personalizedLearningSuggestionsBasedOnYourActivity")}
         primaryAction={
           <Button
             icon={<ReloadOutlined />}
             onClick={() => void handleReload()}
             loading={loading}
           >
-            Refresh recommendations
+            {i18nT("ui.konnected.learningLibrary.recommendedResources.refreshRecommendations")}
           </Button>
         }
         secondaryActions={
@@ -449,10 +451,10 @@ export default function RecommendedResourcesPage(): JSX.Element {
                 router.push('/konnected/learning-library/browse-resources')
               }
             >
-              Browse library
+              {i18nT("ui.konnected.learningLibrary.recommendedResources.browseLibrary")}
             </Button>
             <Button icon={<SettingOutlined />} disabled>
-              Recommendation settings
+              {i18nT("ui.konnected.learningLibrary.recommendedResources.recommendationSettings")}
             </Button>
           </Space>
         }
@@ -462,7 +464,7 @@ export default function RecommendedResourcesPage(): JSX.Element {
             <Card
               title={
                 <Space size={8} align="center">
-                  <span>Recommended for you</span>
+                  <span>{i18nT("ui.konnected.learningLibrary.recommendedResources.recommendedForYou")}</span>
                   {renderHeaderTags()}
                 </Space>
               }
@@ -472,14 +474,12 @@ export default function RecommendedResourcesPage(): JSX.Element {
                   type="warning"
                   showIcon
                   style={{ marginBottom: 16 }}
-                  message="We couldn't load live recommendations."
+                  message={i18nT("ui.konnected.learningLibrary.recommendedResources.weCouldnTLoadLiveRecommendations")}
                   description={
                     <span>
                       {error}{' '}
                       <Text type="secondary">
-                        If this keeps happening, the personalized recommendation
-                        API for KonnectED may not be wired yet. In that case we
-                        will fall back to generic library suggestions.
+                        {i18nT("ui.konnected.learningLibrary.recommendedResources.ifThisKeepsHappeningThePersonalizedRecommendation")}
                       </Text>
                     </span>
                   }
@@ -503,10 +503,9 @@ export default function RecommendedResourcesPage(): JSX.Element {
                 <Empty
                   description={
                     <Space direction="vertical" size={4}>
-                      <span>No recommendations yet.</span>
+                      <span>{i18nT("ui.konnected.learningLibrary.recommendedResources.noRecommendationsYet")}</span>
                       <Text type="secondary">
-                        Start a learning path or complete a few resources so we
-                        can tailor suggestions to you.
+                        {i18nT("ui.konnected.learningLibrary.recommendedResources.startALearningPathOrCompleteA")}
                       </Text>
                     </Space>
                   }
@@ -527,7 +526,7 @@ export default function RecommendedResourcesPage(): JSX.Element {
                             icon={<ArrowRightOutlined />}
                             onClick={() => handleViewResource(rec)}
                           >
-                            Open
+                            {i18nT("ui.konnected.learningLibrary.recommendedResources.open")}
                           </Button>
                           <Button
                             type="text"
@@ -537,7 +536,7 @@ export default function RecommendedResourcesPage(): JSX.Element {
                             )}
                             onClick={() => handleFeedback(rec, 'like')}
                           >
-                            Helpful
+                            {i18nT("ui.konnected.learningLibrary.recommendedResources.helpful")}
                           </Button>
                           <Button
                             type="text"
@@ -547,7 +546,7 @@ export default function RecommendedResourcesPage(): JSX.Element {
                             )}
                             onClick={() => handleFeedback(rec, 'dislike')}
                           >
-                            Not for me
+                            {i18nT("ui.konnected.learningLibrary.recommendedResources.notForMe")}
                           </Button>
                         </Space>,
                       ]}
@@ -574,10 +573,10 @@ export default function RecommendedResourcesPage(): JSX.Element {
                               {rec.source && (
                                 <Tag>
                                   {rec.source === 'ml'
-                                    ? 'Suggested by AI'
+                                    ? i18nT("ui.konnected.learningLibrary.recommendedResources.suggestedByAi")
                                     : rec.source === 'editorial'
-                                    ? 'Curator pick'
-                                    : 'Trending'}
+                                    ? i18nT("ui.konnected.learningLibrary.recommendedResources.curatorPick")
+                                    : i18nT("ui.konnected.learningLibrary.recommendedResources.trending")}
                                 </Tag>
                               )}
                             </Space>
@@ -606,15 +605,15 @@ export default function RecommendedResourcesPage(): JSX.Element {
                               ))}
                               {rec.resource.estimatedDurationMinutes != null && (
                                 <Tag>
-                                  ≈ {rec.resource.estimatedDurationMinutes} min
+                                  ≈ {rec.resource.estimatedDurationMinutes} {i18nT("ui.konnected.learningLibrary.recommendedResources.min")}
                                 </Tag>
                               )}
                               {rec.resource.offlineAvailable && (
-                                <Tag color="green">Offline available</Tag>
+                                <Tag color="green">{i18nT("ui.konnected.learningLibrary.recommendedResources.offlineAvailable")}</Tag>
                               )}
                               {rec.resource.partOfPathTitle && (
                                 <Tag color="magenta">
-                                  Part of{' '}
+                                  {i18nT("ui.konnected.learningLibrary.recommendedResources.partOf")}{' '}
                                   <Text strong>
                                     {rec.resource.partOfPathTitle}
                                   </Text>
@@ -633,7 +632,7 @@ export default function RecommendedResourcesPage(): JSX.Element {
                                       type="secondary"
                                       style={{ fontSize: 12 }}
                                     >
-                                      Your progress
+                                      {i18nT("ui.konnected.learningLibrary.recommendedResources.yourProgress")}
                                     </Text>
                                     <Progress
                                       percent={rec.progress.progressPercent}
@@ -649,7 +648,7 @@ export default function RecommendedResourcesPage(): JSX.Element {
                                         type="secondary"
                                         style={{ fontSize: 12 }}
                                       >
-                                        Last activity:{' '}
+                                        {i18nT("ui.konnected.learningLibrary.recommendedResources.lastActivity")}{' '}
                                         {new Date(
                                           rec.progress.lastTouchedAt,
                                         ).toLocaleString()}
@@ -661,7 +660,7 @@ export default function RecommendedResourcesPage(): JSX.Element {
                                     type="secondary"
                                     style={{ fontSize: 12 }}
                                   >
-                                    You have not started this resource yet.
+                                    {i18nT("ui.konnected.learningLibrary.recommendedResources.youHaveNotStartedThisResourceYet")}
                                   </Text>
                                 )}
                               </Col>
@@ -676,7 +675,7 @@ export default function RecommendedResourcesPage(): JSX.Element {
                                       type="secondary"
                                       style={{ fontSize: 12 }}
                                     >
-                                      Relevance score:{' '}
+                                      {i18nT("ui.konnected.learningLibrary.recommendedResources.relevanceScore")}{' '}
                                       <Text strong>
                                         {(rec.score * 100).toFixed(0)}%
                                       </Text>
@@ -686,7 +685,7 @@ export default function RecommendedResourcesPage(): JSX.Element {
                                     type="secondary"
                                     style={{ fontSize: 12 }}
                                   >
-                                    Recommended on:{' '}
+                                    {i18nT("ui.konnected.learningLibrary.recommendedResources.recommendedOn")}{' '}
                                     {new Date(
                                       rec.recommendedAt,
                                     ).toLocaleDateString()}
@@ -706,21 +705,18 @@ export default function RecommendedResourcesPage(): JSX.Element {
 
           <Col xs={24} lg={8}>
             <Space direction="vertical" size={16} style={{ width: '100%' }}>
-              <Card title="How these recommendations work">
+              <Card title={i18nT("ui.konnected.learningLibrary.recommendedResources.howTheseRecommendationsWork")}>
                 <Space direction="vertical" size={4}>
                   <Text>
-                    KonnectED recommendations are an early prototype. They will
-                    eventually use your learning paths, progress, and Ekoh score
-                    to tailor suggestions.
+                    {i18nT("ui.konnected.learningLibrary.recommendedResources.konnectedRecommendationsAreAnEarlyPrototypeThey")}
                   </Text>
                   <Text type="secondary" style={{ fontSize: 12 }}>
-                    For now, recommendations may rely on simple heuristics like
-                    subject matches, language preferences, and popularity.
+                    {i18nT("ui.konnected.learningLibrary.recommendedResources.forNowRecommendationsMayRelyOnSimple")}
                   </Text>
                 </Space>
               </Card>
 
-              <Card title="Tips to improve recommendations">
+              <Card title={i18nT("ui.konnected.learningLibrary.recommendedResources.tipsToImproveRecommendations")}>
                 <List
                   size="small"
                   dataSource={[
@@ -733,10 +729,10 @@ export default function RecommendedResourcesPage(): JSX.Element {
                 />
               </Card>
 
-              <Card title="KonnectED tips & summary">
+              <Card title={i18nT("ui.konnected.learningLibrary.recommendedResources.konnectedTipsSummary")}>
                 <Space direction="vertical" size={4} style={{ width: '100%' }}>
                   <Text type="secondary" style={{ fontSize: 12 }}>
-                    Looking for a more structured experience?
+                    {i18nT("ui.konnected.learningLibrary.recommendedResources.lookingForAMoreStructuredExperience")}
                   </Text>
                   <Button
                     type="primary"
@@ -745,11 +741,10 @@ export default function RecommendedResourcesPage(): JSX.Element {
                       router.push('/konnected/learning-paths/my-learning-path')
                     }
                   >
-                    Go to my learning paths
+                    {i18nT("ui.konnected.learningLibrary.recommendedResources.goToMyLearningPaths")}
                   </Button>
                   <Text type="secondary" style={{ fontSize: 12 }}>
-                    Or browse curated learning paths and certification programs
-                    from the main dashboard.
+                    {i18nT("ui.konnected.learningLibrary.recommendedResources.orBrowseCuratedLearningPathsAndCertification")}
                   </Text>
                 </Space>
               </Card>

@@ -1,6 +1,7 @@
 // FILE: frontend/modules/ethikos/components/ParticipantRoleBadge.tsx
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Space, Tag, Tooltip, Typography } from 'antd'
 import React from 'react'
 
@@ -122,6 +123,7 @@ export default function ParticipantRoleBadge({
   showDescription = true,
   compact = false,
 }: ParticipantRoleBadgeProps): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const normalizedRole = normalizeRole(role ?? participant?.role)
   const label = ROLE_LABELS[normalizedRole]
   const color = ROLE_COLORS[normalizedRole]
@@ -158,7 +160,7 @@ export default function ParticipantRoleBadge({
       <Text>{resolvedUserLabel}</Text>
       {content}
       {showAssignedBy && resolvedAssignedByLabel ? (
-        <Text type="secondary">assigned by {resolvedAssignedByLabel}</Text>
+        <Text type="secondary">{i18nT("ui.ethikos.participantrolebadge.assignedBy")} {resolvedAssignedByLabel}</Text>
       ) : null}
     </Space>
   )

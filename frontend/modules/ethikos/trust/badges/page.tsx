@@ -1,6 +1,8 @@
 // FILE: frontend/modules/ethikos/trust/badges/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
 import { Badge as AntBadge, Card, Empty } from 'antd';
@@ -13,9 +15,9 @@ import {
   type Badge as UserBadge,
 } from '@/services/trust';
 
-function formatEarnedDate(value?: string): string {
+function formatEarnedDate(i18nT: TranslateFunction, value?: string): string {
   if (!value) {
-    return 'Unknown date';
+    return i18nT("ui.ethikos.trust.badges.unknownDate");
   }
 
   const parsed = dayjs(value);
@@ -24,7 +26,8 @@ function formatEarnedDate(value?: string): string {
 }
 
 export default function Badges(): JSX.Element {
-  usePageTitle('Trust · Badges');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.ethikos.trust.badges.trustBadges"));
 
   const { data, loading } = useRequest<TrustBadgePayload, []>(fetchUserBadges);
 
@@ -34,11 +37,11 @@ export default function Badges(): JSX.Element {
     <PageContainer ghost loading={loading}>
       <ProCard gutter={16} wrap>
         {!loading && badges.length === 0 && (
-          <Empty description="No badges earned yet" />
+          <Empty description={i18nT("ui.ethikos.trust.badges.noBadgesEarnedYet")} />
         )}
 
         {badges.map((badge) => {
-          const earnedDate = formatEarnedDate(badge.earnedAt);
+          const earnedDate = formatEarnedDate(i18nT, badge.earnedAt);
 
           return (
             <AntBadge.Ribbon
@@ -52,7 +55,7 @@ export default function Badges(): JSX.Element {
               >
                 <p>{badge.description}</p>
                 <p style={{ marginTop: 8, fontSize: 12, opacity: 0.7 }}>
-                  Earned on {earnedDate}
+                  {i18nT("ui.ethikos.trust.badges.earnedOn")} {earnedDate}
                 </p>
               </Card>
             </AntBadge.Ribbon>

@@ -2,6 +2,7 @@
 'use client';
 
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ExperimentOutlined,
   HistoryOutlined,
@@ -93,6 +94,7 @@ function extractLatestConfig(
 }
 
 export default function KonsensusSettingsPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   // State for live simulation feedback
   const [simulation, setSimulation] = useState({
     stiffness: 45,
@@ -153,11 +155,10 @@ export default function KonsensusSettingsPage(): JSX.Element {
     }
   };
 
-  const title = 'Konsensus configuration';
+  const title = i18nT("ui.kontrol.konsensus.konsensusConfiguration");
   const subtitle = (
     <>
-      Manage global consensus algorithms, voting thresholds, and
-      governance parameters for the whole platform.
+      {i18nT("ui.kontrol.konsensus.manageGlobalConsensusAlgorithmsVotingThresholdsAnd")}
     </>
   );
 
@@ -166,7 +167,7 @@ export default function KonsensusSettingsPage(): JSX.Element {
       title={title}
       subtitle={subtitle}
       scope="platform"
-      metaTitle="Kontrol · Platform · Konsensus configuration"
+      metaTitle={i18nT("ui.kontrol.konsensus.kontrolPlatformKonsensusConfiguration")}
       maxWidth={1200}
     >
       <Row gutter={24}>
@@ -174,8 +175,8 @@ export default function KonsensusSettingsPage(): JSX.Element {
         <Col xs={24} lg={16}>
           {/* Informational Banner */}
           <Alert
-            message="Critical configuration"
-            description="Changes made here affect the active voting logic for the entire platform immediately. Proceed with caution."
+            message={i18nT("ui.kontrol.konsensus.criticalConfiguration")}
+            description={i18nT("ui.kontrol.konsensus.changesMadeHereAffectTheActiveVoting")}
             type="warning"
             showIcon
             style={{ marginBottom: 24 }}
@@ -253,7 +254,7 @@ export default function KonsensusSettingsPage(): JSX.Element {
                   error,
                 );
                 message.error(
-                  'Could not load current configuration',
+                  i18nT("ui.kontrol.konsensus.couldNotLoadCurrentConfiguration"),
                 );
                 return {};
               }
@@ -262,7 +263,7 @@ export default function KonsensusSettingsPage(): JSX.Element {
             onFinish={async (values) => {
               try {
                 message.loading(
-                  'Applying consensus parameters...',
+                  i18nT("ui.kontrol.konsensus.applyingConsensusParameters"),
                   0.5,
                 );
 
@@ -300,14 +301,14 @@ export default function KonsensusSettingsPage(): JSX.Element {
                   throw new Error('Failed to save');
 
                 message.success(
-                  'Configuration updated successfully',
+                  i18nT("ui.kontrol.konsensus.configurationUpdatedSuccessfully"),
                 );
                 return true;
               } catch (error) {
                  
                 console.error(error);
                 message.error(
-                  'Failed to save configuration',
+                  i18nT("ui.kontrol.konsensus.failedToSaveConfiguration"),
                 );
                 return false;
               }
@@ -343,7 +344,7 @@ export default function KonsensusSettingsPage(): JSX.Element {
             >
               {/* Section 1: Voting Thresholds */}
               <ProCard
-                title="Global thresholds"
+                title={i18nT("ui.kontrol.konsensus.globalThresholds")}
                 headerBordered
                 collapsible
                 defaultCollapsed={false}
@@ -355,7 +356,7 @@ export default function KonsensusSettingsPage(): JSX.Element {
               >
                 <ProFormSlider
                   name="quorum"
-                  label="Quorum requirement (%)"
+                  label={i18nT("ui.kontrol.konsensus.quorumRequirement")}
                   width="lg"
                   min={0}
                   max={100}
@@ -367,12 +368,12 @@ export default function KonsensusSettingsPage(): JSX.Element {
                     50: '50%',
                     100: '100%',
                   }}
-                  help="Minimum percentage of eligible voters required for a vote to be valid."
+                  help={i18nT("ui.kontrol.konsensus.minimumPercentageOfEligibleVotersRequiredFor")}
                 />
 
                 <ProFormSlider
                   name="pass_threshold"
-                  label="Pass threshold (%)"
+                  label={i18nT("ui.kontrol.konsensus.passThreshold")}
                   width="lg"
                   min={50}
                   max={100}
@@ -383,23 +384,23 @@ export default function KonsensusSettingsPage(): JSX.Element {
                     66: 'Super',
                     100: 'Unanimous',
                   }}
-                  help="Percentage of 'For' votes required to pass a proposal."
+                  help={i18nT("ui.kontrol.konsensus.percentageOfForVotesRequiredToPass")}
                 />
 
                 <ProFormDigit
                   name="min_duration_days"
-                  label="Minimum voting duration (days)"
+                  label={i18nT("ui.kontrol.konsensus.minimumVotingDurationDays")}
                   width="sm"
                   min={1}
                   max={30}
                   initialValue={3}
-                  tooltip="Proposals cannot close before this duration elapses."
+                  tooltip={i18nT("ui.kontrol.konsensus.proposalsCannotCloseBeforeThisDurationElapses")}
                 />
               </ProCard>
 
               {/* Section 2: Algorithm & Logic */}
               <ProCard
-                title="Consensus algorithm"
+                title={i18nT("ui.kontrol.konsensus.consensusAlgorithm")}
                 headerBordered
                 collapsible
                 extra={
@@ -410,63 +411,61 @@ export default function KonsensusSettingsPage(): JSX.Element {
               >
                 <ProFormSelect
                   name="algorithm"
-                  label="Active calculation method"
+                  label={i18nT("ui.kontrol.konsensus.activeCalculationMethod")}
                   width="md"
                   options={[
                     {
                       value: 'quadratic',
                       label:
-                        'Quadratic voting (cost = votes²)',
+                        i18nT("ui.kontrol.konsensus.quadraticVotingCostVotes2"),
                     },
                     {
                       value: 'linear',
                       label:
-                        'Linear (1 person = 1 vote)',
+                        i18nT("ui.kontrol.konsensus.linear1Person1Vote"),
                     },
                     {
                       value: 'weighted',
                       label:
-                        'Weighted (reputation based)',
+                        i18nT("ui.kontrol.konsensus.weightedReputationBased"),
                     },
                     {
                       value: 'hybrid',
                       label:
-                        'Hybrid (linear + reputation boost)',
+                        i18nT("ui.kontrol.konsensus.hybridLinearReputationBoost"),
                     },
                   ]}
                   initialValue="weighted"
-                  tooltip="Quadratic voting helps protect minorities; weighted empowers experts."
+                  tooltip={i18nT("ui.kontrol.konsensus.quadraticVotingHelpsProtectMinoritiesWeightedEmpowers")}
                 />
 
                 <ProCard split="vertical" bordered>
                   <ProCard>
                     <ProFormSwitch
                       name="allow_delegation"
-                      label="Allow vote delegation"
+                      label={i18nT("ui.kontrol.konsensus.allowVoteDelegation")}
                       initialValue
-                      tooltip="Users can delegate their voting power to trusted experts."
+                      tooltip={i18nT("ui.kontrol.konsensus.usersCanDelegateTheirVotingPowerTo")}
                     />
                     <Text
                       type="secondary"
                       style={{ fontSize: 12 }}
                     >
-                      Liquid democracy features will be
-                      enabled if checked.
+                      {i18nT("ui.kontrol.konsensus.liquidDemocracyFeaturesWillBeEnabledIf")}
                     </Text>
                   </ProCard>
                   <ProCard>
                     <ProFormSwitch
                       name="anonymous_voting"
-                      label="Force anonymous voting"
+                      label={i18nT("ui.kontrol.konsensus.forceAnonymousVoting")}
                       initialValue={false}
-                      tooltip="Hides voter identities on the blockchain/public record."
+                      tooltip={i18nT("ui.kontrol.konsensus.anonymousVotingHint")}
                     />
                     <Text
                       type="secondary"
                       style={{ fontSize: 12 }}
                     >
-                      Prevents social pressure but limits
-                      accountability.
+                      {i18nT("ui.kontrol.konsensus.preventsSocialPressureButLimitsAccountability")}
                     </Text>
                   </ProCard>
                 </ProCard>
@@ -474,36 +473,36 @@ export default function KonsensusSettingsPage(): JSX.Element {
 
               {/* Section 3: Smart Contract Sync */}
               <ProCard
-                title="Blockchain synchronization"
+                title={i18nT("ui.kontrol.konsensus.blockchainSynchronization")}
                 headerBordered
                 collapsible
                 defaultCollapsed
               >
                 <ProFormSelect
                   name="network"
-                  label="Target network"
+                  label={i18nT("ui.kontrol.konsensus.targetNetwork")}
                   width="md"
                   options={[
                     {
                       value: 'eth_mainnet',
-                      label: 'Ethereum Mainnet',
+                      label: i18nT("ui.kontrol.konsensus.ethereumMainnet"),
                     },
                     {
                       value: 'polygon',
-                      label: 'Polygon (Matic)',
+                      label: i18nT("ui.kontrol.konsensus.polygonMatic"),
                     },
                     {
                       value: 'local_ganache',
-                      label: 'Local Ganache (dev)',
+                      label: i18nT("ui.kontrol.konsensus.localGanacheDev"),
                     },
                   ]}
                   initialValue="local_ganache"
                 />
                 <ProFormSwitch
                   name="auto_execute"
-                  label="Auto-execute passed proposals"
+                  label={i18nT("ui.kontrol.konsensus.autoExecutePassedProposals")}
                   initialValue={false}
-                  tooltip="If enabled, the system will attempt to call the smart contract immediately upon vote closure."
+                  tooltip={i18nT("ui.kontrol.konsensus.ifEnabledTheSystemWillAttemptTo")}
                 />
               </ProCard>
             </Space>
@@ -521,8 +520,7 @@ export default function KonsensusSettingsPage(): JSX.Element {
             <ProCard
               title={
                 <Space>
-                  <ThunderboltOutlined /> Live impact
-                  analysis
+                  <ThunderboltOutlined /> {i18nT("ui.kontrol.konsensus.liveImpactAnalysis")}
                 </Space>
               }
               headerBordered
@@ -535,7 +533,7 @@ export default function KonsensusSettingsPage(): JSX.Element {
               >
                 <div>
                   <Text type="secondary">
-                    Governance stiffness
+                    {i18nT("ui.kontrol.konsensus.governanceStiffness")}
                   </Text>
                   <div
                     style={{
@@ -567,8 +565,8 @@ export default function KonsensusSettingsPage(): JSX.Element {
                 </div>
 
                 <Alert
-                  message="Historical replay"
-                  description={`Under these rules, ${simulation.retroFailures} passed proposals from last year would have failed.`}
+                  message={i18nT("ui.kontrol.konsensus.historicalReplay")}
+                  description={i18nT("ui.kontrol.konsensus.underTheseRulesPassedProposalsFromLast", { retroFailures: simulation.retroFailures })}
                   type="info"
                   showIcon
                   icon={<HistoryOutlined />}
@@ -578,7 +576,7 @@ export default function KonsensusSettingsPage(): JSX.Element {
 
             {/* Quick Tips */}
             <ProCard
-              title="Governance tips"
+              title={i18nT("ui.kontrol.konsensus.governanceTips")}
               headerBordered
               collapsible
             >
@@ -586,17 +584,14 @@ export default function KonsensusSettingsPage(): JSX.Element {
                 <List.Item>
                   <Text type="secondary">
                     <WarningOutlined />{' '}
-                    <strong>Quorum {'>'} 30%</strong> often
-                    leads to gridlock in decentralized
-                    communities.
+                    <strong>{i18nT("ui.kontrol.konsensus.quorum")} {'>'} 30%</strong>{' '}
+                    {i18nT("ui.kontrol.konsensus.highQuorumGridlockWarning")}
                   </Text>
                 </List.Item>
                 <List.Item>
                   <Text type="secondary">
                     <SafetyCertificateOutlined />{' '}
-                    <strong>Quadratic voting</strong> is best
-                    used for resource allocation, not binary
-                    decisions.
+                    <strong>{i18nT("ui.kontrol.konsensus.quadraticVoting")}</strong> {i18nT("ui.kontrol.konsensus.isBestUsedForResourceAllocationNot")}
                   </Text>
                 </List.Item>
               </List>

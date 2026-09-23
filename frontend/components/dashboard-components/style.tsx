@@ -1,3 +1,5 @@
+'use client';
+
 // FILE: frontend/components/dashboard-components/style.tsx
 // C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\style.tsx
 /**
@@ -5,6 +7,7 @@
  * Author: Hieu Chu
  */
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   CaretDownOutlined,
   CaretUpOutlined,
@@ -126,13 +129,14 @@ export const CardFooter: React.FC<{
   value: number
   change: number
 }> = ({ title, value, change }) => {
+  const { t: i18nT } = useLanguage();
   return (
     <div style={{ position: 'relative', zIndex: 99 }}>
       <span>{title}:</span>
       <span style={{ marginLeft: 8, color: 'rgba(0,0,0,.85)' }}>
         {value.toLocaleString()}
       </span>
-      <Tooltip title="Change compared to yesterday">
+      <Tooltip title={i18nT("ui.dashboardComponents.style.changeComparedToYesterday")}>
         <span style={{ marginLeft: 16 }}>
           <span style={{ color: 'rgba(0,0,0,.55)', marginRight: 2 }}>
             {change.toLocaleString()}

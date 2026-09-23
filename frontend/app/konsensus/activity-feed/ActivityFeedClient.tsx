@@ -1,6 +1,7 @@
 // FILE: frontend/app/konsensus/activity-feed/ActivityFeedClient.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ApartmentOutlined,
   BellOutlined,
@@ -179,6 +180,7 @@ function isWithinWindow(iso: string, window: TimeWindow): boolean {
 }
 
 export default function KonsensusActivityFeedClient() {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
 
   const [moduleFilter, setModuleFilter] = useState<ModuleKey>('all');
@@ -215,15 +217,15 @@ export default function KonsensusActivityFeedClient() {
   const renderModuleTag = (module: FeedItem['module']) => {
     switch (module) {
       case 'ekoh':
-        return <Tag>Ekoh</Tag>;
+        return <Tag>{i18nT("ui.konsensus.activityFeed.activityfeedclient.ekoh")}</Tag>;
       case 'ethikos':
-        return <Tag>ethiKos</Tag>;
+        return <Tag>{i18nT("ui.konsensus.activityFeed.activityfeedclient.ethikos")}</Tag>;
       case 'keenkonnect':
-        return <Tag>keenKonnect</Tag>;
+        return <Tag>{i18nT("ui.konsensus.activityFeed.activityfeedclient.keenkonnect")}</Tag>;
       case 'konnected':
-        return <Tag>KonnectED</Tag>;
+        return <Tag>{i18nT("ui.konsensus.activityFeed.activityfeedclient.konnected")}</Tag>;
       case 'kreative':
-        return <Tag>Kreative</Tag>;
+        return <Tag>{i18nT("ui.konsensus.activityFeed.activityfeedclient.kreative")}</Tag>;
       default:
         return null;
     }
@@ -234,17 +236,17 @@ export default function KonsensusActivityFeedClient() {
       case 'consensus':
         return (
           <Tag icon={<ApartmentOutlined />}>
-            Konsensus
+            {i18nT("ui.konsensus.activityFeed.activityfeedclient.konsensus")}
           </Tag>
         );
       case 'debate':
-        return <Tag>Debate</Tag>;
+        return <Tag>{i18nT("ui.konsensus.activityFeed.activityfeedclient.debate")}</Tag>;
       case 'project':
-        return <Tag>Project</Tag>;
+        return <Tag>{i18nT("ui.konsensus.activityFeed.activityfeedclient.project")}</Tag>;
       case 'learning':
-        return <Tag>Learning</Tag>;
+        return <Tag>{i18nT("ui.konsensus.activityFeed.activityfeedclient.learning")}</Tag>;
       case 'system':
-        return <Tag>System</Tag>;
+        return <Tag>{i18nT("ui.konsensus.activityFeed.activityfeedclient.system")}</Tag>;
       default:
         return null;
     }
@@ -257,21 +259,19 @@ export default function KonsensusActivityFeedClient() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <Title level={2} style={{ margin: 0 }}>
-              Konsensus Activity Feed
+              {i18nT("ui.konsensus.activityFeed.activityfeedclient.konsensusActivityFeed")}
             </Title>
             <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-              Unified cross-module timeline of debates, projects, learning signals
-              and Konsensus highlights across Ekoh, ethiKos, keenKonnect,
-              KonnectED and Kreative.
+              {i18nT("ui.konsensus.activityFeed.activityfeedclient.unifiedCrossModuleTimelineOfDebatesProjects")}
             </Paragraph>
           </div>
 
           <Space>
-            <Tooltip title="Refresh feed (stubbed – ready for API integration)">
+            <Tooltip title={i18nT("ui.konsensus.activityFeed.activityfeedclient.refreshFeedStubbedReadyForApiIntegration")}>
               <Button icon={<ReloadOutlined />} />
             </Tooltip>
-            <Tooltip title="Configure what appears in your feed (future feature)">
-              <Button icon={<FilterOutlined />}>Feed settings</Button>
+            <Tooltip title={i18nT("ui.konsensus.activityFeed.activityfeedclient.configureWhatAppearsInYourFeedFuture")}>
+              <Button icon={<FilterOutlined />}>{i18nT("ui.konsensus.activityFeed.activityfeedclient.feedSettings")}</Button>
             </Tooltip>
           </Space>
         </div>
@@ -281,7 +281,7 @@ export default function KonsensusActivityFeedClient() {
           <Col xs={24} sm={8}>
             <Card size="small">
               <Statistic
-                title="Total recent events"
+                title={i18nT("ui.konsensus.activityFeed.activityfeedclient.totalRecentEvents")}
                 value={totalEvents}
                 prefix={<BellOutlined />}
               />
@@ -290,7 +290,7 @@ export default function KonsensusActivityFeedClient() {
           <Col xs={24} sm={8}>
             <Card size="small">
               <Statistic
-                title="Konsensus signals"
+                title={i18nT("ui.konsensus.activityFeed.activityfeedclient.konsensusSignals")}
                 value={consensusEvents}
                 prefix={<ThunderboltOutlined />}
               />
@@ -299,7 +299,7 @@ export default function KonsensusActivityFeedClient() {
           <Col xs={24} sm={8}>
             <Card size="small">
               <Statistic
-                title="Unread items"
+                title={i18nT("ui.konsensus.activityFeed.activityfeedclient.unreadItems")}
                 value={unreadCount}
                 prefix={<Badge status="processing" />}
               />
@@ -316,44 +316,44 @@ export default function KonsensusActivityFeedClient() {
             style={{ width: '100%', justifyContent: 'space-between' }}
           >
             <Space direction="vertical" size={8}>
-              <Text strong>Module focus</Text>
+              <Text strong>{i18nT("ui.konsensus.activityFeed.activityfeedclient.moduleFocus")}</Text>
               <Segmented<ModuleKey>
                 value={moduleFilter}
                 onChange={(val) => setModuleFilter(val as ModuleKey)}
                 options={[
-                  { label: 'All modules', value: 'all' },
-                  { label: 'Ekoh', value: 'ekoh' },
-                  { label: 'ethiKos', value: 'ethikos' },
-                  { label: 'keenKonnect', value: 'keenkonnect' },
-                  { label: 'KonnectED', value: 'konnected' },
-                  { label: 'Kreative', value: 'kreative' },
+                  { label: i18nT("ui.konsensus.activityFeed.activityfeedclient.allModules"), value: 'all' },
+                  { label: i18nT("ui.konsensus.activityFeed.activityfeedclient.ekoh"), value: 'ekoh' },
+                  { label: i18nT("ui.konsensus.activityFeed.activityfeedclient.ethikos"), value: 'ethikos' },
+                  { label: i18nT("ui.konsensus.activityFeed.activityfeedclient.keenkonnect"), value: 'keenkonnect' },
+                  { label: i18nT("ui.konsensus.activityFeed.activityfeedclient.konnected"), value: 'konnected' },
+                  { label: i18nT("ui.konsensus.activityFeed.activityfeedclient.kreative"), value: 'kreative' },
                 ]}
               />
             </Space>
 
             <Space direction="vertical" size={8}>
-              <Text strong>Time window</Text>
+              <Text strong>{i18nT("ui.konsensus.activityFeed.activityfeedclient.timeWindow")}</Text>
               <Segmented<TimeWindow>
                 value={timeWindow}
                 onChange={(val) => setTimeWindow(val as TimeWindow)}
                 options={[
-                  { label: '24h', value: '24h' },
-                  { label: '7 days', value: '7d' },
-                  { label: '30 days', value: '30d' },
-                  { label: 'All', value: 'all' },
+                  { label: i18nT("ui.konsensus.activityFeed.activityfeedclient.text24h"), value: '24h' },
+                  { label: i18nT("ui.konsensus.activityFeed.activityfeedclient.text7Days"), value: '7d' },
+                  { label: i18nT("ui.konsensus.activityFeed.activityfeedclient.text30Days"), value: '30d' },
+                  { label: i18nT("ui.konsensus.activityFeed.activityfeedclient.all"), value: 'all' },
                 ]}
               />
             </Space>
 
             <Space direction="vertical" size={8}>
-              <Text strong>Custom range (placeholder)</Text>
+              <Text strong>{i18nT("ui.konsensus.activityFeed.activityfeedclient.customRangePlaceholder")}</Text>
               <RangePicker
                 size="small"
                 style={{ minWidth: 230 }}
                 disabled
               />
               <Text type="secondary">
-                Hook up to backend filters later.
+                {i18nT("ui.konsensus.activityFeed.activityfeedclient.hookUpToBackendFiltersLater")}
               </Text>
             </Space>
           </Space>
@@ -367,13 +367,13 @@ export default function KonsensusActivityFeedClient() {
             items={[
               {
                 key: 'all',
-                label: 'All signals',
+                label: i18nT("ui.konsensus.activityFeed.activityfeedclient.allSignals"),
               },
               {
                 key: 'unread',
                 label: (
                   <Badge count={unreadCount} size="small">
-                    <span>Unread</span>
+                    <span>{i18nT("ui.konsensus.activityFeed.activityfeedclient.unread")}</span>
                   </Badge>
                 ),
               },
@@ -382,7 +382,7 @@ export default function KonsensusActivityFeedClient() {
                 label: (
                   <Space size={4}>
                     <ThunderboltOutlined />
-                    <span>High-signal</span>
+                    <span>{i18nT("ui.konsensus.activityFeed.activityfeedclient.highSignal")}</span>
                     <Badge
                       count={importantCount}
                       size="small"
@@ -396,7 +396,7 @@ export default function KonsensusActivityFeedClient() {
 
           {filteredItems.length === 0 ? (
             <div className="py-10 flex justify-center">
-              <Empty description="No activity matches your filters yet." />
+              <Empty description={i18nT("ui.konsensus.activityFeed.activityfeedclient.noActivityMatchesYourFiltersYet")} />
             </div>
           ) : (
             <List
@@ -407,7 +407,7 @@ export default function KonsensusActivityFeedClient() {
                   key={item.id}
                   extra={
                     item.isUnread ? (
-                      <Badge status="processing" text="Unread" />
+                      <Badge status="processing" text={i18nT("ui.konsensus.activityFeed.activityfeedclient.unread")} />
                     ) : null
                   }
                   actions={[
@@ -417,7 +417,7 @@ export default function KonsensusActivityFeedClient() {
                         type="link"
                         onClick={() => router.push(item.relatedPath!)}
                       >
-                        Open in context
+                        {i18nT("ui.konsensus.activityFeed.activityfeedclient.openInContext")}
                       </Button>
                     ) : null,
                   ].filter(Boolean)}
@@ -433,7 +433,7 @@ export default function KonsensusActivityFeedClient() {
                         <Text strong>{item.title}</Text>
                         {item.isImportant && (
                           <Tag icon={<ThunderboltOutlined />}>
-                            Highlight
+                            {i18nT("ui.konsensus.activityFeed.activityfeedclient.highlight")}
                           </Tag>
                         )}
                       </Space>

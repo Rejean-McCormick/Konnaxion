@@ -1,6 +1,7 @@
 // FILE: frontend/modules/kontact/components/ProfileCard.tsx
 ﻿'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   EnvironmentOutlined,
   MessageOutlined,
@@ -86,6 +87,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   compact = false,
   showActions = true,
 }) => {
+  const { t: i18nT } = useLanguage();
   const {
     name,
     headline,
@@ -146,21 +148,21 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 
                 {typeof isOpenToCollab === 'boolean' && (
                   <Tag color={isOpenToCollab ? 'green' : 'default'}>
-                    {isOpenToCollab ? 'Open to collaboration' : 'Not actively looking'}
+                    {isOpenToCollab ? i18nT("ui.kontact.profilecard.openToCollaboration") : i18nT("ui.kontact.profilecard.notActivelyLooking")}
                   </Tag>
                 )}
 
                 {typeof ekohScore === 'number' && !Number.isNaN(ekohScore) && (
-                  <Tooltip title="Ekoh trust score used inside KeenKonnect decisions">
-                    <Tag color="gold">Ekoh {Math.round(ekohScore)}</Tag>
+                  <Tooltip title={i18nT("ui.kontact.profilecard.ekohTrustScoreUsedInsideKeenkonnectDecisions")}>
+                    <Tag color="gold">{i18nT("ui.kontact.profilecard.ekoh")} {Math.round(ekohScore)}</Tag>
                   </Tooltip>
                 )}
 
                 {typeof smartVoteWeight === 'number' &&
                   !Number.isNaN(smartVoteWeight) &&
                   smartVoteWeight !== 1 && (
-                    <Tooltip title="SmartVote influence weight from Ekoh reputation">
-                      <Tag color="purple">Weight ×{smartVoteWeight.toFixed(1)}</Tag>
+                    <Tooltip title={i18nT("ui.kontact.profilecard.smartvoteInfluenceWeightFromEkohReputation")}>
+                      <Tag color="purple">{i18nT("ui.kontact.profilecard.weight")}{smartVoteWeight.toFixed(1)}</Tag>
                     </Tooltip>
                   )}
               </Space>
@@ -223,7 +225,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
               </Tag>
             ))}
             {hiddenCount > 0 && (
-              <Tag>+{hiddenCount} more</Tag>
+              <Tag>+{hiddenCount} {i18nT("ui.kontact.profilecard.more")}</Tag>
             )}
           </Space>
         )}
@@ -242,7 +244,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
           >
             {lastActiveAgo && (
               <Text type="secondary" style={{ fontSize: 12 }}>
-                Active {lastActiveAgo}
+                {i18nT("ui.kontact.profilecard.active")} {lastActiveAgo}
               </Text>
             )}
 
@@ -254,7 +256,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                   icon={<UserOutlined />}
                   onClick={() => onViewProfile(profile)}
                 >
-                  View profile
+                  {i18nT("ui.kontact.profilecard.viewProfile")}
                 </Button>
               )}
 
@@ -265,7 +267,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                   icon={<TeamOutlined />}
                   onClick={() => onConnect(profile)}
                 >
-                  Connect
+                  {i18nT("ui.kontact.profilecard.connect")}
                 </Button>
               )}
 
@@ -275,7 +277,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                   icon={<MessageOutlined />}
                   onClick={() => onMessage(profile)}
                 >
-                  Message
+                  {i18nT("ui.kontact.profilecard.message")}
                 </Button>
               )}
             </Space>

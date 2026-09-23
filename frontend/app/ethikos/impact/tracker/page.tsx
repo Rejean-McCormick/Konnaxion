@@ -1,6 +1,8 @@
 // FILE: frontend/app/ethikos/impact/tracker/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   AuditOutlined,
   CheckCircleOutlined,
@@ -88,15 +90,15 @@ const STATUS_COLORS: Record<ImpactStatus, string> = {
   Blocked: 'error',
 };
 
-const FILTER_OPTIONS: { label: string; value: StatusFilter }[] = [
-  { label: 'Active', value: 'active' },
-  { label: 'Needs attention', value: 'needs-attention' },
-  { label: 'All', value: 'all' },
-  { label: 'Planned', value: 'Planned' },
-  { label: 'In progress', value: 'In-Progress' },
-  { label: 'Completed', value: 'Completed' },
-  { label: 'Blocked', value: 'Blocked' },
-];
+const FILTER_OPTIONS = (i18nT: TranslateFunction): { label: string; value: StatusFilter }[] => ([
+  { label: i18nT("ui.ethikos.impact.tracker.active"), value: 'active' },
+  { label: i18nT("ui.ethikos.impact.tracker.needsAttention"), value: 'needs-attention' },
+  { label: i18nT("ui.ethikos.impact.tracker.all"), value: 'all' },
+  { label: i18nT("ui.ethikos.impact.tracker.planned"), value: 'Planned' },
+  { label: i18nT("ui.ethikos.impact.tracker.inProgress"), value: 'In-Progress' },
+  { label: i18nT("ui.ethikos.impact.tracker.completed"), value: 'Completed' },
+  { label: i18nT("ui.ethikos.impact.tracker.blocked"), value: 'Blocked' },
+]);
 
 function isActive(status: ImpactStatus): boolean {
   return status === 'Planned' || status === 'In-Progress';
@@ -144,9 +146,9 @@ function optionalNumber(
   return undefined;
 }
 
-function formatRelative(value?: string | null): string {
+function formatRelative(i18nT: TranslateFunction, value?: string | null): string {
   if (!value) {
-    return 'No activity yet';
+    return i18nT("ui.ethikos.impact.tracker.noActivityYet");
   }
 
   const parsed = dayjs(value);
@@ -154,9 +156,9 @@ function formatRelative(value?: string | null): string {
   return parsed.isValid() ? parsed.fromNow() : 'Unknown';
 }
 
-function formatDate(value?: string | null): string {
+function formatDate(i18nT: TranslateFunction, value?: string | null): string {
   if (!value) {
-    return 'No date set';
+    return i18nT("ui.ethikos.impact.tracker.noDateSet");
   }
 
   const parsed = dayjs(value);
@@ -169,6 +171,7 @@ function route(path: string): string {
 }
 
 export default function ImpactTracker(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const { message } = App.useApp();
 
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('active');
@@ -263,10 +266,10 @@ export default function ImpactTracker(): JSX.Element {
         refresh();
       }
 
-      message.success('Impact status updated.');
+      message.success(i18nT("ui.ethikos.impact.tracker.impactStatusUpdated"));
     } catch (requestError) {
       console.error('Failed to update impact status', requestError);
-      message.error('Could not update impact status.');
+      message.error(i18nT("ui.ethikos.impact.tracker.couldNotUpdateImpactStatus"));
     } finally {
       setUpdatingId(null);
     }
@@ -274,14 +277,14 @@ export default function ImpactTracker(): JSX.Element {
 
   const columns: ProColumns<TrackerRow>[] = [
     {
-      title: 'Decision / promise',
+      title: i18nT("ui.ethikos.impact.tracker.decisionPromise"),
       dataIndex: 'title',
       width: 340,
       ellipsis: true,
       render: (_dom, row) => {
         const action =
           optionalString(row, ['action', 'actionLabel']) ??
-          'Follow-up action not specified yet';
+          i18nT("ui.ethikos.impact.tracker.followUpActionNotSpecifiedYet");
 
         return (
           <Space direction="vertical" size={2}>
@@ -290,13 +293,13 @@ export default function ImpactTracker(): JSX.Element {
 
             {row.status === 'Blocked' ? (
               <Tag icon={<ExclamationCircleOutlined />} color="error">
-                Needs unblock
+                {i18nT("ui.ethikos.impact.tracker.needsUnblock")}
               </Tag>
             ) : null}
 
             {isOverdue(row) ? (
               <Tag icon={<ClockCircleOutlined />} color="volcano">
-                Overdue
+                {i18nT("ui.ethikos.impact.tracker.overdue")}
               </Tag>
             ) : null}
           </Space>
@@ -304,7 +307,7 @@ export default function ImpactTracker(): JSX.Element {
       },
     },
     {
-      title: 'Owner',
+      title: i18nT("ui.ethikos.impact.tracker.owner"),
       dataIndex: 'owner',
       width: 180,
       ellipsis: true,
@@ -312,11 +315,11 @@ export default function ImpactTracker(): JSX.Element {
         row.owner ? (
           <Text>{row.owner}</Text>
         ) : (
-          <Text type="secondary">No owner assigned</Text>
+          <Text type="secondary">{i18nT("ui.ethikos.impact.tracker.noOwnerAssigned")}</Text>
         ),
     },
     {
-      title: 'Status',
+      title: i18nT("ui.ethikos.impact.tracker.status"),
       dataIndex: 'status',
       width: 260,
       render: (_dom, row) => {
@@ -345,27 +348,27 @@ export default function ImpactTracker(): JSX.Element {
       },
     },
     {
-      title: 'Next milestone',
+      title: i18nT("ui.ethikos.impact.tracker.nextMilestone"),
       key: 'milestone',
       width: 260,
       render: (_dom, row) => {
         const milestone =
           optionalString(row, ['nextMilestone', 'next_milestone']) ??
-          'No milestone recorded';
+          i18nT("ui.ethikos.impact.tracker.noMilestoneRecorded");
         const dueAt = row.dueAt ?? row.due_at;
 
         return (
           <Space direction="vertical" size={2}>
             <Text>{milestone}</Text>
             <Text type={isOverdue(row) ? 'danger' : 'secondary'}>
-              Due: {formatDate(dueAt)}
+              {i18nT("ui.ethikos.impact.tracker.due")} {formatDate(i18nT, dueAt)}
             </Text>
           </Space>
         );
       },
     },
     {
-      title: 'Evidence / feedback',
+      title: i18nT("ui.ethikos.impact.tracker.evidenceFeedback"),
       key: 'evidence',
       width: 220,
       render: (_dom, row) => {
@@ -384,10 +387,10 @@ export default function ImpactTracker(): JSX.Element {
                 href={evidenceUrl}
                 target="_blank"
               >
-                Evidence
+                {i18nT("ui.ethikos.impact.tracker.evidence")}
               </Button>
             ) : (
-              <Text type="secondary">No evidence linked</Text>
+              <Text type="secondary">{i18nT("ui.ethikos.impact.tracker.noEvidenceLinked")}</Text>
             )}
 
             <Button
@@ -396,26 +399,26 @@ export default function ImpactTracker(): JSX.Element {
               href={route('/ethikos/impact/feedback')}
               style={{ padding: 0 }}
             >
-              {feedbackCount ?? 0} feedback items
+              {feedbackCount ?? 0} {i18nT("ui.ethikos.impact.tracker.feedbackItems")}
             </Button>
           </Space>
         );
       },
     },
     {
-      title: 'Last activity',
+      title: i18nT("ui.ethikos.impact.tracker.lastActivity"),
       dataIndex: 'updatedAt',
       width: 180,
       sorter: (a, b) =>
         dayjs(a.updatedAt).valueOf() - dayjs(b.updatedAt).valueOf(),
-      render: (_dom, row) => <Text>{formatRelative(row.updatedAt)}</Text>,
+      render: (_dom, row) => <Text>{formatRelative(i18nT, row.updatedAt)}</Text>,
     },
   ];
 
   const secondaryActions = (
     <Space wrap>
-      <Button href={route('/ethikos/impact/outcomes')}>Outcomes</Button>
-      <Button href={route('/ethikos/impact/feedback')}>Feedback</Button>
+      <Button href={route('/ethikos/impact/outcomes')}>{i18nT("ui.ethikos.impact.tracker.outcomes")}</Button>
+      <Button href={route('/ethikos/impact/feedback')}>{i18nT("ui.ethikos.impact.tracker.feedback")}</Button>
       <Button
         icon={<ReloadOutlined />}
         onClick={() => refresh()}
@@ -423,17 +426,17 @@ export default function ImpactTracker(): JSX.Element {
         loading={loading}
         disabled={updatingId !== null}
       >
-        Refresh
+        {i18nT("ui.ethikos.impact.tracker.refresh")}
       </Button>
     </Space>
   );
 
   return (
     <EthikosPageShell
-      title="Impact tracker"
-      sectionLabel="Impact"
-      metaTitle="Impact · Tracker"
-      subtitle="Follow Ethikos decisions from promise to action, evidence, feedback, and closure."
+      title={i18nT("ui.ethikos.impact.tracker.impactTracker")}
+      sectionLabel={i18nT("ui.ethikos.impact.tracker.impact")}
+      metaTitle={i18nT("ui.ethikos.impact.tracker.impactTracker_9590e1")}
+      subtitle={i18nT("ui.ethikos.impact.tracker.followEthikosDecisionsFromPromiseToAction")}
       secondaryActions={secondaryActions}
     >
       <PageContainer ghost loading={loading}>
@@ -442,8 +445,8 @@ export default function ImpactTracker(): JSX.Element {
             type="error"
             showIcon
             style={{ marginBottom: 16 }}
-            message="Unable to load impact tracker."
-            description="Check the Impact service and retry."
+            message={i18nT("ui.ethikos.impact.tracker.unableToLoadImpactTracker")}
+            description={i18nT("ui.ethikos.impact.tracker.checkTheImpactServiceAndRetry")}
           />
         ) : null}
 
@@ -451,7 +454,7 @@ export default function ImpactTracker(): JSX.Element {
           title={
             <Space>
               <FlagOutlined />
-              <span>Impact workflow</span>
+              <span>{i18nT("ui.ethikos.impact.tracker.impactWorkflow")}</span>
             </Space>
           }
           style={{ marginBottom: 16 }}
@@ -461,10 +464,10 @@ export default function ImpactTracker(): JSX.Element {
               <Space direction="vertical" size={8}>
                 <Space>
                   <AuditOutlined />
-                  <Text strong>1. Decision</Text>
+                  <Text strong>{i18nT("ui.ethikos.impact.tracker.text1Decision")}</Text>
                 </Space>
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  Start from a decision, consultation, or deliberation outcome.
+                  {i18nT("ui.ethikos.impact.tracker.startFromADecisionConsultationOrDeliberation")}
                 </Paragraph>
               </Space>
             </ProCard>
@@ -473,10 +476,10 @@ export default function ImpactTracker(): JSX.Element {
               <Space direction="vertical" size={8}>
                 <Space>
                   <SendOutlined />
-                  <Text strong>2. Action</Text>
+                  <Text strong>{i18nT("ui.ethikos.impact.tracker.text2Action")}</Text>
                 </Space>
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  Track the follow-up action and assign ownership.
+                  {i18nT("ui.ethikos.impact.tracker.trackTheFollowUpActionAndAssign")}
                 </Paragraph>
               </Space>
             </ProCard>
@@ -485,10 +488,10 @@ export default function ImpactTracker(): JSX.Element {
               <Space direction="vertical" size={8}>
                 <Space>
                   <FileSearchOutlined />
-                  <Text strong>3. Evidence</Text>
+                  <Text strong>{i18nT("ui.ethikos.impact.tracker.text3Evidence")}</Text>
                 </Space>
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  Link evidence so progress can be verified, not just claimed.
+                  {i18nT("ui.ethikos.impact.tracker.linkEvidenceSoProgressCanBeVerified")}
                 </Paragraph>
               </Space>
             </ProCard>
@@ -497,10 +500,10 @@ export default function ImpactTracker(): JSX.Element {
               <Space direction="vertical" size={8}>
                 <Space>
                   <CheckCircleOutlined />
-                  <Text strong>4. Closure</Text>
+                  <Text strong>{i18nT("ui.ethikos.impact.tracker.text4Closure")}</Text>
                 </Space>
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  Close, revise, or unblock the commitment based on results.
+                  {i18nT("ui.ethikos.impact.tracker.closeReviseOrUnblockTheCommitmentBased")}
                 </Paragraph>
               </Space>
             </ProCard>
@@ -512,10 +515,8 @@ export default function ImpactTracker(): JSX.Element {
             type="warning"
             showIcon
             style={{ marginBottom: 16 }}
-            message={`${stats.needsAttention} tracked item${
-              stats.needsAttention === 1 ? '' : 's'
-            } need attention`}
-            description="Blocked or overdue items should be reviewed before new commitments are added."
+            message={i18nT("ui.ethikos.impact.tracker.trackedItemNeedAttention", { needsAttention: stats.needsAttention, value1: stats.needsAttention === 1 ? '' : 's' })}
+            description={i18nT("ui.ethikos.impact.tracker.blockedOrOverdueItemsShouldBeReviewed")}
           />
         ) : null}
 
@@ -523,34 +524,34 @@ export default function ImpactTracker(): JSX.Element {
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, xl: 6 }}
             statistic={{
-              title: 'Tracked decisions',
+              title: i18nT("ui.ethikos.impact.tracker.trackedDecisions"),
               value: stats.total,
-              description: 'Decision outcomes being followed',
+              description: i18nT("ui.ethikos.impact.tracker.decisionOutcomesBeingFollowed"),
             }}
           />
 
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, xl: 6 }}
             statistic={{
-              title: 'Active follow-up',
+              title: i18nT("ui.ethikos.impact.tracker.activeFollowUp"),
               value: stats.active,
-              description: 'Planned or in progress',
+              description: i18nT("ui.ethikos.impact.tracker.plannedOrInProgress"),
             }}
           />
 
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, xl: 6 }}
             statistic={{
-              title: 'Blocked',
+              title: i18nT("ui.ethikos.impact.tracker.blocked"),
               value: stats.blocked,
-              description: 'Needs action or clarification',
+              description: i18nT("ui.ethikos.impact.tracker.needsActionOrClarification"),
             }}
           />
 
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, xl: 6 }}
             statistic={{
-              title: 'Completion rate',
+              title: i18nT("ui.ethikos.impact.tracker.completionRate"),
               value: stats.completionRate,
               suffix: '%',
               description: (
@@ -565,13 +566,13 @@ export default function ImpactTracker(): JSX.Element {
         </ProCard>
 
         <ProCard
-          title="Tracked commitments"
+          title={i18nT("ui.ethikos.impact.tracker.trackedCommitments")}
           extra={
             <Space wrap>
-              <Tooltip title="Active hides completed and blocked items unless selected.">
+              <Tooltip title={i18nT("ui.ethikos.impact.tracker.activeFilterHint")}>
                 <Segmented<StatusFilter>
                   value={statusFilter}
-                  options={FILTER_OPTIONS}
+                  options={FILTER_OPTIONS(i18nT)}
                   onChange={(value) => setStatusFilter(value)}
                 />
               </Tooltip>
@@ -579,7 +580,7 @@ export default function ImpactTracker(): JSX.Element {
           }
         >
           {filteredItems.length === 0 && !loading ? (
-            <Empty description="No tracked commitments match the current filter." />
+            <Empty description={i18nT("ui.ethikos.impact.tracker.noTrackedCommitmentsMatchTheCurrentFilter")} />
           ) : (
             <ProTable<TrackerRow>
               rowKey="id"
@@ -591,8 +592,7 @@ export default function ImpactTracker(): JSX.Element {
               loading={loading}
               toolBarRender={() => [
                 <Text key="hint" type="secondary">
-                  Update status when a decision moves from promise to action,
-                  evidence, or closure.
+                  {i18nT("ui.ethikos.impact.tracker.updateStatusWhenADecisionMovesFrom")}
                 </Text>,
               ]}
             />

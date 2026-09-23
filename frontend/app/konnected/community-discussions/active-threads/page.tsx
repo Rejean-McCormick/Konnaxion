@@ -2,6 +2,7 @@
 ﻿// C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\active-threads\page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   FireOutlined,
   MessageTwoTone,
@@ -239,6 +240,7 @@ function useActiveThreads(params: {
 }
 
 export default function ActiveThreadsPage() {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
 
   // Paging + filters
@@ -270,13 +272,13 @@ export default function ActiveThreadsPage() {
         router.push('/konnected/community-discussions/start-new-discussion')
       }
     >
-      Start new discussion
+      {i18nT("ui.konnected.communityDiscussions.activeThreads.startNewDiscussion")}
     </Button>
   );
 
   const headerSecondaryActions = (
     <Space>
-      <Tooltip title="Refresh active threads">
+      <Tooltip title={i18nT("ui.konnected.communityDiscussions.activeThreads.refreshActiveThreads")}>
         <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isFetching} />
       </Tooltip>
     </Space>
@@ -298,7 +300,7 @@ export default function ActiveThreadsPage() {
         <Space style={{ width: '100%' }} wrap>
           <Input
             allowClear
-            placeholder="Search by title, category, or keyword"
+            placeholder={i18nT("ui.konnected.communityDiscussions.activeThreads.searchByTitleCategoryOrKeyword")}
             prefix={<SearchOutlined />}
             value={pendingSearch}
             onChange={(e) => setPendingSearch(e.target.value)}
@@ -312,13 +314,13 @@ export default function ActiveThreadsPage() {
             icon={<SearchOutlined />}
             type="default"
           >
-            Search
+            {i18nT("ui.konnected.communityDiscussions.activeThreads.search")}
           </Button>
         </Space>
 
         <Space wrap>
           <Space>
-            <Text type="secondary">Thread type:</Text>
+            <Text type="secondary">{i18nT("ui.konnected.communityDiscussions.activeThreads.threadType")}</Text>
             <Select<TopicFilter>
               value={topicFilter}
               onChange={(val) => {
@@ -327,14 +329,14 @@ export default function ActiveThreadsPage() {
               }}
               style={{ width: 180 }}
             >
-              <Option value="all">All threads</Option>
-              <Option value="questions">Questions only</Option>
-              <Option value="discussions">Open discussions</Option>
+              <Option value="all">{i18nT("ui.konnected.communityDiscussions.activeThreads.allThreads")}</Option>
+              <Option value="questions">{i18nT("ui.konnected.communityDiscussions.activeThreads.questionsOnly")}</Option>
+              <Option value="discussions">{i18nT("ui.konnected.communityDiscussions.activeThreads.openDiscussions")}</Option>
             </Select>
           </Space>
 
           <Space>
-            <Text type="secondary">Sort by:</Text>
+            <Text type="secondary">{i18nT("ui.konnected.communityDiscussions.activeThreads.sortBy")}</Text>
             <Select<SortOption>
               value={sort}
               onChange={(val) => {
@@ -343,17 +345,15 @@ export default function ActiveThreadsPage() {
               }}
               style={{ width: 200 }}
             >
-              <Option value="recent">Most recent activity</Option>
-              <Option value="most_replies">Most replies</Option>
-              <Option value="most_active">Most participants</Option>
+              <Option value="recent">{i18nT("ui.konnected.communityDiscussions.activeThreads.mostRecentActivity")}</Option>
+              <Option value="most_replies">{i18nT("ui.konnected.communityDiscussions.activeThreads.mostReplies")}</Option>
+              <Option value="most_active">{i18nT("ui.konnected.communityDiscussions.activeThreads.mostParticipants")}</Option>
             </Select>
           </Space>
         </Space>
 
         <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-          Active Threads shows forum topics with recent replies and engagement across
-          KonnectED’s knowledge forums. Use filters to focus on questions needing
-          answers or heavily active thematic discussions.
+          {i18nT("ui.konnected.communityDiscussions.activeThreads.activeThreadsShowsForumTopicsWithRecent")}
         </Paragraph>
       </Space>
     </Card>
@@ -368,13 +368,13 @@ export default function ActiveThreadsPage() {
           {item.is_pinned && (
             <Tag color="gold">
               <FireOutlined style={{ marginRight: 4 }} />
-              Pinned
+              {i18nT("ui.konnected.communityDiscussions.activeThreads.pinned")}
             </Tag>
           )}
           {item.kind === 'question' && (
             <Tag color="blue">
               <QuestionCircleOutlined style={{ marginRight: 4 }} />
-              Question
+              {i18nT("ui.konnected.communityDiscussions.activeThreads.question")}
             </Tag>
           )}
           {item.category && <Tag>{item.category}</Tag>}
@@ -390,13 +390,13 @@ export default function ActiveThreadsPage() {
             <Space>
               <MessageTwoTone />
               <Text strong>{item.replies_count}</Text>
-              <Text type="secondary">replies</Text>
+              <Text type="secondary">{i18nT("ui.konnected.communityDiscussions.activeThreads.replies")}</Text>
             </Space>
             {item.participants_count != null && (
               <Space>
                 <TeamOutlined />
                 <Text strong>{item.participants_count}</Text>
-                <Text type="secondary">participants</Text>
+                <Text type="secondary">{i18nT("ui.konnected.communityDiscussions.activeThreads.participants")}</Text>
               </Space>
             )}
           </Space>
@@ -413,25 +413,25 @@ export default function ActiveThreadsPage() {
                 }
               >
                 {item.status === 'open'
-                  ? 'Open'
+                  ? i18nT("ui.konnected.communityDiscussions.activeThreads.open")
                   : item.status === 'closed'
-                  ? 'Closed'
-                  : 'Archived'}
+                  ? i18nT("ui.konnected.communityDiscussions.activeThreads.closed")
+                  : i18nT("ui.konnected.communityDiscussions.activeThreads.archived")}
               </Tag>
             )}
             <Text type="secondary">
-              Last activity{' '}
+              {i18nT("ui.konnected.communityDiscussions.activeThreads.lastActivity")}{' '}
               {Number.isNaN(lastActivity.getTime())
-                ? 'recently'
+                ? i18nT("ui.konnected.communityDiscussions.activeThreads.recently")
                 : lastActivity.toLocaleString()}
-              {item.last_activity_by ? ` • by ${item.last_activity_by}` : ''}
+              {item.last_activity_by ? i18nT("ui.konnected.communityDiscussions.activeThreads.by", { last_activity_by: item.last_activity_by }) : ''}
             </Text>
           </Space>
         </Space>
 
         {item.linked_resource_title && (
           <Text type="secondary">
-            Linked resource: <strong>{item.linked_resource_title}</strong>
+            {i18nT("ui.konnected.communityDiscussions.activeThreads.linkedResource")} <strong>{item.linked_resource_title}</strong>
           </Text>
         )}
 
@@ -466,12 +466,12 @@ export default function ActiveThreadsPage() {
       return (
         <Alert
           type="error"
-          message="Unable to load active threads"
-          description={error?.message ?? 'An unexpected error occurred.'}
+          message={i18nT("ui.konnected.communityDiscussions.activeThreads.unableToLoadActiveThreads")}
+          description={error?.message ?? i18nT("ui.konnected.communityDiscussions.activeThreads.anUnexpectedErrorOccurred")}
           showIcon
           action={
             <Button size="small" onClick={() => refetch()} icon={<ReloadOutlined />}>
-              Retry
+              {i18nT("ui.konnected.communityDiscussions.activeThreads.retry")}
             </Button>
           }
           style={{ marginBottom: 16 }}
@@ -486,9 +486,9 @@ export default function ActiveThreadsPage() {
             image={Empty.PRESENTED_IMAGE_SIMPLE}
             description={
               <>
-                <div>No active threads match your filters.</div>
+                <div>{i18nT("ui.konnected.communityDiscussions.activeThreads.noActiveThreadsMatchYourFilters")}</div>
                 <div>
-                  You can adjust filters or{' '}
+                  {i18nT("ui.konnected.communityDiscussions.activeThreads.youCanAdjustFiltersOr")}{' '}
                   <Button
                     type="link"
                     onClick={() =>
@@ -497,7 +497,7 @@ export default function ActiveThreadsPage() {
                       )
                     }
                   >
-                    start a new discussion
+                    {i18nT("ui.konnected.communityDiscussions.activeThreads.startANewDiscussion")}
                   </Button>
                   .
                 </div>
@@ -522,18 +522,18 @@ export default function ActiveThreadsPage() {
               actions={[
                 <Space key="stats">
                   <MessageTwoTone />
-                  <Text>{item.replies_count} replies</Text>
+                  <Text>{item.replies_count} {i18nT("ui.konnected.communityDiscussions.activeThreads.replies")}</Text>
                   {item.participants_count != null && (
                     <>
                       <TeamOutlined />
-                      <Text>{item.participants_count} participants</Text>
+                      <Text>{item.participants_count} {i18nT("ui.konnected.communityDiscussions.activeThreads.participants")}</Text>
                     </>
                   )}
                 </Space>,
               ]}
               extra={
                 item.is_unread ? (
-                  <Badge status="processing" text="New activity" />
+                  <Badge status="processing" text={i18nT("ui.konnected.communityDiscussions.activeThreads.newActivity")} />
                 ) : undefined
               }
             >
@@ -548,7 +548,7 @@ export default function ActiveThreadsPage() {
                     <Text strong>{item.title}</Text>
                     {item.is_pinned && (
                       <Tag color="gold" icon={<FireOutlined />}>
-                        Pinned
+                        {i18nT("ui.konnected.communityDiscussions.activeThreads.pinned")}
                       </Tag>
                     )}
                   </Space>
@@ -561,7 +561,7 @@ export default function ActiveThreadsPage() {
                   >
                     {item.created_by_name && (
                       <Text type="secondary">
-                        Started by <strong>{item.created_by_name}</strong>
+                        {i18nT("ui.konnected.communityDiscussions.activeThreads.startedBy")} <strong>{item.created_by_name}</strong>
                       </Text>
                     )}
                     {renderListItemMeta(item)}
@@ -587,8 +587,8 @@ export default function ActiveThreadsPage() {
 
   return (
     <KonnectedPageShell
-      title="Community Discussions – Active Threads"
-      subtitle="Subject-based forums for learners and educators. These threads show recent activity across KonnectED’s thematic forums."
+      title={i18nT("ui.konnected.communityDiscussions.activeThreads.communityDiscussionsActiveThreads")}
+      subtitle={i18nT("ui.konnected.communityDiscussions.activeThreads.subjectBasedForumsForLearnersAndEducators")}
       primaryAction={headerPrimaryAction}
       secondaryActions={headerSecondaryActions}
     >

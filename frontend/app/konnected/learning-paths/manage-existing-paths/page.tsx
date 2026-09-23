@@ -1,6 +1,7 @@
 // FILE: frontend/app/konnected/learning-paths/manage-existing-paths/page.tsx
 ﻿'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   DeleteOutlined,
   EditOutlined,
@@ -188,6 +189,7 @@ function isFormValidationError(error: unknown): error is { errorFields: unknown 
 }
 
 export default function ManageExistingPathsPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const actionRef = useRef<ActionType>();
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editSubmitting, setEditSubmitting] = useState(false);
@@ -213,7 +215,7 @@ export default function ManageExistingPathsPage(): JSX.Element {
 
       setEditSubmitting(true);
       await updateLearningPath(editingPath.id, values);
-      message.success('Learning path updated.');
+      message.success(i18nT("ui.konnected.learningPaths.manageExistingPaths.learningPathUpdated"));
       setEditModalOpen(false);
       setEditingPath(null);
       editForm.resetFields();
@@ -229,14 +231,14 @@ export default function ManageExistingPathsPage(): JSX.Element {
 
   const confirmArchive = (record: LearningPath) => {
     Modal.confirm({
-      title: 'Archive this learning path?',
+      title: i18nT("ui.konnected.learningPaths.manageExistingPaths.archiveThisLearningPath"),
       content:
-        'Learners will no longer see this path in recommendations, but historical progress may remain visible.',
-      okText: 'Archive',
+        i18nT("ui.konnected.learningPaths.manageExistingPaths.learnersWillNoLongerSeeThisPath"),
+      okText: i18nT("ui.konnected.learningPaths.manageExistingPaths.archive"),
       onOk: async () => {
         try {
           await archiveLearningPath(record.id);
-          message.success('Learning path archived.');
+          message.success(i18nT("ui.konnected.learningPaths.manageExistingPaths.learningPathArchived"));
           actionRef.current?.reload();
         } catch (err: unknown) {
           message.error(errorMessage(err, 'Failed to archive learning path.'));
@@ -247,15 +249,15 @@ export default function ManageExistingPathsPage(): JSX.Element {
 
   const confirmDelete = (record: LearningPath) => {
     Modal.confirm({
-      title: 'Delete this learning path?',
+      title: i18nT("ui.konnected.learningPaths.manageExistingPaths.deleteThisLearningPath"),
       content:
-        'This action cannot be undone. If learners are still attached, prefer archiving instead of deleting.',
-      okText: 'Delete',
+        i18nT("ui.konnected.learningPaths.manageExistingPaths.thisActionCannotBeUndoneIfLearners"),
+      okText: i18nT("ui.konnected.learningPaths.manageExistingPaths.delete"),
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
           await deleteLearningPath(record.id);
-          message.success('Learning path deleted.');
+          message.success(i18nT("ui.konnected.learningPaths.manageExistingPaths.learningPathDeleted"));
           actionRef.current?.reload();
         } catch (err: unknown) {
           message.error(errorMessage(err, 'Failed to delete learning path.'));
@@ -266,7 +268,7 @@ export default function ManageExistingPathsPage(): JSX.Element {
 
   const columns: ProColumns<LearningPath>[] = [
     {
-      title: 'Path',
+      title: i18nT("ui.konnected.learningPaths.manageExistingPaths.path"),
       dataIndex: 'name',
       key: 'name',
       ellipsis: true,
@@ -277,7 +279,7 @@ export default function ManageExistingPathsPage(): JSX.Element {
       ),
     },
     {
-      title: 'Subject',
+      title: i18nT("ui.konnected.learningPaths.manageExistingPaths.subject"),
       dataIndex: 'subject',
       key: 'subject',
       ellipsis: true,
@@ -286,7 +288,7 @@ export default function ManageExistingPathsPage(): JSX.Element {
       },
     },
     {
-      title: 'Owner',
+      title: i18nT("ui.konnected.learningPaths.manageExistingPaths.owner"),
       dataIndex: 'owner_name',
       key: 'owner_name',
       ellipsis: true,
@@ -296,19 +298,19 @@ export default function ManageExistingPathsPage(): JSX.Element {
       },
     },
     {
-      title: 'Difficulty',
+      title: i18nT("ui.konnected.learningPaths.manageExistingPaths.difficulty"),
       dataIndex: 'difficulty',
       key: 'difficulty',
       valueType: 'select',
       valueEnum: {
-        Beginner: { text: 'Beginner' },
-        Intermediate: { text: 'Intermediate' },
-        Advanced: { text: 'Advanced' },
+        Beginner: { text: i18nT("ui.konnected.learningPaths.manageExistingPaths.beginner") },
+        Intermediate: { text: i18nT("ui.konnected.learningPaths.manageExistingPaths.intermediate") },
+        Advanced: { text: i18nT("ui.konnected.learningPaths.manageExistingPaths.advanced") },
       },
       render: (_, record) => record.difficulty || '—',
     },
     {
-      title: 'Modules',
+      title: i18nT("ui.konnected.learningPaths.manageExistingPaths.modules"),
       dataIndex: 'modules_count',
       key: 'modules_count',
       width: 110,
@@ -317,7 +319,7 @@ export default function ManageExistingPathsPage(): JSX.Element {
       search: false,
     },
     {
-      title: 'Learners',
+      title: i18nT("ui.konnected.learningPaths.manageExistingPaths.learners"),
       dataIndex: 'learners_count',
       key: 'learners_count',
       width: 120,
@@ -326,7 +328,7 @@ export default function ManageExistingPathsPage(): JSX.Element {
       search: false,
     },
     {
-      title: 'Created',
+      title: i18nT("ui.konnected.learningPaths.manageExistingPaths.created"),
       dataIndex: 'created_at',
       key: 'created_at',
       valueType: 'date',
@@ -335,20 +337,20 @@ export default function ManageExistingPathsPage(): JSX.Element {
       search: false,
     },
     {
-      title: 'Status',
+      title: i18nT("ui.konnected.learningPaths.manageExistingPaths.status"),
       dataIndex: 'status',
       key: 'status',
       valueType: 'select',
       width: 130,
       valueEnum: {
-        draft: { text: 'Draft' },
-        published: { text: 'Published' },
-        archived: { text: 'Archived' },
+        draft: { text: i18nT("ui.konnected.learningPaths.manageExistingPaths.draft") },
+        published: { text: i18nT("ui.konnected.learningPaths.manageExistingPaths.published") },
+        archived: { text: i18nT("ui.konnected.learningPaths.manageExistingPaths.archived") },
       },
       render: (_, record) => renderStatusTag(record.status),
     },
     {
-      title: 'Created between',
+      title: i18nT("ui.konnected.learningPaths.manageExistingPaths.createdBetween"),
       dataIndex: 'created_at_range',
       hideInTable: true,
       valueType: 'dateRange',
@@ -360,18 +362,18 @@ export default function ManageExistingPathsPage(): JSX.Element {
       },
     },
     {
-      title: 'Keyword',
+      title: i18nT("ui.konnected.learningPaths.manageExistingPaths.keyword"),
       dataIndex: 'keyword',
       hideInTable: true,
       renderFormItem: () => (
-        <Input placeholder="Search by title, description, tags…" allowClear />
+        <Input placeholder={i18nT("ui.konnected.learningPaths.manageExistingPaths.searchByTitleDescriptionTags")} allowClear />
       ),
       search: {
         transform: (value: string) => ({ keyword: value }),
       },
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.konnected.learningPaths.manageExistingPaths.actions"),
       key: 'actions',
       fixed: 'right',
       width: 220,
@@ -384,14 +386,14 @@ export default function ManageExistingPathsPage(): JSX.Element {
         return (
           <Space size="small">
             <Button type="link" onClick={() => openEditModal(record)} disabled={!canEdit}>
-              <EditOutlined /> Edit
+              <EditOutlined /> {i18nT("ui.konnected.learningPaths.manageExistingPaths.edit")}
             </Button>
             <Button
               type="link"
               onClick={() => confirmArchive(record)}
               disabled={!canArchive}
             >
-              Archive
+              {i18nT("ui.konnected.learningPaths.manageExistingPaths.archive")}
             </Button>
             <Button
               type="link"
@@ -399,7 +401,7 @@ export default function ManageExistingPathsPage(): JSX.Element {
               onClick={() => confirmDelete(record)}
               disabled={!canDelete}
             >
-              <DeleteOutlined /> Delete
+              <DeleteOutlined /> {i18nT("ui.konnected.learningPaths.manageExistingPaths.delete")}
             </Button>
           </Space>
         );
@@ -409,17 +411,16 @@ export default function ManageExistingPathsPage(): JSX.Element {
 
   return (
     <KonnectedPageShell
-      title="Manage Learning Paths"
+      title={i18nT("ui.konnected.learningPaths.manageExistingPaths.manageLearningPaths")}
       subtitle={
         <Paragraph style={{ marginBottom: 0 }}>
-          Review, edit, archive or delete existing learning paths. Published paths
-          are visible to learners and may already have active enrollments.
+          {i18nT("ui.konnected.learningPaths.manageExistingPaths.reviewEditArchiveOrDeleteExistingLearning")}
         </Paragraph>
       }
       primaryAction={
         <Link href="/konnected/learning-paths/create-learning-path">
           <Button type="primary" icon={<PlusOutlined />}>
-            Create Path
+            {i18nT("ui.konnected.learningPaths.manageExistingPaths.createPath")}
           </Button>
         </Link>
       }
@@ -431,17 +432,17 @@ export default function ManageExistingPathsPage(): JSX.Element {
         pagination={{
           pageSize: 10,
           showSizeChanger: true,
-          showTotal: (total) => `${total} learning paths`,
+          showTotal: (total) => i18nT("ui.konnected.learningPaths.manageExistingPaths.learningPathsCount", { count: total }),
         }}
         search={{
           labelWidth: 120,
         }}
         locale={{
           emptyText: (
-            <Empty description="No learning paths found.">
+            <Empty description={i18nT("ui.konnected.learningPaths.manageExistingPaths.noLearningPathsFound")}>
               <Link href="/konnected/learning-paths/create-learning-path">
                 <Button type="primary" icon={<PlusOutlined />}>
-                  Create New Path
+                  {i18nT("ui.konnected.learningPaths.manageExistingPaths.createNewPath")}
                 </Button>
               </Link>
             </Empty>
@@ -449,7 +450,7 @@ export default function ManageExistingPathsPage(): JSX.Element {
         }}
         toolBarRender={() => [
           <Text type="secondary" key="hint">
-            Filter by owner, subject, status or date to narrow down large catalogs.
+            {i18nT("ui.konnected.learningPaths.manageExistingPaths.filterByOwnerSubjectStatusOrDate")}
           </Text>,
         ]}
         request={async (params) => {
@@ -484,8 +485,8 @@ export default function ManageExistingPathsPage(): JSX.Element {
       <Modal
         title={
           editingPath
-            ? `Edit learning path – ${editingPath.name}`
-            : 'Edit learning path'
+            ? i18nT("ui.konnected.learningPaths.manageExistingPaths.editLearningPath", { name: editingPath.name })
+            : i18nT("ui.konnected.learningPaths.manageExistingPaths.editLearningPath_6c476b")
         }
         open={editModalOpen}
         onOk={handleEditSubmit}
@@ -499,41 +500,41 @@ export default function ManageExistingPathsPage(): JSX.Element {
       >
         <Form<EditFormValues> form={editForm} layout="vertical">
           <Form.Item
-            label="Path name"
+            label={i18nT("ui.konnected.learningPaths.manageExistingPaths.pathName")}
             name="name"
-            rules={[{ required: true, message: 'Please enter a path name.' }]}
+            rules={[{ required: true, message: i18nT("ui.konnected.learningPaths.manageExistingPaths.pleaseEnterAPathName") }]}
           >
-            <Input placeholder="e.g. Intro to Sustainability for Team Leads" />
+            <Input placeholder={i18nT("ui.konnected.learningPaths.manageExistingPaths.eGIntroToSustainabilityForTeam")} />
           </Form.Item>
 
-          <Form.Item label="Description" name="description">
+          <Form.Item label={i18nT("ui.konnected.learningPaths.manageExistingPaths.description")} name="description">
             <Input.TextArea
               rows={3}
-              placeholder="Short summary of who this path is for and what it covers."
+              placeholder={i18nT("ui.konnected.learningPaths.manageExistingPaths.shortSummaryOfWhoThisPathIs")}
             />
           </Form.Item>
 
-          <Form.Item label="Difficulty" name="difficulty">
-            <Select allowClear placeholder="Select difficulty">
-              <Option value="Beginner">Beginner</Option>
-              <Option value="Intermediate">Intermediate</Option>
-              <Option value="Advanced">Advanced</Option>
+          <Form.Item label={i18nT("ui.konnected.learningPaths.manageExistingPaths.difficulty")} name="difficulty">
+            <Select allowClear placeholder={i18nT("ui.konnected.learningPaths.manageExistingPaths.selectDifficulty")}>
+              <Option value="Beginner">{i18nT("ui.konnected.learningPaths.manageExistingPaths.beginner")}</Option>
+              <Option value="Intermediate">{i18nT("ui.konnected.learningPaths.manageExistingPaths.intermediate")}</Option>
+              <Option value="Advanced">{i18nT("ui.konnected.learningPaths.manageExistingPaths.advanced")}</Option>
             </Select>
           </Form.Item>
 
-          <Form.Item label="Subject / Domain" name="subject">
-            <Input placeholder="e.g. AI Ethics, Public Health, Civic Engagement" />
+          <Form.Item label={i18nT("ui.konnected.learningPaths.manageExistingPaths.subjectDomain")} name="subject">
+            <Input placeholder={i18nT("ui.konnected.learningPaths.manageExistingPaths.eGAiEthicsPublicHealthCivic")} />
           </Form.Item>
 
           <Form.Item
-            label="Status"
+            label={i18nT("ui.konnected.learningPaths.manageExistingPaths.status")}
             name="status"
-            rules={[{ required: true, message: 'Please select a status.' }]}
+            rules={[{ required: true, message: i18nT("ui.konnected.learningPaths.manageExistingPaths.pleaseSelectAStatus") }]}
           >
             <Select>
-              <Option value="draft">Draft</Option>
-              <Option value="published">Published</Option>
-              <Option value="archived">Archived</Option>
+              <Option value="draft">{i18nT("ui.konnected.learningPaths.manageExistingPaths.draft")}</Option>
+              <Option value="published">{i18nT("ui.konnected.learningPaths.manageExistingPaths.published")}</Option>
+              <Option value="archived">{i18nT("ui.konnected.learningPaths.manageExistingPaths.archived")}</Option>
             </Select>
           </Form.Item>
         </Form>

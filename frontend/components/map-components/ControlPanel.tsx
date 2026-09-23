@@ -1,3 +1,5 @@
+'use client';
+
 // FILE: frontend/components/map-components/ControlPanel.tsx
 // C:\MyCode\Konnaxionv14\frontend\components\map-components\ControlPanel.tsx
 /**
@@ -5,6 +7,7 @@
  * Displays current coordinates and optionally exposes zoom, filters, view‑mode and layer controls.
  */
 
+import { useLanguage } from '@/context/LanguageContext';
 import React, { type CSSProperties } from 'react';
 
 export type ViewMode = 'default' | 'satellite' | 'terrain';
@@ -131,6 +134,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   className,
   style,
 }) => {
+  const { t: i18nT } = useLanguage();
   const zoomValue = typeof zoom === 'number' ? zoom : undefined;
   const hasZoomControl = zoomValue !== undefined && !!onZoomChange;
   const hasFilters = Array.isArray(filters) && filters.length > 0;
@@ -150,9 +154,9 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
     >
       {/* Coordinates */}
       <div style={rowStyle}>
-        <div style={sectionTitleStyle}>Location</div>
-        <div>Latitude: {formatCoord(lat)}</div>
-        <div>Longitude: {formatCoord(lng)}</div>
+        <div style={sectionTitleStyle}>{i18nT("ui.mapComponents.controlpanel.location")}</div>
+        <div>{i18nT("ui.mapComponents.controlpanel.latitude")} {formatCoord(lat)}</div>
+        <div>{i18nT("ui.mapComponents.controlpanel.longitude")} {formatCoord(lng)}</div>
         {onRecenter && (
           <button
             type="button"
@@ -167,7 +171,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
               cursor: 'pointer',
             }}
           >
-            Recenter map
+            {i18nT("ui.mapComponents.controlpanel.recenterMap")}
           </button>
         )}
       </div>
@@ -175,7 +179,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
       {/* Zoom control */}
       {hasZoomControl && zoomValue !== undefined && (
         <div style={rowStyle}>
-          <div style={sectionTitleStyle}>Zoom</div>
+          <div style={sectionTitleStyle}>{i18nT("ui.mapComponents.controlpanel.zoom")}</div>
           <input
             type="range"
             min={minZoom}
@@ -185,14 +189,14 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
             onChange={(e) => onZoomChange?.(Number(e.target.value))}
             style={{ width: '100%' }}
           />
-          <div style={{ marginTop: 2 }}>Current: {zoomValue.toFixed(1)}</div>
+          <div style={{ marginTop: 2 }}>{i18nT("ui.mapComponents.controlpanel.current")} {zoomValue.toFixed(1)}</div>
         </div>
       )}
 
       {/* View mode selector */}
       {hasViewMode && (
         <div style={rowStyle}>
-          <div style={sectionTitleStyle}>View</div>
+          <div style={sectionTitleStyle}>{i18nT("ui.mapComponents.controlpanel.view")}</div>
           <div style={{ display: 'flex', gap: 6 }}>
             {(['default', 'satellite', 'terrain'] as ViewMode[]).map((mode) => (
               <button
@@ -202,7 +206,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
                 style={viewMode === mode ? chipActiveStyle : chipStyle}
               >
                 {mode === 'default'
-                  ? 'Standard'
+                  ? i18nT("ui.mapComponents.controlpanel.standard")
                   : mode.charAt(0).toUpperCase() + mode.slice(1)}
               </button>
             ))}
@@ -213,14 +217,14 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
       {/* Filters */}
       {hasFilters && (
         <div style={rowStyle}>
-          <div style={sectionTitleStyle}>Filters</div>
+          <div style={sectionTitleStyle}>{i18nT("ui.mapComponents.controlpanel.filters")}</div>
           <div style={chipContainerStyle}>
             <button
               type="button"
               onClick={() => onFilterChange?.(null)}
               style={!selectedFilterId ? chipActiveStyle : chipStyle}
             >
-              All
+              {i18nT("ui.mapComponents.controlpanel.all")}
             </button>
             {(filters ?? []).map((f) => (
               <button
@@ -241,7 +245,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
       {/* Layer toggles */}
       {hasLayers && (
         <div style={rowStyle}>
-          <div style={sectionTitleStyle}>Layers</div>
+          <div style={sectionTitleStyle}>{i18nT("ui.mapComponents.controlpanel.layers")}</div>
           {(layers ?? []).map((layer) => (
             <label key={layer.id} style={layerRowStyle}>
               <input

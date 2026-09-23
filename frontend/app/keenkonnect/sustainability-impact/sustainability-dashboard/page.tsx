@@ -1,6 +1,7 @@
 // FILE: frontend/app/keenkonnect/sustainability-impact/sustainability-dashboard/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Area, Column, Line } from '@ant-design/plots';
 import { Card, Col, Row, Select, Space, Statistic, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
@@ -106,6 +107,7 @@ const projectLeaderboard: ProjectRow[] = [
 ];
 
 export default function SustainabilityDashboardPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [timeRange, setTimeRange] = useState<TimeRange>('6m');
 
   const filteredCo2Trend = useMemo(() => {
@@ -140,7 +142,7 @@ export default function SustainabilityDashboardPage(): JSX.Element {
     },
     tooltip: {
       formatter: (datum: { month: string; value: number }) => ({
-        name: 'CO₂ saved',
+        name: i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.co2Saved"),
         value: `${datum.value.toLocaleString()} kg`,
       }),
     },
@@ -167,7 +169,7 @@ export default function SustainabilityDashboardPage(): JSX.Element {
     },
     tooltip: {
       formatter: (datum: { month: string; value: number }) => ({
-        name: 'Energy saved',
+        name: i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.energySaved"),
         value: `${datum.value.toLocaleString()} kWh`,
       }),
     },
@@ -197,36 +199,36 @@ export default function SustainabilityDashboardPage(): JSX.Element {
 
   const columns: ColumnsType<ProjectRow> = [
     {
-      title: 'Project',
+      title: i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.project"),
       dataIndex: 'name',
       key: 'name',
       ellipsis: true,
     },
     {
-      title: 'Owner',
+      title: i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.owner"),
       dataIndex: 'owner',
       key: 'owner',
     },
     {
-      title: 'CO₂ saved (kg)',
+      title: i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.co2SavedKg"),
       dataIndex: 'co2SavedKg',
       key: 'co2SavedKg',
       render: (value: number) => value.toLocaleString(),
     },
     {
-      title: 'Energy saved (kWh)',
+      title: i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.energySavedKwh"),
       dataIndex: 'energySavedKwh',
       key: 'energySavedKwh',
       render: (value: number) => value.toLocaleString(),
     },
     {
-      title: 'Impact score',
+      title: i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.impactScore"),
       dataIndex: 'impactScore',
       key: 'impactScore',
       render: (value: number) => `${value}/100`,
     },
     {
-      title: 'Tags',
+      title: i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.tags"),
       dataIndex: 'tags',
       key: 'tags',
       render: (tags: string[]) => (
@@ -241,20 +243,20 @@ export default function SustainabilityDashboardPage(): JSX.Element {
 
   return (
     <KeenPageShell
-      title="Sustainability Impact Dashboard"
-      description="High-level dashboard aggregating sustainability impact across KeenKonnect projects."
-      metaTitle="KeenKonnect · Sustainability Impact Dashboard"
+      title={i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.sustainabilityImpactDashboard")}
+      description={i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.highLevelDashboardAggregatingSustainabilityImpactAcross")}
+      metaTitle={i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.keenkonnectSustainabilityImpactDashboard")}
       toolbar={
         <Space>
-          <span>Time range:</span>
+          <span>{i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.timeRange")}</span>
           <Select<TimeRange>
             size="small"
             value={timeRange}
             onChange={setTimeRange}
             options={[
-              { label: 'Last 3 months', value: '3m' },
-              { label: 'Last 6 months', value: '6m' },
-              { label: 'Last 12 months', value: '12m' },
+              { label: i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.last3Months"), value: '3m' },
+              { label: i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.last6Months"), value: '6m' },
+              { label: i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.last12Months"), value: '12m' },
             ]}
             style={{ minWidth: 140 }}
           />
@@ -266,28 +268,28 @@ export default function SustainabilityDashboardPage(): JSX.Element {
         <Row gutter={[16, 16]}>
           <Col xs={12} md={6}>
             <Statistic
-              title="Total CO₂ saved"
+              title={i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.totalCo2Saved")}
               value={overviewStats.totalCo2SavedKg}
               suffix="kg"
             />
           </Col>
           <Col xs={12} md={6}>
             <Statistic
-              title="Total energy saved"
+              title={i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.totalEnergySaved")}
               value={overviewStats.totalEnergySavedKwh}
               suffix="kWh"
             />
           </Col>
           <Col xs={12} md={6}>
             <Statistic
-              title="Waste diverted"
+              title={i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.wasteDiverted")}
               value={overviewStats.wasteDivertedKg}
               suffix="kg"
             />
           </Col>
           <Col xs={12} md={6}>
             <Statistic
-              title="Active projects"
+              title={i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.activeProjects")}
               value={overviewStats.activeProjects}
             />
           </Col>
@@ -297,13 +299,13 @@ export default function SustainabilityDashboardPage(): JSX.Element {
       {/* Lignes / Colonnes principales */}
       <Row gutter={[16, 16]} className="mb-4">
         <Col xs={24} xl={16}>
-          <Card title="Timeline of CO₂ saved (kg)">
+          <Card title={i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.timelineOfCo2SavedKg")}>
             <Line {...co2LineConfig} />
           </Card>
         </Col>
 
         <Col xs={24} xl={8}>
-          <Card title="Impact category distribution">
+          <Card title={i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.impactCategoryDistribution")}>
             <Column {...categoryColumnConfig} />
           </Card>
         </Col>
@@ -312,13 +314,13 @@ export default function SustainabilityDashboardPage(): JSX.Element {
       {/* Area + Leaderboard */}
       <Row gutter={[16, 16]}>
         <Col xs={24} xl={12}>
-          <Card title="Energy savings trend (kWh)">
+          <Card title={i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.energySavingsTrendKwh")}>
             <Area {...energyAreaConfig} />
           </Card>
         </Col>
 
         <Col xs={24} xl={12}>
-          <Card title="Top projects by impact">
+          <Card title={i18nT("ui.keenkonnect.sustainabilityImpact.sustainabilityDashboard.topProjectsByImpact")}>
             <Table<ProjectRow>
               size="small"
               rowKey="key"

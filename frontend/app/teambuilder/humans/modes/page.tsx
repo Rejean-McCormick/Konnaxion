@@ -1,6 +1,7 @@
 // frontend/app/teambuilder/humans/modes/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ExperimentOutlined,
   SafetyCertificateOutlined,
@@ -175,6 +176,7 @@ function computeStrictnessScore(mode: ModeConfig): number {
 }
 
 export default function TeamModesPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [modes, setModes] = useState<ModeConfigs>(() => createDefaultModes());
   const [activeMode, setActiveMode] = useState<ModeKey>('elite');
   const [saving, setSaving] = useState(false);
@@ -212,7 +214,7 @@ export default function TeamModesPage(): JSX.Element {
 
   const handleResetDefaults = () => {
     setModes(createDefaultModes());
-    message.success('Team modes reset to defaults.');
+    message.success(i18nT("ui.teambuilder.humans.modes.teamModesResetToDefaults"));
   };
 
   const handleSaveAll = async () => {
@@ -221,11 +223,11 @@ export default function TeamModesPage(): JSX.Element {
       // TODO: wire to backend service when available
        
       console.log('Saving team modes (stub):', modes);
-      message.success('Team modes saved (local stub).');
+      message.success(i18nT("ui.teambuilder.humans.modes.teamModesSavedLocalStub"));
     } catch (err) {
        
       console.error(err);
-      message.error('Failed to save modes. Please try again.');
+      message.error(i18nT("ui.teambuilder.humans.modes.failedToSaveModesPleaseTryAgain"));
     } finally {
       setSaving(false);
     }
@@ -234,7 +236,7 @@ export default function TeamModesPage(): JSX.Element {
   const handleDuplicateMode = () => {
     const current = modes[activeMode];
     message.info(
-      `Duplicate "${current.shortLabel}" is not implemented yet (stub button).`,
+      i18nT("ui.teambuilder.humans.modes.duplicateIsNotImplementedYetStubButton", { shortLabel: current.shortLabel }),
     );
   };
 
@@ -265,15 +267,15 @@ export default function TeamModesPage(): JSX.Element {
           <Col xs={24} lg={14}>
             <Card
               size="small"
-              title="Scoring weights"
+              title={i18nT("ui.teambuilder.humans.modes.scoringWeights")}
               extra={
                 <Text type="secondary" style={{ fontSize: 12 }}>
-                  0 = ignored · 100 = dominant
+                  {i18nT("ui.teambuilder.humans.modes.text0Ignored100Dominant")}
                 </Text>
               }
             >
               <Form layout="vertical">
-                <Form.Item label="Skill fit">
+                <Form.Item label={i18nT("ui.teambuilder.humans.modes.skillFit")}>
                   <InputNumber
                     min={0}
                     max={100}
@@ -296,7 +298,7 @@ export default function TeamModesPage(): JSX.Element {
                   </Row>
                 </Form.Item>
 
-                <Form.Item label="Past performance & reliability">
+                <Form.Item label={i18nT("ui.teambuilder.humans.modes.pastPerformanceReliability")}>
                   <InputNumber
                     min={0}
                     max={100}
@@ -319,7 +321,7 @@ export default function TeamModesPage(): JSX.Element {
                   </Row>
                 </Form.Item>
 
-                <Form.Item label="Learning opportunity">
+                <Form.Item label={i18nT("ui.teambuilder.humans.modes.learningOpportunity")}>
                   <InputNumber
                     min={0}
                     max={100}
@@ -342,7 +344,7 @@ export default function TeamModesPage(): JSX.Element {
                   </Row>
                 </Form.Item>
 
-                <Form.Item label="Past collaboration history">
+                <Form.Item label={i18nT("ui.teambuilder.humans.modes.pastCollaborationHistory")}>
                   <InputNumber
                     min={0}
                     max={100}
@@ -368,7 +370,7 @@ export default function TeamModesPage(): JSX.Element {
                   </Row>
                 </Form.Item>
 
-                <Form.Item label="Tolerance for difficult members">
+                <Form.Item label={i18nT("ui.teambuilder.humans.modes.toleranceForDifficultMembers")}>
                   <InputNumber
                     min={0}
                     max={100}
@@ -395,8 +397,7 @@ export default function TeamModesPage(): JSX.Element {
                     </Col>
                   </Row>
                   <Text type="secondary" style={{ fontSize: 12 }}>
-                    Higher values allow more “difficult” members in the same
-                    team before penalising the configuration.
+                    {i18nT("ui.teambuilder.humans.modes.higherValuesAllowMoreDifficultMembersIn")}
                   </Text>
                 </Form.Item>
               </Form>
@@ -417,7 +418,7 @@ export default function TeamModesPage(): JSX.Element {
                 >
                   <Space align="center">
                     <ThunderboltOutlined style={{ color: '#faad14' }} />
-                    <Text strong>Strictness overview</Text>
+                    <Text strong>{i18nT("ui.teambuilder.humans.modes.strictnessOverview")}</Text>
                     <Tag color={mode.riskColor}>{mode.riskLevel}</Tag>
                   </Space>
 
@@ -429,20 +430,19 @@ export default function TeamModesPage(): JSX.Element {
                     </Col>
                     <Col span={12}>
                       <Statistic
-                        title="Strictness score"
+                        title={i18nT("ui.teambuilder.humans.modes.strictnessScore")}
                         value={strictness}
                         suffix="/ 100"
                       />
                       <Text type="secondary" style={{ fontSize: 12 }}>
-                        Based on skill fit, performance, and tolerance for
-                        difficult members.
+                        {i18nT("ui.teambuilder.humans.modes.basedOnSkillFitPerformanceAndTolerance")}
                       </Text>
                     </Col>
                   </Row>
                 </Space>
               </Card>
 
-              <Card size="small" title="Summary">
+              <Card size="small" title={i18nT("ui.teambuilder.humans.modes.summary")}>
                 <Space
                   direction="vertical"
                   size="small"
@@ -450,21 +450,21 @@ export default function TeamModesPage(): JSX.Element {
                 >
                   <Row>
                     <Col span={12}>
-                      <Text type="secondary">Skill fit weight</Text>
+                      <Text type="secondary">{i18nT("ui.teambuilder.humans.modes.skillFitWeight")}</Text>
                       <div>{mode.weights.skillFit}/100</div>
                     </Col>
                     <Col span={12}>
-                      <Text type="secondary">Performance weight</Text>
+                      <Text type="secondary">{i18nT("ui.teambuilder.humans.modes.performanceWeight")}</Text>
                       <div>{mode.weights.performance}/100</div>
                     </Col>
                   </Row>
                   <Row style={{ marginTop: 8 }}>
                     <Col span={12}>
-                      <Text type="secondary">Learning emphasis</Text>
+                      <Text type="secondary">{i18nT("ui.teambuilder.humans.modes.learningEmphasis")}</Text>
                       <div>{mode.weights.learning}/100</div>
                     </Col>
                     <Col span={12}>
-                      <Text type="secondary">Collaboration emphasis</Text>
+                      <Text type="secondary">{i18nT("ui.teambuilder.humans.modes.collaborationEmphasis")}</Text>
                       <div>{mode.weights.collaboration}/100</div>
                     </Col>
                   </Row>
@@ -472,14 +472,14 @@ export default function TeamModesPage(): JSX.Element {
               </Card>
 
               <Collapse ghost>
-                <Panel header="Advanced constraints" key="advanced">
+                <Panel header={i18nT("ui.teambuilder.humans.modes.advancedConstraints")} key="advanced">
                   <Space
                     direction="vertical"
                     size="middle"
                     style={{ width: '100%' }}
                   >
                     <Form layout="vertical">
-                      <Form.Item label="Max difficult members per team">
+                      <Form.Item label={i18nT("ui.teambuilder.humans.modes.maxDifficultMembersPerTeam")}>
                         <InputNumber
                           min={0}
                           max={10}
@@ -492,7 +492,7 @@ export default function TeamModesPage(): JSX.Element {
                         />
                       </Form.Item>
 
-                      <Form.Item label="Minimum seniors per team">
+                      <Form.Item label={i18nT("ui.teambuilder.humans.modes.minimumSeniorsPerTeam")}>
                         <InputNumber
                           min={0}
                           max={10}
@@ -509,11 +509,10 @@ export default function TeamModesPage(): JSX.Element {
                     <Alert
                       type="info"
                       showIcon
-                      message="Guidance"
+                      message={i18nT("ui.teambuilder.humans.modes.guidance")}
                       description={
                         <Text type="secondary">
-                          Use these constraints to bound extreme proposals from
-                          the algorithm, especially in Elite and Rehab modes.
+                          {i18nT("ui.teambuilder.humans.modes.useTheseConstraintsToBoundExtremeProposals")}
                         </Text>
                       }
                     />
@@ -536,25 +535,25 @@ export default function TeamModesPage(): JSX.Element {
   const primaryAction = (
     <Space>
       <Button onClick={handleDuplicateMode} icon={<ExperimentOutlined />}>
-        Duplicate mode
+        {i18nT("ui.teambuilder.humans.modes.duplicateMode")}
       </Button>
-      <Button onClick={handleResetDefaults}>Reset defaults</Button>
+      <Button onClick={handleResetDefaults}>{i18nT("ui.teambuilder.humans.modes.resetDefaults")}</Button>
       <Button
         type="primary"
         onClick={handleSaveAll}
         loading={saving}
         icon={<SafetyCertificateOutlined />}
       >
-        Save all modes
+        {i18nT("ui.teambuilder.humans.modes.saveAllModes")}
       </Button>
     </Space>
   );
 
   return (
     <TeamBuilderPageShell
-      title="Team modes & presets"
-      subtitle="Configure how the matching engine balances performance, learning, collaboration, and risk for different team contexts."
-      sectionLabel="Humans"
+      title={i18nT("ui.teambuilder.humans.modes.teamModesPresets")}
+      subtitle={i18nT("ui.teambuilder.humans.modes.configureHowTheMatchingEngineBalancesPerformance")}
+      sectionLabel={i18nT("ui.teambuilder.humans.modes.humans")}
       maxWidth={1200}
       primaryAction={primaryAction}
     >
@@ -562,13 +561,10 @@ export default function TeamModesPage(): JSX.Element {
         <Alert
           type="info"
           showIcon
-          message="Team modes control how the engine weighs signals"
+          message={i18nT("ui.teambuilder.humans.modes.teamModesControlHowTheEngineWeighs")}
           description={
             <Text type="secondary">
-              Each mode corresponds to a different operating context (elite,
-              balanced, learning, average-only, rehabilitation). Adjust the
-              weights and constraints here once, and the engine will reuse these
-              presets for all future sessions.
+              {i18nT("ui.teambuilder.humans.modes.eachModeCorrespondsToADifferentOperating")}
             </Text>
           }
         />

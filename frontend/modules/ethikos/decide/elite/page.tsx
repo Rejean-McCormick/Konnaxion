@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
@@ -17,14 +18,15 @@ import type { Ballot } from '@/types';
 type BallotRow = Ballot & { turnout: number };
 
 export default function EliteBallots(): JSX.Element {
-  usePageTitle('Decide · Elite Ballots');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.ethikos.decide.elite.decideEliteBallots"));
 
   const { data, loading } = useRequest(fetchEliteBallots);
 
   const columns: ProColumns<BallotRow>[] = [
-    { title: 'Title', dataIndex: 'title', width: 260 },
+    { title: i18nT("ui.ethikos.decide.elite.title"), dataIndex: 'title', width: 260 },
     {
-      title: 'Closes In',
+      title: i18nT("ui.ethikos.decide.elite.closesIn"),
       dataIndex: 'closesAt',
       width: 180,
       // ProTable render signature: (dom, entity, index, action, schema)
@@ -36,13 +38,13 @@ export default function EliteBallots(): JSX.Element {
       ),
     },
     {
-      title: 'Turnout',
+      title: i18nT("ui.ethikos.decide.elite.turnout"),
       dataIndex: 'turnout',
       width: 160,
       // ProTable render signature: (dom, entity, index, action, schema)
       render: (_dom, record) => <Progress type="circle" percent={record.turnout} />,
     },
-    { title: 'Scope', dataIndex: 'scope', width: 100 },
+    { title: i18nT("ui.ethikos.decide.elite.scope"), dataIndex: 'scope', width: 100 },
   ];
 
   return (

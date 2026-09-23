@@ -5,6 +5,7 @@
  * Static map view
  */
 
+import { useLanguage } from '@/context/LanguageContext';
 import { useMemo, useState } from 'react';
 import type { CSSProperties } from 'react';
 import {
@@ -43,6 +44,7 @@ type Props = {
 };
 
 export default function MyStaticMap({ markerLat, markerLng }: Props) {
+  const { t: i18nT } = useLanguage();
   const token =
     process.env.NEXT_PUBLIC_MAPBOX_TOKEN ??
     process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ??
@@ -98,8 +100,8 @@ export default function MyStaticMap({ markerLat, markerLng }: Props) {
             offset={[0, -20]}
           >
             <div style={{ marginLeft: 5, marginRight: 5 }}>
-              <div>Latitude: {markerLat}</div>
-              <div>Longitude: {markerLng}</div>
+              <div>{i18nT("ui.mapComponents.staticmap.latitude")} {markerLat}</div>
+              <div>{i18nT("ui.mapComponents.staticmap.longitude")} {markerLng}</div>
             </div>
           </Popup>
         </>

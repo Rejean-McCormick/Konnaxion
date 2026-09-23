@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from '@/context/LanguageContext';
 import { useMemo, useState } from "react";
 
 import {
@@ -37,6 +38,7 @@ const EMPTY_SCENARIO_TEXT = `{
 export function DemoImporterPanel({
   initialJsonText,
 }: DemoImporterPanelProps) {
+  const { t: i18nT } = useLanguage();
   const [jsonText, setJsonText] = useState(
     initialJsonText ?? EMPTY_SCENARIO_TEXT,
   );
@@ -201,33 +203,32 @@ export function DemoImporterPanel({
       <header className="space-y-2">
         <div>
           <p className="text-sm font-medium text-muted-foreground">
-            ethiKos Admin
+            {i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.ethikosAdmin")}
           </p>
 
           <h1 className="text-2xl font-semibold tracking-tight">
-            Demo Importer
+            {i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.demoImporter")}
           </h1>
         </div>
 
         <p className="max-w-3xl text-sm text-muted-foreground">
-          Paste an ethikos demo scenario JSON file, preview validation, import
-          it into ethiKos, or reset the imported scenario.
+          {i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.pasteAnEthikosDemoScenarioJsonFile")}
         </p>
       </header>
 
       <div className="rounded-lg border bg-card p-4">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-medium">Scenario JSON</h2>
+            <h2 className="text-lg font-medium">{i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.scenarioJson")}</h2>
 
             {scenarioKey ? (
               <p className="text-sm text-muted-foreground">
-                Current scenario:{" "}
+                {i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.currentScenario")}{" "}
                 <span className="font-mono">{scenarioKey}</span>
               </p>
             ) : (
               <p className="text-sm text-muted-foreground">
-                No valid scenario_key detected yet.
+                {i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.noValidScenarioKeyDetectedYet")}
               </p>
             )}
           </div>
@@ -239,7 +240,7 @@ export function DemoImporterPanel({
               disabled={isBusy}
               className="rounded-md border px-3 py-2 text-sm font-medium disabled:opacity-50"
             >
-              Format JSON
+              {i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.formatJson")}
             </button>
 
             <button
@@ -248,7 +249,7 @@ export function DemoImporterPanel({
               disabled={isBusy}
               className="rounded-md border px-3 py-2 text-sm font-medium disabled:opacity-50"
             >
-              Clear Results
+              {i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.clearResults")}
             </button>
           </div>
         </div>
@@ -267,7 +268,7 @@ export function DemoImporterPanel({
           disabled={isBusy}
           className="rounded-md border px-4 py-2 text-sm font-medium disabled:opacity-50"
         >
-          {isPreviewing ? "Previewing..." : "Preview"}
+          {isPreviewing ? i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.previewing") : i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.preview")}
         </button>
 
         <button
@@ -276,7 +277,7 @@ export function DemoImporterPanel({
           disabled={isBusy}
           className="rounded-md border px-4 py-2 text-sm font-medium disabled:opacity-50"
         >
-          {isImporting ? "Importing..." : "Import"}
+          {isImporting ? i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.importing") : i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.import")}
         </button>
 
         <button
@@ -285,7 +286,7 @@ export function DemoImporterPanel({
           disabled={isBusy || !scenarioKey}
           className="rounded-md border px-4 py-2 text-sm font-medium disabled:opacity-50"
         >
-          {isResetting ? "Resetting..." : "Reset Scenario"}
+          {isResetting ? i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.resetting") : i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.resetScenario")}
         </button>
       </div>
 
@@ -296,9 +297,9 @@ export function DemoImporterPanel({
       ) : null}
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <ImportResultPanel title="Preview Result" result={previewResult} />
-        <ImportResultPanel title="Import Result" result={importResult} />
-        <ImportResultPanel title="Reset Result" result={resetResult} />
+        <ImportResultPanel title={i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.previewResult")} result={previewResult} />
+        <ImportResultPanel title={i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.importResult")} result={importResult} />
+        <ImportResultPanel title={i18nT("ui.features.ethikos.demoImporter.demoimporterpanel.resetResult")} result={resetResult} />
       </div>
     </section>
   );

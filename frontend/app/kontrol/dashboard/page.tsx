@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   AuditOutlined,
   CheckCircleOutlined,
@@ -78,6 +79,7 @@ async function getJson<T>(url: string): Promise<T> {
 }
 
 export default function KontrolDashboard(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -117,21 +119,21 @@ export default function KontrolDashboard(): JSX.Element {
   const active = userRows.filter((user) => user.is_active !== false).length
 
   const moderationColumns = useMemo<ProColumns<ModerationRecord>[]>(() => [
-    { title: 'ID', dataIndex: 'id', width: 70 },
-    { title: 'Type', dataIndex: 'target_type', width: 120 },
+    { title: i18nT("ui.kontrol.dashboard.id"), dataIndex: 'id', width: 70 },
+    { title: i18nT("ui.kontrol.dashboard.type"), dataIndex: 'target_type', width: 120 },
     {
-      title: 'Reason',
+      title: i18nT("ui.kontrol.dashboard.reason"),
       dataIndex: 'report_reason',
       ellipsis: true,
     },
     {
-      title: 'Reports',
+      title: i18nT("ui.kontrol.dashboard.reports"),
       dataIndex: 'report_count',
       width: 90,
       valueType: 'digit',
     },
     {
-      title: 'Severity',
+      title: i18nT("ui.kontrol.dashboard.severity"),
       dataIndex: 'severity',
       width: 100,
       render: (_, row) => (
@@ -140,20 +142,20 @@ export default function KontrolDashboard(): JSX.Element {
         </Tag>
       ),
     },
-  ], [])
+  ], [i18nT])
 
   const runHealthCheck = async () => {
-    const hide = message.loading('Checking governance APIs...', 0)
+    const hide = message.loading(i18nT("ui.kontrol.dashboard.checkingGovernanceApis"), 0)
     try {
       await Promise.all([
         getJson('/api/admin/audit-log/'),
         getJson('/api/admin/moderation/'),
         getJson('/api/admin/users/'),
       ])
-      message.success('Governance APIs responded successfully.')
+      message.success(i18nT("ui.kontrol.dashboard.governanceApisRespondedSuccessfully"))
     } catch (healthError) {
       message.error(
-        healthError instanceof Error ? healthError.message : 'Governance API check failed.',
+        healthError instanceof Error ? healthError.message : i18nT("ui.kontrol.dashboard.governanceApiCheckFailed"),
       )
     } finally {
       hide()
@@ -162,13 +164,13 @@ export default function KontrolDashboard(): JSX.Element {
 
   return (
     <KontrolPageShell
-      title="Platform governance dashboard"
-      subtitle="Live governance overview backed by Kontrol administration APIs."
+      title={i18nT("ui.kontrol.dashboard.platformGovernanceDashboard")}
+      subtitle={i18nT("ui.kontrol.dashboard.liveGovernanceOverviewBackedByKontrolAdministration")}
       scope="platform"
-      metaTitle="Kontrol · Platform · Dashboard"
+      metaTitle={i18nT("ui.kontrol.dashboard.kontrolPlatformDashboard")}
       primaryAction={
         <Button icon={<ReloadOutlined />} onClick={() => void load()}>
-          Refresh
+          {i18nT("ui.kontrol.dashboard.refresh")}
         </Button>
       }
     >
@@ -176,7 +178,7 @@ export default function KontrolDashboard(): JSX.Element {
         <Alert
           type="error"
           showIcon
-          message="Kontrol data could not be loaded"
+          message={i18nT("ui.kontrol.dashboard.kontrolDataCouldNotBeLoaded")}
           description={error}
           style={{ marginBottom: 16 }}
         />
@@ -184,36 +186,35 @@ export default function KontrolDashboard(): JSX.Element {
 
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-          Values below are derived from the current admin user, moderation and audit endpoints.
-          Infrastructure metrics that are not exposed by those contracts are not fabricated here.
+          {i18nT("ui.kontrol.dashboard.valuesBelowAreDerivedFromTheCurrent")}
         </Paragraph>
 
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} lg={6}>
             <StatisticCard
               loading={loading}
-              statistic={{ title: 'Registered users', value: count(usersPayload), prefix: <UserOutlined /> }}
+              statistic={{ title: i18nT("ui.kontrol.dashboard.registeredUsers"), value: count(usersPayload), prefix: <UserOutlined /> }}
               onClick={() => router.push('/kontrol/users/all')}
             />
           </Col>
           <Col xs={24} sm={12} lg={6}>
             <StatisticCard
               loading={loading}
-              statistic={{ title: 'Active users', value: active, prefix: <CheckCircleOutlined /> }}
+              statistic={{ title: i18nT("ui.kontrol.dashboard.activeUsers"), value: active, prefix: <CheckCircleOutlined /> }}
             />
           </Col>
           <Col xs={24} sm={12} lg={6}>
             <StatisticCard
               loading={loading}
-              statistic={{ title: 'Pending moderation', value: pending.length, prefix: <WarningOutlined /> }}
-              extra={critical ? <Tag color="red">{critical} critical</Tag> : <Tag color="green">No critical</Tag>}
+              statistic={{ title: i18nT("ui.kontrol.dashboard.pendingModeration"), value: pending.length, prefix: <WarningOutlined /> }}
+              extra={critical ? <Tag color="red">{critical} {i18nT("ui.kontrol.dashboard.critical")}</Tag> : <Tag color="green">{i18nT("ui.kontrol.dashboard.noCritical")}</Tag>}
               onClick={() => router.push('/kontrol/moderation/queue')}
             />
           </Col>
           <Col xs={24} sm={12} lg={6}>
             <StatisticCard
               loading={loading}
-              statistic={{ title: 'Staff / admins', value: staff, prefix: <TeamOutlined /> }}
+              statistic={{ title: i18nT("ui.kontrol.dashboard.staffAdmins"), value: staff, prefix: <TeamOutlined /> }}
               onClick={() => router.push('/kontrol/users/all')}
             />
           </Col>
@@ -222,9 +223,9 @@ export default function KontrolDashboard(): JSX.Element {
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={16}>
             <ProCard
-              title={<Space><AuditOutlined /> Moderation queue</Space>}
+              title={<Space><AuditOutlined /> {i18nT("ui.kontrol.dashboard.moderationQueue")}</Space>}
               headerBordered
-              extra={<Button type="link" onClick={() => router.push('/kontrol/moderation/queue')}>View all</Button>}
+              extra={<Button type="link" onClick={() => router.push('/kontrol/moderation/queue')}>{i18nT("ui.kontrol.dashboard.viewAll")}</Button>}
             >
               <ProTable<ModerationRecord>
                 columns={moderationColumns}
@@ -234,7 +235,7 @@ export default function KontrolDashboard(): JSX.Element {
                 options={false}
                 pagination={false}
                 loading={loading}
-                locale={{ emptyText: <Empty description="No pending moderation tickets." /> }}
+                locale={{ emptyText: <Empty description={i18nT("ui.kontrol.dashboard.noPendingModerationTickets")} /> }}
                 toolBarRender={false}
               />
             </ProCard>
@@ -242,22 +243,22 @@ export default function KontrolDashboard(): JSX.Element {
 
           <Col xs={24} lg={8}>
             <ProCard
-              title="Recent admin activity"
+              title={i18nT("ui.kontrol.dashboard.recentAdminActivity")}
               headerBordered
-              extra={<Button type="link" onClick={() => router.push('/kontrol/audit-log')}>View log</Button>}
+              extra={<Button type="link" onClick={() => router.push('/kontrol/audit-log')}>{i18nT("ui.kontrol.dashboard.viewLog")}</Button>}
             >
               <List
                 loading={loading}
                 dataSource={auditRows.slice(0, 6)}
-                locale={{ emptyText: 'No audit activity recorded.' }}
+                locale={{ emptyText: i18nT("ui.kontrol.dashboard.noAuditActivityRecorded") }}
                 renderItem={(item) => (
                   <List.Item>
                     <List.Item.Meta
-                      title={item.action || 'Administrative action'}
+                      title={item.action || i18nT("ui.kontrol.dashboard.administrativeAction")}
                       description={
                         <Space size={4} wrap>
                           <Text type="secondary">
-                            by {item.actor_name || item.actor_username || 'System'}
+                            {i18nT("ui.kontrol.dashboard.by")} {item.actor_name || item.actor_username || i18nT("ui.kontrol.dashboard.system")}
                           </Text>
                           {item.module && <Tag>{item.module}</Tag>}
                           {item.created && <Text type="secondary">{new Date(item.created).toLocaleString()}</Text>}
@@ -272,19 +273,19 @@ export default function KontrolDashboard(): JSX.Element {
         </Row>
 
         <ProCard
-          title="Governance API health"
+          title={i18nT("ui.kontrol.dashboard.governanceApiHealth")}
           headerBordered
           extra={
             <Button type="primary" onClick={() => void runHealthCheck()}>
-              Run live check
+              {i18nT("ui.kontrol.dashboard.runLiveCheck")}
             </Button>
           }
         >
           <Alert
             type={error ? 'error' : 'success'}
             showIcon
-            message={error ? 'One or more governance APIs failed.' : 'Governance API surfaces are reachable.'}
-            description="This check covers the endpoints used by this dashboard; it does not invent database, cache, queue or infrastructure telemetry."
+            message={error ? i18nT("ui.kontrol.dashboard.oneOrMoreGovernanceApisFailed") : i18nT("ui.kontrol.dashboard.governanceApiSurfacesAreReachable")}
+            description={i18nT("ui.kontrol.dashboard.thisCheckCoversTheEndpointsUsedBy")}
           />
         </ProCard>
       </Space>

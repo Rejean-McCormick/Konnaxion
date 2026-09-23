@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { ArrowRightOutlined, BulbOutlined } from '@ant-design/icons'
 import { ProCard } from '@ant-design/pro-components'
 import { useRequest } from 'ahooks'
@@ -37,6 +38,7 @@ export default function EmergentQuestionCard({
 }: {
   currentTitle: string
 }): JSX.Element | null {
+  const { t: i18nT } = useLanguage();
   const router = useRouter()
   const enabled = isEconomicAutonomyDemo(currentTitle)
   const { data, loading } = useRequest(fetchEliteTopics, { ready: enabled })
@@ -53,7 +55,7 @@ export default function EmergentQuestionCard({
       title={
         <Space>
           <BulbOutlined />
-          <span>Question emerged from this deliberation</span>
+          <span>{i18nT("ui.ethikos.deliberate.topic.emergentquestioncard.questionEmergedFromThisDeliberation")}</span>
         </Space>
       }
       data-testid="emergent-question-card"
@@ -62,15 +64,15 @@ export default function EmergentQuestionCard({
         <Alert
           type="info"
           showIcon
-          message="The infrastructure proposal creates a new governance question"
-          description="Ethikos can preserve the original discussion while opening a distinct question whose relevant expertise mix may be different."
+          message={i18nT("ui.ethikos.deliberate.topic.emergentquestioncard.theInfrastructureProposalCreatesANewGovernance")}
+          description={i18nT("ui.ethikos.deliberate.topic.emergentquestioncard.ethikosCanPreserveTheOriginalDiscussionWhile")}
         />
 
         {target ? (
           <Space direction="vertical" size={8} style={{ width: '100%' }}>
             <Space wrap>
-              <Tag color="purple">DEMO FICTION</Tag>
-              <Tag>New question</Tag>
+              <Tag color="purple">{i18nT("ui.ethikos.deliberate.topic.emergentquestioncard.demoFiction")}</Tag>
+              <Tag>{i18nT("ui.ethikos.deliberate.topic.emergentquestioncard.newQuestion")}</Tag>
             </Space>
 
             <Text strong>{target.title}</Text>
@@ -81,12 +83,12 @@ export default function EmergentQuestionCard({
               data-testid="open-emergent-question"
               onClick={() => router.push(`/ethikos/deliberate/${target.id}`)}
             >
-              Open question
+              {i18nT("ui.ethikos.deliberate.topic.emergentquestioncard.openQuestion")}
             </Button>
           </Space>
         ) : (
           <Button loading={loading} disabled>
-            Finding linked question…
+            {i18nT("ui.ethikos.deliberate.topic.emergentquestioncard.findingLinkedQuestion")}
           </Button>
         )}
       </Space>

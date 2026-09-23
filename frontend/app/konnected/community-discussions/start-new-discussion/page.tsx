@@ -3,6 +3,7 @@
 'use client';
 
 
+import { useLanguage } from '@/context/LanguageContext';
 import { InfoCircleOutlined, MessageOutlined, QuestionCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import {
   Alert,
@@ -75,6 +76,7 @@ async function extractBackendMessage(res: Response): Promise<string | undefined>
  * using the real backend endpoints /api/konnected/forum-topics/ and /api/konnected/forum-posts/.
  */
 export default function StartNewDiscussionPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [form] = Form.useForm<FormValues>();
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -109,15 +111,15 @@ export default function StartNewDiscussionPage(): JSX.Element {
 
       if (!topicRes.ok) {
         const backendMessage =
-          (await extractBackendMessage(topicRes)) ?? 'Unable to create discussion.';
+          (await extractBackendMessage(topicRes)) ?? i18nT("ui.konnected.communityDiscussions.startNewDiscussion.unableToCreateDiscussion");
         if (topicRes.status === 403) {
           antdMessage.error(
-            backendMessage || 'You do not have permission to start a new discussion.',
+            backendMessage || i18nT("ui.konnected.communityDiscussions.startNewDiscussion.youDoNotHavePermissionToStart"),
           );
         } else if (topicRes.status === 429) {
           antdMessage.error(
             backendMessage ||
-              'You have created too many discussions in a short time. Please try again later.',
+              i18nT("ui.konnected.communityDiscussions.startNewDiscussion.youHaveCreatedTooManyDiscussionsIn"),
           );
         } else {
           antdMessage.error(backendMessage);
@@ -152,44 +154,43 @@ export default function StartNewDiscussionPage(): JSX.Element {
           if (!postRes.ok) {
             const backendMessage =
               (await extractBackendMessage(postRes)) ??
-              'Your topic was created, but the initial post could not be saved.';
+              i18nT("ui.konnected.communityDiscussions.startNewDiscussion.yourTopicWasCreatedButTheInitial");
             antdMessage.warning(backendMessage);
           }
         }
       }
 
-      antdMessage.success('Discussion created successfully.');
+      antdMessage.success(i18nT("ui.konnected.communityDiscussions.startNewDiscussion.discussionCreatedSuccessfully"));
       router.push('/konnected/community-discussions/active-threads');
     } catch (error) {
       // Network or unexpected error
        
       console.error('Error creating discussion', error);
-      antdMessage.error('Something went wrong while creating the discussion. Please try again.');
+      antdMessage.error(i18nT("ui.konnected.communityDiscussions.startNewDiscussion.somethingWentWrongWhileCreatingTheDiscussion"));
     } finally {
       setSubmitting(false);
     }
   };
 
   const onFinishFailed: FormProps<FormValues>['onFinishFailed'] = () => {
-    antdMessage.error('Please fix the highlighted fields and try again.');
+    antdMessage.error(i18nT("ui.konnected.communityDiscussions.startNewDiscussion.pleaseFixTheHighlightedFieldsAndTry"));
   };
 
   // Categories mapped to ForumTopic.category values. Adjust as needed.
   const CATEGORY_OPTIONS: { label: string; value: string }[] = [
-    { label: 'Math', value: 'Math' },
-    { label: 'Science', value: 'Science' },
-    { label: 'General', value: 'General' },
+    { label: i18nT("ui.konnected.communityDiscussions.startNewDiscussion.math"), value: 'Math' },
+    { label: i18nT("ui.konnected.communityDiscussions.startNewDiscussion.science"), value: 'Science' },
+    { label: i18nT("ui.konnected.communityDiscussions.startNewDiscussion.general"), value: 'General' },
   ];
 
   const TAG_SUGGESTIONS = ['Exam prep', 'Project help', 'Tips & tricks', 'Resources', 'Mentoring'];
 
   return (
     <KonnectedPageShell
-      title="Start a New Discussion"
+      title={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.startANewDiscussion")}
       subtitle={
         <span>
-          Share a question or topic with the KonnectED community. Your post may be surfaced in learning
-          paths and thematic forums.
+          {i18nT("ui.konnected.communityDiscussions.startNewDiscussion.shareAQuestionOrTopicWithThe")}
         </span>
       }
     >
@@ -202,11 +203,10 @@ export default function StartNewDiscussionPage(): JSX.Element {
                 type="info"
                 showIcon
                 icon={<InfoCircleOutlined />}
-                message="Reminder: keep it constructive and on-topic"
+                message={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.reminderKeepItConstructiveAndOnTopic")}
                 description={
                   <span>
-                    Discussions are visible across teams. Content may be routed to moderators before
-                    publication for low-trust accounts.
+                    {i18nT("ui.konnected.communityDiscussions.startNewDiscussion.discussionsAreVisibleAcrossTeamsContentMay")}
                   </span>
                 }
               />
@@ -223,12 +223,12 @@ export default function StartNewDiscussionPage(): JSX.Element {
               >
                 {/* Title */}
                 <Form.Item
-                  label="Title"
+                  label={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.title")}
                   name="title"
                   rules={[
-                    { required: true, message: 'Please enter a title' },
-                    { min: 10, message: 'The title should be at least 10 characters long.' },
-                    { max: 150, message: 'The title should be at most 150 characters.' },
+                    { required: true, message: i18nT("ui.konnected.communityDiscussions.startNewDiscussion.pleaseEnterATitle") },
+                    { min: 10, message: i18nT("ui.konnected.communityDiscussions.startNewDiscussion.theTitleShouldBeAtLeast10") },
+                    { max: 150, message: i18nT("ui.konnected.communityDiscussions.startNewDiscussion.theTitleShouldBeAtMost150") },
                     {
                       validator: (_, value) => {
                         if (typeof value === 'string' && !value.trim()) {
@@ -241,26 +241,26 @@ export default function StartNewDiscussionPage(): JSX.Element {
                     },
                   ]}
                 >
-                  <Input placeholder="e.g. How do we measure impact across teams in cross-faculty projects?" />
+                  <Input placeholder={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.eGHowDoWeMeasureImpact")} />
                 </Form.Item>
 
                 {/* Thread type */}
                 <Form.Item
-                  label="Type of thread"
+                  label={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.typeOfThread")}
                   name="threadType"
-                  rules={[{ required: true, message: 'Please select the type of discussion.' }]}
+                  rules={[{ required: true, message: i18nT("ui.konnected.communityDiscussions.startNewDiscussion.pleaseSelectTheTypeOfDiscussion") }]}
                 >
                   <Radio.Group>
                     <Radio.Button value="question">
                       <Space>
                         <QuestionCircleOutlined />
-                        <span>Question (Q&amp;A)</span>
+                        <span>{i18nT("ui.konnected.communityDiscussions.startNewDiscussion.questionQA")}</span>
                       </Space>
                     </Radio.Button>
                     <Radio.Button value="discussion">
                       <Space>
                         <MessageOutlined />
-                        <span>Open discussion</span>
+                        <span>{i18nT("ui.konnected.communityDiscussions.startNewDiscussion.openDiscussion")}</span>
                       </Space>
                     </Radio.Button>
                   </Radio.Group>
@@ -268,12 +268,12 @@ export default function StartNewDiscussionPage(): JSX.Element {
 
                 {/* Category */}
                 <Form.Item
-                  label="Category / subject area"
+                  label={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.categorySubjectArea")}
                   name="category"
-                  rules={[{ required: true, message: 'Please select a category.' }]}
+                  rules={[{ required: true, message: i18nT("ui.konnected.communityDiscussions.startNewDiscussion.pleaseSelectACategory") }]}
                 >
                   <Select
-                    placeholder="Select a category"
+                    placeholder={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.selectACategory")}
                     options={CATEGORY_OPTIONS}
                     allowClear
                     showSearch
@@ -283,19 +283,19 @@ export default function StartNewDiscussionPage(): JSX.Element {
 
                 {/* Content */}
                 <Form.Item
-                  label="Content"
+                  label={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.content")}
                   name="content"
                   rules={[
                     {
                       max: 5000,
-                      message: 'The content is too long (max 5000 characters).',
+                      message: i18nT("ui.konnected.communityDiscussions.startNewDiscussion.theContentIsTooLongMax5000"),
                     },
                   ]}
-                  extra="Provide enough context so that others can give meaningful answers or contributions."
+                  extra={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.contentHint")}
                 >
                   <TextArea
                     rows={6}
-                    placeholder="Describe your question or topic. You can mention specific courses, projects, or resources…"
+                    placeholder={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.describeYourQuestionOrTopicYouCan")}
                     showCount
                     maxLength={5000}
                   />
@@ -303,25 +303,25 @@ export default function StartNewDiscussionPage(): JSX.Element {
 
                 {/* Tags */}
                 <Form.Item
-                  label="Tags"
+                  label={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.tags")}
                   name="tags"
-                  tooltip="Use tags so your discussion can be surfaced in thematic forums and learning paths."
+                  tooltip={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.useTagsSoYourDiscussionCanBe")}
                 >
                   <Select
                     mode="tags"
                     tokenSeparators={[',']}
-                    placeholder="Add tags (press Enter to confirm)…"
+                    placeholder={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.addTagsPressEnterToConfirm")}
                     options={TAG_SUGGESTIONS.map((t) => ({ label: t, value: t }))}
                   />
                 </Form.Item>
 
                 {/* Attachments */}
                 <Form.Item
-                  label="Attachments"
+                  label={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.attachments")}
                   name="attachments"
                   valuePropName="fileList"
                   getValueFromEvent={(e: { fileList: UploadFile[] }) => e?.fileList}
-                  extra="Attach optional supporting files (e.g. PDF instructions, slides)."
+                  extra={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.attachmentsHint")}
                 >
                   <Upload.Dragger
                     multiple
@@ -331,19 +331,19 @@ export default function StartNewDiscussionPage(): JSX.Element {
                     <p className="ant-upload-drag-icon">
                       <UploadOutlined />
                     </p>
-                    <p className="ant-upload-text">Click or drag files to this area to attach</p>
+                    <p className="ant-upload-text">{i18nT("ui.konnected.communityDiscussions.startNewDiscussion.clickOrDragFilesToThisArea")}</p>
                     <p className="ant-upload-hint">
-                      Files will be included with your initial post when supported.
+                      {i18nT("ui.konnected.communityDiscussions.startNewDiscussion.filesWillBeIncludedWithYourInitial")}
                     </p>
                   </Upload.Dragger>
                 </Form.Item>
 
                 {/* Notification / subscription */}
                 <Form.Item
-                  label="Notify me about replies"
+                  label={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.notifyMeAboutReplies")}
                   name="subscribeToReplies"
                   valuePropName="checked"
-                  tooltip="You will receive notifications when someone replies or your post is updated."
+                  tooltip={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.youWillReceiveNotificationsWhenSomeoneReplies")}
                 >
                   <Switch />
                 </Form.Item>
@@ -352,7 +352,7 @@ export default function StartNewDiscussionPage(): JSX.Element {
                 <Form.Item>
                   <Space>
                     <Button type="primary" htmlType="submit" loading={submitting}>
-                      Post discussion
+                      {i18nT("ui.konnected.communityDiscussions.startNewDiscussion.postDiscussion")}
                     </Button>
                     <Button
                       htmlType="button"
@@ -360,7 +360,7 @@ export default function StartNewDiscussionPage(): JSX.Element {
                         router.push('/konnected/community-discussions/active-threads')
                       }
                     >
-                      Cancel
+                      {i18nT("ui.konnected.communityDiscussions.startNewDiscussion.cancel")}
                     </Button>
                   </Space>
                 </Form.Item>
@@ -372,39 +372,33 @@ export default function StartNewDiscussionPage(): JSX.Element {
         {/* Right-hand guidance / meta column */}
         <Col xs={24} md={8}>
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
-            <Card title="Good discussion practices">
+            <Card title={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.goodDiscussionPractices")}>
               <Space direction="vertical">
                 <Text>
-                  <Tag color="blue">Be specific</Tag> Clearly describe the context (course, team,
-                  project, tool).
+                  <Tag color="blue">{i18nT("ui.konnected.communityDiscussions.startNewDiscussion.beSpecific")}</Tag> {i18nT("ui.konnected.communityDiscussions.startNewDiscussion.clearlyDescribeTheContextCourseTeamProject")}
                 </Text>
                 <Text>
-                  <Tag color="green">Show your attempt</Tag> For questions, explain what you already
-                  tried or understood.
+                  <Tag color="green">{i18nT("ui.konnected.communityDiscussions.startNewDiscussion.showYourAttempt")}</Tag> {i18nT("ui.konnected.communityDiscussions.startNewDiscussion.forQuestionsExplainWhatYouAlreadyTried")}
                 </Text>
                 <Text>
-                  <Tag color="gold">Respect privacy</Tag> Avoid sharing sensitive personal or
-                  institutional data.
+                  <Tag color="gold">{i18nT("ui.konnected.communityDiscussions.startNewDiscussion.respectPrivacy")}</Tag> {i18nT("ui.konnected.communityDiscussions.startNewDiscussion.avoidSharingSensitivePersonalOrInstitutionalData")}
                 </Text>
                 <Text>
-                  <Tag color="purple">Use tags</Tag> Tags help link the discussion to Knowledge units
-                  and learning paths.
+                  <Tag color="purple">{i18nT("ui.konnected.communityDiscussions.startNewDiscussion.useTags")}</Tag> {i18nT("ui.konnected.communityDiscussions.startNewDiscussion.tagsHelpLinkTheDiscussionToKnowledge")}
                 </Text>
               </Space>
             </Card>
 
-            <Card title="Moderation and visibility">
+            <Card title={i18nT("ui.konnected.communityDiscussions.startNewDiscussion.moderationAndVisibility")}>
               <Paragraph>
-                Posts may be queued for moderation based on your trust level or if they match
-                sensitive topics.
+                {i18nT("ui.konnected.communityDiscussions.startNewDiscussion.postsMayBeQueuedForModerationBased")}
               </Paragraph>
               <Paragraph>
-                If moderation is required, you&apos;ll see your topic as{' '}
-                <Text strong>“Pending review”</Text> until a moderator approves it.
+                {i18nT("ui.konnected.communityDiscussions.startNewDiscussion.ifModerationIsRequiredYouLlSee")}{' '}
+                <Text strong>{i18nT("ui.konnected.communityDiscussions.startNewDiscussion.pendingReview")}</Text> {i18nT("ui.konnected.communityDiscussions.startNewDiscussion.untilAModeratorApprovesIt")}
               </Paragraph>
               <Paragraph>
-                You can later edit your post, close a question, or mark an answer as accepted from
-                the thread detail page (when implemented).
+                {i18nT("ui.konnected.communityDiscussions.startNewDiscussion.youCanLaterEditYourPostClose")}
               </Paragraph>
             </Card>
           </Space>

@@ -1,6 +1,7 @@
 // FILE: frontend/app/ethikos/learn/glossary/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { DownloadOutlined, SyncOutlined } from '@ant-design/icons';
 import {
   PageContainer,
@@ -76,6 +77,7 @@ function downloadGlossaryCsv(items: GlossaryItem[]): void {
 }
 
 export default function Glossary(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [query, setQuery] = useState('');
   const [letter, setLetter] = useState<LetterFilter>('all');
 
@@ -96,7 +98,7 @@ export default function Glossary(): JSX.Element {
     });
 
     const result: { label: string; value: string }[] = [
-      { label: 'All', value: 'all' },
+      { label: i18nT("ui.ethikos.learn.glossary.all"), value: 'all' },
     ];
 
     if (availableLetters.has('#')) {
@@ -112,7 +114,7 @@ export default function Glossary(): JSX.Element {
     }
 
     return result;
-  }, [items]);
+  }, [items, i18nT]);
 
   const filteredByQuery = useMemo<GlossaryItem[]>(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -144,7 +146,7 @@ export default function Glossary(): JSX.Element {
 
   const columns: ProColumns<GlossaryItem>[] = [
     {
-      title: 'Term',
+      title: i18nT("ui.ethikos.learn.glossary.term"),
       dataIndex: 'term',
       width: 280,
       sorter: (left, right) =>
@@ -159,12 +161,12 @@ export default function Glossary(): JSX.Element {
       ),
     },
     {
-      title: 'Definition',
+      title: i18nT("ui.ethikos.learn.glossary.definition"),
       dataIndex: 'definition',
       ellipsis: true,
       render: (_dom, row) => (
         <Paragraph style={{ marginBottom: 0 }}>
-          {row.definition || 'No definition available.'}
+          {row.definition || i18nT("ui.ethikos.learn.glossary.noDefinitionAvailable")}
         </Paragraph>
       ),
     },
@@ -172,23 +174,23 @@ export default function Glossary(): JSX.Element {
 
   const secondaryActions = (
     <Space wrap>
-      <Tooltip title="Reload glossary terms from the Learn service">
+      <Tooltip title={i18nT("ui.ethikos.learn.glossary.reloadGlossaryTermsFromTheLearnService")}>
         <Button
           icon={<SyncOutlined />}
           onClick={() => refresh()}
           loading={loading}
         >
-          Refresh
+          {i18nT("ui.ethikos.learn.glossary.refresh")}
         </Button>
       </Tooltip>
 
-      <Tooltip title="Export the currently visible glossary rows">
+      <Tooltip title={i18nT("ui.ethikos.learn.glossary.exportTheCurrentlyVisibleGlossaryRows")}>
         <Button
           icon={<DownloadOutlined />}
           disabled={filtered.length === 0}
           onClick={() => downloadGlossaryCsv(filtered)}
         >
-          Export CSV
+          {i18nT("ui.ethikos.learn.glossary.exportCsv")}
         </Button>
       </Tooltip>
     </Space>
@@ -196,9 +198,9 @@ export default function Glossary(): JSX.Element {
 
   return (
     <EthikosPageShell
-      title="Glossary"
-      sectionLabel="Learn"
-      subtitle="Definitions for the core Ethikos concepts used across Deliberate, Decide, Pulse, Trust, and Impact."
+      title={i18nT("ui.ethikos.learn.glossary.glossary")}
+      sectionLabel={i18nT("ui.ethikos.learn.glossary.learn")}
+      subtitle={i18nT("ui.ethikos.learn.glossary.definitionsForTheCoreEthikosConceptsUsed")}
       secondaryActions={secondaryActions}
     >
       <PageContainer ghost loading={loading}>
@@ -207,8 +209,8 @@ export default function Glossary(): JSX.Element {
             <Alert
               type="warning"
               showIcon
-              message="Glossary unavailable"
-              description="The Learn glossary service did not respond. The page will recover automatically once the service is available."
+              message={i18nT("ui.ethikos.learn.glossary.glossaryUnavailable")}
+              description={i18nT("ui.ethikos.learn.glossary.theLearnGlossaryServiceDidNotRespond")}
             />
           )}
 
@@ -221,15 +223,15 @@ export default function Glossary(): JSX.Element {
             }}
           >
             <Space size="large" wrap>
-              <Statistic title="Total terms" value={items.length} />
-              <Statistic title="Visible terms" value={filtered.length} />
-              <Statistic title="Letters" value={Math.max(letters.length - 1, 0)} />
+              <Statistic title={i18nT("ui.ethikos.learn.glossary.totalTerms")} value={items.length} />
+              <Statistic title={i18nT("ui.ethikos.learn.glossary.visibleTerms")} value={filtered.length} />
+              <Statistic title={i18nT("ui.ethikos.learn.glossary.letters")} value={Math.max(letters.length - 1, 0)} />
             </Space>
 
             <Input.Search
               allowClear
               value={query}
-              placeholder="Search terms or definitions"
+              placeholder={i18nT("ui.ethikos.learn.glossary.searchTermsOrDefinitions")}
               style={{ width: 320 }}
               onChange={(event) => setQuery(event.target.value)}
               onSearch={(value) => setQuery(value)}
@@ -246,16 +248,16 @@ export default function Glossary(): JSX.Element {
             <Empty
               description={
                 error
-                  ? 'Unable to load glossary terms.'
-                  : 'No glossary terms are available yet.'
+                  ? i18nT("ui.ethikos.learn.glossary.unableToLoadGlossaryTerms")
+                  : i18nT("ui.ethikos.learn.glossary.noGlossaryTermsAreAvailableYet")
               }
             />
           ) : filtered.length === 0 ? (
             <Empty
               description={
                 hasActiveFilters
-                  ? 'No glossary terms match the current filters.'
-                  : 'No glossary terms are available yet.'
+                  ? i18nT("ui.ethikos.learn.glossary.noGlossaryTermsMatchTheCurrentFilters")
+                  : i18nT("ui.ethikos.learn.glossary.noGlossaryTermsAreAvailableYet")
               }
             />
           ) : (
@@ -268,12 +270,11 @@ export default function Glossary(): JSX.Element {
               pagination={{
                 pageSize: 12,
                 showSizeChanger: true,
-                showTotal: (total) => `${total} terms`,
+                showTotal: (total) => i18nT("ui.ethikos.learn.glossary.termsCount", { count: total }),
               }}
               toolBarRender={() => [
                 <Text key="hint" type="secondary">
-                  Terms are sourced from the Ethikos Learn service and category
-                  metadata when available.
+                  {i18nT("ui.ethikos.learn.glossary.termsAreSourcedFromTheEthikosLearn")}
                 </Text>,
               ]}
             />

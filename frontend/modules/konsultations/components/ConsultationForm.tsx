@@ -1,5 +1,8 @@
+'use client';
+
 // FILE: frontend/modules/konsultations/components/ConsultationForm.tsx
 ﻿import { useRequest } from 'ahooks';
+import { useLanguage } from '@/context/LanguageContext';
 import { message as antdMessage, Button, Form, Slider } from 'antd';
 import React, { useState } from 'react';
 
@@ -37,6 +40,7 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({
   consultationId,
   initialValue,
 }) => {
+  const { t: i18nT } = useLanguage();
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
 
@@ -62,12 +66,12 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({
     {
       manual: true,
       onSuccess: () => {
-        antdMessage.success('Your stance has been recorded.');
+        antdMessage.success(i18nT("ui.konsultations.consultationform.yourStanceHasBeenRecorded"));
         // Optionally refresh consultation data (results, etc.)
         // Keep the selected stance visible after a successful save.
       },
       onError: () => {
-        antdMessage.error('Failed to submit stance. Please try again.');
+        antdMessage.error(i18nT("ui.konsultations.consultationform.failedToSubmitStancePleaseTryAgain"));
       },
       onFinally: () => setSubmitting(false),
     },
@@ -86,9 +90,9 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({
       onFinish={onFinish}
     >
       <Form.Item
-        label="Your stance"
+        label={i18nT("ui.konsultations.consultationform.yourStance")}
         name="value"
-        rules={[{ required: true, message: 'Please select a stance.' }]}
+        rules={[{ required: true, message: i18nT("ui.konsultations.consultationform.pleaseSelectAStance") }]}
       >
         <Slider
           min={-3}
@@ -100,7 +104,7 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={submitting}>
-          Submit Stance
+          {i18nT("ui.konsultations.consultationform.submitStance")}
         </Button>
       </Form.Item>
     </Form>

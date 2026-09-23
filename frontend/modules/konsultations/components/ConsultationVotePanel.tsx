@@ -1,6 +1,10 @@
+'use client';
+
 // FILE: frontend/modules/konsultations/components/ConsultationVotePanel.tsx
 ﻿// frontend/modules/konsultations/components/ConsultationVotePanel.tsx
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import { useRequest } from 'ahooks';
 import {
   Alert,
@@ -104,24 +108,24 @@ function computeStanceStats(stances: EthikosStancePoint[]): StanceStats {
   };
 }
 
-function stanceLabel(value: number): string {
+function stanceLabel(i18nT: TranslateFunction, value: number): string {
   switch (value) {
     case -3:
-      return 'Strongly against';
+      return i18nT("ui.konsultations.consultationvotepanel.stronglyAgainst");
     case -2:
-      return 'Moderately against';
+      return i18nT("ui.konsultations.consultationvotepanel.moderatelyAgainst");
     case -1:
-      return 'Somewhat against';
+      return i18nT("ui.konsultations.consultationvotepanel.somewhatAgainst");
     case 0:
-      return 'Neutral / undecided';
+      return i18nT("ui.konsultations.consultationvotepanel.neutralUndecided");
     case 1:
-      return 'Somewhat for';
+      return i18nT("ui.konsultations.consultationvotepanel.somewhatFor");
     case 2:
-      return 'Moderately for';
+      return i18nT("ui.konsultations.consultationvotepanel.moderatelyFor");
     case 3:
-      return 'Strongly for';
+      return i18nT("ui.konsultations.consultationvotepanel.stronglyFor");
     default:
-      return 'Neutral / undecided';
+      return i18nT("ui.konsultations.consultationvotepanel.neutralUndecided");
   }
 }
 
@@ -161,6 +165,7 @@ const sliderMarks: Record<number, React.ReactNode> = {
 export default function ConsultationVotePanel(
   props: ConsultationVotePanelProps,
 ): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const { topicId, title, hideSummary, className } = props;
 
   const topicKey = useMemo(
@@ -210,10 +215,10 @@ export default function ConsultationVotePanel(
     setSavingStance(true);
     try {
       await submitTopicStance(topicKey, stanceValue);
-      message.success('Stance saved');
+      message.success(i18nT("ui.konsultations.consultationvotepanel.stanceSaved"));
       await refreshStances();
     } catch {
-      message.error('Could not save your stance. Please try again.');
+      message.error(i18nT("ui.konsultations.consultationvotepanel.couldNotSaveYourStancePleaseTry"));
     } finally {
       setSavingStance(false);
     }
@@ -222,7 +227,7 @@ export default function ConsultationVotePanel(
   if (!topicKey) {
     return (
       <Card className={className}>
-        <Empty description="No consultation selected" />
+        <Empty description={i18nT("ui.konsultations.consultationvotepanel.noConsultationSelected")} />
       </Card>
     );
   }
@@ -230,13 +235,12 @@ export default function ConsultationVotePanel(
   return (
     <Card
       className={className}
-      title={title ?? 'Your stance'}
+      title={title ?? i18nT("ui.konsultations.consultationvotepanel.yourStance")}
       bordered
       bodyStyle={{ paddingBottom: hideSummary ? 16 : 24 }}
     >
       <Paragraph type="secondary">
-        Use the scale below to register how strongly you are for or against this
-        consultation. You can change your stance while the consultation is open.
+        {i18nT("ui.konsultations.consultationvotepanel.useTheScaleBelowToRegisterHow")}
       </Paragraph>
 
       <div style={{ marginTop: 16 }}>
@@ -249,7 +253,7 @@ export default function ConsultationVotePanel(
           value={stanceValue}
           tooltip={{
             formatter: (v) =>
-              typeof v === 'number' ? stanceLabel(v) : undefined,
+              typeof v === 'number' ? stanceLabel(i18nT, v) : undefined,
           }}
           onChange={(v) => setStanceValue(v as number)}
         />
@@ -261,23 +265,23 @@ export default function ConsultationVotePanel(
             width: '100%',
           }}
         >
-          <Text type="secondary">Strongly against</Text>
-          <Text type="secondary">Neutral</Text>
-          <Text type="secondary">Strongly for</Text>
+          <Text type="secondary">{i18nT("ui.konsultations.consultationvotepanel.stronglyAgainst")}</Text>
+          <Text type="secondary">{i18nT("ui.konsultations.consultationvotepanel.neutral")}</Text>
+          <Text type="secondary">{i18nT("ui.konsultations.consultationvotepanel.stronglyFor")}</Text>
         </Space>
 
         <Paragraph style={{ marginTop: 8 }}>
-          Current selection: <Text strong>{stanceLabel(stanceValue)}</Text>
+          {i18nT("ui.konsultations.consultationvotepanel.currentSelection")} <Text strong>{stanceLabel(i18nT, stanceValue)}</Text>
         </Paragraph>
 
         <Space style={{ marginTop: 8 }}>
           <Statistic
-            title="Raw stance"
+            title={i18nT("ui.konsultations.consultationvotepanel.rawStance")}
             value={stanceValue}
             precision={0}
             style={{ marginRight: 16 }}
           />
-          <Tag color="geekblue">−3 … +3 scale</Tag>
+          <Tag color="geekblue">{i18nT("ui.konsultations.consultationvotepanel.text33Scale")}</Tag>
         </Space>
 
         <Space style={{ marginTop: 12 }}>
@@ -287,7 +291,7 @@ export default function ConsultationVotePanel(
             onClick={handleSaveStance}
             disabled={savingStance}
           >
-            {savingStance ? 'Saving…' : 'Save stance'}
+            {savingStance ? i18nT("ui.konsultations.consultationvotepanel.saving") : i18nT("ui.konsultations.consultationvotepanel.saveStance")}
           </button>
           <button
             type="button"
@@ -295,7 +299,7 @@ export default function ConsultationVotePanel(
             onClick={() => setStanceValue(0)}
             disabled={savingStance}
           >
-            Reset to neutral
+            {i18nT("ui.konsultations.consultationvotepanel.resetToNeutral")}
           </button>
         </Space>
 
@@ -303,8 +307,8 @@ export default function ConsultationVotePanel(
           style={{ marginTop: 16 }}
           type="info"
           showIcon
-          message="One stance per topic"
-          description="You can adjust your position at any time; only your latest stance is used in the consensus."
+          message={i18nT("ui.konsultations.consultationvotepanel.oneStancePerTopic")}
+          description={i18nT("ui.konsultations.consultationvotepanel.youCanAdjustYourPositionAtAny")}
         />
       </div>
 
@@ -312,10 +316,10 @@ export default function ConsultationVotePanel(
         <>
           <Divider />
           <Title level={5} style={{ marginTop: 0 }}>
-            Collective stance
+            {i18nT("ui.konsultations.consultationvotepanel.collectiveStance")}
           </Title>
           <Paragraph type="secondary">
-            Snapshot of all recorded stances for this consultation.
+            {i18nT("ui.konsultations.consultationvotepanel.snapshotOfAllRecordedStancesForThis")}
           </Paragraph>
 
           <Space
@@ -323,18 +327,18 @@ export default function ConsultationVotePanel(
             style={{ marginTop: 12, flexWrap: 'wrap' }}
           >
             <Statistic
-              title="Participants"
+              title={i18nT("ui.konsultations.consultationvotepanel.participants")}
               value={stanceStats.total}
               loading={loadingStances}
             />
             <Statistic
-              title="Average stance"
+              title={i18nT("ui.konsultations.consultationvotepanel.averageStance")}
               value={stanceStats.average}
               precision={2}
               loading={loadingStances}
             />
             <Statistic
-              title="For / Against balance"
+              title={i18nT("ui.konsultations.consultationvotepanel.forAgainstBalance")}
               value={
                 stanceStats.total > 0
                   ? Math.round(
@@ -360,7 +364,7 @@ export default function ConsultationVotePanel(
                 style={{ width: '100%' }}
               >
                 <div>
-                  <Text>For</Text>
+                  <Text>{i18nT("ui.konsultations.consultationvotepanel.for")}</Text>
                   <Progress
                     percent={Math.round(
                       (stanceStats.positive / stanceStats.total) * 100,
@@ -369,7 +373,7 @@ export default function ConsultationVotePanel(
                   />
                 </div>
                 <div>
-                  <Text>Neutral</Text>
+                  <Text>{i18nT("ui.konsultations.consultationvotepanel.neutral")}</Text>
                   <Progress
                     percent={Math.round(
                       (stanceStats.neutral / stanceStats.total) * 100,
@@ -378,7 +382,7 @@ export default function ConsultationVotePanel(
                   />
                 </div>
                 <div>
-                  <Text>Against</Text>
+                  <Text>{i18nT("ui.konsultations.consultationvotepanel.against")}</Text>
                   <Progress
                     percent={Math.round(
                       (stanceStats.negative / stanceStats.total) * 100,
@@ -388,17 +392,16 @@ export default function ConsultationVotePanel(
                 </div>
 
                 <Paragraph style={{ marginTop: 4 }}>
-                  <Tag color="geekblue">−3 … +3 scale</Tag>{' '}
+                  <Tag color="geekblue">{i18nT("ui.konsultations.consultationvotepanel.text33Scale")}</Tag>{' '}
                   <Text type="secondary">
-                    0 = neutral; negative values = against; positive values =
-                    for.
+                    {i18nT("ui.konsultations.consultationvotepanel.text0NeutralNegativeValuesAgainstPositiveValues")}
                   </Text>
                 </Paragraph>
               </Space>
             </div>
           ) : (
             <Empty
-              description="No stances recorded yet"
+              description={i18nT("ui.konsultations.consultationvotepanel.noStancesRecordedYet")}
               image={Empty.PRESENTED_IMAGE_SIMPLE}
               style={{ marginTop: 16 }}
             />

@@ -1,5 +1,8 @@
+'use client';
+
 // frontend/features/ethikos/demo-importer/ImportResultPanel.tsx
 
+import { useLanguage } from '@/context/LanguageContext';
 import type { EthikosDemoImportResponse } from "./types";
 
 type ImportResultPanelProps = {
@@ -8,6 +11,7 @@ type ImportResultPanelProps = {
 };
 
 function StatusBadge({ ok }: { ok: boolean }) {
+  const { t: i18nT } = useLanguage();
   return (
     <span
       className={[
@@ -17,15 +21,16 @@ function StatusBadge({ ok }: { ok: boolean }) {
           : "bg-red-100 text-red-800",
       ].join(" ")}
     >
-      {ok ? "Success" : "Error"}
+      {ok ? i18nT("ui.features.ethikos.demoImporter.importresultpanel.success") : i18nT("ui.features.ethikos.demoImporter.importresultpanel.error")}
     </span>
   );
 }
 
 function EmptyState() {
+  const { t: i18nT } = useLanguage();
   return (
     <p className="text-sm text-muted-foreground">
-      No result yet. Preview, import, or reset a scenario to see output here.
+      {i18nT("ui.features.ethikos.demoImporter.importresultpanel.noResultYetPreviewImportOrReset")}
     </p>
   );
 }
@@ -65,11 +70,12 @@ function ErrorList({
 }: {
   errors: NonNullable<EthikosDemoImportResponse["errors"]>;
 }) {
+  const { t: i18nT } = useLanguage();
   if (!errors.length) return null;
 
   return (
     <section className="space-y-2">
-      <h3 className="text-sm font-semibold text-red-800">Validation errors</h3>
+      <h3 className="text-sm font-semibold text-red-800">{i18nT("ui.features.ethikos.demoImporter.importresultpanel.validationErrors")}</h3>
 
       <ul className="space-y-2">
         {errors.map((error, index) => (
@@ -91,11 +97,12 @@ function WarningList({
 }: {
   warnings: NonNullable<EthikosDemoImportResponse["warnings"]>;
 }) {
+  const { t: i18nT } = useLanguage();
   if (!warnings.length) return null;
 
   return (
     <section className="space-y-2">
-      <h3 className="text-sm font-semibold text-yellow-800">Warnings</h3>
+      <h3 className="text-sm font-semibold text-yellow-800">{i18nT("ui.features.ethikos.demoImporter.importresultpanel.warnings")}</h3>
 
       <ul className="space-y-2">
         {warnings.map((warning, index) => (
@@ -120,6 +127,7 @@ function ObjectList({
   title: string;
   objects?: EthikosDemoImportResponse["created"];
 }) {
+  const { t: i18nT } = useLanguage();
   if (!objects?.length) return null;
 
   return (
@@ -130,9 +138,9 @@ function ObjectList({
         <table className="w-full text-sm">
           <thead className="bg-muted">
             <tr>
-              <th className="px-3 py-2 text-left font-medium">Type</th>
-              <th className="px-3 py-2 text-left font-medium">ID</th>
-              <th className="px-3 py-2 text-left font-medium">Label</th>
+              <th className="px-3 py-2 text-left font-medium">{i18nT("ui.features.ethikos.demoImporter.importresultpanel.type")}</th>
+              <th className="px-3 py-2 text-left font-medium">{i18nT("ui.features.ethikos.demoImporter.importresultpanel.id")}</th>
+              <th className="px-3 py-2 text-left font-medium">{i18nT("ui.features.ethikos.demoImporter.importresultpanel.label")}</th>
             </tr>
           </thead>
 
@@ -154,6 +162,7 @@ function ObjectList({
 }
 
 export function ImportResultPanel({ title, result }: ImportResultPanelProps) {
+  const { t: i18nT } = useLanguage();
   return (
     <section className="rounded-lg border bg-card p-4 shadow-sm">
       <div className="mb-4 flex items-center justify-between gap-3">
@@ -162,7 +171,7 @@ export function ImportResultPanel({ title, result }: ImportResultPanelProps) {
 
           {result?.scenario_key && (
             <p className="text-sm text-muted-foreground">
-              Scenario:{" "}
+              {i18nT("ui.features.ethikos.demoImporter.importresultpanel.scenario")}{" "}
               <span className="font-mono">{result.scenario_key}</span>
             </p>
           )}
@@ -177,9 +186,9 @@ export function ImportResultPanel({ title, result }: ImportResultPanelProps) {
         <div className="space-y-5">
           {typeof result.dry_run === "boolean" && (
             <div className="rounded-md border p-3 text-sm">
-              Mode:{" "}
+              {i18nT("ui.features.ethikos.demoImporter.importresultpanel.mode")}{" "}
               <span className="font-medium">
-                {result.dry_run ? "Preview / dry run" : "Write operation"}
+                {result.dry_run ? i18nT("ui.features.ethikos.demoImporter.importresultpanel.previewDryRun") : i18nT("ui.features.ethikos.demoImporter.importresultpanel.writeOperation")}
               </span>
             </div>
           )}
@@ -189,13 +198,13 @@ export function ImportResultPanel({ title, result }: ImportResultPanelProps) {
           <ErrorList errors={result.errors ?? []} />
           <WarningList warnings={result.warnings ?? []} />
 
-          <ObjectList title="Created" objects={result.created} />
-          <ObjectList title="Updated" objects={result.updated} />
-          <ObjectList title="Deleted" objects={result.deleted} />
+          <ObjectList title={i18nT("ui.features.ethikos.demoImporter.importresultpanel.created")} objects={result.created} />
+          <ObjectList title={i18nT("ui.features.ethikos.demoImporter.importresultpanel.updated")} objects={result.updated} />
+          <ObjectList title={i18nT("ui.features.ethikos.demoImporter.importresultpanel.deleted")} objects={result.deleted} />
 
           <details className="rounded-md border p-3">
             <summary className="cursor-pointer text-sm font-medium">
-              Raw response
+              {i18nT("ui.features.ethikos.demoImporter.importresultpanel.rawResponse")}
             </summary>
 
             <pre className="mt-3 max-h-96 overflow-auto whitespace-pre-wrap break-words text-xs">

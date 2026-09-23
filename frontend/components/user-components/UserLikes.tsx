@@ -8,6 +8,7 @@
  * Author: Hieu Chu
  */
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Avatar, Card, Empty, List, Tooltip, Typography } from 'antd';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -36,6 +37,7 @@ interface UserLikesProps {
 const FALLBACK_IMG = '/static/no-image.png';
 
 const UserLikes: React.FC<UserLikesProps> = ({ likes }) => {
+  const { t: i18nT } = useLanguage();
   // Tri sans muter la prop et tri interne des images sans mutation
   const items = useMemo<UserLikeItem[]>(() => {
     const safeLikes = Array.isArray(likes) ? likes : [];
@@ -62,7 +64,7 @@ const UserLikes: React.FC<UserLikesProps> = ({ likes }) => {
 
   return (
     <Card
-      title="Likes"
+      title={i18nT("ui.userComponents.userlikes.likes")}
       bodyStyle={{ padding: '20px 24px 0px' }}
       variant="borderless"
       style={{ marginTop: 12 }}
@@ -75,7 +77,7 @@ const UserLikes: React.FC<UserLikesProps> = ({ likes }) => {
           emptyText: (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No Likes"
+              description={i18nT("ui.userComponents.userlikes.noLikes")}
             />
           ),
         }}
@@ -94,7 +96,7 @@ const UserLikes: React.FC<UserLikesProps> = ({ likes }) => {
                 color: 'rgba(0, 0, 0, 0.65)',
               }}
             >
-              {x.sculpture?.name ?? 'Unknown sculpture'}
+              {x.sculpture?.name ?? i18nT("ui.userComponents.userlikes.unknownSculpture")}
             </Typography.Text>
           );
 
@@ -110,7 +112,7 @@ const UserLikes: React.FC<UserLikesProps> = ({ likes }) => {
                     shape="square"
                     size={42}
                     src={firstImageUrl}
-                    alt={x.sculpture?.name ?? 'sculpture'}
+                    alt={x.sculpture?.name ?? i18nT("ui.userComponents.userlikes.sculpture")}
                     style={{ objectFit: 'cover', borderRadius: 4 }}
                   />
                 }

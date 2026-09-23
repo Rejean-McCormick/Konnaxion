@@ -7,6 +7,7 @@
  * Author: Hieu Chu
  */
 
+import { useLanguage } from '@/context/LanguageContext';
 import type { AreaConfig } from '@ant-design/plots'
 import dynamic from 'next/dynamic'
 import React from 'react'
@@ -39,6 +40,7 @@ export default function CommentCard({
   DAILY_COMMENTS_CHANGE,
   COMMENT_DATA,
 }: Props) {
+  const { t: i18nT } = useLanguage();
   const areaConfig: AreaConfig = {
     data: COMMENT_DATA,
     xField: 'x',
@@ -57,7 +59,7 @@ export default function CommentCard({
     <>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <MainIcon type="message" twoToneColor="rgb(205, 34, 255)" />
-        <NumberInfoStyled subTitle="Comments" total={TOTAL_COMMENTS} />
+        <NumberInfoStyled subTitle={i18nT("ui.dashboardComponents.commentcard.comments")} total={TOTAL_COMMENTS} />
       </div>
 
       <BarContainer>
@@ -67,7 +69,7 @@ export default function CommentCard({
       <CardDivider />
 
       <CardFooter
-        title="Daily comments"
+        title={i18nT("ui.dashboardComponents.commentcard.dailyComments")}
         value={DAILY_COMMENTS}
         change={DAILY_COMMENTS_CHANGE}
       />

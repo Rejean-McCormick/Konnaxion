@@ -2,6 +2,7 @@
 // app/kreative/idea-incubator/collaborate-on-ideas/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Alert, Badge, Button, Input, List, Select, Space, Typography } from 'antd';
 import React, { useMemo, useState } from 'react';
 
@@ -44,6 +45,7 @@ const PREVIEW_IDEAS: Idea[] = [
 type StatusFilter = 'All' | Idea['status'];
 
 export default function CollaborateOnIdeasPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<StatusFilter>('All');
 
@@ -64,14 +66,14 @@ export default function CollaborateOnIdeasPage(): JSX.Element {
 
   return (
     <KreativePageShell
-      title="Collaborate on Ideas"
-      subtitle="Discover community ideas and join as a collaborator."
+      title={i18nT("ui.kreative.ideaIncubator.collaborateOnIdeas.collaborateOnIdeas")}
+      subtitle={i18nT("ui.kreative.ideaIncubator.collaborateOnIdeas.discoverCommunityIdeasAndJoinAsA")}
     >
       <Alert
         type="info"
         showIcon
-        message="Idea collaboration preview"
-        description="This surface uses a declared preview dataset because no dedicated idea/showcase persistence contract exists in the current backend. Preview records are not presented as persisted state."
+        message={i18nT("ui.kreative.ideaIncubator.collaborateOnIdeas.ideaCollaborationPreview")}
+        description={i18nT("ui.kreative.ideaIncubator.collaborateOnIdeas.thisSurfaceUsesADeclaredPreviewDataset")}
         style={{ marginBottom: 16 }}
       />
       <Space
@@ -81,7 +83,7 @@ export default function CollaborateOnIdeasPage(): JSX.Element {
       >
         <Space>
           <Input
-            placeholder="Search by title..."
+            placeholder={i18nT("ui.kreative.ideaIncubator.collaborateOnIdeas.searchByTitle")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ width: 300 }}
@@ -92,9 +94,9 @@ export default function CollaborateOnIdeasPage(): JSX.Element {
             onChange={(value) => setSelectedStatus(value)}
             style={{ width: 220 }}
             options={[
-              { value: 'All', label: 'All Status' },
-              { value: 'Seeking Collaboration', label: 'Seeking Collaboration' },
-              { value: 'In Progress', label: 'In Progress' },
+              { value: 'All', label: i18nT("ui.kreative.ideaIncubator.collaborateOnIdeas.allStatus") },
+              { value: 'Seeking Collaboration', label: i18nT("ui.kreative.ideaIncubator.collaborateOnIdeas.seekingCollaboration") },
+              { value: 'In Progress', label: i18nT("ui.kreative.ideaIncubator.collaborateOnIdeas.inProgress") },
             ]}
           />
         </Space>
@@ -108,10 +110,10 @@ export default function CollaborateOnIdeasPage(): JSX.Element {
             key={idea.id}
             actions={[
               <Button key="edit" type="primary" disabled>
-                Edit unavailable
+                {i18nT("ui.kreative.ideaIncubator.collaborateOnIdeas.editUnavailable")}
               </Button>,
               <Button key="view" disabled>
-                View preview
+                {i18nT("ui.kreative.ideaIncubator.collaborateOnIdeas.viewPreview")}
               </Button>,
             ]}
           >
@@ -128,10 +130,10 @@ export default function CollaborateOnIdeasPage(): JSX.Element {
               }
               description={
                 <>
-                  <Text type="secondary">Status: {idea.status}</Text>
+                  <Text type="secondary">{i18nT("ui.kreative.ideaIncubator.collaborateOnIdeas.status")} {idea.status}</Text>
                   <br />
                   <Text type="secondary">
-                    Created on: {idea.dateCreated}
+                    {i18nT("ui.kreative.ideaIncubator.collaborateOnIdeas.createdOn")} {idea.dateCreated}
                   </Text>
                 </>
               }

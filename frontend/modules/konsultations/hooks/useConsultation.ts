@@ -1,8 +1,12 @@
+'use client';
+
 // FILE: frontend/modules/konsultations/hooks/useConsultation.ts
 ﻿// modules/konsultations/hooks/useConsultations.ts
 
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
+
+import { useLanguage } from '@/context/LanguageContext';
 import { useMemo } from 'react';
 
 import {
@@ -53,6 +57,7 @@ export default function useConsultations(
   params: UseConsultationsParams = {},
 ): UseConsultationsResult {
   const { search = '', quickFilter = 'all' } = params;
+  const { t: i18nT } = useLanguage();
 
   const query = useQuery<PublicBallotResponse, Error>({
     queryKey: ['consultations', 'public-ballots'],
@@ -80,11 +85,11 @@ export default function useConsultations(
     }).length;
 
     return [
-      { label: 'Active consultations', value: total },
-      { label: 'Avg participation', value: avgTurnout, suffix: '%' },
-      { label: 'Closing ≤ 48h', value: closingSoon },
+      { label: i18nT('ui.konsultations.stats.activeConsultations'), value: total },
+      { label: i18nT('ui.konsultations.stats.avgParticipation'), value: avgTurnout, suffix: '%' },
+      { label: i18nT('ui.konsultations.stats.closing48h'), value: closingSoon },
     ];
-  }, [ballots]);
+  }, [ballots, i18nT]);
 
   const filteredBallots = useMemo<PublicBallot[]>(() => {
     const normalizedSearch = search.trim().toLowerCase();

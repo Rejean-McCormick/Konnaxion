@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Alert, Button, Form, Input, Select } from 'antd'
 import { useRouter } from 'next/navigation'
 import React from 'react'
@@ -17,27 +18,28 @@ type FormValues = {
 }
 
 export default function SubmitToShowcasePage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [form] = Form.useForm<FormValues>()
   const router = useRouter()
 
   const categories = [
-    { label: 'Art', value: 'art' },
-    { label: 'Design', value: 'design' },
-    { label: 'Photography', value: 'photography' },
-    { label: 'Music', value: 'music' },
+    { label: i18nT("ui.kreative.communityShowcases.submitToShowcase.art"), value: 'art' },
+    { label: i18nT("ui.kreative.communityShowcases.submitToShowcase.design"), value: 'design' },
+    { label: i18nT("ui.kreative.communityShowcases.submitToShowcase.photography"), value: 'photography' },
+    { label: i18nT("ui.kreative.communityShowcases.submitToShowcase.music"), value: 'music' },
   ]
 
   return (
     <KreativePageShell
-      title="Submit to Showcase"
-      subtitle="Prepare a showcase submission without implying persistence that the backend does not expose yet."
+      title={i18nT("ui.kreative.communityShowcases.submitToShowcase.submitToShowcase")}
+      subtitle={i18nT("ui.kreative.communityShowcases.submitToShowcase.prepareAShowcaseSubmissionWithoutImplyingPersistence")}
     >
       <Alert
         type="warning"
         showIcon
         style={{ marginBottom: 16 }}
-        message="Showcase review submissions are not persisted in this build."
-        description="Use Submit Creative Work for a real persisted artwork. This form remains available as a read-only product preview until a dedicated showcase-review contract exists."
+        message={i18nT("ui.kreative.communityShowcases.submitToShowcase.showcaseReviewSubmissionsAreNotPersistedIn")}
+        description={i18nT("ui.kreative.communityShowcases.submitToShowcase.useSubmitCreativeWorkForAReal")}
       />
 
       <Form<FormValues>
@@ -46,13 +48,13 @@ export default function SubmitToShowcasePage(): JSX.Element {
         name="submitToShowcaseForm"
         disabled
       >
-        <Form.Item label="Project title" name="title">
-          <Input placeholder="e.g. Konnaxion Visualizer" allowClear />
+        <Form.Item label={i18nT("ui.kreative.communityShowcases.submitToShowcase.projectTitle")} name="title">
+          <Input placeholder={i18nT("ui.kreative.communityShowcases.submitToShowcase.eGKonnaxionVisualizer")} allowClear />
         </Form.Item>
 
-        <Form.Item label="Category" name="category">
+        <Form.Item label={i18nT("ui.kreative.communityShowcases.submitToShowcase.category")} name="category">
           <Select
-            placeholder="Select a category"
+            placeholder={i18nT("ui.kreative.communityShowcases.submitToShowcase.selectACategory")}
             options={categories}
             showSearch
             filterOption={(input, option) =>
@@ -63,35 +65,35 @@ export default function SubmitToShowcasePage(): JSX.Element {
           />
         </Form.Item>
 
-        <Form.Item label="Description" name="description">
+        <Form.Item label={i18nT("ui.kreative.communityShowcases.submitToShowcase.description")} name="description">
           <TextArea
             rows={5}
-            placeholder="What is this project about?"
+            placeholder={i18nT("ui.kreative.communityShowcases.submitToShowcase.whatIsThisProjectAbout")}
             allowClear
           />
         </Form.Item>
 
-        <Form.Item label="Reference link" name="link">
+        <Form.Item label={i18nT("ui.kreative.communityShowcases.submitToShowcase.referenceLink")} name="link">
           <Input placeholder="https://…" allowClear type="url" />
         </Form.Item>
 
-        <Form.Item label="Tags" name="tags">
+        <Form.Item label={i18nT("ui.kreative.communityShowcases.submitToShowcase.tags")} name="tags">
           <Select
             mode="tags"
-            placeholder="Add tags"
+            placeholder={i18nT("ui.kreative.communityShowcases.submitToShowcase.addTags")}
             tokenSeparators={[',']}
             options={[]}
           />
         </Form.Item>
       </Form>
 
-      <Button onClick={() => router.back()}>Back</Button>
+      <Button onClick={() => router.back()}>{i18nT("ui.kreative.communityShowcases.submitToShowcase.back")}</Button>
       <Button
         type="primary"
         style={{ marginLeft: 8 }}
         onClick={() => router.push('/kreative/creative-hub/submit-creative-work')}
       >
-        Submit persisted creative work
+        {i18nT("ui.kreative.communityShowcases.submitToShowcase.submitPersistedCreativeWork")}
       </Button>
     </KreativePageShell>
   )

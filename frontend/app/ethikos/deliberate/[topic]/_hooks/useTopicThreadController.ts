@@ -6,6 +6,7 @@ import type { SegmentedValue } from 'antd/es/segmented'
 import { useParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
+import { useLanguage } from '@/context/LanguageContext'
 import type { ArgumentTreeItem } from '@/modules/ethikos/components/ArgumentTree'
 import { get } from '@/services/_request'
 import {
@@ -73,6 +74,7 @@ async function fetchOptionalMe(): Promise<UserMeApi | undefined> {
 
 export function useTopicThreadController(): TopicThreadController {
   const { message } = App.useApp()
+  const { t: i18nT } = useLanguage()
 
   const params = useParams<{ topic: string | string[] }>()
   const topicId = useMemo(() => toTopicParam(params?.topic), [params])
@@ -168,12 +170,12 @@ export function useTopicThreadController(): TopicThreadController {
         value: stanceValue,
       })
       await refreshStances()
-      message.success('Your stance has been recorded.')
+      message.success(i18nT('ui.ethikos.deliberate.topic.controller.stanceRecorded'))
     } catch (error) {
       message.error(
         error instanceof Error
           ? error.message
-          : 'Unable to save your stance right now.',
+          : i18nT('ui.ethikos.deliberate.topic.controller.unableSaveStance'),
       )
     } finally {
       setSavingStance(false)
@@ -185,7 +187,7 @@ export function useTopicThreadController(): TopicThreadController {
 
     const trimmed = newArgument.trim()
     if (!trimmed) {
-      message.warning('Please enter an argument before posting.')
+      message.warning(i18nT('ui.ethikos.deliberate.topic.controller.argumentRequired'))
       return
     }
 
@@ -202,14 +204,14 @@ export function useTopicThreadController(): TopicThreadController {
       await refreshPageData()
       message.success(
         replyTarget
-          ? 'Your reply has been added.'
-          : 'Your argument has been added.',
+          ? i18nT('ui.ethikos.deliberate.topic.controller.replyAdded')
+          : i18nT('ui.ethikos.deliberate.topic.controller.argumentAdded'),
       )
     } catch (error) {
       message.error(
         error instanceof Error
           ? error.message
-          : 'Unable to post your argument right now.',
+          : i18nT('ui.ethikos.deliberate.topic.controller.unablePostArgument'),
       )
     } finally {
       setSavingArgument(false)

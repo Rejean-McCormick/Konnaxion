@@ -2,6 +2,7 @@
 // C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\featured-projects\page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { SearchOutlined } from '@ant-design/icons';
 import {
   Alert,
@@ -73,6 +74,7 @@ const PREVIEW_PROJECTS: Project[] = [
 ];
 
 export default function FeaturedProjectsPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] =
     useState<string>('All');
@@ -122,13 +124,13 @@ export default function FeaturedProjectsPage(): JSX.Element {
 
   return (
     <KreativePageShell
-      title="Featured projects"
-      subtitle="Discover highlighted creative projects from the Kreative community."
+      title={i18nT("ui.kreative.communityShowcases.featuredProjects.featuredProjects")}
+      subtitle={i18nT("ui.kreative.communityShowcases.featuredProjects.discoverHighlightedCreativeProjectsFromTheKreative")}
     >
       {/* Filters */}
       <Space wrap style={{ marginBottom: 24 }}>
         <Input
-          placeholder="Search projects."
+          placeholder={i18nT("ui.kreative.communityShowcases.featuredProjects.searchProjects")}
           prefix={<SearchOutlined />}
           value={searchQuery}
           onChange={(e) => {
@@ -146,11 +148,11 @@ export default function FeaturedProjectsPage(): JSX.Element {
           }}
           style={{ width: 220 }}
           options={[
-            { value: 'All', label: 'All Categories' },
-            { value: 'Photography', label: 'Photography' },
-            { value: 'Digital Art', label: 'Digital Art' },
-            { value: 'Mixed Media', label: 'Mixed Media' },
-            { value: 'Painting', label: 'Painting' },
+            { value: 'All', label: i18nT("ui.kreative.communityShowcases.featuredProjects.allCategories") },
+            { value: 'Photography', label: i18nT("ui.kreative.communityShowcases.featuredProjects.photography") },
+            { value: 'Digital Art', label: i18nT("ui.kreative.communityShowcases.featuredProjects.digitalArt") },
+            { value: 'Mixed Media', label: i18nT("ui.kreative.communityShowcases.featuredProjects.mixedMedia") },
+            { value: 'Painting', label: i18nT("ui.kreative.communityShowcases.featuredProjects.painting") },
           ]}
         />
       </Space>
@@ -159,7 +161,7 @@ export default function FeaturedProjectsPage(): JSX.Element {
       <Row gutter={[24, 24]}>
         {paginatedProjects.map((project) => (
           <Col key={project.id} xs={24} sm={12} md={8} lg={6}>
-            <Badge.Ribbon text="Featured" color="red">
+            <Badge.Ribbon text={i18nT("ui.kreative.communityShowcases.featuredProjects.featured")} color="red">
               <Card
                 hoverable
                 cover={
@@ -189,7 +191,7 @@ export default function FeaturedProjectsPage(): JSX.Element {
                         {project.description}
                       </Paragraph>
                       <Text type="secondary">
-                        By {project.creator}
+                        {i18nT("ui.kreative.communityShowcases.featuredProjects.by")} {project.creator}
                       </Text>
                     </>
                   }
@@ -239,13 +241,13 @@ export default function FeaturedProjectsPage(): JSX.Element {
             <div style={{ marginTop: 16 }}>
               <Title level={3}>{selectedProject.title}</Title>
               <Text type="secondary">
-                By {selectedProject.creator}
+                {i18nT("ui.kreative.communityShowcases.featuredProjects.by")} {selectedProject.creator}
               </Text>
               <p style={{ marginTop: 12 }}>
                 {selectedProject.description}
               </p>
               <Button type="primary" disabled>
-                Detail route unavailable
+                {i18nT("ui.kreative.communityShowcases.featuredProjects.detailRouteUnavailable")}
               </Button>
             </div>
           </div>
@@ -253,14 +255,7 @@ export default function FeaturedProjectsPage(): JSX.Element {
       </Modal>
 
       {/* simple 2-line clamp */}
-      <style jsx>{`
-        .line-clamp-2 {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-      `}</style>
+      <style jsx>{`.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }`}</style>
     </KreativePageShell>
   );
 }

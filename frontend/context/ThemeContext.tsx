@@ -3,6 +3,7 @@
 
 import { App as AntdApp, theme as antdTheme, ConfigProvider } from 'antd'
 import enUS from 'antd/locale/en_US'
+import frFR from 'antd/locale/fr_FR'
 import React, {
   createContext,
   type ReactNode,
@@ -13,6 +14,7 @@ import React, {
   useState,
 } from 'react'
 
+import { useLanguage } from '@/context/LanguageContext'
 import { defaultTheme, themeById } from '@/theme'
 import type { ThemeColors, ThemeId, Theme as ThemeModel } from '@/theme/types'
 
@@ -69,6 +71,8 @@ const pruneEmptyObjects = <T extends Record<string, unknown>>(obj: T): T =>
   ) as T
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { language } = useLanguage()
+
   /** Current theme id */
   const [themeType, setThemeType] = useState<ThemeType>(defaultTheme.id)
 
@@ -274,7 +278,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       value={{ token: safeToken, themeType, setThemeType, cycleTheme }}
     >
       <ConfigProvider
-        locale={enUS}
+        locale={language === 'fr' ? frFR : enUS}
         componentSize="middle"
         theme={{
           algorithm,

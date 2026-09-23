@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Button, Card, Empty, List, Space, Spin, Typography } from 'antd'
 
 import ParticipantRoleBadge from '@/modules/ethikos/components/ParticipantRoleBadge'
@@ -16,13 +17,14 @@ export default function ParticipantRolesPanel({
   loading: boolean
   onRefresh: () => void
 }): JSX.Element {
+  const { t: i18nT } = useLanguage();
   return (
     <Card
       size="small"
-      title="Participant roles"
+      title={i18nT("ui.ethikos.deliberate.topic.participantrolespanel.participantRoles")}
       extra={
         <Button size="small" loading={loading} onClick={onRefresh}>
-          Refresh
+          {i18nT("ui.ethikos.deliberate.topic.participantrolespanel.refresh")}
         </Button>
       }
     >
@@ -42,7 +44,7 @@ export default function ParticipantRolesPanel({
                   />
                   {role.assigned_by != null && (
                     <Text type="secondary">
-                      Assigned by {String(role.assigned_by)}
+                      {i18nT("ui.ethikos.deliberate.topic.participantrolespanel.assignedBy")} {String(role.assigned_by)}
                     </Text>
                   )}
                 </Space>
@@ -52,7 +54,7 @@ export default function ParticipantRolesPanel({
         ) : (
           <Empty
             image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description="No participant roles yet"
+            description={i18nT("ui.ethikos.deliberate.topic.participantrolespanel.noParticipantRolesYet")}
           />
         )}
       </Spin>

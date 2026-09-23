@@ -1,48 +1,50 @@
 // FILE: frontend/modules/ethikos/deliberate/guidelines/page.tsx
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { PageContainer } from '@ant-design/pro-components';
 import { Anchor, Divider, Typography } from 'antd';
 
 import usePageTitle from '@/hooks/usePageTitle';
 
 export default function Guidelines() {
-  usePageTitle('Deliberate · Guidelines');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.ethikos.deliberate.guidelines.deliberateGuidelines"));
 
   return (
     <PageContainer ghost>
       <Anchor
         affix
         items={[
-          { key: 'etiquette', href: '#etiquette', title: '1. Etiquette' },
-          { key: 'evidence', href: '#evidence', title: '2. Evidence Rules' },
-          { key: 'moderation', href: '#moderation', title: '3. Moderation & Appeals' },
+          { key: 'etiquette', href: '#etiquette', title: i18nT("ui.ethikos.deliberate.guidelines.text1Etiquette") },
+          { key: 'evidence', href: '#evidence', title: i18nT("ui.ethikos.deliberate.guidelines.text2EvidenceRules") },
+          { key: 'moderation', href: '#moderation', title: i18nT("ui.ethikos.deliberate.guidelines.text3ModerationAppeals") },
         ]}
       />
 
       <Typography.Title id="etiquette" level={3}>
-        1. Etiquette
+        {i18nT("ui.ethikos.deliberate.guidelines.text1Etiquette")}
       </Typography.Title>
       <Typography.Paragraph>
-        • Be concise, civil, and on-topic. Personal attacks and profanity are removed.
+        {i18nT("ui.ethikos.deliberate.guidelines.beConciseCivilAndOnTopicPersonal")}
       </Typography.Paragraph>
 
       <Divider />
 
       <Typography.Title id="evidence" level={3}>
-        2. Evidence Rules
+        {i18nT("ui.ethikos.deliberate.guidelines.text2EvidenceRules")}
       </Typography.Title>
       <Typography.Paragraph>
-        • Claims must cite peer-reviewed sources or official data. Unsupported assertions can be flagged.
+        {i18nT("ui.ethikos.deliberate.guidelines.claimsMustCitePeerReviewedSourcesOr")}
       </Typography.Paragraph>
 
       <Divider />
 
       <Typography.Title id="moderation" level={3}>
-        3. Moderation & Appeals
+        {i18nT("ui.ethikos.deliberate.guidelines.text3ModerationAppeals")}
       </Typography.Title>
       <Typography.Paragraph>
-        • First strike = comment hidden. Second strike = 24 h read-only. Appeals via “Request review” button.
+        {i18nT("ui.ethikos.deliberate.guidelines.firstStrikeCommentHiddenSecondStrike24")}
       </Typography.Paragraph>
     </PageContainer>
   );

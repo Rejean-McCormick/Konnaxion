@@ -1,6 +1,7 @@
 // FILE: frontend/app/ekoh/voting-influence/current-voting-weight/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Alert, Card, Empty, List, Progress, Space, Tag, Typography } from 'antd';
 
 import EkohPageShell from '@/app/ekoh/EkohPageShell';
@@ -14,20 +15,21 @@ function percent(score: number): number {
 }
 
 export default function CurrentVotingWeightPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const { data, isLoading, isError, error } = useReputationEvents();
   const expertise = data?.ekohProfile?.expertise ?? [];
 
   return (
     <EkohPageShell
-      title="Contextual Smart Vote influence"
-      subtitle="Smart Vote influence exists only inside a declared question-specific lens."
+      title={i18nT("ui.ekoh.votingInfluence.currentVotingWeight.contextualSmartVoteInfluence")}
+      subtitle={i18nT("ui.ekoh.votingInfluence.currentVotingWeight.smartVoteInfluenceExistsOnlyInsideA")}
     >
       {isError && (
         <Alert
           type="error"
           showIcon
-          message="Unable to load EkoH context"
-          description={(error as Error | undefined)?.message ?? 'Please try again.'}
+          message={i18nT("ui.ekoh.votingInfluence.currentVotingWeight.unableToLoadEkohContext")}
+          description={(error as Error | undefined)?.message ?? i18nT("ui.ekoh.votingInfluence.currentVotingWeight.pleaseTryAgain")}
           style={{ marginBottom: 16 }}
         />
       )}
@@ -35,12 +37,12 @@ export default function CurrentVotingWeightPage(): JSX.Element {
       <Alert
         type="info"
         showIcon
-        message="There is no global Smart Vote weight"
-        description="Every participant remains part of the public baseline. An advisory reading may apply a bounded contextual weight only when a question declares relevant domains and a reproducible Smart Vote lens is computed."
+        message={i18nT("ui.ekoh.votingInfluence.currentVotingWeight.thereIsNoGlobalSmartVoteWeight")}
+        description={i18nT("ui.ekoh.votingInfluence.currentVotingWeight.everyParticipantRemainsPartOfThePublic")}
         style={{ marginBottom: 16 }}
       />
 
-      <Card title="EkoH context available to question-specific lenses" loading={isLoading}>
+      <Card title={i18nT("ui.ekoh.votingInfluence.currentVotingWeight.ekohContextAvailableToQuestionSpecificLenses")} loading={isLoading}>
         {expertise.length ? (
           <List<EkohExpertiseScore>
             dataSource={expertise}
@@ -57,7 +59,7 @@ export default function CurrentVotingWeightPage(): JSX.Element {
                         <Text strong>{item.domainName}</Text>
                         <Tag>{item.domainCode}</Tag>
                       </Space>
-                      <Text type="secondary">{value}% profile expertise</Text>
+                      <Text type="secondary">{value}{i18nT("ui.ekoh.votingInfluence.currentVotingWeight.profileExpertise")}</Text>
                     </Space>
                     <Progress percent={value} showInfo={false} />
                   </div>
@@ -66,21 +68,16 @@ export default function CurrentVotingWeightPage(): JSX.Element {
             }}
           />
         ) : (
-          <Empty description="No EkoH expertise context available" />
+          <Empty description={i18nT("ui.ekoh.votingInfluence.currentVotingWeight.noEkohExpertiseContextAvailable")} />
         )}
       </Card>
 
-      <Card title="How influence is determined" style={{ marginTop: 16 }}>
+      <Card title={i18nT("ui.ekoh.votingInfluence.currentVotingWeight.howInfluenceIsDetermined")} style={{ marginTop: 16 }}>
         <Paragraph>
-          A Smart Vote reading combines the question&apos;s declared domain relevance
-          with the participant&apos;s disclosed EkoH expertise and the configured
-          ethics/reliability modifier.
+          {i18nT("ui.ekoh.votingInfluence.currentVotingWeight.aSmartVoteReadingCombinesTheQuestion")}
         </Paragraph>
         <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-          A weight such as 70%, an “average user” comparison, or a “top experts”
-          benchmark is not displayed here because no such global measurement exists.
-          The actual advisory weight belongs to a specific reading and is shown with
-          that question.
+          {i18nT("ui.ekoh.votingInfluence.currentVotingWeight.aWeightSuchAs70AnAverage")}
         </Paragraph>
       </Card>
     </EkohPageShell>

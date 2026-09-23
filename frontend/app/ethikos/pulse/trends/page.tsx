@@ -1,5 +1,8 @@
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
+import { pulseChartTitle } from '@/i18n/uiModelLabels';
 import {
   AreaChartOutlined,
   BarChartOutlined,
@@ -61,11 +64,11 @@ type PulseChart = {
 
 const { Text } = Typography;
 
-const RANGE_OPTIONS: { label: string; value: TimeRangeKey }[] = [
-  { label: '7d', value: '7d' },
-  { label: '30d', value: '30d' },
-  { label: '60d', value: '60d' },
-];
+const RANGE_OPTIONS = (i18nT: TranslateFunction): { label: string; value: TimeRangeKey }[] => ([
+  { label: i18nT("ui.ethikos.pulse.trends.text7d"), value: '7d' },
+  { label: i18nT("ui.ethikos.pulse.trends.text30d"), value: '30d' },
+  { label: i18nT("ui.ethikos.pulse.trends.text60d"), value: '60d' },
+]);
 
 function getDaysForRange(range: TimeRangeKey): number {
   switch (range) {
@@ -166,6 +169,7 @@ function getChartIcon(type: PulseChart['type']): React.ReactNode {
 }
 
 export default function PulseTrends(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const { message } = App.useApp();
 
   const [range, setRange] = useState<TimeRangeKey>('30d');
@@ -268,13 +272,13 @@ export default function PulseTrends(): JSX.Element {
 
   const exportCurrentChartCsv = useCallback(() => {
     if (!charts.length || !activeKey) {
-      message.info('Nothing to export.');
+      message.info(i18nT("ui.ethikos.pulse.trends.nothingToExport"));
       return;
     }
 
     const idx = charts.findIndex((chart) => chart.key === activeKey);
     if (idx < 0) {
-      message.info('Nothing to export.');
+      message.info(i18nT("ui.ethikos.pulse.trends.nothingToExport"));
       return;
     }
 
@@ -282,12 +286,12 @@ export default function PulseTrends(): JSX.Element {
     const cfg = enhancedConfigs[idx];
 
     if (!chart || !cfg) {
-      message.info('Nothing to export.');
+      message.info(i18nT("ui.ethikos.pulse.trends.nothingToExport"));
       return;
     }
 
     if (chart.type === 'heatmap') {
-      message.warning('Heatmap export is not supported.');
+      message.warning(i18nT("ui.ethikos.pulse.trends.heatmapExportIsNotSupported"));
       return;
     }
 
@@ -323,22 +327,22 @@ export default function PulseTrends(): JSX.Element {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
-    message.success('Exported current chart as CSV.');
-  }, [activeKey, charts, comparePrev, enhancedConfigs, message, range]);
+    message.success(i18nT("ui.ethikos.pulse.trends.exportedCurrentChartAsCsv"));
+  }, [activeKey, charts, comparePrev, enhancedConfigs, message, range, i18nT]);
 
   const shellProps = useMemo(
     () => ({
-      title: 'Pulse · Trends',
-      sectionLabel: 'Pulse',
+      title: i18nT("ui.ethikos.pulse.trends.pulseTrends"),
+      sectionLabel: i18nT("ui.ethikos.pulse.trends.pulse"),
       subtitle:
-        'Topic creation, stances, and deliberation activity over time. Filter by range, smooth lines, and optionally overlay the previous period.',
+        i18nT("ui.ethikos.pulse.trends.topicCreationStancesAndDeliberationActivityOver"),
       primaryAction: (
         <Button type="primary" href="/ethikos/insights" icon={<InsightsIcon />}>
-          Open opinion analytics
+          {i18nT("ui.ethikos.pulse.trends.openOpinionAnalytics")}
         </Button>
       ),
     }),
-    [],
+    [i18nT],
   );
 
   const secondaryActions = useMemo(
@@ -348,15 +352,15 @@ export default function PulseTrends(): JSX.Element {
           size="small"
           value={range}
           onChange={(value) => setRange(value as TimeRangeKey)}
-          options={RANGE_OPTIONS}
+          options={RANGE_OPTIONS(i18nT)}
         />
-        <Tooltip title="Smooth lines">
+        <Tooltip title={i18nT("ui.ethikos.pulse.trends.smoothLines")}>
           <Switch size="small" checked={smoothLines} onChange={setSmoothLines} />
         </Tooltip>
-        <Tooltip title="Compare with previous period">
+        <Tooltip title={i18nT("ui.ethikos.pulse.trends.compareWithPreviousPeriod")}>
           <Switch size="small" checked={comparePrev} onChange={setComparePrev} />
         </Tooltip>
-        <Tooltip title="Last data point in the underlying series">
+        <Tooltip title={i18nT("ui.ethikos.pulse.trends.lastDataPointInTheUnderlyingSeries")}>
           <Badge
             count={
               <Space size={4}>
@@ -368,12 +372,12 @@ export default function PulseTrends(): JSX.Element {
           />
         </Tooltip>
         <Button icon={<DownloadOutlined />} size="small" onClick={exportCurrentChartCsv}>
-          Export CSV
+          {i18nT("ui.ethikos.pulse.trends.exportCsv")}
         </Button>
         <Button icon={<SyncOutlined />} size="small" onClick={refresh} />
       </Space>
     ),
-    [comparePrev, exportCurrentChartCsv, lastUpdatedLabel, range, refresh, smoothLines],
+    [comparePrev, exportCurrentChartCsv, lastUpdatedLabel, range, refresh, smoothLines, i18nT],
   );
 
   const tabItems = useMemo<TabsProps['items']>(
@@ -386,7 +390,7 @@ export default function PulseTrends(): JSX.Element {
           label: (
             <Space size="small">
               {getChartIcon(chart.type)}
-              <span>{chart.title}</span>
+              <span>{pulseChartTitle(i18nT, chart.key, chart.title)}</span>
             </Space>
           ),
           children: (
@@ -398,7 +402,7 @@ export default function PulseTrends(): JSX.Element {
           ),
         };
       }),
-    [charts, enhancedConfigs],
+    [charts, enhancedConfigs, i18nT],
   );
 
   let body: React.ReactNode;
@@ -412,9 +416,9 @@ export default function PulseTrends(): JSX.Element {
   } else if (error) {
     body = (
       <PageContainer ghost>
-        <Empty description="Failed to load trend data">
+        <Empty description={i18nT("ui.ethikos.pulse.trends.failedToLoadTrendData")}>
           <Button icon={<SyncOutlined />} onClick={refresh} type="primary">
-            Retry
+            {i18nT("ui.ethikos.pulse.trends.retry")}
           </Button>
         </Empty>
       </PageContainer>
@@ -422,7 +426,7 @@ export default function PulseTrends(): JSX.Element {
   } else if (!charts.length) {
     body = (
       <PageContainer ghost>
-        <Empty description="No trend data available yet" />
+        <Empty description={i18nT("ui.ethikos.pulse.trends.noTrendDataAvailableYet")} />
       </PageContainer>
     );
   } else {

@@ -1,6 +1,8 @@
 // FILE: frontend/modules/ethikos/components/ArgumentTree.tsx
 'use client'
 
+import TranslatedText from '@/components/i18n/TranslatedText';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   BranchesOutlined,
   DownOutlined,
@@ -298,18 +300,18 @@ function formatDate(value?: string | null): string | null {
 
 function sideTag(side: ArgumentTreeSide): ReactNode {
   if (side === 'pro') {
-    return <Tag color="green">Pro</Tag>
+    return <Tag color="green"><TranslatedText id="ui.ethikos.argumenttree.pro" /></Tag>
   }
 
   if (side === 'con') {
-    return <Tag color="red">Con</Tag>
+    return <Tag color="red"><TranslatedText id="ui.ethikos.argumenttree.con" /></Tag>
   }
 
   if (side === 'neutral') {
-    return <Tag>Neutral</Tag>
+    return <Tag><TranslatedText id="ui.ethikos.argumenttree.neutral" /></Tag>
   }
 
-  return <Tag>Argument</Tag>
+  return <Tag><TranslatedText id="ui.ethikos.argumenttree.argument" /></Tag>
 }
 
 function collectExpandableIds(nodes: ArgumentTreeNode[]): string[] {
@@ -336,6 +338,7 @@ function hasPositiveCount(value?: number): boolean {
 }
 
 function CountMeta({ node }: { node: ArgumentTreeNode }) {
+  const { t: i18nT } = useLanguage();
   const hasSources = hasPositiveCount(node.sourceCount)
   const hasVotes = hasPositiveCount(node.impactVoteCount)
   const hasSuggestions = hasPositiveCount(node.suggestionCount)
@@ -346,9 +349,9 @@ function CountMeta({ node }: { node: ArgumentTreeNode }) {
 
   return (
     <>
-      {hasSources && <Tag>{node.sourceCount} sources</Tag>}
-      {hasVotes && <Tag>{node.impactVoteCount} impact votes</Tag>}
-      {hasSuggestions && <Tag>{node.suggestionCount} suggestions</Tag>}
+      {hasSources && <Tag>{node.sourceCount} {i18nT("ui.ethikos.argumenttree.sources")}</Tag>}
+      {hasVotes && <Tag>{node.impactVoteCount} {i18nT("ui.ethikos.argumenttree.impactVotes")}</Tag>}
+      {hasSuggestions && <Tag>{node.suggestionCount} {i18nT("ui.ethikos.argumenttree.suggestions")}</Tag>}
     </>
   )
 }
@@ -361,7 +364,7 @@ export default function ArgumentTree({
   items,
   arguments: apiArguments,
   loading = false,
-  emptyText = 'No arguments yet.',
+  emptyText: emptyTextProp,
   selectedId = null,
   defaultCollapsedIds = EMPTY_COLLAPSED_IDS,
   hideHidden = true,
@@ -375,6 +378,8 @@ export default function ArgumentTree({
   renderAuthor,
   renderBody,
 }: ArgumentTreeProps) {
+  const { t: i18nT } = useLanguage();
+  const emptyText = emptyTextProp ?? i18nT("ui.ethikos.argumenttree.noArgumentsYet");
   const selectedKey = selectedId == null ? null : String(selectedId)
   const safeMaxDepth = Math.max(0, Math.floor(maxDepth))
 
@@ -460,12 +465,12 @@ export default function ArgumentTree({
       >
         <Space size={8} wrap>
           <BranchesOutlined />
-          <span style={strongTextStyle}>Argument tree</span>
-          <span style={secondaryTextStyle}>({tree.length} roots)</span>
-          <span style={secondaryTextStyle}>({flatItems.length} total)</span>
+          <span style={strongTextStyle}>{i18nT("ui.ethikos.argumenttree.argumentTree")}</span>
+          <span style={secondaryTextStyle}>({tree.length} {i18nT("ui.ethikos.argumenttree.roots")}</span>
+          <span style={secondaryTextStyle}>({flatItems.length} {i18nT("ui.ethikos.argumenttree.total")}</span>
           {hideHidden && hiddenCount > 0 && (
-            <Tooltip title="Hidden arguments are excluded from this tree.">
-              <Tag>{hiddenCount} hidden</Tag>
+            <Tooltip title={i18nT("ui.ethikos.argumenttree.hiddenArgumentsAreExcludedFromThisTree")}>
+              <Tag>{i18nT("ui.ethikos.argumenttree.hiddenCount", { count: hiddenCount })}</Tag>
             </Tooltip>
           )}
         </Space>
@@ -473,16 +478,16 @@ export default function ArgumentTree({
         {expandableIds.length > 0 && (
           <Space size={8}>
             <Button size="small" onClick={expandAll}>
-              Expand all
+              {i18nT("ui.ethikos.argumenttree.expandAll")}
             </Button>
             <Button size="small" onClick={collapseAll}>
-              Collapse all
+              {i18nT("ui.ethikos.argumenttree.collapseAll")}
             </Button>
           </Space>
         )}
       </div>
 
-      <div role="tree" aria-label="Argument tree">
+      <div role="tree" aria-label={i18nT("ui.ethikos.argumenttree.argumentTree")}>
         {tree.map((node) => (
           <ArgumentTreeRow
             key={node.id}
@@ -534,6 +539,7 @@ function ArgumentTreeRow({
   renderAuthor,
   renderBody,
 }: ArgumentTreeRowProps) {
+  const { t: i18nT } = useLanguage();
   const isCollapsed = collapsedIds.has(node.id)
   const isSelected = selectedId === node.id
   const hasChildren = node.children.length > 0
@@ -591,12 +597,12 @@ function ArgumentTreeRow({
         >
           <div style={{ width: 24, paddingTop: 2 }}>
             {hasChildren ? (
-              <Tooltip title={isCollapsed ? 'Expand replies' : 'Collapse replies'}>
+              <Tooltip title={isCollapsed ? i18nT("ui.ethikos.argumenttree.expandReplies") : i18nT("ui.ethikos.argumenttree.collapseReplies")}>
                 <Button
                   type="text"
                   size="small"
                   icon={isCollapsed ? <RightOutlined /> : <DownOutlined />}
-                  aria-label={isCollapsed ? 'Expand replies' : 'Collapse replies'}
+                  aria-label={isCollapsed ? i18nT("ui.ethikos.argumenttree.expandReplies") : i18nT("ui.ethikos.argumenttree.collapseReplies")}
                   onClick={(event) => {
                     event.stopPropagation()
                     onToggleCollapsed(node.id)
@@ -617,7 +623,7 @@ function ArgumentTreeRow({
               }}
             >
               {sideTag(node.side)}
-              {node.isHidden && <Tag color="default">Hidden</Tag>}
+              {node.isHidden && <Tag color="default">{i18nT("ui.ethikos.argumenttree.hidden")}</Tag>}
               {renderAuthor ? (
                 renderAuthor(node)
               ) : (
@@ -659,14 +665,14 @@ function ArgumentTreeRow({
                     onReply(node)
                   }}
                 >
-                  Reply
+                  {i18nT("ui.ethikos.argumenttree.reply")}
                 </Button>
               )}
 
               {hasChildren && (
                 <span style={secondaryTextStyle}>
                   {node.children.length}{' '}
-                  {node.children.length === 1 ? 'reply' : 'replies'}
+                  {node.children.length === 1 ? i18nT("ui.ethikos.argumenttree.reply_a5dfd1") : i18nT("ui.ethikos.argumenttree.replies")}
                 </span>
               )}
 

@@ -2,6 +2,8 @@
 ﻿// app/konnected/certifications/exam-preparation/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
+import type { TranslateFunction } from '@/i18n/runtime';
 import {
   ArrowRightOutlined,
   CalendarOutlined,
@@ -122,17 +124,18 @@ function computeStepIndex(progress: number): number {
 }
 
 function getReadinessBadge(
+  i18nT: TranslateFunction,
   progress: number,
   lastScore: number | null | undefined,
   passPercent: number,
 ): { status: 'ready' | 'almost' | 'not_ready'; label: string; color: 'green' | 'gold' | 'red' } {
   if (lastScore != null && lastScore >= passPercent) {
-    return { status: 'ready', label: 'Ready based on last score', color: 'green' };
+    return { status: 'ready', label: i18nT('ui.konnected.certifications.examPreparation.readyBasedOnLastScore'), color: 'green' };
   }
   if (progress >= passPercent - 10) {
-    return { status: 'almost', label: 'Almost ready – focus on weak areas', color: 'gold' };
+    return { status: 'almost', label: i18nT('ui.konnected.certifications.examPreparation.almostReady'), color: 'gold' };
   }
-  return { status: 'not_ready', label: 'Not ready yet – keep studying', color: 'red' };
+  return { status: 'not_ready', label: i18nT('ui.konnected.certifications.examPreparation.notReadyYet'), color: 'red' };
 }
 
 async function fetchExamPreparation(pathId: string): Promise<ExamPreparationResponse> {
@@ -140,6 +143,7 @@ async function fetchExamPreparation(pathId: string): Promise<ExamPreparationResp
 }
 
 export default function ExamPreparationPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -170,7 +174,7 @@ export default function ExamPreparationPage(): JSX.Element {
   const isCooldownActive = data?.exam?.isCooldownActive ?? false;
   const cooldownEndsAt = data?.exam?.cooldownEndsAt ?? null;
 
-  const readiness = getReadinessBadge(overallProgress, lastScore, passPercent);
+  const readiness = getReadinessBadge(i18nT, overallProgress, lastScore, passPercent);
   const currentStepIndex = computeStepIndex(overallProgress);
 
   const recommendedStudyHours = data?.exam?.recommendedStudyHours ?? null;
@@ -193,9 +197,7 @@ export default function ExamPreparationPage(): JSX.Element {
 
   const subtitle = (
     <>
-      Get an at-a-glance view of your preparation for this certification path:
-      study modules, focus areas, readiness vs. the {passPercent}% pass threshold,
-      and next steps.
+      {i18nT("ui.konnected.certifications.examPreparation.getAnAtAGlanceViewOf")} {passPercent}{i18nT("ui.konnected.certifications.examPreparation.passThresholdAndNextSteps")}
     </>
   );
 
@@ -205,8 +207,8 @@ export default function ExamPreparationPage(): JSX.Element {
         <Alert
           type="info"
           showIcon
-          message="No study modules are defined yet."
-          description="Once your CertificationPath is configured with learning units, they will appear here as a guided preparation plan."
+          message={i18nT("ui.konnected.certifications.examPreparation.noStudyModulesAreDefinedYet")}
+          description={i18nT("ui.konnected.certifications.examPreparation.onceYourCertificationpathIsConfiguredWithLearning")}
         />
       );
     }
@@ -232,7 +234,7 @@ export default function ExamPreparationPage(): JSX.Element {
                   console.log('Open module', module.id);
                 }}
               >
-                View module
+                {i18nT("ui.konnected.certifications.examPreparation.viewModule")}
               </Button>,
             ]}
           >
@@ -245,7 +247,7 @@ export default function ExamPreparationPage(): JSX.Element {
                   )}
                   {module.isCriticalWeakness && (
                     <Tag color="volcano" icon={<WarningTwoTone twoToneColor="#fa541c" />}>
-                      Focus area
+                      {i18nT("ui.konnected.certifications.examPreparation.focusArea")}
                     </Tag>
                   )}
                 </Space>
@@ -255,23 +257,23 @@ export default function ExamPreparationPage(): JSX.Element {
                   <Space size="small" wrap>
                     <Tag>
                       {module.type === 'content'
-                        ? 'Content'
+                        ? i18nT("ui.konnected.certifications.examPreparation.content")
                         : module.type === 'practice_quiz'
-                        ? 'Practice quiz'
+                        ? i18nT("ui.konnected.certifications.examPreparation.practiceQuiz")
                         : module.type === 'project'
-                        ? 'Project'
-                        : 'Checkpoint'}
+                        ? i18nT("ui.konnected.certifications.examPreparation.project")
+                        : i18nT("ui.konnected.certifications.examPreparation.checkpoint")}
                     </Tag>
                     <Text type="secondary">
                       {module.status === 'completed'
-                        ? 'Completed'
+                        ? i18nT("ui.konnected.certifications.examPreparation.completed")
                         : module.status === 'in_progress'
-                        ? `In progress – ${module.progressPercent}%`
-                        : 'Not started yet'}
+                        ? i18nT("ui.konnected.certifications.examPreparation.inProgress", { progressPercent: module.progressPercent })
+                        : i18nT("ui.konnected.certifications.examPreparation.notStartedYet")}
                     </Text>
                     {module.estimatedMinutes != null && (
                       <Text type="secondary">
-                        • ~{module.estimatedMinutes} min
+                        • ~{module.estimatedMinutes} {i18nT("ui.konnected.certifications.examPreparation.min")}
                       </Text>
                     )}
                   </Space>
@@ -282,7 +284,7 @@ export default function ExamPreparationPage(): JSX.Element {
                   />
                   {module.lastTouchedAt && (
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                      Last worked on:{' '}
+                      {i18nT("ui.konnected.certifications.examPreparation.lastWorkedOn")}{' '}
                       {dayjs(module.lastTouchedAt).format('MMM D, YYYY HH:mm')}
                     </Text>
                   )}
@@ -301,8 +303,8 @@ export default function ExamPreparationPage(): JSX.Element {
         <Alert
           type="info"
           showIcon
-          message="No specific focus areas identified yet."
-          description="Once you complete some evaluations, the system will highlight weak domains to prioritize in your study time."
+          message={i18nT("ui.konnected.certifications.examPreparation.noSpecificFocusAreasIdentifiedYet")}
+          description={i18nT("ui.konnected.certifications.examPreparation.onceYouCompleteSomeEvaluationsTheSystem")}
         />
       );
     }
@@ -332,8 +334,8 @@ export default function ExamPreparationPage(): JSX.Element {
                   )}
                   {area.recommendedResourcesCount != null && (
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                      {area.recommendedResourcesCount} recommended resources
-                      {area.recommendedResourcesCount === 1 ? '' : 's'} in Knowledge
+                      {area.recommendedResourcesCount} {i18nT("ui.konnected.certifications.examPreparation.recommendedResources")}
+                      {area.recommendedResourcesCount === 1 ? '' : 's'} {i18nT("ui.konnected.certifications.examPreparation.inKnowledge")}
                     </Text>
                   )}
                 </>
@@ -348,23 +350,23 @@ export default function ExamPreparationPage(): JSX.Element {
   const mainTabsItems: TabsProps['items'] = [
     {
       key: 'plan',
-      label: 'Study plan & progress',
+      label: i18nT("ui.konnected.certifications.examPreparation.studyPlanProgress"),
       children: (
         <Card variant="borderless">
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             <div>
-              <Text strong>Your overall preparation progress</Text>
+              <Text strong>{i18nT("ui.konnected.certifications.examPreparation.yourOverallPreparationProgress")}</Text>
               <Progress
                 percent={overallProgress}
                 status={overallProgress >= passPercent ? 'success' : 'active'}
               />
               <Text type="secondary" style={{ fontSize: 12 }}>
-                Based on all study modules in this CertificationPath.
+                {i18nT("ui.konnected.certifications.examPreparation.basedOnAllStudyModulesInThis")}
               </Text>
             </div>
 
             <div>
-              <Text strong>Recommended sequence</Text>
+              <Text strong>{i18nT("ui.konnected.certifications.examPreparation.recommendedSequence")}</Text>
               <Steps
                 direction="vertical"
                 size="small"
@@ -372,20 +374,20 @@ export default function ExamPreparationPage(): JSX.Element {
                 style={{ marginTop: 8 }}
               >
                 <Step
-                  title="Study core content"
-                  description="Work through required modules and lessons."
+                  title={i18nT("ui.konnected.certifications.examPreparation.studyCoreContent")}
+                  description={i18nT("ui.konnected.certifications.examPreparation.workThroughRequiredModulesAndLessons")}
                 />
                 <Step
-                  title="Complete practice activities"
-                  description="Interactive exercises, quizzes, and projects."
+                  title={i18nT("ui.konnected.certifications.examPreparation.completePracticeActivities")}
+                  description={i18nT("ui.konnected.certifications.examPreparation.interactiveExercisesQuizzesAndProjects")}
                 />
                 <Step
-                  title="Attempt a practice evaluation"
-                  description={`Use automated_evaluation in "practice mode" to benchmark against ${passPercent}%.`}
+                  title={i18nT("ui.konnected.certifications.examPreparation.attemptAPracticeEvaluation")}
+                  description={i18nT("ui.konnected.certifications.examPreparation.useAutomatedEvaluationInPracticeModeTo", { passPercent: passPercent })}
                 />
                 <Step
-                  title="Review feedback & focus areas"
-                  description="Revisit weak domains before booking the official exam."
+                  title={i18nT("ui.konnected.certifications.examPreparation.reviewFeedbackFocusAreas")}
+                  description={i18nT("ui.konnected.certifications.examPreparation.revisitWeakDomainsBeforeBookingTheOfficial")}
                 />
               </Steps>
             </div>
@@ -396,19 +398,19 @@ export default function ExamPreparationPage(): JSX.Element {
               onClick={handleStartPracticeExam}
               disabled={isCooldownActive}
             >
-              Start practice exam
+              {i18nT("ui.konnected.certifications.examPreparation.startPracticeExam")}
             </Button>
 
             {isCooldownActive && cooldownEndsAt && (
               <Alert
                 type="warning"
                 showIcon
-                message="Practice exam on cooldown"
+                message={i18nT("ui.konnected.certifications.examPreparation.practiceExamOnCooldown")}
                 description={
                   <>
-                    You recently attempted a practice evaluation. You can try again after{' '}
-                    {dayjs(cooldownEndsAt).format('MMM D, YYYY HH:mm')} (cooldown{' '}
-                    {retryCooldownMinutes} minutes).
+                    {i18nT("ui.konnected.certifications.examPreparation.youRecentlyAttemptedAPracticeEvaluationYou")}{' '}
+                    {dayjs(cooldownEndsAt).format('MMM D, YYYY HH:mm')} {i18nT("ui.konnected.certifications.examPreparation.cooldown")}{' '}
+                    {retryCooldownMinutes} {i18nT("ui.konnected.certifications.examPreparation.minutes")}
                   </>
                 }
               />
@@ -419,7 +421,7 @@ export default function ExamPreparationPage(): JSX.Element {
     },
     {
       key: 'focus',
-      label: 'Focus areas',
+      label: i18nT("ui.konnected.certifications.examPreparation.focusAreas"),
       children: <Card variant="borderless">{renderFocusAreas()}</Card>,
     },
   ];
@@ -436,7 +438,7 @@ export default function ExamPreparationPage(): JSX.Element {
           icon={<CalendarOutlined />}
           onClick={handleGoToExamRegistration}
         >
-          Exam registration
+          {i18nT("ui.konnected.certifications.examPreparation.examRegistration")}
         </Button>
       }
       secondaryActions={
@@ -444,7 +446,7 @@ export default function ExamPreparationPage(): JSX.Element {
           icon={<FileSearchOutlined />}
           onClick={handleGoToExamDashboard}
         >
-          Exam dashboard
+          {i18nT("ui.konnected.certifications.examPreparation.examDashboard")}
         </Button>
       }
     >
@@ -453,8 +455,8 @@ export default function ExamPreparationPage(): JSX.Element {
           type="info"
           showIcon
           style={{ marginBottom: 16 }}
-          message="No certification path selected"
-          description="Open this page from a specific Certification Program (e.g. from the Programs list) to see a tailored preparation plan."
+          message={i18nT("ui.konnected.certifications.examPreparation.noCertificationPathSelected")}
+          description={i18nT("ui.konnected.certifications.examPreparation.openThisPageFromASpecificCertification")}
         />
       )}
 
@@ -463,8 +465,8 @@ export default function ExamPreparationPage(): JSX.Element {
           type="error"
           showIcon
           style={{ marginBottom: 16 }}
-          message="Unable to load your exam preparation data"
-          description="Please try again in a moment. If the problem persists, contact an administrator."
+          message={i18nT("ui.konnected.certifications.examPreparation.unableToLoadYourExamPreparationData")}
+          description={i18nT("ui.konnected.certifications.examPreparation.pleaseTryAgainInAMomentIf")}
         />
       )}
 
@@ -474,8 +476,8 @@ export default function ExamPreparationPage(): JSX.Element {
           <Card
             title={
               data?.path?.name
-                ? `Study modules for: ${data.path.name}`
-                : 'Study modules'
+                ? i18nT("ui.konnected.certifications.examPreparation.studyModulesFor", { name: data.path.name })
+                : i18nT("ui.konnected.certifications.examPreparation.studyModules")
             }
             extra={
               <Tag color={readiness.color} icon={<FlagOutlined />}>
@@ -505,14 +507,14 @@ export default function ExamPreparationPage(): JSX.Element {
                   <Row gutter={[16, 16]}>
                     <Col span={12}>
                       <Statistic
-                        title="Overall progress"
+                        title={i18nT("ui.konnected.certifications.examPreparation.overallProgress")}
                         value={overallProgress}
                         suffix="%"
                       />
                     </Col>
                     <Col span={12}>
                       <Statistic
-                        title="Pass threshold"
+                        title={i18nT("ui.konnected.certifications.examPreparation.passThreshold")}
                         value={passPercent}
                         suffix="%"
                       />
@@ -522,7 +524,7 @@ export default function ExamPreparationPage(): JSX.Element {
                   <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
                     <Col span={12}>
                       <Statistic
-                        title="Recommended study time"
+                        title={i18nT("ui.konnected.certifications.examPreparation.recommendedStudyTime")}
                         value={
                           recommendedStudyHours != null
                             ? recommendedStudyHours
@@ -534,7 +536,7 @@ export default function ExamPreparationPage(): JSX.Element {
                     </Col>
                     <Col span={12}>
                       <Statistic
-                        title="Retry cooldown"
+                        title={i18nT("ui.konnected.certifications.examPreparation.retryCooldown")}
                         value={retryCooldownMinutes}
                         suffix="min"
                         prefix={<ClockCircleOutlined />}
@@ -544,16 +546,15 @@ export default function ExamPreparationPage(): JSX.Element {
 
                   <div style={{ marginTop: 16 }}>
                     <Text type="secondary" style={{ display: 'block' }}>
-                      Pass/fail uses a frozen threshold ({passPercent}%), and
-                      failed attempts are throttled by a{' '}
-                      {retryCooldownMinutes}-minute cooldown.
+                      {i18nT("ui.konnected.certifications.examPreparation.passFailUsesAFrozenThreshold")}{passPercent}{i18nT("ui.konnected.certifications.examPreparation.andFailedAttemptsAreThrottledByA")}{' '}
+                      {retryCooldownMinutes}{i18nT("ui.konnected.certifications.examPreparation.minuteCooldown")}
                     </Text>
                   </div>
                 </>
               )}
             </Card>
 
-            <Card title="Upcoming exam">
+            <Card title={i18nT("ui.konnected.certifications.examPreparation.upcomingExam")}>
               {isLoading && pathId ? (
                 <Skeleton active paragraph={{ rows: 2 }} />
               ) : targetDate ? (
@@ -566,8 +567,7 @@ export default function ExamPreparationPage(): JSX.Element {
                       </Text>
                     </Space>
                     <Text type="secondary">
-                      Make sure your preparation progress and practice scores are
-                      comfortably above {passPercent}% before this date.
+                      {i18nT("ui.konnected.certifications.examPreparation.makeSureYourPreparationProgressAndPractice")} {passPercent}{i18nT("ui.konnected.certifications.examPreparation.beforeThisDate")}
                     </Text>
                   </Space>
                   <Button
@@ -576,7 +576,7 @@ export default function ExamPreparationPage(): JSX.Element {
                     style={{ marginTop: 12, paddingLeft: 0 }}
                     onClick={handleGoToExamRegistration}
                   >
-                    Adjust exam session
+                    {i18nT("ui.konnected.certifications.examPreparation.adjustExamSession")}
                   </Button>
                 </>
               ) : (
@@ -584,8 +584,8 @@ export default function ExamPreparationPage(): JSX.Element {
                   <Alert
                     type="info"
                     showIcon
-                    message="No exam date scheduled"
-                    description="Book a session to lock in your target exam date and align your study plan."
+                    message={i18nT("ui.konnected.certifications.examPreparation.noExamDateScheduled")}
+                    description={i18nT("ui.konnected.certifications.examPreparation.bookASessionToLockInYour")}
                   />
                   <Button
                     type="primary"
@@ -593,13 +593,13 @@ export default function ExamPreparationPage(): JSX.Element {
                     style={{ marginTop: 12 }}
                     onClick={handleGoToExamRegistration}
                   >
-                    Schedule exam
+                    {i18nT("ui.konnected.certifications.examPreparation.scheduleExam")}
                   </Button>
                 </>
               )}
             </Card>
 
-            <Card title="Focus summary">
+            <Card title={i18nT("ui.konnected.certifications.examPreparation.focusSummary")}>
               {isLoading && pathId ? (
                 <Skeleton active paragraph={{ rows: 3 }} />
               ) : (
@@ -607,9 +607,8 @@ export default function ExamPreparationPage(): JSX.Element {
                   {focusAreas.length > 0 ? (
                     <>
                       <Text>
-                        You have {focusAreas.length} identified focus{' '}
-                        {focusAreas.length === 1 ? 'area' : 'areas'} based on your
-                        evaluations.
+                        {i18nT("ui.konnected.certifications.examPreparation.youHave")} {focusAreas.length} {i18nT("ui.konnected.certifications.examPreparation.identifiedFocus")}{' '}
+                        {focusAreas.length === 1 ? i18nT("ui.konnected.certifications.examPreparation.area") : i18nT("ui.konnected.certifications.examPreparation.areas")} {i18nT("ui.konnected.certifications.examPreparation.basedOnYourEvaluations")}
                       </Text>
                       <div style={{ marginTop: 12 }}>{renderFocusAreas()}</div>
                       <Button
@@ -617,14 +616,12 @@ export default function ExamPreparationPage(): JSX.Element {
                         style={{ marginTop: 8, paddingLeft: 0 }}
                         onClick={handleGoToExamDashboard}
                       >
-                        View detailed breakdown in Exam Dashboard
+                        {i18nT("ui.konnected.certifications.examPreparation.viewDetailedBreakdownInExamDashboard")}
                       </Button>
                     </>
                   ) : (
                     <Text type="secondary">
-                      Once you complete your first practice or official exam,
-                      we will highlight weak domains and recommended topics
-                      here.
+                      {i18nT("ui.konnected.certifications.examPreparation.onceYouCompleteYourFirstPracticeOr")}
                     </Text>
                   )}
                 </>

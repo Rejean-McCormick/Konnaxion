@@ -1,6 +1,7 @@
 // FILE: frontend/app/ethikos/decide/results/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ArrowRightOutlined,
   CheckCircleOutlined,
@@ -58,20 +59,22 @@ function route(path: string): string {
 }
 
 function ResultTag({ passed }: { passed: boolean }): JSX.Element {
+  const { t: i18nT } = useLanguage();
   return (
     <Tag
       color={passed ? 'green' : 'red'}
       icon={passed ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
     >
-      {passed ? 'POSITIVE' : 'NEGATIVE'}
+      {passed ? i18nT("ui.ethikos.decide.results.positive") : i18nT("ui.ethikos.decide.results.negative")}
     </Tag>
   );
 }
 
 function ScopeTag({ scope }: { scope: DecisionScope }): JSX.Element {
+  const { t: i18nT } = useLanguage();
   return (
     <Tag color={scope === 'Elite' ? 'geekblue' : 'default'}>
-      {scope === 'Elite' ? 'EXPERT CONTEXT' : 'PUBLIC'}
+      {scope === 'Elite' ? i18nT("ui.ethikos.decide.results.expertContext") : i18nT("ui.ethikos.decide.results.public")}
     </Tag>
   );
 }
@@ -82,6 +85,7 @@ function formatStanceScore(value: number): string {
 }
 
 export default function ResultsArchive(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const { data, loading, error, refresh } = useRequest(fetchDecisionResults);
   const items = data?.items ?? [];
 
@@ -132,20 +136,20 @@ export default function ResultsArchive(): JSX.Element {
 
   const columns: ProColumns<DecisionResult>[] = [
     {
-      title: 'Decision',
+      title: i18nT("ui.ethikos.decide.results.decision"),
       dataIndex: 'title',
       width: 330,
       render: (_dom, row) => (
         <Space direction="vertical" size={0}>
           <Text strong>{row.title}</Text>
           <Text type="secondary">
-            {row.region ?? 'No category'} · {row.participationCount} stances
+            {row.region ?? i18nT("ui.ethikos.decide.results.noCategory")} · {row.participationCount} {i18nT("ui.ethikos.decide.results.stances")}
           </Text>
         </Space>
       ),
     },
     {
-      title: 'Public baseline',
+      title: i18nT("ui.ethikos.decide.results.publicBaseline"),
       key: 'baseline',
       width: 190,
       render: (_dom, row) => (
@@ -156,28 +160,28 @@ export default function ResultsArchive(): JSX.Element {
       ),
     },
     {
-      title: 'EkoH advisory reading',
+      title: i18nT("ui.ethikos.decide.results.ekohAdvisoryReading"),
       key: 'reading',
       width: 210,
       render: (_dom, row) =>
         typeof row.readingScore === 'number' ? (
           <Space direction="vertical" size={0}>
-            <Tag color="blue">ADVISORY</Tag>
+            <Tag color="blue">{i18nT("ui.ethikos.decide.results.advisory")}</Tag>
             <Text>{formatStanceScore(row.readingScore)}</Text>
             {row.readingKey && <Text type="secondary">{row.readingKey}</Text>}
           </Space>
         ) : (
-          <Text type="secondary">No declared reading</Text>
+          <Text type="secondary">{i18nT("ui.ethikos.decide.results.noDeclaredReading")}</Text>
         ),
     },
     {
-      title: 'Context',
+      title: i18nT("ui.ethikos.decide.results.context"),
       dataIndex: 'scope',
       width: 170,
       render: (_dom, row) => <ScopeTag scope={row.scope} />,
     },
     {
-      title: 'Closed',
+      title: i18nT("ui.ethikos.decide.results.closed"),
       dataIndex: 'closesAt',
       width: 180,
       render: (_dom, row) => (
@@ -188,13 +192,13 @@ export default function ResultsArchive(): JSX.Element {
       ),
     },
     {
-      title: 'Next',
+      title: i18nT("ui.ethikos.decide.results.next"),
       key: 'next',
       width: 150,
       render: () => (
         <Link href={route('/ethikos/impact/tracker')} prefetch={false}>
           <Button size="small" icon={<ArrowRightOutlined />}>
-            Follow impact
+            {i18nT("ui.ethikos.decide.results.followImpact")}
           </Button>
         </Link>
       ),
@@ -209,26 +213,26 @@ export default function ResultsArchive(): JSX.Element {
 
   return (
     <EthikosPageShell
-      title="Decision results"
-      sectionLabel="Decide"
-      subtitle="Compare the public baseline with declared advisory readings without collapsing them into one score."
+      title={i18nT("ui.ethikos.decide.results.decisionResults")}
+      sectionLabel={i18nT("ui.ethikos.decide.results.decide")}
+      subtitle={i18nT("ui.ethikos.decide.results.compareThePublicBaselineWithDeclaredAdvisory")}
       primaryAction={
         <Link href={route('/ethikos/decide/methodology')} prefetch={false}>
           <Button type="primary" icon={<InfoCircleOutlined />}>
-            Voting methodology
+            {i18nT("ui.ethikos.decide.results.votingMethodology")}
           </Button>
         </Link>
       }
       secondaryActions={
         <Space wrap>
           <Link href={route('/ethikos/decide/public')} prefetch={false}>
-            <Button>Public consultations</Button>
+            <Button>{i18nT("ui.ethikos.decide.results.publicConsultations")}</Button>
           </Link>
           <Link href={route('/ethikos/decide/elite')} prefetch={false}>
-            <Button>Expert context</Button>
+            <Button>{i18nT("ui.ethikos.decide.results.expertContext_ee5748")}</Button>
           </Link>
           <Button icon={<ReloadOutlined />} onClick={() => refresh()} loading={loading}>
-            Refresh
+            {i18nT("ui.ethikos.decide.results.refresh")}
           </Button>
         </Space>
       }
@@ -238,35 +242,35 @@ export default function ResultsArchive(): JSX.Element {
           <Alert
             type="info"
             showIcon
-            message="Single source facts, multiple readings"
-            description="The public baseline remains visible. EkoH supplies contextual expertise; Smart Vote may compute or publish a separate advisory reading. A missing reading is shown as missing, never fabricated from the baseline."
+            message={i18nT("ui.ethikos.decide.results.singleSourceFactsMultipleReadings")}
+            description={i18nT("ui.ethikos.decide.results.thePublicBaselineRemainsVisibleEkohSupplies")}
           />
 
           {error && (
             <Alert
               type="error"
               showIcon
-              message="Unable to load decision results"
-              description="Check the Decide service or refresh this page."
+              message={i18nT("ui.ethikos.decide.results.unableToLoadDecisionResults")}
+              description={i18nT("ui.ethikos.decide.results.checkTheDecideServiceOrRefreshThis")}
             />
           )}
 
           <ProCard gutter={16} wrap>
             <StatisticCard
               colSpan={{ xs: 24, sm: 12, lg: 6 }}
-              statistic={{ title: 'Closed decisions', value: items.length }}
+              statistic={{ title: i18nT("ui.ethikos.decide.results.closedDecisions"), value: items.length }}
             />
             <StatisticCard
               colSpan={{ xs: 24, sm: 12, lg: 6 }}
-              statistic={{ title: 'Positive baseline', value: passedCount }}
+              statistic={{ title: i18nT("ui.ethikos.decide.results.positiveBaseline"), value: passedCount }}
             />
             <StatisticCard
               colSpan={{ xs: 24, sm: 12, lg: 6 }}
-              statistic={{ title: 'Available advisory readings', value: availableReadings }}
+              statistic={{ title: i18nT("ui.ethikos.decide.results.availableAdvisoryReadings"), value: availableReadings }}
             />
             <StatisticCard
               colSpan={{ xs: 24, sm: 12, lg: 6 }}
-              statistic={{ title: 'Categories represented', value: allRegions.length }}
+              statistic={{ title: i18nT("ui.ethikos.decide.results.categoriesRepresented"), value: allRegions.length }}
             />
           </ProCard>
 
@@ -274,54 +278,54 @@ export default function ResultsArchive(): JSX.Element {
             <ProCard
               colSpan={{ xs: 24, lg: 8 }}
               bordered
-              title={<Space><CheckCircleOutlined /><span>1. Public baseline</span></Space>}
+              title={<Space><CheckCircleOutlined /><span>{i18nT("ui.ethikos.decide.results.text1PublicBaseline")}</span></Space>}
             >
               <Paragraph type="secondary">
-                One source result from the canonical Ethikos stances.
+                {i18nT("ui.ethikos.decide.results.oneSourceResultFromTheCanonicalEthikos")}
               </Paragraph>
             </ProCard>
             <ProCard
               colSpan={{ xs: 24, lg: 8 }}
               bordered
-              title={<Space><SafetyCertificateOutlined /><span>2. Advisory lens</span></Space>}
+              title={<Space><SafetyCertificateOutlined /><span>{i18nT("ui.ethikos.decide.results.text2AdvisoryLens")}</span></Space>}
             >
               <Paragraph type="secondary">
-                Relevant expertise may produce a separate Smart Vote reading. It does not replace the baseline.
+                {i18nT("ui.ethikos.decide.results.relevantExpertiseMayProduceASeparateSmart")}
               </Paragraph>
             </ProCard>
             <ProCard
               colSpan={{ xs: 24, lg: 8 }}
               bordered
-              title={<Space><ArrowRightOutlined /><span>3. Decision context</span></Space>}
+              title={<Space><ArrowRightOutlined /><span>{i18nT("ui.ethikos.decide.results.text3DecisionContext")}</span></Space>}
             >
               <Paragraph type="secondary">
-                Divergence is information for judgment, not an automatic instruction.
+                {i18nT("ui.ethikos.decide.results.divergenceIsInformationForJudgmentNotAn")}
               </Paragraph>
             </ProCard>
           </ProCard>
 
-          <ProCard title="Filter results">
+          <ProCard title={i18nT("ui.ethikos.decide.results.filterResults")}>
             <Space wrap>
               <Segmented
                 value={scopeFilter}
                 onChange={(value) => setScopeFilter(value as ScopeFilter)}
                 options={[
-                  { label: 'All', value: 'all' },
-                  { label: 'Public', value: 'Public' },
-                  { label: 'Expert context', value: 'Elite' },
+                  { label: i18nT("ui.ethikos.decide.results.all"), value: 'all' },
+                  { label: i18nT("ui.ethikos.decide.results.public_dc5eb7"), value: 'Public' },
+                  { label: i18nT("ui.ethikos.decide.results.expertContext_ee5748"), value: 'Elite' },
                 ]}
               />
               <Segmented
                 value={resultFilter}
                 onChange={(value) => setResultFilter(value as ResultFilter)}
                 options={[
-                  { label: 'All results', value: 'all' },
-                  { label: 'Positive', value: 'passed' },
-                  { label: 'Negative', value: 'rejected' },
+                  { label: i18nT("ui.ethikos.decide.results.allResults"), value: 'all' },
+                  { label: i18nT("ui.ethikos.decide.results.positive_06fe9a"), value: 'passed' },
+                  { label: i18nT("ui.ethikos.decide.results.negative_c70827"), value: 'rejected' },
                 ]}
               />
               <Select
-                placeholder="Category"
+                placeholder={i18nT("ui.ethikos.decide.results.category")}
                 style={{ minWidth: 200 }}
                 allowClear
                 value={regionFilter === 'all' ? undefined : regionFilter}
@@ -338,7 +342,7 @@ export default function ResultsArchive(): JSX.Element {
                     setRange(null);
                   }}
                 >
-                  Clear
+                  {i18nT("ui.ethikos.decide.results.clear")}
                 </Button>
               )}
             </Space>
@@ -346,7 +350,7 @@ export default function ResultsArchive(): JSX.Element {
 
           {filteredItems.length === 0 && !loading ? (
             <ProCard>
-              <Empty description="No archived decisions match the current filters." />
+              <Empty description={i18nT("ui.ethikos.decide.results.noArchivedDecisionsMatchTheCurrentFilters")} />
             </ProCard>
           ) : (
             <ProTable<DecisionResult>
@@ -357,7 +361,7 @@ export default function ResultsArchive(): JSX.Element {
               search={false}
               options={false}
               toolBarRender={false}
-              headerTitle="Archived decisions"
+              headerTitle={i18nT("ui.ethikos.decide.results.archivedDecisions")}
             />
           )}
         </Space>

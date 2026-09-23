@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { ProCard } from '@ant-design/pro-components'
 import { Card, Col, Row, Space, Typography } from 'antd'
 
@@ -39,10 +40,11 @@ export default function KorumPanelsGrid({
   onMutation: () => void
   onRefreshParticipantRoles: () => void
 }): JSX.Element {
+  const { t: i18nT } = useLanguage();
   return (
     <ProCard
-      title="Argument details and follow-up"
-      subTitle="Select an argument to attach sources, record impact signals, or suggest a refinement."
+      title={i18nT("ui.ethikos.deliberate.topic.korumpanelsgrid.argumentDetailsAndFollowUp")}
+      subTitle={i18nT("ui.ethikos.deliberate.topic.korumpanelsgrid.selectArgumentFollowUpHint")}
       ghost
     >
       <Row gutter={[16, 16]}>
@@ -56,18 +58,18 @@ export default function KorumPanelsGrid({
             />
           ) : (
             <EmptySelectionCard
-              title="Sources"
-              description="Select an argument to add references, citations, or supporting context."
+              title={i18nT("ui.ethikos.deliberate.topic.korumpanelsgrid.sources")}
+              description={i18nT("ui.ethikos.deliberate.topic.korumpanelsgrid.selectAnArgumentToAddReferencesCitations")}
             />
           )}
         </Col>
 
         <Col xs={24} lg={12} xl={6}>
           {selectedArgumentId ? (
-            <Card size="small" title="Impact signal">
+            <Card size="small" title={i18nT("ui.ethikos.deliberate.topic.korumpanelsgrid.impactSignal")}>
               <Space direction="vertical" size={12} style={{ width: '100%' }}>
                 <Text type="secondary">
-                  Rate the practical importance of the selected argument.
+                  {i18nT("ui.ethikos.deliberate.topic.korumpanelsgrid.rateThePracticalImportanceOfTheSelected")}
                 </Text>
 
                 <ImpactVoteControl
@@ -76,15 +78,14 @@ export default function KorumPanelsGrid({
                 />
 
                 <Text type="secondary">
-                  This signal applies to the argument only. Your topic stance is
-                  recorded separately.
+                  {i18nT("ui.ethikos.deliberate.topic.korumpanelsgrid.thisSignalAppliesToTheArgumentOnly")}
                 </Text>
               </Space>
             </Card>
           ) : (
             <EmptySelectionCard
-              title="Impact signal"
-              description="Select an argument to rate its practical importance."
+              title={i18nT("ui.ethikos.deliberate.topic.korumpanelsgrid.impactSignal")}
+              description={i18nT("ui.ethikos.deliberate.topic.korumpanelsgrid.selectAnArgumentToRateItsPractical")}
             />
           )}
         </Col>
@@ -94,11 +95,11 @@ export default function KorumPanelsGrid({
             topicId={topicId}
             parentId={selectedArgumentId}
             side={toSuggestionSide(selectedArgument?.side)}
-            title="Suggested improvement"
+            title={i18nT("ui.ethikos.deliberate.topic.korumpanelsgrid.suggestedImprovement")}
             description={
               selectedArgument
-                ? 'Suggest a reply, refinement, or missing nuance for the selected argument.'
-                : 'Suggest a new top-level argument for review.'
+                ? i18nT("ui.ethikos.deliberate.topic.korumpanelsgrid.suggestAReplyRefinementOrMissingNuance")
+                : i18nT("ui.ethikos.deliberate.topic.korumpanelsgrid.suggestANewTopLevelArgumentFor")
             }
             onSubmitted={onMutation}
           />

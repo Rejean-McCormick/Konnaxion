@@ -1,6 +1,8 @@
 // FILE: frontend/app/ethikos/pulse/health/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
+import type { TranslateFunction } from '@/i18n/runtime';
 import { ClockCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import { Pie, Radar } from '@ant-design/plots';
 import {
@@ -31,15 +33,16 @@ type PiePoint = { type: string; value: number };
 type PlotConfig = { data?: unknown[]; [key: string]: unknown };
 
 function computeHealthStatus(
+  i18nT: TranslateFunction,
   constructiveness?: number,
   engagement?: number,
 ): { status: 'success' | 'warning' | 'error'; label: string } {
   const c = constructiveness ?? 0;
   const e = engagement ?? 0;
 
-  if (c >= 70 && e >= 50) return { status: 'success', label: 'Healthy' };
-  if (c >= 50) return { status: 'warning', label: 'Watch' };
-  return { status: 'error', label: 'At risk' };
+  if (c >= 70 && e >= 50) return { status: 'success', label: i18nT('ui.ethikos.pulse.health.healthy') };
+  if (c >= 50) return { status: 'warning', label: i18nT('ui.ethikos.pulse.health.watch') };
+  return { status: 'error', label: i18nT('ui.ethikos.pulse.health.atRisk') };
 }
 
 function asRadarPoints(value: unknown): RadarPoint[] {
@@ -73,7 +76,8 @@ function formatRefreshTime(refreshedAt?: string): string | null {
 }
 
 export default function PulseHealth(): JSX.Element {
-  const shellTitle = 'Pulse · Participation Health';
+  const { t: i18nT } = useLanguage();
+  const shellTitle = i18nT("ui.ethikos.pulse.health.pulseParticipationHealth");
 
   const { data, loading, error, refresh } = useRequest<HealthSummary, []>(
     fetchPulseHealth,
@@ -83,7 +87,7 @@ export default function PulseHealth(): JSX.Element {
 
   if (loading && !data) {
     return (
-      <EthikosPageShell title={shellTitle} sectionLabel="Pulse">
+      <EthikosPageShell title={shellTitle} sectionLabel={i18nT("ui.ethikos.pulse.health.pulse")}>
         <PageContainer ghost>
           <Skeleton active />
         </PageContainer>
@@ -93,10 +97,10 @@ export default function PulseHealth(): JSX.Element {
 
   if (error) {
     return (
-      <EthikosPageShell title={shellTitle} sectionLabel="Pulse">
+      <EthikosPageShell title={shellTitle} sectionLabel={i18nT("ui.ethikos.pulse.health.pulse")}>
         <PageContainer ghost>
           <Empty
-            description="Failed to load participation health"
+            description={i18nT("ui.ethikos.pulse.health.failedToLoadParticipationHealth")}
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           >
             <Button
@@ -104,7 +108,7 @@ export default function PulseHealth(): JSX.Element {
               onClick={() => void refresh()}
               type="primary"
             >
-              Retry
+              {i18nT("ui.ethikos.pulse.health.retry")}
             </Button>
           </Empty>
         </PageContainer>
@@ -114,9 +118,9 @@ export default function PulseHealth(): JSX.Element {
 
   if (!data) {
     return (
-      <EthikosPageShell title={shellTitle} sectionLabel="Pulse">
+      <EthikosPageShell title={shellTitle} sectionLabel={i18nT("ui.ethikos.pulse.health.pulse")}>
         <PageContainer ghost>
-          <Empty description="No participation data available yet" />
+          <Empty description={i18nT("ui.ethikos.pulse.health.noParticipationDataAvailableYet")} />
         </PageContainer>
       </EthikosPageShell>
     );
@@ -139,6 +143,7 @@ export default function PulseHealth(): JSX.Element {
   const constructiveness = metricMap.get('Constructiveness') ?? 0;
 
   const { status: healthStatus, label: healthLabel } = computeHealthStatus(
+    i18nT,
     constructiveness,
     engagement,
   );
@@ -165,7 +170,7 @@ export default function PulseHealth(): JSX.Element {
       {lastUpdated && (
         <Badge
           count={
-            <Tooltip title={`Last refreshed at ${lastUpdated}`}>
+            <Tooltip title={i18nT("ui.ethikos.pulse.health.lastRefreshedAt", { lastUpdated: lastUpdated })}>
               <ClockCircleOutlined />
             </Tooltip>
           }
@@ -183,7 +188,7 @@ export default function PulseHealth(): JSX.Element {
   return (
     <EthikosPageShell
       title={shellTitle}
-      sectionLabel="Pulse"
+      sectionLabel={i18nT("ui.ethikos.pulse.health.pulse")}
       secondaryActions={secondaryActions}
     >
       <PageContainer ghost>
@@ -191,12 +196,12 @@ export default function PulseHealth(): JSX.Element {
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
             statistic={{
-              title: 'Participation',
+              title: i18nT("ui.ethikos.pulse.health.participation"),
               value: participation,
               suffix: '%',
               description: (
                 <Text type="secondary">
-                  Share of users who have expressed a stance.
+                  {i18nT("ui.ethikos.pulse.health.shareOfUsersWhoHaveExpressedA")}
                 </Text>
               ),
             }}
@@ -204,12 +209,12 @@ export default function PulseHealth(): JSX.Element {
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
             statistic={{
-              title: 'Engagement',
+              title: i18nT("ui.ethikos.pulse.health.engagement"),
               value: engagement,
               suffix: '%',
               description: (
                 <Text type="secondary">
-                  Voting and reactions across recent debates.
+                  {i18nT("ui.ethikos.pulse.health.votingAndReactionsAcrossRecentDebates")}
                 </Text>
               ),
             }}
@@ -217,13 +222,12 @@ export default function PulseHealth(): JSX.Element {
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
             statistic={{
-              title: 'Balance',
+              title: i18nT("ui.ethikos.pulse.health.balance"),
               value: balance,
               suffix: '%',
               description: (
                 <Text type="secondary">
-                  How evenly positions are distributed between positive and
-                  negative.
+                  {i18nT("ui.ethikos.pulse.health.howEvenlyPositionsAreDistributedBetweenPositive")}
                 </Text>
               ),
             }}
@@ -231,12 +235,12 @@ export default function PulseHealth(): JSX.Element {
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
             statistic={{
-              title: 'Constructiveness',
+              title: i18nT("ui.ethikos.pulse.health.constructiveness"),
               value: constructiveness,
               suffix: '%',
               description: (
                 <Text type="secondary">
-                  Composite of participation and balance.
+                  {i18nT("ui.ethikos.pulse.health.compositeOfParticipationAndBalance")}
                 </Text>
               ),
             }}
@@ -246,22 +250,22 @@ export default function PulseHealth(): JSX.Element {
         <ProCard gutter={[16, 16]} wrap>
           <ProCard
             colSpan={{ xs: 24, xl: 14 }}
-            title="Participation health radar"
-            extra={<Text type="secondary">Each axis normalised to 0–100.</Text>}
+            title={i18nT("ui.ethikos.pulse.health.participationHealthRadar")}
+            extra={<Text type="secondary">{i18nT("ui.ethikos.pulse.health.eachAxisNormalisedTo0100")}</Text>}
           >
             {hasRadarData ? (
               <Radar {...(radarConfig as React.ComponentProps<typeof Radar>)} />
             ) : (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="No participation health data yet"
+                description={i18nT("ui.ethikos.pulse.health.noParticipationHealthDataYet")}
               />
             )}
           </ProCard>
 
           <ProCard
             colSpan={{ xs: 24, xl: 10 }}
-            title="Ethics sentiment breakdown"
+            title={i18nT("ui.ethikos.pulse.health.ethicsSentimentBreakdown")}
             split="horizontal"
           >
             <ProCard ghost>
@@ -270,7 +274,7 @@ export default function PulseHealth(): JSX.Element {
               ) : (
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="No sentiment data yet"
+                  description={i18nT("ui.ethikos.pulse.health.noSentimentDataYet")}
                 />
               )}
             </ProCard>
@@ -285,7 +289,7 @@ export default function PulseHealth(): JSX.Element {
                       <Space>
                         <Text strong>{item.label}</Text>
                         <Text type="secondary">
-                          {item.count} stances ({item.percent}%)
+                          {item.count} {i18nT("ui.ethikos.pulse.health.stances")}{item.percent}%)
                         </Text>
                       </Space>
                     </List.Item>
@@ -294,7 +298,7 @@ export default function PulseHealth(): JSX.Element {
               ) : (
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="No sentiment breakdown available"
+                  description={i18nT("ui.ethikos.pulse.health.noSentimentBreakdownAvailable")}
                 />
               )}
             </ProCard>

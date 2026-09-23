@@ -1,6 +1,7 @@
 // FILE: frontend/modules/ethikos/deliberate/[topic]/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
 import { Timeline, Typography } from 'antd';
@@ -14,6 +15,7 @@ type TopicDetail = Awaited<ReturnType<typeof fetchTopicDetail>>;
 type Statement = TopicDetail['statements'][number];
 
 export default function TopicDetailPage() {
+  const { t: i18nT } = useLanguage();
   const params = useParams<{ topic: string }>();
   const topicParam = params?.topic;
   const topicId =
@@ -33,9 +35,9 @@ export default function TopicDetailPage() {
 
   return (
     <PageContainer ghost loading={loading}>
-      <Typography.Title level={3}>{data?.title ?? 'Topic'}</Typography.Title>
+      <Typography.Title level={3}>{data?.title ?? i18nT("ui.ethikos.deliberate.topic.topic")}</Typography.Title>
 
-      <ProCard title="Statements Thread" ghost>
+      <ProCard title={i18nT("ui.ethikos.deliberate.topic.statementsThread")} ghost>
         <Timeline
           items={(data?.statements ?? []).map((s) => ({
             key: s.id,

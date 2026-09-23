@@ -2,6 +2,7 @@
 // app/konnected/learning-library/browse-resources/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   DownloadOutlined,
   FilterOutlined,
@@ -128,6 +129,7 @@ function normalizeArray<T>(values: T[] | undefined, fallback: T[]): T[] {
 /* ------------------------------------------------------------------ */
 
 export default function BrowseResourcesPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -380,7 +382,7 @@ export default function BrowseResourcesPage(): JSX.Element {
 
   const handleExportCurrentPage = async () => {
     if (!resources.length) {
-      message.info('There are no resources to export for the current filters.');
+      message.info(i18nT("ui.konnected.learningLibrary.browseResources.thereAreNoResourcesToExportFor"));
       return;
     }
 
@@ -441,9 +443,9 @@ export default function BrowseResourcesPage(): JSX.Element {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      message.success('Exported current page of results as CSV.');
+      message.success(i18nT("ui.konnected.learningLibrary.browseResources.exportedCurrentPageOfResultsAsCsv"));
     } catch {
-      message.error('Unable to export resources. Please try again.');
+      message.error(i18nT("ui.konnected.learningLibrary.browseResources.unableToExportResourcesPleaseTryAgain"));
     } finally {
       setExporting(false);
     }
@@ -461,9 +463,9 @@ export default function BrowseResourcesPage(): JSX.Element {
         const fullUrl = `${window.location.origin}${href}`;
         try {
           await navigator.clipboard.writeText(fullUrl);
-          message.success('Link with current filters copied to your clipboard.');
+          message.success(i18nT("ui.konnected.learningLibrary.browseResources.linkWithCurrentFiltersCopiedToYour"));
         } catch {
-          message.warning('Unable to copy link automatically. The URL has been updated instead.');
+          message.warning(i18nT("ui.konnected.learningLibrary.browseResources.unableToCopyLinkAutomaticallyTheUrl"));
         }
       }
 
@@ -480,7 +482,7 @@ export default function BrowseResourcesPage(): JSX.Element {
   const columns: ColumnsType<KnowledgeResource> = useMemo(
     () => [
       {
-        title: 'Title',
+        title: i18nT("ui.konnected.learningLibrary.browseResources.title"),
         dataIndex: 'title',
         key: 'title',
         render: (value: string, record) => (
@@ -501,7 +503,7 @@ export default function BrowseResourcesPage(): JSX.Element {
         ),
       },
       {
-        title: 'Subject',
+        title: i18nT("ui.konnected.learningLibrary.browseResources.subject"),
         dataIndex: 'subject',
         key: 'subject',
         render: (value?: string) =>
@@ -509,22 +511,22 @@ export default function BrowseResourcesPage(): JSX.Element {
             <Tag color="blue">{value}</Tag>
           ) : (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Not specified
+              {i18nT("ui.konnected.learningLibrary.browseResources.notSpecified")}
             </Text>
           ),
       },
       {
-        title: 'Type',
+        title: i18nT("ui.konnected.learningLibrary.browseResources.type"),
         dataIndex: 'resource_type',
         key: 'resource_type',
         render: (value: string) => (
           <Tag color="geekblue" style={{ textTransform: 'capitalize' }}>
-            {value || 'other'}
+            {value || i18nT("ui.konnected.learningLibrary.browseResources.other")}
           </Tag>
         ),
       },
       {
-        title: 'Level',
+        title: i18nT("ui.konnected.learningLibrary.browseResources.level"),
         dataIndex: 'level',
         key: 'level',
         render: (value?: KnowledgeLevel) =>
@@ -534,12 +536,12 @@ export default function BrowseResourcesPage(): JSX.Element {
             </Tag>
           ) : (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Any level
+              {i18nT("ui.konnected.learningLibrary.browseResources.anyLevel")}
             </Text>
           ),
       },
       {
-        title: 'Language',
+        title: i18nT("ui.konnected.learningLibrary.browseResources.language"),
         dataIndex: 'language',
         key: 'language',
         render: (value?: string) =>
@@ -547,12 +549,12 @@ export default function BrowseResourcesPage(): JSX.Element {
             <Tag color="cyan">{value}</Tag>
           ) : (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Not specified
+              {i18nT("ui.konnected.learningLibrary.browseResources.notSpecified")}
             </Text>
           ),
       },
       {
-        title: 'Rating',
+        title: i18nT("ui.konnected.learningLibrary.browseResources.rating"),
         dataIndex: 'average_rating',
         key: 'average_rating',
         width: 150,
@@ -566,18 +568,18 @@ export default function BrowseResourcesPage(): JSX.Element {
             </Space>
           ) : (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Not rated yet
+              {i18nT("ui.konnected.learningLibrary.browseResources.notRatedYet")}
             </Text>
           ),
       },
       {
-        title: 'Duration / min',
+        title: i18nT("ui.konnected.learningLibrary.browseResources.durationMin"),
         dataIndex: 'estimated_minutes',
         key: 'estimated_minutes',
         width: 120,
         render: (value?: number | null) =>
           value != null ? (
-            <Text>{value} min</Text>
+            <Text>{value} {i18nT("ui.konnected.learningLibrary.browseResources.min")}</Text>
           ) : (
             <Text type="secondary" style={{ fontSize: 12 }}>
               —
@@ -585,7 +587,7 @@ export default function BrowseResourcesPage(): JSX.Element {
           ),
       },
       {
-        title: 'Progress',
+        title: i18nT("ui.konnected.learningLibrary.browseResources.progress"),
         dataIndex: 'user_progress_percent',
         key: 'user_progress_percent',
         width: 120,
@@ -594,12 +596,12 @@ export default function BrowseResourcesPage(): JSX.Element {
             <Text>{value}%</Text>
           ) : (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Not started
+              {i18nT("ui.konnected.learningLibrary.browseResources.notStarted")}
             </Text>
           ),
       },
       {
-        title: 'Tags',
+        title: i18nT("ui.konnected.learningLibrary.browseResources.tags"),
         dataIndex: 'tags',
         key: 'tags',
         render: (value?: string[]) =>
@@ -611,44 +613,44 @@ export default function BrowseResourcesPage(): JSX.Element {
             </Space>
           ) : (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              No tags
+              {i18nT("ui.konnected.learningLibrary.browseResources.noTags")}
             </Text>
           ),
       },
       {
-        title: 'Offline',
+        title: i18nT("ui.konnected.learningLibrary.browseResources.offline"),
         dataIndex: 'is_offline_available',
         key: 'is_offline_available',
         width: 120,
         render: (value?: boolean) =>
           value ? (
-            <Tag color="green">Available</Tag>
+            <Tag color="green">{i18nT("ui.konnected.learningLibrary.browseResources.available")}</Tag>
           ) : (
-            <Tag>Online only</Tag>
+            <Tag>{i18nT("ui.konnected.learningLibrary.browseResources.onlineOnly")}</Tag>
           ),
       },
       {
-        title: 'Actions',
+        title: i18nT("ui.konnected.learningLibrary.browseResources.actions"),
         key: 'actions',
         fixed: 'right',
         width: 150,
         render: (_: unknown, record) => (
           <Space>
             <Button size="small" type="link" onClick={() => handleOpenResource(record)}>
-              Open
+              {i18nT("ui.konnected.learningLibrary.browseResources.open")}
             </Button>
             <Button
               size="small"
               icon={<DownloadOutlined />}
               disabled={!record.is_offline_available}
             >
-              Offline
+              {i18nT("ui.konnected.learningLibrary.browseResources.offline")}
             </Button>
           </Space>
         ),
       },
     ],
-    [handleOpenResource],
+    [handleOpenResource, i18nT],
   );
 
   const hasResults = resources.length > 0;
@@ -672,7 +674,7 @@ export default function BrowseResourcesPage(): JSX.Element {
         disabled={!hasResults}
         loading={exporting}
       >
-        Export selection
+        {i18nT("ui.konnected.learningLibrary.browseResources.exportSelection")}
       </Button>
       <Button
         icon={<ShareAltOutlined />}
@@ -680,7 +682,7 @@ export default function BrowseResourcesPage(): JSX.Element {
         disabled={!hasResults && !filtersActive}
         loading={sharing}
       >
-        Share filters
+        {i18nT("ui.konnected.learningLibrary.browseResources.shareFilters")}
       </Button>
     </Space>
   );
@@ -691,7 +693,7 @@ export default function BrowseResourcesPage(): JSX.Element {
       onClick={() => fetchResources(1, pageSize)}
       disabled={loading}
     >
-      Refresh
+      {i18nT("ui.konnected.learningLibrary.browseResources.refresh")}
     </Button>
   );
 
@@ -701,8 +703,8 @@ export default function BrowseResourcesPage(): JSX.Element {
 
   return (
     <KonnectedPageShell
-      title="Browse learning resources"
-      subtitle="Explore the shared knowledge library and filter by subject, level, language, and more."
+      title={i18nT("ui.konnected.learningLibrary.browseResources.browseLearningResources")}
+      subtitle={i18nT("ui.konnected.learningLibrary.browseResources.exploreTheSharedKnowledgeLibraryAndFilter")}
       primaryAction={headerPrimaryAction}
       secondaryActions={headerSecondaryActions}
     >
@@ -712,7 +714,7 @@ export default function BrowseResourcesPage(): JSX.Element {
             <Row gutter={[16, 16]} align="middle">
               <Col xs={24} md={10}>
                 <Search
-                  placeholder="Search by title or description"
+                  placeholder={i18nT("ui.konnected.learningLibrary.browseResources.searchByTitleOrDescription")}
                   allowClear
                   enterButton={<SearchOutlined />}
                   onSearch={handleSearch}
@@ -726,7 +728,7 @@ export default function BrowseResourcesPage(): JSX.Element {
                       value={filters.subject}
                       onChange={handleFilterChange('subject')}
                       allowClear
-                      placeholder="All subjects"
+                      placeholder={i18nT("ui.konnected.learningLibrary.browseResources.allSubjects")}
                       style={{ width: '100%' }}
                       options={subjects.map((s) => ({ label: s, value: s }))}
                     />
@@ -736,7 +738,7 @@ export default function BrowseResourcesPage(): JSX.Element {
                       value={filters.level}
                       onChange={handleFilterChange('level')}
                       allowClear
-                      placeholder="Any level"
+                      placeholder={i18nT("ui.konnected.learningLibrary.browseResources.anyLevel")}
                       style={{ width: '100%' }}
                       options={levels.map((lvl) => ({
                         label: lvl.charAt(0).toUpperCase() + lvl.slice(1),
@@ -749,7 +751,7 @@ export default function BrowseResourcesPage(): JSX.Element {
                       value={filters.language}
                       onChange={handleFilterChange('language')}
                       allowClear
-                      placeholder="Any language"
+                      placeholder={i18nT("ui.konnected.learningLibrary.browseResources.anyLanguage")}
                       style={{ width: '100%' }}
                       options={languages.map((lng) => ({ label: lng, value: lng }))}
                     />
@@ -759,7 +761,7 @@ export default function BrowseResourcesPage(): JSX.Element {
                       value={filters.resourceType}
                       onChange={handleFilterChange('resourceType')}
                       allowClear
-                      placeholder="All types"
+                      placeholder={i18nT("ui.konnected.learningLibrary.browseResources.allTypes")}
                       style={{ width: '100%' }}
                       options={resourceTypes.map((t) => ({
                         label: t.charAt(0).toUpperCase() + t.slice(1),
@@ -780,62 +782,62 @@ export default function BrowseResourcesPage(): JSX.Element {
               <Col>
                 {filtersActive ? (
                   <Text type="secondary">
-                    <strong>Active filters:</strong>{' '}
+                    <strong>{i18nT("ui.konnected.learningLibrary.browseResources.activeFilters")}</strong>{' '}
                     {filters.query && (
                       <>
-                        Search = <strong>"{filters.query}"</strong>{' '}
+                        {i18nT("ui.konnected.learningLibrary.browseResources.search")} <strong>"{filters.query}"</strong>{' '}
                       </>
                     )}
                     {filters.subject && (
                       <>
-                        Subject = <strong>{filters.subject}</strong>{' '}
+                        {i18nT("ui.konnected.learningLibrary.browseResources.subject_29c162")} <strong>{filters.subject}</strong>{' '}
                       </>
                     )}
                     {filters.level && (
                       <>
-                        Level = <strong>{filters.level}</strong>{' '}
+                        {i18nT("ui.konnected.learningLibrary.browseResources.level_8a4222")} <strong>{filters.level}</strong>{' '}
                       </>
                     )}
                     {filters.language && (
                       <>
-                        Language = <strong>{filters.language}</strong>{' '}
+                        {i18nT("ui.konnected.learningLibrary.browseResources.language_96c3f3")} <strong>{filters.language}</strong>{' '}
                       </>
                     )}
                     {filters.resourceType && (
                       <>
-                        Type = <strong>{filters.resourceType}</strong>{' '}
+                        {i18nT("ui.konnected.learningLibrary.browseResources.type_cf9acb")} <strong>{filters.resourceType}</strong>{' '}
                       </>
                     )}
                     {filters.sort !== 'relevance' && (
                       <>
-                        Sort = <strong>{filters.sort}</strong>
+                        {i18nT("ui.konnected.learningLibrary.browseResources.sort")} <strong>{filters.sort}</strong>
                       </>
                     )}
                   </Text>
                 ) : (
                   <Text type="secondary">
-                    Use the search box and filters above to explore the knowledge library.
+                    {i18nT("ui.konnected.learningLibrary.browseResources.useTheSearchBoxAndFiltersAbove")}
                   </Text>
                 )}
               </Col>
               <Col>
                 <Space align="center">
-                  <Text type="secondary">Sort by</Text>
+                  <Text type="secondary">{i18nT("ui.konnected.learningLibrary.browseResources.sortBy")}</Text>
                   <Select<SortOption>
                     value={filters.sort}
                     onChange={handleSortChange}
                     style={{ width: 180 }}
                     options={[
-                      { label: 'Best match', value: 'relevance' },
-                      { label: 'Newest first', value: 'newest' },
-                      { label: 'Most popular', value: 'popular' },
-                      { label: 'Shortest duration', value: 'shortest' },
-                      { label: 'Longest duration', value: 'longest' },
+                      { label: i18nT("ui.konnected.learningLibrary.browseResources.bestMatch"), value: 'relevance' },
+                      { label: i18nT("ui.konnected.learningLibrary.browseResources.newestFirst"), value: 'newest' },
+                      { label: i18nT("ui.konnected.learningLibrary.browseResources.mostPopular"), value: 'popular' },
+                      { label: i18nT("ui.konnected.learningLibrary.browseResources.shortestDuration"), value: 'shortest' },
+                      { label: i18nT("ui.konnected.learningLibrary.browseResources.longestDuration"), value: 'longest' },
                     ]}
                   />
                   {loadingMeta && (
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                      Updating filter options…
+                      {i18nT("ui.konnected.learningLibrary.browseResources.updatingFilterOptions")}
                     </Text>
                   )}
                 </Space>
@@ -846,7 +848,7 @@ export default function BrowseResourcesPage(): JSX.Element {
 
         <Col span={24}>
           <Card
-            title="Library results"
+            title={i18nT("ui.konnected.learningLibrary.browseResources.libraryResults")}
             extra={
               <Space>
                 <Button
@@ -854,7 +856,7 @@ export default function BrowseResourcesPage(): JSX.Element {
                   onClick={() => fetchResources(1, pageSize)}
                   disabled={loading}
                 >
-                  Refresh
+                  {i18nT("ui.konnected.learningLibrary.browseResources.refresh")}
                 </Button>
               </Space>
             }
@@ -863,7 +865,7 @@ export default function BrowseResourcesPage(): JSX.Element {
               <Alert
                 type="error"
                 showIcon
-                message="Unable to load resources"
+                message={i18nT("ui.konnected.learningLibrary.browseResources.unableToLoadResources")}
                 description={error}
                 style={{ marginBottom: 16 }}
               />
@@ -871,7 +873,7 @@ export default function BrowseResourcesPage(): JSX.Element {
 
             {loading && !hasResults ? (
               <Spin
-                tip="Loading resources…"
+                tip={i18nT("ui.konnected.learningLibrary.browseResources.loadingResources")}
                 size="large"
                 style={{
                   width: '100%',
@@ -898,8 +900,7 @@ export default function BrowseResourcesPage(): JSX.Element {
                     emptyText: (
                       <div style={{ padding: '24px 0' }}>
                         <Text type="secondary">
-                          No resources match your filters yet. Try adjusting your search terms or
-                          filter options.
+                          {i18nT("ui.konnected.learningLibrary.browseResources.noResourcesMatchYourFiltersYetTry")}
                         </Text>
                       </div>
                     ),
@@ -917,7 +918,7 @@ export default function BrowseResourcesPage(): JSX.Element {
                   }}
                 >
                   <Text type="secondary">
-                    Page {page} of {Math.max(1, Math.ceil(total / pageSize))}
+                    {i18nT("ui.konnected.learningLibrary.browseResources.page")} {page} {i18nT("ui.konnected.learningLibrary.browseResources.of")} {Math.max(1, Math.ceil(total / pageSize))}
                   </Text>
 
                   <Pagination

@@ -1,6 +1,9 @@
 // FILE: frontend/app/ethikos/admin/audit/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import TranslatedText from '@/components/i18n/TranslatedText';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ClockCircleOutlined,
   EyeOutlined,
@@ -71,9 +74,9 @@ function isUnauthorizedError(error: unknown): boolean {
   return isRecord(response) && response.status === 403;
 }
 
-function formatDate(value?: string): string {
+function formatDate(i18nT: TranslateFunction, value?: string): string {
   if (!value) {
-    return 'Unknown';
+    return i18nT("ui.ethikos.admin.audit.unknown_bc7819");
   }
 
   const parsed = dayjs(value);
@@ -110,34 +113,34 @@ function isWithinWindow(log: LogRow, timeWindow: TimeWindow): boolean {
 
 function severityTag(severity?: LogRow['severity']): ReactNode {
   if (severity === 'critical') {
-    return <Tag color="red">critical</Tag>;
+    return <Tag color="red"><TranslatedText id="ui.ethikos.admin.audit.critical" /></Tag>;
   }
 
   if (severity === 'warn') {
-    return <Tag color="orange">warn</Tag>;
+    return <Tag color="orange"><TranslatedText id="ui.ethikos.admin.audit.warn" /></Tag>;
   }
 
   if (severity === 'info') {
-    return <Tag color="blue">info</Tag>;
+    return <Tag color="blue"><TranslatedText id="ui.ethikos.admin.audit.info" /></Tag>;
   }
 
-  return <Tag>unknown</Tag>;
+  return <Tag><TranslatedText id="ui.ethikos.admin.audit.unknown" /></Tag>;
 }
 
 function statusTag(status?: LogRow['status']): ReactNode {
   if (status === 'ok') {
-    return <Tag color="green">ok</Tag>;
+    return <Tag color="green"><TranslatedText id="ui.ethikos.admin.audit.ok" /></Tag>;
   }
 
   if (status === 'warn') {
-    return <Tag color="orange">warn</Tag>;
+    return <Tag color="orange"><TranslatedText id="ui.ethikos.admin.audit.warn" /></Tag>;
   }
 
   if (status === 'error') {
-    return <Tag color="red">error</Tag>;
+    return <Tag color="red"><TranslatedText id="ui.ethikos.admin.audit.error" /></Tag>;
   }
 
-  return <Tag>unknown</Tag>;
+  return <Tag><TranslatedText id="ui.ethikos.admin.audit.unknown" /></Tag>;
 }
 
 function normalizeSearch(value: string): string {
@@ -160,6 +163,7 @@ function buildQuery(
 }
 
 export default function AuditLogs(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [query, setQuery] = React.useState<AuditQueryParams>({
     page: 1,
     pageSize: 20,
@@ -286,7 +290,7 @@ export default function AuditLogs(): JSX.Element {
   const columns = React.useMemo<ProColumns<LogRow>[]>(
     () => [
       {
-        title: 'Time',
+        title: i18nT("ui.ethikos.admin.audit.time"),
         dataIndex: 'ts',
         valueType: 'dateTime',
         width: 180,
@@ -294,13 +298,13 @@ export default function AuditLogs(): JSX.Element {
           dayjs(left.ts).valueOf() - dayjs(right.ts).valueOf(),
         render: (_dom, row) => (
           <Space direction="vertical" size={0}>
-            <Text>{formatDate(row.ts)}</Text>
+            <Text>{formatDate(i18nT, row.ts)}</Text>
             <Text type="secondary">{dayjs(row.ts).fromNow()}</Text>
           </Space>
         ),
       },
       {
-        title: 'Actor',
+        title: i18nT("ui.ethikos.admin.audit.actor"),
         dataIndex: 'actor',
         width: 180,
         ellipsis: true,
@@ -308,11 +312,11 @@ export default function AuditLogs(): JSX.Element {
           row.actor ? (
             <Text>{row.actor}</Text>
           ) : (
-            <Text type="secondary">System</Text>
+            <Text type="secondary">{i18nT("ui.ethikos.admin.audit.system")}</Text>
           ),
       },
       {
-        title: 'Action',
+        title: i18nT("ui.ethikos.admin.audit.action"),
         dataIndex: 'action',
         width: 220,
         ellipsis: true,
@@ -322,65 +326,65 @@ export default function AuditLogs(): JSX.Element {
             {row.entity && (
               <Text type="secondary">
                 {row.entity}
-                {row.entityId ? ` #${row.entityId}` : ''}
+                {row.entityId ? i18nT("ui.ethikos.admin.audit.text", { entityId: row.entityId }) : ''}
               </Text>
             )}
           </Space>
         ),
       },
       {
-        title: 'Target',
+        title: i18nT("ui.ethikos.admin.audit.target"),
         dataIndex: 'target',
         ellipsis: true,
         render: (_dom, row) =>
           row.target ? (
             <Text>{row.target}</Text>
           ) : (
-            <Text type="secondary">No target</Text>
+            <Text type="secondary">{i18nT("ui.ethikos.admin.audit.noTarget")}</Text>
           ),
       },
       {
-        title: 'Severity',
+        title: i18nT("ui.ethikos.admin.audit.severity"),
         dataIndex: 'severity',
         width: 130,
         filters: [
-          { text: 'Info', value: 'info' },
-          { text: 'Warn', value: 'warn' },
-          { text: 'Critical', value: 'critical' },
+          { text: i18nT("ui.ethikos.admin.audit.info_4b631f"), value: 'info' },
+          { text: i18nT("ui.ethikos.admin.audit.warn_3009d5"), value: 'warn' },
+          { text: i18nT("ui.ethikos.admin.audit.critical_04b7b2"), value: 'critical' },
         ],
         onFilter: (value, row) => row.severity === String(value),
         render: (_dom, row) => severityTag(row.severity),
       },
       {
-        title: 'Outcome',
+        title: i18nT("ui.ethikos.admin.audit.outcome"),
         dataIndex: 'status',
         width: 120,
         filters: [
-          { text: 'OK', value: 'ok' },
-          { text: 'Warn', value: 'warn' },
-          { text: 'Error', value: 'error' },
+          { text: i18nT("ui.ethikos.admin.audit.ok_9ce3bd"), value: 'ok' },
+          { text: i18nT("ui.ethikos.admin.audit.warn_3009d5"), value: 'warn' },
+          { text: i18nT("ui.ethikos.admin.audit.error_7f2f6a"), value: 'error' },
         ],
         onFilter: (value, row) => row.status === String(value),
         render: (_dom, row) => statusTag(row.status),
       },
       {
-        title: 'Details',
+        title: i18nT("ui.ethikos.admin.audit.details"),
         valueType: 'option',
         width: 110,
         render: (_dom, row) => [
-          <Tooltip key="view" title="View audit event details">
+          <Tooltip key="view" title={i18nT("ui.ethikos.admin.audit.viewAuditEventDetails")}>
             <Button
               size="small"
               icon={<EyeOutlined />}
               onClick={() => setDetailRow(row)}
             >
-              View
+              {i18nT("ui.ethikos.admin.audit.view")}
             </Button>
           </Tooltip>,
         ],
       },
     ],
-    [],
+    [i18nT],
   );
 
   const primaryAction = (
@@ -390,7 +394,7 @@ export default function AuditLogs(): JSX.Element {
       onClick={refreshLogs}
       loading={loading}
     >
-      Refresh
+      {i18nT("ui.ethikos.admin.audit.refresh")}
     </Button>
   );
 
@@ -398,7 +402,7 @@ export default function AuditLogs(): JSX.Element {
     <Space wrap>
       <Input.Search
         allowClear
-        placeholder="Search actor, action, target…"
+        placeholder={i18nT("ui.ethikos.admin.audit.searchActorActionTarget")}
         value={searchValue}
         onChange={(event) => setSearchValue(event.target.value)}
         onSearch={handleSearch}
@@ -409,10 +413,10 @@ export default function AuditLogs(): JSX.Element {
         value={severityFilter}
         onChange={handleSeverityChange}
         options={[
-          { label: 'All severity', value: 'all' },
-          { label: 'Info', value: 'info' },
-          { label: 'Warn', value: 'warn' },
-          { label: 'Critical', value: 'critical' },
+          { label: i18nT("ui.ethikos.admin.audit.allSeverity"), value: 'all' },
+          { label: i18nT("ui.ethikos.admin.audit.info_4b631f"), value: 'info' },
+          { label: i18nT("ui.ethikos.admin.audit.warn_3009d5"), value: 'warn' },
+          { label: i18nT("ui.ethikos.admin.audit.critical_04b7b2"), value: 'critical' },
         ]}
       />
 
@@ -420,10 +424,10 @@ export default function AuditLogs(): JSX.Element {
         value={timeWindow}
         onChange={setTimeWindow}
         options={[
-          { label: '24h', value: '24h' },
-          { label: '7d', value: '7d' },
-          { label: '30d', value: '30d' },
-          { label: 'All', value: 'all' },
+          { label: i18nT("ui.ethikos.admin.audit.text24h"), value: '24h' },
+          { label: i18nT("ui.ethikos.admin.audit.text7d"), value: '7d' },
+          { label: i18nT("ui.ethikos.admin.audit.text30d"), value: '30d' },
+          { label: i18nT("ui.ethikos.admin.audit.all"), value: 'all' },
         ]}
       />
     </Space>
@@ -431,9 +435,9 @@ export default function AuditLogs(): JSX.Element {
 
   return (
     <EthikosPageShell
-      title="Audit logs"
-      sectionLabel="Admin"
-      subtitle="Inspect governance, moderation, and system events across Ethikos."
+      title={i18nT("ui.ethikos.admin.audit.auditLogs")}
+      sectionLabel={i18nT("ui.ethikos.admin.audit.admin")}
+      subtitle={i18nT("ui.ethikos.admin.audit.inspectGovernanceModerationAndSystemEventsAcross")}
       primaryAction={primaryAction}
       secondaryActions={secondaryActions}
     >
@@ -443,8 +447,8 @@ export default function AuditLogs(): JSX.Element {
             <Alert
               type="error"
               showIcon
-              message="Access denied for audit logs."
-              description="You need an Ethikos admin role to inspect governance and moderation events."
+              message={i18nT("ui.ethikos.admin.audit.accessDeniedForAuditLogs")}
+              description={i18nT("ui.ethikos.admin.audit.youNeedAnEthikosAdminRoleTo")}
             />
           )}
 
@@ -452,11 +456,11 @@ export default function AuditLogs(): JSX.Element {
             <Alert
               type="error"
               showIcon
-              message="Unable to load audit logs."
-              description="Check your connection or retry. The audit service may be temporarily unavailable."
+              message={i18nT("ui.ethikos.admin.audit.unableToLoadAuditLogs")}
+              description={i18nT("ui.ethikos.admin.audit.checkYourConnectionOrRetryTheAudit")}
               action={
                 <Button size="small" onClick={refreshLogs}>
-                  Retry
+                  {i18nT("ui.ethikos.admin.audit.retry")}
                 </Button>
               }
             />
@@ -466,11 +470,11 @@ export default function AuditLogs(): JSX.Element {
             <StatisticCard
               colSpan={{ xs: 24, sm: 12, lg: 6 }}
               statistic={{
-                title: 'Total events',
+                title: i18nT("ui.ethikos.admin.audit.totalEvents"),
                 value: stats.totalCount,
                 description: (
                   <Text type="secondary">
-                    {stats.pageCount} visible in current window
+                    {stats.pageCount} {i18nT("ui.ethikos.admin.audit.visibleInCurrentWindow")}
                   </Text>
                 ),
               }}
@@ -479,12 +483,12 @@ export default function AuditLogs(): JSX.Element {
             <StatisticCard
               colSpan={{ xs: 24, sm: 12, lg: 6 }}
               statistic={{
-                title: 'Warnings',
+                title: i18nT("ui.ethikos.admin.audit.warnings"),
                 value: stats.warnCount,
                 description: (
                   <Space size={4}>
                     <Badge status="warning" />
-                    <Text type="secondary">Requires review</Text>
+                    <Text type="secondary">{i18nT("ui.ethikos.admin.audit.requiresReview")}</Text>
                   </Space>
                 ),
               }}
@@ -493,12 +497,12 @@ export default function AuditLogs(): JSX.Element {
             <StatisticCard
               colSpan={{ xs: 24, sm: 12, lg: 6 }}
               statistic={{
-                title: 'Critical',
+                title: i18nT("ui.ethikos.admin.audit.critical_04b7b2"),
                 value: stats.criticalCount,
                 description: (
                   <Space size={4}>
                     <Badge status="error" />
-                    <Text type="secondary">High-priority events</Text>
+                    <Text type="secondary">{i18nT("ui.ethikos.admin.audit.highPriorityEvents")}</Text>
                   </Space>
                 ),
               }}
@@ -507,12 +511,12 @@ export default function AuditLogs(): JSX.Element {
             <StatisticCard
               colSpan={{ xs: 24, sm: 12, lg: 6 }}
               statistic={{
-                title: 'Errors',
+                title: i18nT("ui.ethikos.admin.audit.errors"),
                 value: stats.errorStatus,
                 description: (
                   <Text type="secondary">
-                    {stats.okStatus} ok · {stats.warnStatus} warn ·{' '}
-                    {stats.infoCount} info
+                    {stats.okStatus} {i18nT("ui.ethikos.admin.audit.ok_598a27")} {stats.warnStatus} {i18nT("ui.ethikos.admin.audit.warn_57b875")}{' '}
+                    {stats.infoCount} {i18nT("ui.ethikos.admin.audit.info")}
                   </Text>
                 ),
               }}
@@ -523,16 +527,15 @@ export default function AuditLogs(): JSX.Element {
             type="info"
             showIcon
             icon={<InfoCircleOutlined />}
-            message="Ethikos audit stream"
+            message={i18nT("ui.ethikos.admin.audit.ethikosAuditStream")}
             description={
               <Space direction="vertical" size={4}>
                 <Text type="secondary">
-                  Use this page to review moderation actions, governance
-                  changes, trust updates, and system-level events.
+                  {i18nT("ui.ethikos.admin.audit.useThisPageToReviewModerationActions")}
                 </Text>
                 {lastRefreshedAt && (
                   <Text type="secondary">
-                    Last refreshed: {formatDate(lastRefreshedAt)}
+                    {i18nT("ui.ethikos.admin.audit.lastRefreshed")} {formatDate(i18nT, lastRefreshedAt)}
                   </Text>
                 )}
               </Space>
@@ -552,7 +555,7 @@ export default function AuditLogs(): JSX.Element {
               pageSize: query.pageSize ?? data?.pageSize ?? 20,
               total: data?.total ?? visibleLogs.length,
               showSizeChanger: true,
-              showTotal: (total) => `${total} audit events`,
+              showTotal: (total) => i18nT("ui.ethikos.admin.audit.auditEventsCount", { count: total }),
               onChange: (page, pageSize) => {
                 setQuery((previous) => ({
                   ...previous,
@@ -565,7 +568,7 @@ export default function AuditLogs(): JSX.Element {
               <Space key="filters" wrap>
                 <Tag icon={<FilterOutlined />}>
                   {severityFilter === 'all'
-                    ? 'All severities'
+                    ? i18nT("ui.ethikos.admin.audit.allSeverities")
                     : severityFilter}
                 </Tag>
                 <Tag icon={<ClockCircleOutlined />}>{timeWindow}</Tag>
@@ -573,15 +576,15 @@ export default function AuditLogs(): JSX.Element {
             ]}
             locale={{
               emptyText: unauthorized ? (
-                <Empty description="Access denied for audit logs." />
+                <Empty description={i18nT("ui.ethikos.admin.audit.accessDeniedForAuditLogs")} />
               ) : (
-                <Empty description="No audit events to display." />
+                <Empty description={i18nT("ui.ethikos.admin.audit.noAuditEventsToDisplay")} />
               ),
             }}
           />
 
           <Drawer
-            title="Audit event details"
+            title={i18nT("ui.ethikos.admin.audit.auditEventDetails")}
             width={520}
             open={!!detailRow}
             onClose={() => setDetailRow(null)}
@@ -603,32 +606,32 @@ export default function AuditLogs(): JSX.Element {
                 </Space>
 
                 <Descriptions column={1} size="small" bordered>
-                  <Descriptions.Item label="Time">
-                    {formatDate(detailRow.ts)}
+                  <Descriptions.Item label={i18nT("ui.ethikos.admin.audit.time")}>
+                    {formatDate(i18nT, detailRow.ts)}
                   </Descriptions.Item>
 
-                  <Descriptions.Item label="Actor">
-                    {detailRow.actor || <Text type="secondary">System</Text>}
+                  <Descriptions.Item label={i18nT("ui.ethikos.admin.audit.actor")}>
+                    {detailRow.actor || <Text type="secondary">{i18nT("ui.ethikos.admin.audit.system")}</Text>}
                   </Descriptions.Item>
 
-                  <Descriptions.Item label="Action">
+                  <Descriptions.Item label={i18nT("ui.ethikos.admin.audit.action")}>
                     {detailRow.action}
                   </Descriptions.Item>
 
                   {detailRow.target && (
-                    <Descriptions.Item label="Target">
+                    <Descriptions.Item label={i18nT("ui.ethikos.admin.audit.target")}>
                       {detailRow.target}
                     </Descriptions.Item>
                   )}
 
                   {detailRow.ip && (
-                    <Descriptions.Item label="Source IP">
+                    <Descriptions.Item label={i18nT("ui.ethikos.admin.audit.sourceIp")}>
                       {detailRow.ip}
                     </Descriptions.Item>
                   )}
 
                   {detailRow.status && (
-                    <Descriptions.Item label="Outcome">
+                    <Descriptions.Item label={i18nT("ui.ethikos.admin.audit.outcome")}>
                       {statusTag(detailRow.status)}
                     </Descriptions.Item>
                   )}
@@ -637,9 +640,9 @@ export default function AuditLogs(): JSX.Element {
                 {detailRow.meta &&
                   Object.keys(detailRow.meta).length > 0 && (
                     <div>
-                      <Text strong>Raw metadata</Text>
+                      <Text strong>{i18nT("ui.ethikos.admin.audit.rawMetadata")}</Text>
                       <Paragraph type="secondary">
-                        JSON payload supplied by the backend for this event.
+                        {i18nT("ui.ethikos.admin.audit.jsonPayloadSuppliedByTheBackendFor")}
                       </Paragraph>
                       <pre
                         style={{

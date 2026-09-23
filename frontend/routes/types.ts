@@ -18,8 +18,11 @@ export interface Route {
   /** Concrete path for a leaf route. */
   path?: string;
 
-  /** Display name shown in the sidebar. */
+  /** English fallback display name shown when no translation exists. */
   name: string;
+
+  /** Stable i18n key for the visible route label. */
+  labelKey?: string;
 
   /** Optional icon for leaf items or section headers. */
   icon?: ReactNode;

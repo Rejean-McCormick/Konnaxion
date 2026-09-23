@@ -1,5 +1,6 @@
 // FILE: frontend/modules/insights/components/LatencySLOGauge.tsx
 "use client";
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ArcElement,
   Chart as ChartJS,
@@ -16,6 +17,7 @@ export default function LatencySLOGauge({
   valueMs: number;
   sloMs: number;
 }) {
+  const { t: i18nT } = useLanguage();
   const pct = Math.min(100, (valueMs / sloMs) * 100);
   const data = {
     labels: ["Latency", "Budget"],
@@ -30,7 +32,7 @@ export default function LatencySLOGauge({
   return (
     <div className="w-48">
       <Doughnut data={data} options={{ cutout: "70%" }} />
-      <p className="text-center -mt-14 text-xl font-semibold">{valueMs} ms</p>
+      <p className="text-center -mt-14 text-xl font-semibold">{valueMs} {i18nT("ui.insights.latencyslogauge.ms")}</p>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { ReloadOutlined } from '@ant-design/icons'
 import { ProCard, StatisticCard } from '@ant-design/pro-components'
 import {
@@ -68,6 +69,7 @@ function computePresetRange(rangeKey: RangeKey): [Dayjs, Dayjs] {
 }
 
 export default function SmartVoteReportPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [rangeKey, setRangeKey] = useState<RangeKey>('30d')
   const [[start, end], setRange] = useState<[Dayjs, Dayjs]>(() =>
     computePresetRange('30d'),
@@ -104,7 +106,7 @@ export default function SmartVoteReportPage(): JSX.Element {
 
   const domainColumns: ColumnsType<ApiSmartVoteDomain> = [
     {
-      title: 'Domain',
+      title: i18nT("ui.reports.smartVote.domain"),
       dataIndex: 'domain',
       key: 'domain',
       render: (value: string, row) => (
@@ -115,26 +117,26 @@ export default function SmartVoteReportPage(): JSX.Element {
       ),
     },
     {
-      title: 'Topics in range',
+      title: i18nT("ui.reports.smartVote.topicsInRange"),
       dataIndex: 'topics',
       key: 'topics',
       width: 140,
     },
     {
-      title: 'Current stances',
+      title: i18nT("ui.reports.smartVote.currentStances"),
       dataIndex: 'currentStances',
       key: 'currentStances',
       width: 150,
     },
     {
-      title: 'Topics with stances',
+      title: i18nT("ui.reports.smartVote.topicsWithStances"),
       dataIndex: 'topicsWithStancesPct',
       key: 'topicsWithStancesPct',
       width: 170,
       render: (value: number) => `${value.toFixed(1)}%`,
     },
     {
-      title: 'Avg relevance',
+      title: i18nT("ui.reports.smartVote.avgRelevance"),
       dataIndex: 'avgRelevancePct',
       key: 'avgRelevancePct',
       width: 140,
@@ -145,9 +147,9 @@ export default function SmartVoteReportPage(): JSX.Element {
   if (loading && !data) {
     return (
       <ReportsPageShell
-        title="Smart Vote"
-        subtitle="Current Smart Vote coverage over canonical Ethikos source facts."
-        metaTitle="Reports · Smart Vote"
+        title={i18nT("ui.reports.smartVote.smartVote")}
+        subtitle={i18nT("ui.reports.smartVote.currentSmartVoteCoverageOverCanonicalEthikos")}
+        metaTitle={i18nT("ui.reports.smartVote.reportsSmartVote")}
       >
         <Skeleton active paragraph={{ rows: 10 }} />
       </ReportsPageShell>
@@ -157,13 +159,13 @@ export default function SmartVoteReportPage(): JSX.Element {
   if (error || !data) {
     return (
       <ReportsPageShell
-        title="Smart Vote"
-        subtitle="Current Smart Vote coverage over canonical Ethikos source facts."
-        metaTitle="Reports · Smart Vote"
+        title={i18nT("ui.reports.smartVote.smartVote")}
+        subtitle={i18nT("ui.reports.smartVote.currentSmartVoteCoverageOverCanonicalEthikos")}
+        metaTitle={i18nT("ui.reports.smartVote.reportsSmartVote")}
       >
-        <Empty description="Failed to load Smart Vote analytics">
+        <Empty description={i18nT("ui.reports.smartVote.failedToLoadSmartVoteAnalytics")}>
           <Button icon={<ReloadOutlined />} onClick={() => void fetchData(rangeKey)}>
-            Retry
+            {i18nT("ui.reports.smartVote.retry")}
           </Button>
         </Empty>
       </ReportsPageShell>
@@ -174,22 +176,22 @@ export default function SmartVoteReportPage(): JSX.Element {
 
   return (
     <ReportsPageShell
-      title="Smart Vote"
-      subtitle="Real cross-sectional reporting over Ethikos topics bound to declared Smart Vote readings."
-      metaTitle="Reports · Smart Vote"
+      title={i18nT("ui.reports.smartVote.smartVote")}
+      subtitle={i18nT("ui.reports.smartVote.realCrossSectionalReportingOverEthikosTopics")}
+      metaTitle={i18nT("ui.reports.smartVote.reportsSmartVote")}
     >
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         <ProCard ghost>
           <Row gutter={[16, 16]} align="middle">
             <Col xs={24} md={12}>
               <Space direction="vertical" size={4}>
-                <Text strong>Topic creation range</Text>
+                <Text strong>{i18nT("ui.reports.smartVote.topicCreationRange")}</Text>
                 <Segmented
                   value={rangeKey}
                   options={[
-                    { label: 'Last 7 days', value: '7d' },
-                    { label: 'Last 30 days', value: '30d' },
-                    { label: 'Last 90 days', value: '90d' },
+                    { label: i18nT("ui.reports.smartVote.last7Days"), value: '7d' },
+                    { label: i18nT("ui.reports.smartVote.last30Days"), value: '30d' },
+                    { label: i18nT("ui.reports.smartVote.last90Days"), value: '90d' },
                   ]}
                   onChange={(value) => handleRangePresetChange(value as RangeKey)}
                 />
@@ -199,11 +201,11 @@ export default function SmartVoteReportPage(): JSX.Element {
             <Col xs={24} md={12} style={{ textAlign: 'right' }}>
               <Space direction="vertical" size={4} style={{ alignItems: 'flex-end' }}>
                 <Space>
-                  <Text type="secondary">Custom dates disabled</Text>
+                  <Text type="secondary">{i18nT("ui.reports.smartVote.customDatesDisabled")}</Text>
                   <RangePicker value={[start, end]} disabled />
                 </Space>
                 <Text type="secondary">
-                  Generated {dayjs(generatedAt).format('MMM D, YYYY · HH:mm')}
+                  {i18nT("ui.reports.smartVote.generated")} {dayjs(generatedAt).format('MMM D, YYYY · HH:mm')}
                 </Text>
               </Space>
             </Col>
@@ -213,48 +215,48 @@ export default function SmartVoteReportPage(): JSX.Element {
         <Alert
           type="info"
           showIcon
-          message="Snapshot semantics"
-          description="The selected range filters Ethikos topics by creation date. Metrics below show the current canonical stance state of those topics; they do not claim when each stance was originally cast."
+          message={i18nT("ui.reports.smartVote.snapshotSemantics")}
+          description={i18nT("ui.reports.smartVote.theSelectedRangeFiltersEthikosTopicsBy")}
         />
 
         <ProCard gutter={16} wrap>
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, lg: 6 }}
-            statistic={{ title: 'Smart Vote linked topics', value: summary.linkedTopics }}
+            statistic={{ title: i18nT("ui.reports.smartVote.smartVoteLinkedTopics"), value: summary.linkedTopics }}
           />
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, lg: 6 }}
-            statistic={{ title: 'Currently open topics', value: summary.openTopics }}
+            statistic={{ title: i18nT("ui.reports.smartVote.currentlyOpenTopics"), value: summary.openTopics }}
           />
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, lg: 6 }}
-            statistic={{ title: 'Current canonical stances', value: summary.currentStances }}
+            statistic={{ title: i18nT("ui.reports.smartVote.currentCanonicalStances"), value: summary.currentStances }}
           />
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, lg: 6 }}
-            statistic={{ title: 'Relevant domains covered', value: summary.domainsCovered }}
+            statistic={{ title: i18nT("ui.reports.smartVote.relevantDomainsCovered"), value: summary.domainsCovered }}
           />
         </ProCard>
 
         <Card>
-          <Title level={4}>Historical trends</Title>
+          <Title level={4}>{i18nT("ui.reports.smartVote.historicalTrends")}</Title>
           <Alert
             type="warning"
             showIcon
-            message="Historical trend unavailable"
+            message={i18nT("ui.reports.smartVote.historicalTrendUnavailable")}
             description={history.reason}
           />
           <Paragraph type="secondary" style={{ marginTop: 16, marginBottom: 0 }}>
-            A real time-series report requires an append-only stance/vote event log. Until that source exists, Konnaxion does not synthesize participation, consensus, or polarization history.
+            {i18nT("ui.reports.smartVote.aRealTimeSeriesReportRequiresAn")}
           </Paragraph>
         </Card>
 
         <Card>
           <Title id="smart-vote-domain-heading" level={4} style={{ marginBottom: 8 }}>
-            Domain coverage · EkoH relevance
+            {i18nT("ui.reports.smartVote.domainCoverageEkohRelevance")}
           </Title>
           <Paragraph type="secondary">
-            Each row is derived from the real Smart Vote source bindings, consultation relevance vector, and current Ethikos stances. A topic may contribute to more than one declared relevant domain.
+            {i18nT("ui.reports.smartVote.eachRowIsDerivedFromTheReal")}
           </Paragraph>
           <Table<ApiSmartVoteDomain>
             size="small"
@@ -262,7 +264,7 @@ export default function SmartVoteReportPage(): JSX.Element {
             columns={domainColumns}
             dataSource={domains}
             pagination={false}
-            locale={{ emptyText: 'No Smart Vote-linked topics were created in this range.' }}
+            locale={{ emptyText: i18nT("ui.reports.smartVote.noSmartVoteLinkedTopicsWereCreated") }}
             aria-labelledby="smart-vote-domain-heading"
           />
         </Card>

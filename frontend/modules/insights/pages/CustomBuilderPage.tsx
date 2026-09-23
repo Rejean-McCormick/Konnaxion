@@ -1,5 +1,6 @@
 // FILE: frontend/modules/insights/pages/CustomBuilderPage.tsx
 "use client";
+import { useLanguage } from '@/context/LanguageContext';
 import dayjs from "dayjs";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -27,6 +28,7 @@ interface StreamMessage {
 }
 
 export default function CustomBuilderPage() {
+  const { t: i18nT } = useLanguage();
   // Keep the hook wired so it can evolve to manage the stream internally.
   useReportStream();
 
@@ -142,7 +144,7 @@ export default function CustomBuilderPage() {
     connectionStatus === "idle"
       ? "Idle"
       : connectionStatus === "connecting"
-      ? "Connecting…"
+      ? i18nT("ui.insights.pages.custombuilderpage.connecting")
       : connectionStatus === "open"
       ? "Connected"
       : connectionStatus === "closed"
@@ -161,7 +163,7 @@ export default function CustomBuilderPage() {
   return (
     <MainLayout>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Custom report builder</h1>
+        <h1 className="text-xl font-semibold">{i18nT("ui.insights.pages.custombuilderpage.customReportBuilder")}</h1>
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <span
             className={`inline-block h-2 w-2 rounded-full ${statusDotClass}`}
@@ -171,9 +173,7 @@ export default function CustomBuilderPage() {
       </div>
 
       <p className="mb-6 text-sm text-gray-600">
-        Define an Insights query and send it over the live WebSocket stream.
-        This page is a beta playground; the backend may still return only test
-        data.
+        {i18nT("ui.insights.pages.custombuilderpage.defineAnInsightsQueryAndSendIt")}
       </p>
 
       {lastError && (
@@ -186,12 +186,12 @@ export default function CustomBuilderPage() {
         <div className="space-y-4 lg:col-span-2">
           <section>
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-600">
-              Query definition
+              {i18nT("ui.insights.pages.custombuilderpage.queryDefinition")}
             </h2>
 
             <div className="mb-4">
               <label className="mb-1 block text-xs font-medium text-gray-600">
-                Time range
+                {i18nT("ui.insights.pages.custombuilderpage.timeRange")}
               </label>
               <TimeRangePicker
                 value={builder.range}
@@ -207,7 +207,7 @@ export default function CustomBuilderPage() {
             <div className="mb-4 grid gap-4 md:grid-cols-3">
               <div>
                 <label className="mb-1 block text-xs font-medium text-gray-600">
-                  Metric
+                  {i18nT("ui.insights.pages.custombuilderpage.metric")}
                 </label>
                 <select
                   className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
@@ -219,15 +219,15 @@ export default function CustomBuilderPage() {
                     }))
                   }
                 >
-                  <option value="smart-vote">Smart Vote</option>
-                  <option value="usage">Usage</option>
-                  <option value="perf">API performance</option>
+                  <option value="smart-vote">{i18nT("ui.insights.pages.custombuilderpage.smartVote")}</option>
+                  <option value="usage">{i18nT("ui.insights.pages.custombuilderpage.usage")}</option>
+                  <option value="perf">{i18nT("ui.insights.pages.custombuilderpage.apiPerformance")}</option>
                 </select>
               </div>
 
               <div>
                 <label className="mb-1 block text-xs font-medium text-gray-600">
-                  Grouping
+                  {i18nT("ui.insights.pages.custombuilderpage.grouping")}
                 </label>
                 <select
                   className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
@@ -239,8 +239,8 @@ export default function CustomBuilderPage() {
                     }))
                   }
                 >
-                  <option value="day">By day</option>
-                  <option value="week">By week</option>
+                  <option value="day">{i18nT("ui.insights.pages.custombuilderpage.byDay")}</option>
+                  <option value="week">{i18nT("ui.insights.pages.custombuilderpage.byWeek")}</option>
                 </select>
               </div>
 
@@ -261,7 +261,7 @@ export default function CustomBuilderPage() {
                   htmlFor="include-raw"
                   className="text-xs font-medium text-gray-600"
                 >
-                  Include raw samples
+                  {i18nT("ui.insights.pages.custombuilderpage.includeRawSamples")}
                 </label>
               </div>
             </div>
@@ -272,7 +272,7 @@ export default function CustomBuilderPage() {
               className="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
               disabled={connectionStatus !== "open"}
             >
-              Send to live stream
+              {i18nT("ui.insights.pages.custombuilderpage.sendToLiveStream")}
             </button>
           </section>
         </div>
@@ -280,7 +280,7 @@ export default function CustomBuilderPage() {
         <div className="space-y-4">
           <section>
             <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-600">
-              Payload preview
+              {i18nT("ui.insights.pages.custombuilderpage.payloadPreview")}
             </h2>
             <pre className="max-h-64 overflow-auto rounded bg-gray-50 p-3 text-xs">
               {JSON.stringify(payload, null, 2)}
@@ -289,12 +289,11 @@ export default function CustomBuilderPage() {
 
           <section>
             <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-600">
-              Live stream (debug)
+              {i18nT("ui.insights.pages.custombuilderpage.liveStreamDebug")}
             </h2>
             {messages.length === 0 ? (
               <p className="text-xs text-gray-500">
-                No messages yet. When the backend starts emitting responses over
-                /ws/reports/custom, they will appear here.
+                {i18nT("ui.insights.pages.custombuilderpage.noMessagesYetWhenTheBackendStarts")}
               </p>
             ) : (
               <ul className="max-h-64 space-y-2 overflow-auto rounded border border-gray-200 bg-white p-2 text-xs">
@@ -305,7 +304,7 @@ export default function CustomBuilderPage() {
                         {msg.ts}
                       </span>
                       <span className="rounded bg-gray-100 px-1 py-0.5 text-[10px] uppercase text-gray-600">
-                        {msg.direction === "out" ? "Sent" : "Received"}
+                        {msg.direction === "out" ? i18nT("ui.insights.pages.custombuilderpage.sent") : i18nT("ui.insights.pages.custombuilderpage.received")}
                       </span>
                     </div>
                     <pre className="overflow-auto rounded bg-gray-50 p-2">

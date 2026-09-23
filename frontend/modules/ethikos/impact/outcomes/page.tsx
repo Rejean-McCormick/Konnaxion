@@ -1,6 +1,7 @@
 // FILE: frontend/modules/ethikos/impact/outcomes/page.tsx
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Bar, Line } from '@ant-design/plots';
 import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
@@ -10,7 +11,8 @@ import usePageTitle from '@/hooks/usePageTitle';
 import { fetchImpactOutcomes } from '@/services/impact';
 
 export default function Outcomes() {
-  usePageTitle('Impact · Outcomes');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.ethikos.impact.outcomes.impactOutcomes"));
 
   const { data, loading } = useRequest(fetchImpactOutcomes);
 

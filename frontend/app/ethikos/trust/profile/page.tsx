@@ -1,6 +1,8 @@
 // FILE: frontend/app/ethikos/trust/profile/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import { ClockCircleOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
 import {
@@ -30,8 +32,8 @@ function percent(score: number): number {
   return Math.max(0, Math.min(100, Math.round(score * 100)));
 }
 
-function formatDate(value?: string): string {
-  if (!value) return 'Unknown date';
+function formatDate(i18nT: TranslateFunction, value?: string): string {
+  if (!value) return i18nT("ui.ethikos.trust.profile.unknownDate");
   const parsed = dayjs(value);
   return parsed.isValid() ? parsed.format('MMM D, YYYY') : value;
 }
@@ -42,8 +44,9 @@ function avatarInitial(value: string): string {
 }
 
 function ExpertiseList({ expertise }: { expertise: EkohExpertiseScore[] }): JSX.Element {
+  const { t: i18nT } = useLanguage();
   if (!expertise.length) {
-    return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No verified EkoH expertise scores yet" />;
+    return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={i18nT("ui.ethikos.trust.profile.noVerifiedEkohExpertiseScoresYet")} />;
   }
 
   return (
@@ -71,6 +74,7 @@ function ExpertiseList({ expertise }: { expertise: EkohExpertiseScore[] }): JSX.
 }
 
 export default function TrustProfilePage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const { data, isLoading, error, refetch } = useReputationEvents();
 
   const activityProfile = data?.profile;
@@ -91,17 +95,17 @@ export default function TrustProfilePage(): JSX.Element {
 
   const primaryAction = (
     <Link href="/ethikos/insights" prefetch={false}>
-      <Button type="primary">Open analytics</Button>
+      <Button type="primary">{i18nT("ui.ethikos.trust.profile.openAnalytics")}</Button>
     </Link>
   );
 
   const secondaryActions = (
     <Space wrap>
       <Link href="/ethikos/trust/credentials" prefetch={false}>
-        <Button icon={<SafetyCertificateOutlined />}>Upload credential</Button>
+        <Button icon={<SafetyCertificateOutlined />}>{i18nT("ui.ethikos.trust.profile.uploadCredential")}</Button>
       </Link>
       <Link href="/ethikos/trust/badges" prefetch={false}>
-        <Button>View badges</Button>
+        <Button>{i18nT("ui.ethikos.trust.profile.viewBadges")}</Button>
       </Link>
     </Space>
   );
@@ -109,14 +113,14 @@ export default function TrustProfilePage(): JSX.Element {
   if (error) {
     return (
       <EthikosPageShell
-        title="My EkoH profile"
-        sectionLabel="Trust"
+        title={i18nT("ui.ethikos.trust.profile.myEkohProfile")}
+        sectionLabel={i18nT("ui.ethikos.trust.profile.trust")}
         primaryAction={primaryAction}
         secondaryActions={secondaryActions}
       >
         <PageContainer ghost>
-          <Empty description="Unable to load trust and expertise profile">
-            <Button onClick={() => void refetch()} type="primary">Retry</Button>
+          <Empty description={i18nT("ui.ethikos.trust.profile.unableToLoadTrustAndExpertiseProfile")}>
+            <Button onClick={() => void refetch()} type="primary">{i18nT("ui.ethikos.trust.profile.retry")}</Button>
           </Empty>
         </PageContainer>
       </EthikosPageShell>
@@ -125,8 +129,8 @@ export default function TrustProfilePage(): JSX.Element {
 
   return (
     <EthikosPageShell
-      title="My EkoH profile"
-      sectionLabel="Trust"
+      title={i18nT("ui.ethikos.trust.profile.myEkohProfile")}
+      sectionLabel={i18nT("ui.ethikos.trust.profile.trust")}
       primaryAction={primaryAction}
       secondaryActions={secondaryActions}
     >
@@ -135,44 +139,44 @@ export default function TrustProfilePage(): JSX.Element {
           <Alert
             type="info"
             showIcon
-            message="Expertise is contextual, not a universal rank"
-            description="EkoH records domain-specific expertise signals. Smart Vote may use those signals in a declared advisory reading when the same domains are relevant to a question. The public baseline remains separate."
+            message={i18nT("ui.ethikos.trust.profile.expertiseIsContextualNotAUniversalRank")}
+            description={i18nT("ui.ethikos.trust.profile.ekohRecordsDomainSpecificExpertiseSignalsSmart")}
           />
 
           <ProCard gutter={16} wrap>
             <StatisticCard
               colSpan={{ xs: 24, sm: 12, lg: 6 }}
               statistic={{
-                title: 'Expertise domains',
+                title: i18nT("ui.ethikos.trust.profile.expertiseDomains"),
                 value: expertise.length,
-                description: <Text type="secondary">Domain-bounded EkoH profile</Text>,
+                description: <Text type="secondary">{i18nT("ui.ethikos.trust.profile.domainBoundedEkohProfile")}</Text>,
               }}
             />
             <StatisticCard
               colSpan={{ xs: 24, sm: 12, lg: 6 }}
               statistic={{
-                title: 'Strongest current domain',
+                title: i18nT("ui.ethikos.trust.profile.strongestCurrentDomain"),
                 value: topExpertise ? percent(topExpertise.weightedScore) : 0,
                 suffix: topExpertise ? '%' : undefined,
-                description: topExpertise ? <Tag>{topExpertise.domainName}</Tag> : <Text type="secondary">No score yet</Text>,
+                description: topExpertise ? <Tag>{topExpertise.domainName}</Tag> : <Text type="secondary">{i18nT("ui.ethikos.trust.profile.noScoreYet")}</Text>,
               }}
             />
             <StatisticCard
               colSpan={{ xs: 24, sm: 12, lg: 6 }}
               statistic={{
-                title: 'Ethics / reliability modifier',
+                title: i18nT("ui.ethikos.trust.profile.ethicsReliabilityModifier"),
                 value: ethicsScore ?? 'Restricted',
                 suffix: ethicsScore == null ? undefined : '×',
                 precision: ethicsScore == null ? undefined : 2,
-                description: <Text type="secondary">Governed signal; not a moral rank</Text>,
+                description: <Text type="secondary">{i18nT("ui.ethikos.trust.profile.governedSignalNotAMoralRank")}</Text>,
               }}
             />
             <StatisticCard
               colSpan={{ xs: 24, sm: 12, lg: 6 }}
               statistic={{
-                title: 'Profile visibility',
+                title: i18nT("ui.ethikos.trust.profile.profileVisibility"),
                 value: confidentiality,
-                description: <Text type="secondary">Applied by EkoH privacy rules</Text>,
+                description: <Text type="secondary">{i18nT("ui.ethikos.trust.profile.appliedByEkohPrivacyRules")}</Text>,
               }}
             />
           </ProCard>
@@ -186,51 +190,51 @@ export default function TrustProfilePage(): JSX.Element {
                   </Avatar>
                   <div>
                     <Title level={4} style={{ marginBottom: 4 }}>{displayName}</Title>
-                    <Text type="secondary">EkoH expertise context for Ethikos</Text>
+                    <Text type="secondary">{i18nT("ui.ethikos.trust.profile.ekohExpertiseContextForEthikos")}</Text>
                   </div>
                 </Space>
 
                 {ekohProfile ? (
                   <Descriptions size="small" column={1} labelStyle={{ width: 150 }}>
-                    <Descriptions.Item label="EkoH user ID">{ekohProfile.userId}</Descriptions.Item>
-                    <Descriptions.Item label="Visibility">
+                    <Descriptions.Item label={i18nT("ui.ethikos.trust.profile.ekohUserId")}>{ekohProfile.userId}</Descriptions.Item>
+                    <Descriptions.Item label={i18nT("ui.ethikos.trust.profile.visibility")}>
                       <Tag>{ekohProfile.confidentialityLevel}</Tag>
                     </Descriptions.Item>
-                    <Descriptions.Item label="Ethics signal">
+                    <Descriptions.Item label={i18nT("ui.ethikos.trust.profile.ethicsSignal")}>
                       {ekohProfile.ethicsScore == null
-                        ? 'Restricted'
-                        : `${ekohProfile.ethicsScore.toFixed(2)}×`}
+                        ? i18nT("ui.ethikos.trust.profile.restricted")
+                        : i18nT("ui.ethikos.trust.profile.text", { value1: ekohProfile.ethicsScore.toFixed(2) })}
                     </Descriptions.Item>
                   </Descriptions>
                 ) : (
                   <Alert
                     type="warning"
                     showIcon
-                    message="No EkoH profile available"
-                    description="Ethikos activity is available, but no canonical EkoH expertise profile was returned for this account."
+                    message={i18nT("ui.ethikos.trust.profile.noEkohProfileAvailable")}
+                    description={i18nT("ui.ethikos.trust.profile.ethikosActivityIsAvailableButNoCanonical")}
                   />
                 )}
 
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  A domain score does not give permanent extra influence. Its relevance depends on the declared domain mix of the specific consultation or reading.
+                  {i18nT("ui.ethikos.trust.profile.aDomainScoreDoesNotGivePermanent")}
                 </Paragraph>
               </Space>
             </ProCard>
 
-            <ProCard colSpan={{ xs: 24, md: 16 }} title="Domain expertise">
+            <ProCard colSpan={{ xs: 24, md: 16 }} title={i18nT("ui.ethikos.trust.profile.domainExpertise")}>
               <ExpertiseList expertise={expertise} />
             </ProCard>
           </ProCard>
 
           <ProCard gutter={16} wrap>
-            <ProCard colSpan={{ xs: 24, lg: 14 }} title="Recent activity context">
+            <ProCard colSpan={{ xs: 24, lg: 14 }} title={i18nT("ui.ethikos.trust.profile.recentActivityContext")}>
               {timeline.length ? (
                 <Timeline
                   mode="left"
                   items={timeline.map((event) => ({
                     key: event.id,
                     dot: <ClockCircleOutlined />,
-                    label: formatDate(event.when),
+                    label: formatDate(i18nT, event.when),
                     children: (
                       <Space direction="vertical" size={0}>
                         <Text strong>{event.title}</Text>
@@ -240,11 +244,11 @@ export default function TrustProfilePage(): JSX.Element {
                   }))}
                 />
               ) : (
-                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No recent Ethikos activity" />
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={i18nT("ui.ethikos.trust.profile.noRecentEthikosActivity")} />
               )}
             </ProCard>
 
-            <ProCard colSpan={{ xs: 24, lg: 10 }} title="Badges">
+            <ProCard colSpan={{ xs: 24, lg: 10 }} title={i18nT("ui.ethikos.trust.profile.badges")}>
               {badges.length ? (
                 <List<Badge>
                   size="small"
@@ -253,13 +257,13 @@ export default function TrustProfilePage(): JSX.Element {
                     <List.Item key={badge.id}>
                       <List.Item.Meta
                         title={badge.label}
-                        description={`${badge.description} · ${formatDate(badge.earnedAt)}`}
+                        description={i18nT("ui.ethikos.trust.profile.text_27a79c", { description: badge.description, value1: formatDate(i18nT, badge.earnedAt) })}
                       />
                     </List.Item>
                   )}
                 />
               ) : (
-                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No badges earned yet" />
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={i18nT("ui.ethikos.trust.profile.noBadgesEarnedYet")} />
               )}
             </ProCard>
           </ProCard>

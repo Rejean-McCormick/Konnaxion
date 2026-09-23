@@ -2,6 +2,7 @@
 'use client'
 
 // pages/ethikos/pulse/overview.tsx
+import { useLanguage } from '@/context/LanguageContext';
 import { ClockCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import {
   PageContainer,
@@ -30,7 +31,8 @@ function usePulseOverview() {
 /* ------------------------------------------------------------------ */
 
 export default function PulseOverview() {
-  usePageTitle('Pulse · Overview');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.ethikos.pulse.overview.pulseOverview"));
 
   const { data, loading, error, refresh } = usePulseOverview();
   const lastUpdated = data ? dayjs(data.refreshedAt).format('HH:mm:ss') : null;
@@ -49,11 +51,11 @@ export default function PulseOverview() {
     return (
       <PageContainer ghost>
         <Empty
-          description="Failed to load metrics"
+          description={i18nT("ui.ethikos.pulse.overview.failedToLoadMetrics")}
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         >
           <Button icon={<SyncOutlined />} onClick={refresh}>
-            Retry
+            {i18nT("ui.ethikos.pulse.overview.retry")}
           </Button>
         </Empty>
       </PageContainer>
@@ -64,7 +66,7 @@ export default function PulseOverview() {
   if (data && data.kpis.length === 0) {
     return (
       <PageContainer ghost>
-        <Empty description="No KPI data yet" />
+        <Empty description={i18nT("ui.ethikos.pulse.overview.noKpiDataYet")} />
       </PageContainer>
     );
   }
@@ -78,7 +80,7 @@ export default function PulseOverview() {
           {lastUpdated && (
             <Badge
               count={
-                <Tooltip title={`Last refreshed at ${lastUpdated}`}>
+                <Tooltip title={i18nT("ui.ethikos.pulse.overview.lastRefreshedAt", { lastUpdated: lastUpdated })}>
                   <ClockCircleOutlined style={{ color: '#52c41a' }} />
                 </Tooltip>
               }

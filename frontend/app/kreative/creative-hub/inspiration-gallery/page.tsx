@@ -1,5 +1,6 @@
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { ReloadOutlined } from '@ant-design/icons'
 import { Alert, Button, Card, Col, Empty, Modal, Row, Space, Spin, Tag, Typography } from 'antd'
 import React, { useCallback, useEffect, useState } from 'react'
@@ -10,6 +11,7 @@ import { listKreativeArtworks, type KreativeArtwork } from '@/services/kreative'
 const { Paragraph, Text, Title } = Typography
 
 export default function InspirationGalleryPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [works, setWorks] = useState<KreativeArtwork[]>([])
   const [selected, setSelected] = useState<KreativeArtwork | null>(null)
   const [loading, setLoading] = useState(true)
@@ -33,14 +35,14 @@ export default function InspirationGalleryPage(): JSX.Element {
 
   return (
     <KreativePageShell
-      title="Inspiration Gallery"
-      subtitle="Creative works loaded from the real Kreative artwork API."
-      primaryAction={<Button icon={<ReloadOutlined />} onClick={() => void load()}>Refresh</Button>}
+      title={i18nT("ui.kreative.creativeHub.inspirationGallery.inspirationGallery")}
+      subtitle={i18nT("ui.kreative.creativeHub.inspirationGallery.creativeWorksLoadedFromTheRealKreative")}
+      primaryAction={<Button icon={<ReloadOutlined />} onClick={() => void load()}>{i18nT("ui.kreative.creativeHub.inspirationGallery.refresh")}</Button>}
     >
-      {error ? <Alert type="error" showIcon message="Gallery load failed" description={error} style={{ marginBottom: 16 }} /> : null}
+      {error ? <Alert type="error" showIcon message={i18nT("ui.kreative.creativeHub.inspirationGallery.galleryLoadFailed")} description={error} style={{ marginBottom: 16 }} /> : null}
       <Spin spinning={loading}>
         {works.length === 0 ? (
-          <Empty description="No creative works have been submitted yet." />
+          <Empty description={i18nT("ui.kreative.creativeHub.inspirationGallery.noCreativeWorksHaveBeenSubmittedYet")} />
         ) : (
           <Row gutter={[16, 16]}>
             {works.map((work) => (
@@ -53,7 +55,7 @@ export default function InspirationGalleryPage(): JSX.Element {
                       style={{ width: '100%', height: 190, objectFit: 'cover', borderRadius: 6, marginBottom: 12 }}
                     />
                   ) : (
-                    <Alert type="info" showIcon message={`${work.media_type} work`} style={{ marginBottom: 12 }} />
+                    <Alert type="info" showIcon message={i18nT("ui.kreative.creativeHub.inspirationGallery.work", { media_type: work.media_type })} style={{ marginBottom: 12 }} />
                   )}
                   <Space direction="vertical" size="small">
                     <Text>{work.artist}</Text>
@@ -74,7 +76,7 @@ export default function InspirationGalleryPage(): JSX.Element {
         {selected ? (
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             <Title level={3}>{selected.title}</Title>
-            <Text type="secondary">By {selected.artist}</Text>
+            <Text type="secondary">{i18nT("ui.kreative.creativeHub.inspirationGallery.by")} {selected.artist}</Text>
             {selected.media_type === 'image' && selected.media_url ? (
               <img alt={selected.title} src={selected.media_url} style={{ width: '100%', maxHeight: 460, objectFit: 'contain' }} />
             ) : null}

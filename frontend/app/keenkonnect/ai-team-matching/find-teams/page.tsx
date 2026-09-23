@@ -1,6 +1,8 @@
 // FILE: frontend/app/keenkonnect/ai-team-matching/find-teams/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
+import type { TranslateFunction } from '@/i18n/runtime';
 import {
   FilterOutlined,
   HeartOutlined,
@@ -85,15 +87,16 @@ const sampleTeamMatches: TeamMatch[] = [
   },
 ];
 
-const getTeamSizeTag = (size: number) => {
-  if (size <= 3) return { label: 'Small team', color: 'green' as const };
-  if (size <= 6) return { label: 'Medium team', color: 'blue' as const };
-  return { label: 'Large team', color: 'purple' as const };
+const getTeamSizeTag = (i18nT: TranslateFunction, size: number) => {
+  if (size <= 3) return { label: i18nT('ui.keenkonnect.aiTeamMatching.findTeams.smallTeam'), color: 'green' as const };
+  if (size <= 6) return { label: i18nT('ui.keenkonnect.aiTeamMatching.findTeams.mediumTeam'), color: 'blue' as const };
+  return { label: i18nT('ui.keenkonnect.aiTeamMatching.findTeams.largeTeam'), color: 'purple' as const };
 };
 
 const domainOptions = Array.from(new Set(sampleTeamMatches.map((t) => t.domain)));
 
 const FindTeamsPage: React.FC = () => {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
 
   const [searchText, setSearchText] = useState('');
@@ -173,9 +176,9 @@ const FindTeamsPage: React.FC = () => {
 
   return (
     <KeenPage
-      title="Find AI-recommended teams"
-      description="Discover teams recommended based on your profile and AI matching preferences."
-      metaTitle="KeenKonnect · AI Team Matching · Find teams"
+      title={i18nT("ui.keenkonnect.aiTeamMatching.findTeams.findAiRecommendedTeams")}
+      description={i18nT("ui.keenkonnect.aiTeamMatching.findTeams.discoverTeamsRecommendedBasedOnYourProfile")}
+      metaTitle={i18nT("ui.keenkonnect.aiTeamMatching.findTeams.keenkonnectAiTeamMatchingFindTeams")}
     >
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         {/* Intro / CTA */}
@@ -184,12 +187,10 @@ const FindTeamsPage: React.FC = () => {
             <Col xs={24} md={16}>
               <Space direction="vertical" size={8}>
                 <Title level={3} style={{ marginBottom: 0 }}>
-                  Discover teams that match your profile
+                  {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.discoverTeamsThatMatchYourProfile")}
                 </Title>
                 <Text type="secondary">
-                  KeenKonnect uses your skills, experience, and preferences to
-                  suggest teams where you’re likely to thrive. Refine the
-                  filters or adjust your preferences to tune the recommendations.
+                  {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.keenkonnectUsesYourSkillsExperienceAndPreferences")}
                 </Text>
               </Space>
             </Col>
@@ -204,18 +205,18 @@ const FindTeamsPage: React.FC = () => {
                     onClick={handleGoToPreferences}
                     icon={<FilterOutlined />}
                   >
-                    Adjust match preferences
+                    {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.adjustMatchPreferences")}
                   </Button>
                   <Button
                     type="primary"
                     onClick={handleViewMatches}
                     icon={<TeamOutlined />}
                   >
-                    View my matches
+                    {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.viewMyMatches")}
                   </Button>
                 </Space>
                 <Text type="secondary">
-                  <InfoCircleOutlined /> Results use a declared preview dataset; no AI matching service is connected.
+                  <InfoCircleOutlined /> {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.resultsUseADeclaredPreviewDatasetNo")}
                 </Text>
               </Space>
             </Col>
@@ -230,7 +231,7 @@ const FindTeamsPage: React.FC = () => {
                 <Input
                   allowClear
                   prefix={<SearchOutlined />}
-                  placeholder="Search teams, domains, keywords…"
+                  placeholder={i18nT("ui.keenkonnect.aiTeamMatching.findTeams.searchTeamsDomainsKeywords")}
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
                 />
@@ -240,9 +241,9 @@ const FindTeamsPage: React.FC = () => {
                   style={{ width: '100%' }}
                   value={domainFilter}
                   onChange={(value) => setDomainFilter(value)}
-                  placeholder="Domain"
+                  placeholder={i18nT("ui.keenkonnect.aiTeamMatching.findTeams.domain")}
                 >
-                  <Option value="all">All domains</Option>
+                  <Option value="all">{i18nT("ui.keenkonnect.aiTeamMatching.findTeams.allDomains")}</Option>
                   {domainOptions.map((domain) => (
                     <Option key={domain} value={domain}>
                       {domain}
@@ -256,10 +257,10 @@ const FindTeamsPage: React.FC = () => {
                   value={teamSizeFilter}
                   onChange={(value: TeamSizeFilter) => setTeamSizeFilter(value)}
                 >
-                  <Option value="all">All team sizes</Option>
-                  <Option value="small">Small (≤3)</Option>
-                  <Option value="medium">Medium (4–6)</Option>
-                  <Option value="large">Large (7+)</Option>
+                  <Option value="all">{i18nT("ui.keenkonnect.aiTeamMatching.findTeams.allTeamSizes")}</Option>
+                  <Option value="small">{i18nT("ui.keenkonnect.aiTeamMatching.findTeams.small3")}</Option>
+                  <Option value="medium">{i18nT("ui.keenkonnect.aiTeamMatching.findTeams.medium46")}</Option>
+                  <Option value="large">{i18nT("ui.keenkonnect.aiTeamMatching.findTeams.large7")}</Option>
                 </Select>
               </Col>
               <Col xs={24} sm={12} md={4}>
@@ -269,7 +270,7 @@ const FindTeamsPage: React.FC = () => {
                     onChange={setOpenOnly}
                     size="small"
                   />
-                  <Text>Open to new members only</Text>
+                  <Text>{i18nT("ui.keenkonnect.aiTeamMatching.findTeams.openToNewMembersOnly")}</Text>
                 </Space>
               </Col>
             </Row>
@@ -280,22 +281,22 @@ const FindTeamsPage: React.FC = () => {
                   <Space wrap>
                     {searchText && (
                       <Tag closable onClose={() => setSearchText('')}>
-                        Search: {searchText}
+                        {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.search")} {searchText}
                       </Tag>
                     )}
                     {domainFilter !== 'all' && (
                       <Tag closable onClose={() => setDomainFilter('all')}>
-                        Domain: {domainFilter}
+                        {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.domain_da000b")} {domainFilter}
                       </Tag>
                     )}
                     {teamSizeFilter !== 'all' && (
                       <Tag closable onClose={() => setTeamSizeFilter('all')}>
-                        Team size: {teamSizeFilter}
+                        {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.teamSize")} {teamSizeFilter}
                       </Tag>
                     )}
                     {openOnly && (
                       <Tag closable onClose={() => setOpenOnly(false)}>
-                        Open teams only
+                        {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.openTeamsOnly")}
                       </Tag>
                     )}
                     <Button
@@ -304,7 +305,7 @@ const FindTeamsPage: React.FC = () => {
                       icon={<ReloadOutlined />}
                       onClick={resetFilters}
                     >
-                      Clear all filters
+                      {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.clearAllFilters")}
                     </Button>
                   </Space>
                 </Col>
@@ -318,7 +319,7 @@ const FindTeamsPage: React.FC = () => {
           title={
             <Space>
               <TeamOutlined />
-              <span>Recommended teams</span>
+              <span>{i18nT("ui.keenkonnect.aiTeamMatching.findTeams.recommendedTeams")}</span>
               <Badge
                 count={filteredTeams.length}
                 style={{ backgroundColor: '#1890ff' }}
@@ -330,14 +331,13 @@ const FindTeamsPage: React.FC = () => {
             <Empty
               description={
                 <span>
-                  No teams match your current filters. Try broadening your search
-                  or{' '}
+                  {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.noTeamsMatchYourCurrentFiltersTry")}{' '}
                   <Button
                     type="link"
                     size="small"
                     onClick={handleGoToPreferences}
                   >
-                    updating your preferences
+                    {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.updatingYourPreferences")}
                   </Button>
                   .
                 </span>
@@ -356,7 +356,7 @@ const FindTeamsPage: React.FC = () => {
               }}
               dataSource={filteredTeams}
               renderItem={(team) => {
-                const sizeTag = getTeamSizeTag(team.teamSize);
+                const sizeTag = getTeamSizeTag(i18nT, team.teamSize);
 
                 return (
                   <List.Item>
@@ -366,23 +366,23 @@ const FindTeamsPage: React.FC = () => {
                       actions={[
                         <Tooltip
                           key="join"
-                          title="Join requests are unavailable until an AI matching membership contract exists."
+                          title={i18nT("ui.keenkonnect.aiTeamMatching.findTeams.joinRequestsAreUnavailableUntilAnAi")}
                         >
                           <Button
                             type="link"
                             icon={<UserAddOutlined />}
                             disabled
                           >
-                            Join unavailable
+                            {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.joinUnavailable")}
                           </Button>
                         </Tooltip>,
-                        <Tooltip key="save" title="Saving AI-match recommendations is unavailable in this preview.">
+                        <Tooltip key="save" title={i18nT("ui.keenkonnect.aiTeamMatching.findTeams.savingAiMatchRecommendationsIsUnavailableIn")}>
                           <Button
                             type="link"
                             icon={<HeartOutlined />}
                             disabled
                           >
-                            Save unavailable
+                            {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.saveUnavailable")}
                           </Button>
                         </Tooltip>,
                       ]}
@@ -401,7 +401,7 @@ const FindTeamsPage: React.FC = () => {
                           </Title>
                           <Badge
                             status={team.isOpen ? 'success' : 'default'}
-                            text={team.isOpen ? 'Open' : 'Currently full'}
+                            text={team.isOpen ? i18nT("ui.keenkonnect.aiTeamMatching.findTeams.open") : i18nT("ui.keenkonnect.aiTeamMatching.findTeams.currentlyFull")}
                           />
                         </Space>
 
@@ -416,7 +416,7 @@ const FindTeamsPage: React.FC = () => {
                         </Space>
 
                         <Space direction="vertical" size={4}>
-                          <Text strong>Why this is a good match</Text>
+                          <Text strong>{i18nT("ui.keenkonnect.aiTeamMatching.findTeams.whyThisIsAGoodMatch")}</Text>
                           <Paragraph
                             type="secondary"
                             ellipsis={{ rows: 2 }}
@@ -434,7 +434,7 @@ const FindTeamsPage: React.FC = () => {
                             handleOpenDrawer(team);
                           }}
                         >
-                          View details
+                          {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.viewDetails")}
                         </Button>
                       </Space>
                     </Card>
@@ -455,13 +455,13 @@ const FindTeamsPage: React.FC = () => {
                 <TeamOutlined />
                 <span>{selectedTeam.name}</span>
                 {selectedTeam.isOpen && (
-                  <Tag color="green">Open to new members</Tag>
+                  <Tag color="green">{i18nT("ui.keenkonnect.aiTeamMatching.findTeams.openToNewMembers")}</Tag>
                 )}
               </Space>
               <Text type="secondary">{selectedTeam.domain}</Text>
             </Space>
           ) : (
-            'Team details'
+            i18nT("ui.keenkonnect.aiTeamMatching.findTeams.teamDetails")
           )
         }
         width={520}
@@ -472,31 +472,30 @@ const FindTeamsPage: React.FC = () => {
         {selectedTeam && (
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             <section>
-              <Title level={5}>Overview</Title>
+              <Title level={5}>{i18nT("ui.keenkonnect.aiTeamMatching.findTeams.overview")}</Title>
               <Paragraph>{selectedTeam.description}</Paragraph>
               <Text type="secondary">
-                <InfoCircleOutlined /> This team recommendation is based on your
-                profile and AI matching preferences.
+                <InfoCircleOutlined /> {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.thisTeamRecommendationIsBasedOnYour")}
               </Text>
             </section>
 
             <section>
-              <Title level={5}>Why you’re a match</Title>
+              <Title level={5}>{i18nT("ui.keenkonnect.aiTeamMatching.findTeams.whyYouReAMatch")}</Title>
               <Paragraph>{selectedTeam.matchReason}</Paragraph>
             </section>
 
             <section>
-              <Title level={5}>Team composition</Title>
+              <Title level={5}>{i18nT("ui.keenkonnect.aiTeamMatching.findTeams.teamComposition")}</Title>
               <Space direction="vertical" style={{ width: '100%' }}>
                 <Space size="small" wrap>
                   <Tag icon={<TeamOutlined />}>
-                    {selectedTeam.teamSize} member
+                    {selectedTeam.teamSize} {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.member")}
                     {selectedTeam.teamSize > 1 ? 's' : ''}
                   </Tag>
                   {selectedTeam.isOpen ? (
-                    <Tag color="green">Actively recruiting</Tag>
+                    <Tag color="green">{i18nT("ui.keenkonnect.aiTeamMatching.findTeams.activelyRecruiting")}</Tag>
                   ) : (
-                    <Tag color="default">Currently full</Tag>
+                    <Tag color="default">{i18nT("ui.keenkonnect.aiTeamMatching.findTeams.currentlyFull")}</Tag>
                   )}
                 </Space>
                 <List
@@ -515,28 +514,28 @@ const FindTeamsPage: React.FC = () => {
             </section>
 
             <section>
-              <Title level={5}>Next steps</Title>
+              <Title level={5}>{i18nT("ui.keenkonnect.aiTeamMatching.findTeams.nextSteps")}</Title>
               <Space direction="vertical" style={{ width: '100%' }}>
                 <Button
                   type="primary"
                   icon={<UserAddOutlined />}
                   block
                   disabled
-                  title="Join requests are unavailable until an AI matching membership contract exists."
+                  title={i18nT("ui.keenkonnect.aiTeamMatching.findTeams.joinRequestsAreUnavailableUntilAnAi")}
                 >
-                  Join unavailable
+                  {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.joinUnavailable")}
                 </Button>
                 <Button block onClick={() => handleViewWorkspace(selectedTeam)}>
-                  Preview team workspace
+                  {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.previewTeamWorkspace")}
                 </Button>
                 <Button
                   type="dashed"
                   icon={<HeartOutlined />}
                   block
                   disabled
-                  title="Saving AI-match recommendations is unavailable in this preview."
+                  title={i18nT("ui.keenkonnect.aiTeamMatching.findTeams.savingAiMatchRecommendationsIsUnavailableIn")}
                 >
-                  Save unavailable
+                  {i18nT("ui.keenkonnect.aiTeamMatching.findTeams.saveUnavailable")}
                 </Button>
               </Space>
             </section>

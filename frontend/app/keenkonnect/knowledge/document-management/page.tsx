@@ -1,6 +1,7 @@
 // C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\document-management\page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   EyeOutlined,
   PlusOutlined,
@@ -229,6 +230,7 @@ const getStatusColor = (status: DocumentStatus): string => {
 };
 
 export default function DocumentManagementPage() {
+  const { t: i18nT } = useLanguage();
   const [messageApi, messageContextHolder] = message.useMessage();
   const router = useRouter();
 
@@ -250,14 +252,14 @@ export default function DocumentManagementPage() {
   const handleSaveChanges = () => {
     if (!selectedDocument) return;
     messageApi.info(
-      'Changes are kept in this browser session only; no document persistence endpoint is exposed.',
+      i18nT("ui.keenkonnect.knowledge.documentManagement.changesAreKeptInThisBrowserSession"),
     );
   };
 
   const handlePublishNewVersion = () => {
     if (!selectedDocument) return;
     messageApi.warning(
-      'Version publishing is unavailable until a document-version persistence contract exists.',
+      i18nT("ui.keenkonnect.knowledge.documentManagement.versionPublishingIsUnavailableUntilADocument"),
     );
   };
 
@@ -284,7 +286,7 @@ export default function DocumentManagementPage() {
     setSelectedDocument(newDoc);
     setDrawerOpen(true);
     messageApi.info(
-      'Document added to the current session only; it has not been persisted.',
+      i18nT("ui.keenkonnect.knowledge.documentManagement.documentAddedToTheCurrentSessionOnly"),
     );
 
     return true;
@@ -292,55 +294,55 @@ export default function DocumentManagementPage() {
 
   const columns: ProColumns<ManagedDocument>[] = [
     {
-      title: 'Title',
+      title: i18nT("ui.keenkonnect.knowledge.documentManagement.title"),
       dataIndex: 'title',
       ellipsis: true,
       copyable: true,
       formItemProps: {
-        rules: [{ required: true, message: 'Title is required' }],
+        rules: [{ required: true, message: i18nT("ui.keenkonnect.knowledge.documentManagement.titleIsRequired") }],
       },
     },
     {
-      title: 'Category',
+      title: i18nT("ui.keenkonnect.knowledge.documentManagement.category"),
       dataIndex: 'category',
       valueType: 'select',
       filters: true,
       onFilter: true,
       valueEnum: {
-        Research: { text: 'Research' },
-        'Safety & Compliance': { text: 'Safety & Compliance' },
-        'Clinical Protocol': { text: 'Clinical Protocol' },
-        'Design Blueprint': { text: 'Design Blueprint' },
-        'Learning Module': { text: 'Learning Module' },
+        Research: { text: i18nT("ui.keenkonnect.knowledge.documentManagement.research") },
+        'Safety & Compliance': { text: i18nT("ui.keenkonnect.knowledge.documentManagement.safetyCompliance") },
+        'Clinical Protocol': { text: i18nT("ui.keenkonnect.knowledge.documentManagement.clinicalProtocol") },
+        'Design Blueprint': { text: i18nT("ui.keenkonnect.knowledge.documentManagement.designBlueprint") },
+        'Learning Module': { text: i18nT("ui.keenkonnect.knowledge.documentManagement.learningModule") },
       },
     },
     {
-      title: 'Language',
+      title: i18nT("ui.keenkonnect.knowledge.documentManagement.language"),
       dataIndex: 'language',
       valueType: 'select',
       filters: true,
       onFilter: true,
       valueEnum: {
-        English: { text: 'English' },
-        French: { text: 'French' },
+        English: { text: i18nT("ui.keenkonnect.knowledge.documentManagement.english") },
+        French: { text: i18nT("ui.keenkonnect.knowledge.documentManagement.french") },
       },
       width: 110,
     },
     {
-      title: 'Owner',
+      title: i18nT("ui.keenkonnect.knowledge.documentManagement.owner"),
       dataIndex: 'owner',
       width: 180,
     },
     {
-      title: 'Status',
+      title: i18nT("ui.keenkonnect.knowledge.documentManagement.status"),
       dataIndex: 'status',
       valueType: 'select',
       filters: true,
       onFilter: true,
       valueEnum: {
-        Draft: { text: 'Draft', status: 'Default' },
-        Published: { text: 'Published', status: 'Success' },
-        Archived: { text: 'Archived', status: 'Default' },
+        Draft: { text: i18nT("ui.keenkonnect.knowledge.documentManagement.draft"), status: 'Default' },
+        Published: { text: i18nT("ui.keenkonnect.knowledge.documentManagement.published"), status: 'Success' },
+        Archived: { text: i18nT("ui.keenkonnect.knowledge.documentManagement.archived"), status: 'Default' },
       },
       render: (_, record) => (
         <Tag color={getStatusColor(record.status)}>{record.status}</Tag>
@@ -348,15 +350,15 @@ export default function DocumentManagementPage() {
       width: 120,
     },
     {
-      title: 'AI indexing',
+      title: i18nT("ui.keenkonnect.knowledge.documentManagement.aiIndexing"),
       dataIndex: 'aiIndexed',
       valueType: 'switch',
       render: (_, record) => (
         <Tooltip
           title={
             record.aiIndexed
-              ? 'Document is used by assistants and semantic search.'
-              : 'Document is excluded from AI-powered features.'
+              ? i18nT("ui.keenkonnect.knowledge.documentManagement.documentIsUsedByAssistantsAndSemantic")
+              : i18nT("ui.keenkonnect.knowledge.documentManagement.documentIsExcludedFromAiPoweredFeatures")
           }
         >
           <Switch
@@ -369,7 +371,7 @@ export default function DocumentManagementPage() {
       width: 140,
     },
     {
-      title: 'Visible',
+      title: i18nT("ui.keenkonnect.knowledge.documentManagement.visible"),
       dataIndex: 'visible',
       valueType: 'switch',
       render: (_, record) => (
@@ -382,7 +384,7 @@ export default function DocumentManagementPage() {
       width: 110,
     },
     {
-      title: 'Tags',
+      title: i18nT("ui.keenkonnect.knowledge.documentManagement.tags"),
       dataIndex: 'tags',
       search: false,
       render: (_, record) =>
@@ -397,7 +399,7 @@ export default function DocumentManagementPage() {
         ),
     },
     {
-      title: 'Last updated',
+      title: i18nT("ui.keenkonnect.knowledge.documentManagement.lastUpdated"),
       dataIndex: 'updatedAt',
       valueType: 'date',
       sorter: (a, b) =>
@@ -405,12 +407,12 @@ export default function DocumentManagementPage() {
       width: 140,
     },
     {
-      title: 'Version',
+      title: i18nT("ui.keenkonnect.knowledge.documentManagement.version"),
       dataIndex: 'version',
       width: 90,
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.keenkonnect.knowledge.documentManagement.actions"),
       valueType: 'option',
       fixed: 'right',
       width: 170,
@@ -422,7 +424,7 @@ export default function DocumentManagementPage() {
             setDrawerOpen(true);
           }}
         >
-          Details
+          {i18nT("ui.keenkonnect.knowledge.documentManagement.details")}
         </a>,
         <a
           key="edit"
@@ -433,7 +435,7 @@ export default function DocumentManagementPage() {
             editableAction?.startEditable?.(record.id);
           }}
         >
-          Edit
+          {i18nT("ui.keenkonnect.knowledge.documentManagement.edit")}
         </a>,
       ],
     },
@@ -441,8 +443,8 @@ export default function DocumentManagementPage() {
 
   return (
     <KeenPage
-      title="Document Management"
-      description="Manage your knowledge documents, control AI indexing and visibility, and inspect versions and comments from one place."
+      title={i18nT("ui.keenkonnect.knowledge.documentManagement.documentManagement")}
+      description={i18nT("ui.keenkonnect.knowledge.documentManagement.manageYourKnowledgeDocumentsControlAiIndexing")}
       toolbar={
         <Space>
           <Button
@@ -450,7 +452,7 @@ export default function DocumentManagementPage() {
               router.push('/keenkonnect/knowledge/browse-repository')
             }
           >
-            Go to library view
+            {i18nT("ui.keenkonnect.knowledge.documentManagement.goToLibraryView")}
           </Button>
         </Space>
       }
@@ -460,8 +462,8 @@ export default function DocumentManagementPage() {
         type="warning"
         showIcon
         style={{ marginBottom: 16 }}
-        message="Session-local document workspace"
-        description="This screen has no general document persistence contract yet. Edits and newly created entries remain in the current browser session."
+        message={i18nT("ui.keenkonnect.knowledge.documentManagement.sessionLocalDocumentWorkspace")}
+        description={i18nT("ui.keenkonnect.knowledge.documentManagement.thisScreenHasNoGeneralDocumentPersistence")}
       />
       <EditableProTable<ManagedDocument>
         rowKey="id"
@@ -478,7 +480,7 @@ export default function DocumentManagementPage() {
           newRecordType: 'dataSource',
           record: () => ({
             id: `temp-${Date.now()}`,
-            title: 'New document',
+            title: i18nT("ui.keenkonnect.knowledge.documentManagement.newDocument"),
             category: 'Research',
             language: 'English',
             owner: 'You',
@@ -495,10 +497,10 @@ export default function DocumentManagementPage() {
         toolBarRender={() => [
           <ModalForm<NewDocumentFormValues>
             key="new"
-            title="Add document entry"
+            title={i18nT("ui.keenkonnect.knowledge.documentManagement.addDocumentEntry")}
             trigger={
               <Button type="primary" icon={<PlusOutlined />}>
-                New document
+                {i18nT("ui.keenkonnect.knowledge.documentManagement.newDocument")}
               </Button>
             }
             modalProps={{ destroyOnHidden: true }}
@@ -512,60 +514,60 @@ export default function DocumentManagementPage() {
           >
             <ProFormText
               name="title"
-              label="Title"
-              rules={[{ required: true, message: 'Please enter a title' }]}
+              label={i18nT("ui.keenkonnect.knowledge.documentManagement.title")}
+              rules={[{ required: true, message: i18nT("ui.keenkonnect.knowledge.documentManagement.pleaseEnterATitle") }]}
             />
             <ProFormSelect
               name="category"
-              label="Category"
+              label={i18nT("ui.keenkonnect.knowledge.documentManagement.category")}
               options={[
-                { label: 'Research', value: 'Research' },
-                { label: 'Safety & Compliance', value: 'Safety & Compliance' },
-                { label: 'Clinical Protocol', value: 'Clinical Protocol' },
-                { label: 'Design Blueprint', value: 'Design Blueprint' },
-                { label: 'Learning Module', value: 'Learning Module' },
+                { label: i18nT("ui.keenkonnect.knowledge.documentManagement.research"), value: 'Research' },
+                { label: i18nT("ui.keenkonnect.knowledge.documentManagement.safetyCompliance"), value: 'Safety & Compliance' },
+                { label: i18nT("ui.keenkonnect.knowledge.documentManagement.clinicalProtocol"), value: 'Clinical Protocol' },
+                { label: i18nT("ui.keenkonnect.knowledge.documentManagement.designBlueprint"), value: 'Design Blueprint' },
+                { label: i18nT("ui.keenkonnect.knowledge.documentManagement.learningModule"), value: 'Learning Module' },
               ]}
-              rules={[{ required: true, message: 'Please choose a category' }]}
+              rules={[{ required: true, message: i18nT("ui.keenkonnect.knowledge.documentManagement.pleaseChooseACategory") }]}
             />
             <ProFormSelect
               name="language"
-              label="Language"
+              label={i18nT("ui.keenkonnect.knowledge.documentManagement.language")}
               options={[
-                { label: 'English', value: 'English' },
-                { label: 'French', value: 'French' },
+                { label: i18nT("ui.keenkonnect.knowledge.documentManagement.english"), value: 'English' },
+                { label: i18nT("ui.keenkonnect.knowledge.documentManagement.french"), value: 'French' },
               ]}
-              rules={[{ required: true, message: 'Please choose a language' }]}
+              rules={[{ required: true, message: i18nT("ui.keenkonnect.knowledge.documentManagement.pleaseChooseALanguage") }]}
             />
-            <ProFormText name="owner" label="Owner" />
+            <ProFormText name="owner" label={i18nT("ui.keenkonnect.knowledge.documentManagement.owner")} />
             <ProFormSelect
               name="status"
-              label="Status"
+              label={i18nT("ui.keenkonnect.knowledge.documentManagement.status")}
               options={[
-                { label: 'Draft', value: 'Draft' },
-                { label: 'Published', value: 'Published' },
-                { label: 'Archived', value: 'Archived' },
+                { label: i18nT("ui.keenkonnect.knowledge.documentManagement.draft"), value: 'Draft' },
+                { label: i18nT("ui.keenkonnect.knowledge.documentManagement.published"), value: 'Published' },
+                { label: i18nT("ui.keenkonnect.knowledge.documentManagement.archived"), value: 'Archived' },
               ]}
             />
             <ProFormSelect
               name="tags"
-              label="Tags"
+              label={i18nT("ui.keenkonnect.knowledge.documentManagement.tags")}
               mode="tags"
               fieldProps={{
                 tokenSeparators: [','],
               }}
-              placeholder="Add tags (press Enter or comma)"
+              placeholder={i18nT("ui.keenkonnect.knowledge.documentManagement.addTagsPressEnterOrComma")}
             />
             <ProFormSwitch
               name="aiIndexed"
-              label="Include in AI indexing"
+              label={i18nT("ui.keenkonnect.knowledge.documentManagement.includeInAiIndexing")}
             />
             <ProFormSwitch
               name="visible"
-              label="Visible in library"
+              label={i18nT("ui.keenkonnect.knowledge.documentManagement.visibleInLibrary")}
             />
             <ProFormTextArea
               name="summary"
-              label="Short content / summary"
+              label={i18nT("ui.keenkonnect.knowledge.documentManagement.shortContentSummary")}
               fieldProps={{ rows: 4 }}
             />
           </ModalForm>,
@@ -576,7 +578,7 @@ export default function DocumentManagementPage() {
               router.push('/keenkonnect/knowledge/upload-new-document')
             }
           >
-            Upload new file
+            {i18nT("ui.keenkonnect.knowledge.documentManagement.uploadNewFile")}
           </Button>,
         ]}
         columns={columns}
@@ -593,7 +595,7 @@ export default function DocumentManagementPage() {
       />
 
       <Drawer
-        title={selectedDocument ? 'Document details' : undefined}
+        title={selectedDocument ? i18nT("ui.keenkonnect.knowledge.documentManagement.documentDetails") : undefined}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         width={1000}
@@ -607,7 +609,7 @@ export default function DocumentManagementPage() {
                   {selectedDocument.title}
                 </h2>
                 <div className="text-sm text-gray-500">
-                  Last updated {selectedDocument.updatedAt} · Owner{' '}
+                  {i18nT("ui.keenkonnect.knowledge.documentManagement.lastUpdated")} {selectedDocument.updatedAt} {i18nT("ui.keenkonnect.knowledge.documentManagement.owner_b664a1")}{' '}
                   {selectedDocument.owner}
                 </div>
               </div>
@@ -624,11 +626,11 @@ export default function DocumentManagementPage() {
             <Row gutter={16}>
               <Col xs={24} md={14}>
                 <Card
-                  title="Session-local editing"
+                  title={i18nT("ui.keenkonnect.knowledge.documentManagement.sessionLocalEditing")}
                   extra={
-                    <Tooltip title="Open full editor in Konstruct (future integration)">
+                    <Tooltip title={i18nT("ui.keenkonnect.knowledge.documentManagement.openFullEditorInKonstructFutureIntegration")}>
                       <Button type="link" icon={<EyeOutlined />}>
-                        Open in Konstruct
+                        {i18nT("ui.keenkonnect.knowledge.documentManagement.openInKonstruct")}
                       </Button>
                     </Tooltip>
                   }
@@ -649,31 +651,31 @@ export default function DocumentManagementPage() {
                       icon={<SaveOutlined />}
                       onClick={handleSaveChanges}
                     >
-                      Save changes
+                      {i18nT("ui.keenkonnect.knowledge.documentManagement.saveChanges")}
                     </Button>
                     <Button
                       icon={<UploadOutlined />}
                       onClick={handlePublishNewVersion}
                     >
-                      Publish new version
+                      {i18nT("ui.keenkonnect.knowledge.documentManagement.publishNewVersion")}
                     </Button>
                   </Space>
                 </Card>
               </Col>
 
               <Col xs={24} md={10}>
-                <Card title="Metadata & access control">
+                <Card title={i18nT("ui.keenkonnect.knowledge.documentManagement.metadataAccessControl")}>
                   <p>
-                    <strong>Category:</strong> {selectedDocument.category}
+                    <strong>{i18nT("ui.keenkonnect.knowledge.documentManagement.category_61b920")}</strong> {selectedDocument.category}
                   </p>
                   <p>
-                    <strong>Language:</strong> {selectedDocument.language}
+                    <strong>{i18nT("ui.keenkonnect.knowledge.documentManagement.language_c72064")}</strong> {selectedDocument.language}
                   </p>
                   <p>
-                    <strong>Version:</strong> {selectedDocument.version}
+                    <strong>{i18nT("ui.keenkonnect.knowledge.documentManagement.version_9f4912")}</strong> {selectedDocument.version}
                   </p>
                   <p>
-                    <strong>AI indexing:</strong>{' '}
+                    <strong>{i18nT("ui.keenkonnect.knowledge.documentManagement.aiIndexing_87d148")}</strong>{' '}
                     <Switch
                       size="small"
                       checked={selectedDocument.aiIndexed}
@@ -685,7 +687,7 @@ export default function DocumentManagementPage() {
                     />
                   </p>
                   <p>
-                    <strong>Visible in library:</strong>{' '}
+                    <strong>{i18nT("ui.keenkonnect.knowledge.documentManagement.visibleInLibrary_6e5cb3")}</strong>{' '}
                     <Switch
                       size="small"
                       checked={selectedDocument.visible}
@@ -697,7 +699,7 @@ export default function DocumentManagementPage() {
                     />
                   </p>
                   <p>
-                    <strong>Tags:</strong>{' '}
+                    <strong>{i18nT("ui.keenkonnect.knowledge.documentManagement.tags_b5ddd4")}</strong>{' '}
                     {selectedDocument.tags.length ? (
                       <Space size={[0, 8]} wrap>
                         {selectedDocument.tags.map(tag => (
@@ -705,19 +707,19 @@ export default function DocumentManagementPage() {
                         ))}
                       </Space>
                     ) : (
-                      <span style={{ color: '#999' }}>None</span>
+                      <span style={{ color: '#999' }}>{i18nT("ui.keenkonnect.knowledge.documentManagement.none")}</span>
                     )}
                   </p>
                 </Card>
 
-                <Card title="Version history" className="mt-4">
+                <Card title={i18nT("ui.keenkonnect.knowledge.documentManagement.versionHistory")} className="mt-4">
                   <List
                     size="small"
                     dataSource={versionHistory}
                     renderItem={item => (
                       <List.Item key={item.version}>
                         <List.Item.Meta
-                          title={`${item.version} · ${item.timestamp}`}
+                          title={i18nT("ui.keenkonnect.knowledge.documentManagement.text", { version: item.version, timestamp: item.timestamp })}
                           description={
                             <div>
                               <div>
@@ -734,11 +736,11 @@ export default function DocumentManagementPage() {
                     type="link"
                     style={{ padding: 0, marginTop: 8 }}
                   >
-                    Compare / restore versions
+                    {i18nT("ui.keenkonnect.knowledge.documentManagement.compareRestoreVersions")}
                   </Button>
                 </Card>
 
-                <Card title="Comments preview" className="mt-4">
+                <Card title={i18nT("ui.keenkonnect.knowledge.documentManagement.commentsPreview")} className="mt-4">
                   <List
                     itemLayout="horizontal"
                     dataSource={commentsData}

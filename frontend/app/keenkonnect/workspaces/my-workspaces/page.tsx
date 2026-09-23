@@ -1,6 +1,7 @@
 // FILE: frontend/app/keenkonnect/workspaces/my-workspaces/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { DownOutlined } from '@ant-design/icons';
 import { type ProColumns, ProTable } from '@ant-design/pro-components';
 import {
@@ -67,6 +68,7 @@ const PREVIEW_WORKSPACES: Workspace[] = [
 ];
 
 export default function MyWorkspaces() {
+  const { t: i18nT } = useLanguage();
   const router = useRouter();
 
   // Filter by project
@@ -106,7 +108,7 @@ export default function MyWorkspaces() {
 
   const columns: ProColumns<Workspace>[] = [
     {
-      title: 'Workspace',
+      title: i18nT("ui.keenkonnect.workspaces.myWorkspaces.workspace"),
       dataIndex: 'name',
       key: 'name',
       render: (_dom, record) => (
@@ -117,43 +119,43 @@ export default function MyWorkspaces() {
       ),
     },
     {
-      title: 'Project',
+      title: i18nT("ui.keenkonnect.workspaces.myWorkspaces.project"),
       dataIndex: 'project',
       key: 'project',
     },
     {
-      title: 'Environment',
+      title: i18nT("ui.keenkonnect.workspaces.myWorkspaces.environment"),
       dataIndex: 'environment',
       key: 'environment',
       render: (_dom, record) => <Tag>{record.environment}</Tag>,
     },
     {
-      title: 'Status',
+      title: i18nT("ui.keenkonnect.workspaces.myWorkspaces.status"),
       dataIndex: 'status',
       key: 'status',
       render: (_dom, record) =>
         record.status === 'active' ? (
-          <Tag color="green">Active</Tag>
+          <Tag color="green">{i18nT("ui.keenkonnect.workspaces.myWorkspaces.active")}</Tag>
         ) : (
-          <Tag color="default">Inactive</Tag>
+          <Tag color="default">{i18nT("ui.keenkonnect.workspaces.myWorkspaces.inactive")}</Tag>
         ),
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.keenkonnect.workspaces.myWorkspaces.actions"),
       key: 'actions',
       valueType: 'option',
       render: (_dom, record) => {
         const isActive = record.status === 'active';
-        const primaryLabel = isActive ? 'Join Now' : 'Launch';
+        const primaryLabel = isActive ? i18nT("ui.keenkonnect.workspaces.myWorkspaces.joinNow") : 'Launch';
 
         const menuItems: MenuProps['items'] = [
           {
             key: 'manage',
-            label: 'Preview settings',
+            label: i18nT("ui.keenkonnect.workspaces.myWorkspaces.previewSettings"),
           },
           {
             key: 'remove',
-            label: 'Remove unavailable',
+            label: i18nT("ui.keenkonnect.workspaces.myWorkspaces.removeUnavailable"),
             disabled: true,
           },
         ];
@@ -181,19 +183,19 @@ export default function MyWorkspaces() {
 
   return (
     <KeenPage
-      title="My Workspaces"
-      description="Manage and organize your KeenKonnect workspaces."
+      title={i18nT("ui.keenkonnect.workspaces.myWorkspaces.myWorkspaces")}
+      description={i18nT("ui.keenkonnect.workspaces.myWorkspaces.manageAndOrganizeYourKeenkonnectWorkspaces")}
     >
       <Alert
         type="info"
         showIcon
-        message="Workspace list preview"
-        description="No KeenKonnect workspace persistence contract exists in this build. These entries are declared preview data; settings navigation is illustrative and membership mutations are disabled."
+        message={i18nT("ui.keenkonnect.workspaces.myWorkspaces.workspaceListPreview")}
+        description={i18nT("ui.keenkonnect.workspaces.myWorkspaces.noKeenkonnectWorkspacePersistenceContractExistsIn")}
         style={{ marginBottom: 16 }}
       />
       <Row gutter={[16, 16]} className="mb-4">
         <Col xs={24} sm={12}>
-          <Text strong>Total Active Workspaces: {activeCount}</Text>
+          <Text strong>{i18nT("ui.keenkonnect.workspaces.myWorkspaces.totalActiveWorkspaces")} {activeCount}</Text>
         </Col>
         <Col
           xs={24}
@@ -207,7 +209,7 @@ export default function MyWorkspaces() {
               router.push('/keenkonnect/workspaces/browse-available-workspaces')
             }
           >
-            Browse Available Workspaces
+            {i18nT("ui.keenkonnect.workspaces.myWorkspaces.browseAvailableWorkspaces")}
           </Button>
           <Button
             type="primary"
@@ -215,14 +217,14 @@ export default function MyWorkspaces() {
               router.push('/keenkonnect/workspaces/launch-new-workspace')
             }
           >
-            Launch New Workspace
+            {i18nT("ui.keenkonnect.workspaces.myWorkspaces.launchNewWorkspace")}
           </Button>
         </Col>
       </Row>
 
       <Row gutter={[16, 16]} className="mb-4">
         <Col xs={24} sm={12}>
-          <Text>Filter by Project:</Text>
+          <Text>{i18nT("ui.keenkonnect.workspaces.myWorkspaces.filterByProject")}</Text>
           <Select
             value={selectedProject}
             onChange={(value) => setSelectedProject(value)}

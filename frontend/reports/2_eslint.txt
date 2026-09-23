@@ -1,54 +1,961 @@
 
-C:\mycode\Konnaxion\Konnaxion\frontend\app\_api\version\route.ts
+C:\mycode\Konnaxion\Konnaxion\frontend\app\%5Fapi\version\route.ts
   5:1  warning  `next/server` import should occur before import of `node:fs/promises`  import/order
 
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ekoh\achievements-badges\earned-badges-display\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                               import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ekoh/EkohPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ekoh\dashboard\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                               import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ekoh/EkohPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ekoh\expertise-areas\view-current-expertise\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                               import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ekoh/EkohPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ekoh\overview-analytics\current-ekoh-score\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/hooks/useReputationEvents`     import/order
+  5:1  warning  There should be at least one empty line between import groups                               import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ekoh/EkohPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ekoh\voting-influence\current-voting-weight\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                               import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ekoh/EkohPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\EthikosPageShell.tsx
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `react`           import/order
+  4:1  warning  There should be at least one empty line between import groups                     import/order
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/hooks/usePageTitle`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\admin\audit\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/ethikos/EthikosPageShell`               import/order
+  5:1  warning  `@/components/i18n/TranslatedText` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+  6:1  warning  There should be at least one empty line between import groups                                            import/order
+  6:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`         import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\admin\moderation\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                     import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\admin\roles\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/ethikos/EthikosPageShell`        import/order
+  5:1  warning  There should be at least one empty line between import groups                                     import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\decide\elite\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/ethikos/EthikosPageShell`        import/order
+  5:1  warning  There should be at least one empty line between import groups                                     import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\decide\methodology\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                     import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\decide\public\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/ethikos/EthikosPageShell`        import/order
+  5:1  warning  There should be at least one empty line between import groups                                     import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\decide\results\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                     import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\deliberate\[topic]\_components\ArgumentComposerCard.tsx
+  3:1  warning  There should be at least one empty line between import groups                             import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after type import of `antd/es/segmented`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\deliberate\[topic]\_components\ArgumentThreadCard.tsx
+  3:1  warning  `@/i18n/runtime` type import should occur after import of `antd`               import/order
+  4:1  warning  `@/components/i18n/TranslatedText` import should occur after import of `antd`  import/order
+  5:1  warning  There should be at least one empty line between import groups                  import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `antd`         import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\deliberate\[topic]\_components\EkohParticipantDrawer.tsx
+  3:1  warning  There should be at least one empty line between import groups           import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `antd`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\deliberate\[topic]\_components\EmergentQuestionCard.tsx
+  3:1  warning  There should be at least one empty line between import groups            import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\deliberate\[topic]\_components\KorumPanelsGrid.tsx
+  3:1  warning  There should be at least one empty line between import groups           import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `antd`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\deliberate\[topic]\_components\ParticipantRolesPanel.tsx
+  3:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `antd` import should occur before import of `@/context/LanguageContext`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\deliberate\[topic]\_components\SmartVoteReadingsPanel.tsx
+  3:1  warning  `@/i18n/runtime` type import should occur after import of `react`        import/order
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\deliberate\[topic]\_components\StanceComposerCard.tsx
+  3:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `antd` import should occur before import of `@/context/LanguageContext`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\deliberate\[topic]\_components\TopicStates.tsx
+  3:1  warning  There should be at least one empty line between import groups           import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `antd`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\deliberate\[topic]\_components\TopicSummaryPanel.tsx
+  3:1  warning  There should be at least one empty line between import groups           import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `antd`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\deliberate\[topic]\page.tsx
+  3:1  warning  There should be at least one empty line between import groups                                     import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\deliberate\elite\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                     import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\deliberate\guidelines\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/ethikos/EthikosPageShell`        import/order
+  5:1  warning  There should be at least one empty line between import groups                                     import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\impact\feedback\page.tsx
+  3:1  warning  `@/i18n/runtime` type import should occur after import of `@/hooks/usePageTitle`                  import/order
+  4:1  warning  There should be at least one empty line between import groups                                     import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\impact\outcomes\page.tsx
+  5:1   warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+  6:1   warning  `@/i18n/uiModelLabels` import should occur after import of `@/app/ethikos/EthikosPageShell`       import/order
+  6:28  warning  'C:\mycode\Konnaxion\Konnaxion\frontend\i18n\uiModelLabels.ts' imported multiple times            import/no-duplicates
+  7:1   warning  There should be at least one empty line between import groups                                     import/order
+  7:1   warning  `@/i18n/uiModelLabels` import should occur after import of `@/app/ethikos/EthikosPageShell`       import/order
+  7:50  warning  'C:\mycode\Konnaxion\Konnaxion\frontend\i18n\uiModelLabels.ts' imported multiple times            import/no-duplicates
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\impact\tracker\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/ethikos/EthikosPageShell`        import/order
+  5:1  warning  There should be at least one empty line between import groups                                     import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\insights\page.tsx
+  6:1   warning  `@/i18n/runtime` type import should occur after import of `@/components/charts/ChartCard`        import/order
+  7:1   warning  `@/context/LanguageContext` import should occur after import of `@/components/charts/ChartCard`  import/order
+  8:1   warning  `@/i18n/uiModelLabels` import should occur after import of `@/components/charts/ChartCard`       import/order
+  8:28  warning  'C:\mycode\Konnaxion\Konnaxion\frontend\i18n\uiModelLabels.ts' imported multiple times           import/no-duplicates
+  9:1   warning  There should be at least one empty line between import groups                                    import/order
+  9:1   warning  `@/i18n/uiModelLabels` import should occur after import of `@/components/charts/ChartCard`       import/order
+  9:10  warning  'impactKpiLabel' is defined but never used. Allowed unused vars must match /^_/u                 @typescript-eslint/no-unused-vars
+  9:66  warning  'C:\mycode\Konnaxion\Konnaxion\frontend\i18n\uiModelLabels.ts' imported multiple times           import/no-duplicates
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\layout.tsx
+  6:1  warning  There should be at least one empty line between import groups                           import/order
+  6:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/Loading`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\learn\changelog\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                     import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\learn\glossary\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                     import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\learn\guides\page.tsx
+  4:1  warning  `@/components/i18n/TranslatedText` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+  5:1  warning  There should be at least one empty line between import groups                                            import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`         import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\pulse\health\page.tsx
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+  5:1  warning  There should be at least one empty line between import groups                                     import/order
+  5:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/ethikos/EthikosPageShell`        import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\pulse\live\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/components/charts/ChartCard`        import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/charts/ChartCard`  import/order
+  6:1  warning  There should be at least one empty line between import groups                                    import/order
+  6:1  warning  `@/i18n/uiModelLabels` import should occur after import of `@/components/charts/ChartCard`       import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\pulse\overview\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/components/charts/ChartCard`        import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/charts/ChartCard`  import/order
+  6:1  warning  There should be at least one empty line between import groups                                    import/order
+  6:1  warning  `@/i18n/uiModelLabels` import should occur after import of `@/components/charts/ChartCard`       import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\pulse\trends\page.tsx
+  3:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/ethikos/EthikosPageShell`        import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+  5:1  warning  There should be at least one empty line between import groups                                     import/order
+  5:1  warning  `@/i18n/uiModelLabels` import should occur after import of `@/app/ethikos/EthikosPageShell`       import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\trust\badges\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/ethikos/EthikosPageShell`        import/order
+  5:1  warning  There should be at least one empty line between import groups                                     import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\trust\credentials\page.tsx
+  11:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/ethikos/EthikosPageShell`        import/order
+  12:1  warning  There should be at least one empty line between import groups                                     import/order
+  12:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\trust\profile\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/hooks/useReputationEvents`           import/order
+  5:1  warning  There should be at least one empty line between import groups                                     import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\ai-team-matching\find-teams\page.tsx
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+  5:1  warning  There should be at least one empty line between import groups                                      import/order
+  5:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/keenkonnect/KeenPageShell`        import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\ai-team-matching\match-preferences\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                      import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\ai-team-matching\my-matches\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                      import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\dashboard\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/keenkonnect/KeenPageShell`        import/order
+  5:1  warning  There should be at least one empty line between import groups                                      import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\knowledge\browse-repository\page.tsx
+  3:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/keenkonnect/KeenPageShell`        import/order
+  4:1  warning  There should be at least one empty line between import groups                                      import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\knowledge\document-management\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                      import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\knowledge\search-filter-documents\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                      import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\knowledge\upload-new-document\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                      import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\projects\browse-projects\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                      import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\projects\create-new-project\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                      import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\projects\my-projects\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                      import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\projects\project-workspace\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                      import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+
 C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\sustainability-impact\submit-impact-reports\page.tsx
-  58:23  warning  'setReferenceId' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   4:1   warning  There should be at least one empty line between import groups                                      import/order
+   4:1   warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+  61:23  warning  'setReferenceId' is assigned a value but never used. Allowed unused vars must match /^_/u          @typescript-eslint/no-unused-vars
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\sustainability-impact\sustainability-dashboard\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                      import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\sustainability-impact\track-project-impact\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                      import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
 
 C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx
-  11:3   warning  Member 'CurrentUser' of the import declaration should be sorted alphabetically                                                                                                                                                                                                           sort-imports
-  90:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+   3:1   warning  There should be at least one empty line between import groups                                                                                                                                                                                                                            import/order
+   3:1   warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`                                                                                                                                                                                        import/order
+  12:3   warning  Member 'CurrentUser' of the import declaration should be sorted alphabetically                                                                                                                                                                                                           sort-imports
+  92:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\user-reputation\manage-expertise-areas\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/keenkonnect/KeenPageShell`        import/order
+  5:1  warning  There should be at least one empty line between import groups                                      import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\user-reputation\view-reputation-ekoh\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                      import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\workspaces\browse-available-workspaces\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/keenkonnect/KeenPageShell`        import/order
+  5:1  warning  There should be at least one empty line between import groups                                      import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\workspaces\launch-new-workspace\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                      import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
 
 C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\workspaces\my-workspaces\page.tsx
-  75:29  warning  'setVisibleWorkspaces' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   4:1   warning  There should be at least one empty line between import groups                                      import/order
+   4:1   warning  `@/context/LanguageContext` import should occur after import of `@/app/keenkonnect/KeenPageShell`  import/order
+  77:29  warning  'setVisibleWorkspaces' is assigned a value but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\certifications\certification-programs\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                         import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\certifications\exam-dashboard-results\page.tsx
+  5:1  warning  `@/components/i18n/TranslatedText` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+  6:1  warning  There should be at least one empty line between import groups                                                import/order
+  6:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`         import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\certifications\exam-preparation\page.tsx
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+  6:1  warning  There should be at least one empty line between import groups                                         import/order
+  6:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/konnected/KonnectedPageShell`        import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\certifications\exam-registration\page.tsx
+  5:1  warning  `@/i18n/runtime` type import should occur after import of `@/components/PageContainer`        import/order
+  6:1  warning  There should be at least one empty line between import groups                                 import/order
+  6:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/PageContainer`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\community-discussions\active-threads\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                         import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\community-discussions\moderation\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                         import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\community-discussions\start-new-discussion\page.tsx
+  6:1  warning  There should be at least one empty line between import groups                                         import/order
+  6:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
 
 C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\community-discussions\thread\[topicId]\page.tsx
-  22:3  warning  Member 'message' of the import declaration should be sorted alphabetically  sort-imports
+   4:1  warning  There should be at least one empty line between import groups                                         import/order
+   4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+  23:3  warning  Member 'message' of the import declaration should be sorted alphabetically                            sort-imports
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\dashboard\page.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\knowledge\contribute\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                         import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\learning-library\[resourceId]\page.tsx
+  5:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/konnected/KonnectedPageShell`        import/order
+  6:1  warning  There should be at least one empty line between import groups                                         import/order
+  6:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\learning-library\browse-resources\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                         import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\learning-library\offline-content\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                         import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\learning-library\recommended-resources\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                         import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\learning-library\search-filters\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/konnected/KonnectedPageShell`        import/order
+  5:1  warning  There should be at least one empty line between import groups                                         import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\learning-paths\create-learning-path\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/konnected/KonnectedPageShell`        import/order
+  5:1  warning  There should be at least one empty line between import groups                                         import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                         import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\learning-paths\my-learning-path\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                         import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
 
 C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\mentorship\page.tsx
-  18:3  warning  Member 'Alert' of the import declaration should be sorted alphabetically  sort-imports
+   5:1  warning  `@/i18n/runtime` type import should occur after import of `@/app/konnected/KonnectedPageShell`        import/order
+   6:1  warning  There should be at least one empty line between import groups                                         import/order
+   6:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+  20:3  warning  Member 'Alert' of the import declaration should be sorted alphabetically                              sort-imports
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\teams-collaboration\activity-planner\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                         import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\teams-collaboration\my-teams\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                         import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\teams-collaboration\project-workspaces\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                         import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\teams-collaboration\team-builder\page.tsx
+  6:1  warning  `@/components/i18n/TranslatedText` import should occur after import of `@/app/konnected/KonnectedPageShell`  import/order
+  7:1  warning  There should be at least one empty line between import groups                                                import/order
+  7:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/konnected/KonnectedPageShell`         import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konsensus\activity-feed\ActivityFeedClient.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konsensus\dashboard\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                               import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ekoh/EkohPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konsensus\leaderboards\LeaderboardsClient.tsx
+  4:1  warning  `@/components/i18n/TranslatedText` import should occur after import of `react`  import/order
+  5:1  warning  There should be at least one empty line between import groups                   import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `react`         import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kontrol\KontrolPageShell.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kontrol\audit-log\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                     import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kontrol/KontrolPageShell`  import/order
 
 C:\mycode\Konnaxion\Konnaxion\frontend\app\kontrol\dashboard\page.tsx
-  22:3  warning  Member 'message' of the import declaration should be sorted alphabetically  sort-imports
+   3:1  warning  There should be at least one empty line between import groups                                     import/order
+   3:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kontrol/KontrolPageShell`  import/order
+  23:3  warning  Member 'message' of the import declaration should be sorted alphabetically                        sort-imports
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kontrol\konsensus\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                     import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kontrol/KontrolPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kontrol\moderation\community\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                     import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kontrol/KontrolPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kontrol\moderation\queue\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                     import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kontrol/KontrolPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kontrol\roles\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                     import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kontrol/KontrolPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kontrol\users\all\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                     import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kontrol/KontrolPageShell`  import/order
 
 C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\collaborative-spaces\find-spaces\page.tsx
-  8:30  warning  Member 'KreativeCollabSession' of the import declaration should be sorted alphabetically  sort-imports
+  3:1   warning  There should be at least one empty line between import groups                                       import/order
+  3:1   warning  `@/context/LanguageContext` import should occur after import of `@/app/kreative/kreativePageShell`  import/order
+  9:30  warning  Member 'KreativeCollabSession' of the import declaration should be sorted alphabetically            sort-imports
 
 C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\collaborative-spaces\my-spaces\page.tsx
-  8:30  warning  Member 'KreativeCollabSession' of the import declaration should be sorted alphabetically  sort-imports
-  9:28  warning  Member 'CurrentUser' of the import declaration should be sorted alphabetically            sort-imports
+   3:1   warning  There should be at least one empty line between import groups                                       import/order
+   3:1   warning  `@/context/LanguageContext` import should occur after import of `@/app/kreative/kreativePageShell`  import/order
+   9:30  warning  Member 'KreativeCollabSession' of the import declaration should be sorted alphabetically            sort-imports
+  10:28  warning  Member 'CurrentUser' of the import declaration should be sorted alphabetically                      sort-imports
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\collaborative-spaces\start-new-space\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                 import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/PageContainer`  import/order
 
 C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\community-showcases\featured-projects\page.tsx
-  7:3  warning  'Alert' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  5:1  warning  There should be at least one empty line between import groups                                       import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kreative/kreativePageShell`  import/order
+  8:3  warning  'Alert' is defined but never used. Allowed unused vars must match /^_/u                             @typescript-eslint/no-unused-vars
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\community-showcases\submit-to-showcase\page.tsx
+  3:1  warning  There should be at least one empty line between import groups                                       import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kreative/kreativePageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\community-showcases\top-creators\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                       import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kreative/kreativePageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\creative-hub\explore-ideas\page.tsx
+  6:1  warning  There should be at least one empty line between import groups                                       import/order
+  6:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kreative/kreativePageShell`  import/order
 
 C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\creative-hub\inspiration-gallery\page.tsx
-   8:32  warning  Member 'KreativeArtwork' of the import declaration should be sorted alphabetically                                                                                                                                                                                                       sort-imports
-  50:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-  79:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+   3:1   warning  There should be at least one empty line between import groups                                                                                                                                                                                                                            import/order
+   3:1   warning  `@/context/LanguageContext` import should occur after import of `@/app/kreative/kreativePageShell`                                                                                                                                                                                       import/order
+   9:32  warning  Member 'KreativeArtwork' of the import declaration should be sorted alphabetically                                                                                                                                                                                                       sort-imports
+  52:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  81:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
 C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\creative-hub\submit-creative-work\page.tsx
-  11:3  warning  Member 'antdMessage' of the import declaration should be sorted alphabetically  sort-imports
+   3:1  warning  There should be at least one empty line between import groups                                       import/order
+   3:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kreative/kreativePageShell`  import/order
+  12:3  warning  Member 'antdMessage' of the import declaration should be sorted alphabetically                      sort-imports
 
 C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\dashboard\page.tsx
-   28:3   warning  Member 'KreativeArtwork' of the import declaration should be sorted alphabetically                                                                                                                                                                                                       sort-imports
-  125:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-  188:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+    3:1   warning  There should be at least one empty line between import groups                                                                                                                                                                                                                            import/order
+    3:1   warning  `@/context/LanguageContext` import should occur after import of `@/app/kreative/kreativePageShell`                                                                                                                                                                                       import/order
+   29:3   warning  Member 'KreativeArtwork' of the import declaration should be sorted alphabetically                                                                                                                                                                                                       sort-imports
+  127:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  190:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\idea-incubator\collaborate-on-ideas\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                       import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kreative/kreativePageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\idea-incubator\create-new-idea\page.tsx
+  3:1  warning  There should be at least one empty line between import groups                                       import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kreative/kreativePageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\idea-incubator\my-ideas\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                       import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kreative/kreativePageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\mentorship\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                       import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kreative/kreativePageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\traditions-archive\page.tsx
+  3:1  warning  There should be at least one empty line between import groups                                       import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/kreative/kreativePageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\reports\custom\page.tsx
+  3:1  warning  `@/i18n/runtime` type import should occur after import of `recharts`        import/order
+  4:1  warning  There should be at least one empty line between import groups               import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `recharts`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\reports\page.tsx
+  3:1  warning  `@/i18n/runtime` type import should occur after import of `react`        import/order
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\reports\perf\page.tsx
+  3:1  warning  `@/i18n/runtime` type import should occur after import of `recharts`        import/order
+  4:1  warning  There should be at least one empty line between import groups               import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `recharts`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\reports\smart-vote\page.tsx
+  3:1  warning  There should be at least one empty line between import groups            import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\reports\usage\page.tsx
+  3:1  warning  `@/i18n/runtime` type import should occur after import of `@/api`        import/order
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/api`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\search\GlobalSearchClient.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\teambuilder\[sessionId]\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                                    import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/teambuilder/TeamBuilderPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\teambuilder\create\CreateSessionClient.tsx
+  4:1  warning  There should be at least one empty line between import groups                                                    import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/teambuilder/TeamBuilderPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\teambuilder\humans\conflicts\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/components/teambuilder/TeamBuilderPageShell`        import/order
+  5:1  warning  There should be at least one empty line between import groups                                                    import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/teambuilder/TeamBuilderPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\teambuilder\humans\constraints\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/components/teambuilder/TeamBuilderPageShell`        import/order
+  5:1  warning  There should be at least one empty line between import groups                                                    import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/teambuilder/TeamBuilderPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\teambuilder\humans\modes\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                                    import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/teambuilder/TeamBuilderPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\teambuilder\humans\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                                    import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/teambuilder/TeamBuilderPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\teambuilder\layout.tsx
+  4:1  warning  There should be at least one empty line between import groups                           import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/Loading`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\teambuilder\page.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
 
 C:\mycode\Konnaxion\Konnaxion\frontend\app\teambuilder\problems\[problemId]\page.tsx
-  89:11  warning  'IProblemDetailResponse' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   4:1   warning  There should be at least one empty line between import groups                                                    import/order
+   4:1   warning  `@/context/LanguageContext` import should occur after import of `@/components/teambuilder/TeamBuilderPageShell`  import/order
+  90:11  warning  'IProblemDetailResponse' is defined but never used. Allowed unused vars must match /^_/u                         @typescript-eslint/no-unused-vars
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\teambuilder\problems\create\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/components/teambuilder/TeamBuilderPageShell`        import/order
+  5:1  warning  There should be at least one empty line between import groups                                                    import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/teambuilder/TeamBuilderPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\teambuilder\problems\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                                    import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/teambuilder/TeamBuilderPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\teambuilder\problems\taxonomy\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                                    import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/teambuilder/TeamBuilderPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\TagsList.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\dashboard-components\CommentCard.tsx
+  10:1  warning  There should be at least one empty line between import groups            import/order
+  10:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\dashboard-components\LikeCard.tsx
+  5:1  warning  There should be at least one empty line between import groups            import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\dashboard-components\LineChart.tsx
+  5:1  warning  There should be at least one empty line between import groups               import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `recharts`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\dashboard-components\StatisticCard.tsx
+  5:1  warning  There should be at least one empty line between import groups                 import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after type import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\dashboard-components\UserCard.tsx
+  5:1  warning  There should be at least one empty line between import groups            import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\dashboard-components\UserPieChart.tsx
+  5:1  warning  There should be at least one empty line between import groups               import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `recharts`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\dashboard-components\VisitCard.tsx
+  10:1  warning  There should be at least one empty line between import groups                                    import/order
+  10:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/charts/ChartCard`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\dashboard-components\style.tsx
+  10:1  warning  There should be at least one empty line between import groups                        import/order
+  10:1  warning  `@/context/LanguageContext` import should occur after import of `styled-components`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\dashboard\TeamBuilderCard.tsx
+  5:1  warning  There should be at least one empty line between import groups            import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\map-components\ControlPanel.tsx
+  10:1  warning  There should be at least one empty line between import groups             import/order
+  11:1  warning  `react` import should occur before import of `@/context/LanguageContext`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\map-components\StaticMap.tsx
+  8:1  warning  There should be at least one empty line between import groups                   import/order
+  8:1  warning  `@/context/LanguageContext` import should occur after import of `react-map-gl`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\teambuilder\AlgorithmConfig.tsx
+  4:1  warning  There should be at least one empty line between import groups             import/order
+  5:1  warning  `react` import should occur before import of `@/context/LanguageContext`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\teambuilder\CandidateSelector.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\teambuilder\TeamBuilderPageShell.tsx
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`           import/order
+  5:1  warning  There should be at least one empty line between import groups                     import/order
+  5:1  warning  `@/i18n/runtime` type import should occur after import of `@/hooks/usePageTitle`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\teambuilder\TeamCard.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\user-components\UserComments.tsx
+  9:1  warning  There should be at least one empty line between import groups            import/order
+  9:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\user-components\UserLikes.tsx
+  11:1  warning  There should be at least one empty line between import groups            import/order
+  11:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\user-components\UserProfile.tsx
+  7:1  warning  There should be at least one empty line between import groups            import/order
+  7:1  warning  `@/context/LanguageContext` import should occur after import of `@/api`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\user-components\UserVisit.tsx
+  10:1  warning  There should be at least one empty line between import groups                 import/order
+  10:1  warning  `@/context/LanguageContext` import should occur after type import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\components\user-components\index.tsx
+  11:1  warning  There should be at least one empty line between import groups                                import/order
+  11:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/shared/utils`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\context\LanguageContext.tsx
+  26:3  warning  Member 'Language' of the import declaration should be sorted alphabetically  sort-imports
 
 C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx
   20:3  warning  Member 'withWorldPath' of the import declaration should be sorted alphabetically  sort-imports
+
+C:\mycode\Konnaxion\Konnaxion\frontend\features\ethikos\demo-importer\DemoImporterPanel.tsx
+  3:1  warning  There should be at least one empty line between import groups             import/order
+  4:1  warning  `react` import should occur before import of `@/context/LanguageContext`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\features\ethikos\demo-importer\ImportResultPanel.tsx
+  5:1  warning  There should be at least one empty line between import groups  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\features\ethikos\demo-importer\JsonScenarioEditor.tsx
+  3:1  warning  There should be at least one empty line between import groups             import/order
+  4:1  warning  `react` import should occur before import of `@/context/LanguageContext`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\account\UserSettings.tsx
+  5:1  warning  There should be at least one empty line between import groups            import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\admin\components\ModerationQueue.tsx
+  3:1  warning  There should be at least one empty line between import groups                                  import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `@/admin/hooks/useModeration`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\admin\components\UserStats.tsx
+  3:1  warning  There should be at least one empty line between import groups                             import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `@/admin/hooks/useStats`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\admin\pages\AdminConsole.tsx
+  3:1  warning  There should be at least one empty line between import groups                         import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `@/admin/components`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ekoh\components\EkohAccessNotice.tsx
+  4:1  warning  There should be at least one empty line between import groups                           import/order
+  4:1  warning  `@/context/LanguageContext` import should occur before type import of `@/i18n/runtime`  import/order
+  5:1  warning  `antd` import should occur before type import of `@/i18n/runtime`                       import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ekoh\components\EkohDomainRatings.tsx
+  3:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `antd` import should occur before import of `@/context/LanguageContext`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ekoh\components\EkohRatingDrawer.tsx
+  3:1  warning  There should be at least one empty line between import groups                 import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after type import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\ReputationProfile.tsx
+  5:1  warning  There should be at least one empty line between import groups            import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\admin\audit\page.tsx
+  5:1  warning  There should be at least one empty line between import groups           import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `antd`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\admin\moderation\page.tsx
+  4:1  warning  There should be at least one empty line between import groups           import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `antd`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\admin\roles\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                 import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after type import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\components\ArgumentSourcesPanel.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `react`        import/order
+  5:1  warning  There should be at least one empty line between import groups            import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\components\ArgumentTree.tsx
+  4:1  warning  `@/components/i18n/TranslatedText` import should occur after import of `react`  import/order
+  5:1  warning  There should be at least one empty line between import groups                   import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `react`         import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\components\DiscussionVisibilityPanel.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `react`        import/order
+  5:1  warning  There should be at least one empty line between import groups            import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\components\ImpactVoteControl.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\components\ParticipantRoleBadge.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\components\SuggestionQueue.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `react`        import/order
+  5:1  warning  There should be at least one empty line between import groups            import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\decide\elite\page.tsx
+  7:1  warning  There should be at least one empty line between import groups            import/order
+  7:1  warning  `@/context/LanguageContext` import should occur after import of `dayjs`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\decide\methodology\page.tsx
+  4:1  warning  There should be at least one empty line between import groups           import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `antd`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\decide\results\page.tsx
+  5:1  warning  There should be at least one empty line between import groups            import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\deliberate\[topic]\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                      import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `next/navigation`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\deliberate\elite\page.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\deliberate\guidelines\page.tsx
+  4:1  warning  There should be at least one empty line between import groups           import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `antd`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\impact\feedback\page.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\impact\outcomes\page.tsx
+  4:1  warning  There should be at least one empty line between import groups           import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `antd`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\impact\tracker\page.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\learn\changelog\page.tsx
+  4:1  warning  There should be at least one empty line between import groups           import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `antd`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\learn\glossary\page.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\learn\guides\page.tsx
+  4:1  warning  There should be at least one empty line between import groups           import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `antd`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\pulse\health\page.tsx
+  4:1  warning  There should be at least one empty line between import groups             import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `ahooks`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\pulse\live\page.tsx
+  4:1  warning  There should be at least one empty line between import groups                                    import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/charts/ChartCard`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\pulse\overview\page.tsx
+  5:1  warning  There should be at least one empty line between import groups                                    import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `@/components/charts/ChartCard`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\pulse\trends\page.tsx
+  4:1  warning  There should be at least one empty line between import groups           import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `antd`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\trust\badges\page.tsx
+  4:1  warning  `@/i18n/runtime` type import should occur after import of `@/hooks/usePageTitle`  import/order
+  5:1  warning  There should be at least one empty line between import groups                     import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `dayjs`           import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\trust\credentials\page.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\trust\profile\page.tsx
+  4:1  warning  There should be at least one empty line between import groups           import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `antd`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\global\components\AppShell.tsx
+  3:1  warning  There should be at least one empty line between import groups            import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\global\pages\MyWork.tsx
+  3:1  warning  There should be at least one empty line between import groups  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\insights\components\ExportCSVButton.tsx
+  3:1  warning  There should be at least one empty line between import groups           import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `antd`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\insights\components\LatencySLOGauge.tsx
+  3:1  warning  There should be at least one empty line between import groups                      import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `react-chartjs-2`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\insights\components\SmartVoteChart.tsx
+  3:1  warning  There should be at least one empty line between import groups                      import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `react-chartjs-2`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\insights\pages\CustomBuilderPage.tsx
+  3:1  warning  There should be at least one empty line between import groups            import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\insights\pages\InsightsHomePage.tsx
+  5:1  warning  There should be at least one empty line between import groups                 import/order
+  6:1  warning  `next/link` import should occur before import of `@/context/LanguageContext`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\insights\pages\SmartVoteDashboard.tsx
+  3:1  warning  There should be at least one empty line between import groups            import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\konsensus\components\PollBarChart.tsx
+  3:1  warning  There should be at least one empty line between import groups                      import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `react-chartjs-2`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\konsensus\pages\PollPage.tsx
+  3:1  warning  There should be at least one empty line between import groups            import/order
+  3:1  warning  `@/context/LanguageContext` import should occur after import of `@/api`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\konsultations\components\ConsultationForm.tsx
+  4:2  warning  There should be at least one empty line between import groups            import/order
+  5:1  warning  There should be at least one empty line between import groups            import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\konsultations\components\ConsultationList.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\konsultations\components\ConsultationVotePanel.tsx
+  6:1  warning  `@/i18n/runtime` type import should occur after import of `react`        import/order
+  7:1  warning  There should be at least one empty line between import groups            import/order
+  7:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\konsultations\components\ImpactTimeline.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `dayjs`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\konsultations\components\ResultsDashboard.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  5:1  warning  `antd` import should occur before import of `@/context/LanguageContext`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\konsultations\components\SuggestionBoard.tsx
+  5:1  warning  `@/components/i18n/TranslatedText` import should occur after import of `react`  import/order
+  6:1  warning  There should be at least one empty line between import groups                   import/order
+  6:1  warning  `@/context/LanguageContext` import should occur after import of `react`         import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\konsultations\components\SuggestionsBoard.tsx
+  5:1  warning  `@/i18n/runtime` type import should occur after import of `react`        import/order
+  6:1  warning  There should be at least one empty line between import groups            import/order
+  6:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\konsultations\hooks\useConsultation.ts
+   9:1  warning  There should be at least one empty line between import groups             import/order
+  10:1  warning  `react` import should occur before import of `@/context/LanguageContext`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\konsultations\hooks\useImpact.ts
+   9:1  warning  There should be no empty line within import group                         import/order
+  11:1  warning  `@/api` import should occur before import of `@/context/LanguageContext`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\konsultations\pages\ConsultationDetailPage.tsx
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ethikos/EthikosPageShell`  import/order
+  5:1  warning  There should be at least one empty line between import groups                                     import/order
+  5:1  warning  `@/i18n/uiModelLabels` import should occur after import of `@/app/ethikos/EthikosPageShell`       import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\konsultations\pages\ConsultationHub.tsx
+  4:1  warning  There should be at least one empty line between import groups           import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `antd`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\konsultations\pages\ConsultationsHomePage.tsx
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `next/link`        import/order
+  5:1  warning  There should be at least one empty line between import groups                      import/order
+  5:1  warning  `@/i18n/uiModelLabels` import should occur after import of `@/hooks/usePageTitle`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\konsultations\pages\ResultsPage.tsx
+  4:1  warning  There should be at least one empty line between import groups                               import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `@/app/ekoh/EkohPageShell`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\konsultations\pages\SuggestionPage.tsx
+  5:1  warning  There should be at least one empty line between import groups            import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\kontact\components\OpportunityList.tsx
+  5:1  warning  There should be at least one empty line between import groups            import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\kontact\components\ProfileCard.tsx
+  4:1  warning  There should be at least one empty line between import groups            import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\modules\kontact\pages\ConnectCenter.tsx
+  5:1  warning  There should be at least one empty line between import groups            import/order
+  5:1  warning  `@/context/LanguageContext` import should occur after import of `react`  import/order
 
 C:\mycode\Konnaxion\Konnaxion\frontend\scripts\capture-ethikos-v413-fullpage-v3.mjs
   1:1  warning  There should be at least one empty line between import groups  import/order
@@ -64,10 +971,15 @@ C:\mycode\Konnaxion\Konnaxion\frontend\scripts\extract-ui-translations.mjs
 C:\mycode\Konnaxion\Konnaxion\frontend\services\teambuilder\index.ts
   10:3  warning  Member 'ITeam' of the import declaration should be sorted alphabetically  sort-imports
 
+C:\mycode\Konnaxion\Konnaxion\frontend\shared\layout\MainLayout.tsx
+  3:1  warning  `@/components/i18n/TranslatedText` import should occur after import of `next/link`  import/order
+  4:1  warning  There should be at least one empty line between import groups                       import/order
+  4:1  warning  `@/context/LanguageContext` import should occur after import of `next/link`         import/order
+
 C:\mycode\Konnaxion\Konnaxion\frontend\tests\platform-harvest-wave2.spec.ts
   1:1  warning  There should be at least one empty line between import groups  import/order
 
-Ô£û 28 problems (0 errors, 28 warnings)
-  0 errors and 19 warnings potentially fixable with the `--fix` option.
+Ô£û 530 problems (0 errors, 530 warnings)
+  0 errors and 517 warnings potentially fixable with the `--fix` option.
 
 ESLint found too many warnings (maximum: 0).

@@ -1,6 +1,7 @@
 // app/kontrol/KontrolPageShell.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Grid, Space, Tag, Typography } from 'antd';
 import Head from 'next/head';
 import React, { type ReactNode } from 'react';
@@ -91,6 +92,7 @@ function KontrolPageShell({
   children,
   maxWidth = 1200,
 }: KontrolPageShellProps): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const screens = useBreakpoint();
   const hasActions = Boolean(primaryAction || secondaryActions);
 
@@ -118,13 +120,13 @@ function KontrolPageShell({
     if (scope === 'platform') {
       tags.push(
         <Tag key="scope-platform" color="blue">
-          Platform-wide
+          {i18nT("ui.kontrol.kontrolpageshell.platformWide")}
         </Tag>,
       );
     } else if (scope === 'module') {
       tags.push(
         <Tag key="scope-module" color="purple">
-          Module-specific
+          {i18nT("ui.kontrol.kontrolpageshell.moduleSpecific")}
         </Tag>,
       );
     }
@@ -132,7 +134,7 @@ function KontrolPageShell({
     if (moduleLabel) {
       tags.push(
         <Tag key="module-label" color="geekblue">
-          <Text strong>Module:</Text> {moduleLabel}
+          <Text strong>{i18nT("ui.kontrol.kontrolpageshell.module")}</Text> {moduleLabel}
         </Tag>,
       );
     }

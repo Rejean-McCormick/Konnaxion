@@ -1,6 +1,7 @@
 // FILE: frontend/modules/ethikos/pulse/trends/page.tsx
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Area, Heatmap, Line } from '@ant-design/plots';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
@@ -10,7 +11,8 @@ import usePageTitle from '@/hooks/usePageTitle';
 import { fetchPulseTrends } from '@/services/pulse';
 
 export default function PulseTrends() {
-  usePageTitle('Pulse · Trends');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.ethikos.pulse.trends.pulseTrends"));
 
   const { data, loading } = useRequest(fetchPulseTrends);
 

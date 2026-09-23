@@ -15,8 +15,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import api from '@/api';
+import LanguageToggle from '@/components/LanguageToggle';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 import WorldSwitcher from '@/components/worlds/WorldSwitcher';
+import { useLanguage } from '@/context/LanguageContext';
 import { useWorld } from '@/context/WorldContext';
 import { GlobalSearchBar } from '@/global/components';
 import {
@@ -73,6 +75,9 @@ const Crumb = styled(Breadcrumb)`
 const WorldSlot = styled.div`
   flex: 0 1 auto;
   min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;
 
 const HeaderBlock = styled.div`
@@ -212,6 +217,7 @@ export default function HeaderBar({
   selectedSidebar = '',
 }: Props) {
   const router = useRouter();
+  const { t } = useLanguage();
   const { appPath, href } = useWorld();
 
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
@@ -240,14 +246,14 @@ export default function HeaderBar({
   const accountMenuItems = useMemo<MenuProps['items']>(() => {
     if (currentUser) {
       return [
-        { key: 'profile', icon: <UserOutlined />, label: 'My profile' },
+        { key: 'profile', icon: <UserOutlined />, label: t('header.myProfile') },
         { type: 'divider' as const },
-        { key: 'logout', icon: <LogoutOutlined />, label: 'Sign out' },
+        { key: 'logout', icon: <LogoutOutlined />, label: t('header.signOut') },
       ];
     }
 
-    return [{ key: 'signin', icon: <LoginOutlined />, label: 'Sign in' }];
-  }, [currentUser]);
+    return [{ key: 'signin', icon: <LoginOutlined />, label: t('header.signIn') }];
+  }, [currentUser, t]);
 
   const handleAccountMenuClick: MenuProps['onClick'] = useCallback(
     ({ key }: AccountMenuClickEvent) => {
@@ -273,8 +279,8 @@ export default function HeaderBar({
     const normalizedSidebar = selectedSidebar.toLowerCase();
     const suite = isSuiteKey(normalizedSidebar) ? normalizedSidebar : null;
 
-    const root = {
-      name: suite ? SUITE_LABELS[suite] : 'Home',
+    const root: Route = {
+      name: suite ? SUITE_LABELS[suite] : t('common.home'),
       path: suite ? DEFAULT_ENTRY[suite] : '/',
     };
 
@@ -300,20 +306,26 @@ export default function HeaderBar({
           }}
           style={{ color: 'var(--ant-color-text)' }}
         >
-          {crumb.name}
+          {crumb.labelKey
+            ? t(crumb.labelKey, undefined, crumb.name)
+            : crumb.name}
         </Link>
       ) : (
-        <span style={{ color: 'var(--ant-color-text)' }}>{crumb.name}</span>
+        <span style={{ color: 'var(--ant-color-text)' }}>
+          {crumb.labelKey
+            ? t(crumb.labelKey, undefined, crumb.name)
+            : crumb.name}
+        </span>
       ),
     }));
-  }, [routes, appPath, selectedSidebar, href]);
+  }, [routes, appPath, selectedSidebar, href, t]);
 
   const displayName = useMemo(
     () =>
       (currentUser?.name && currentUser.name.trim()) ||
       currentUser?.username ||
-      'Account',
-    [currentUser],
+      t('common.account'),
+    [currentUser, t],
   );
 
   return (
@@ -344,13 +356,14 @@ export default function HeaderBar({
 
         <WorldSlot>
           <WorldSwitcher />
+          <LanguageToggle />
         </WorldSlot>
 
         <CenterRegion>
           <SearchWrapper>
             <GlobalSearchBar />
           </SearchWrapper>
-          <WidgetSlot aria-label="Header widget">
+          <WidgetSlot aria-label={t('header.widgetAria')}>
             <ActiveHeaderWidget />
           </WidgetSlot>
         </CenterRegion>
@@ -366,7 +379,7 @@ export default function HeaderBar({
                 style={{ marginRight: 8, color: 'var(--ant-color-text)' }}
               />
               <span className="k-account-name">
-                {loadingUser ? 'Loading…' : displayName}
+                {loadingUser ? t('common.loading') : displayName}
               </span>
             </HeaderBlock>
           </Dropdown>

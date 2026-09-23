@@ -1,6 +1,8 @@
 // FILE: frontend/components/teambuilder/TeamBuilderPageShell.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
+import type { TranslateFunction } from '@/i18n/runtime';
 import { Grid, Space, Typography } from 'antd';
 import Head from 'next/head';
 import { useSearchParams } from 'next/navigation';
@@ -44,18 +46,18 @@ export type TeamBuilderPageShellProps = {
  * Best-effort inference of the Team Builder section label
  * from the current ?context=… query parameter.
  */
-function inferSectionLabelFromQuery(
+function inferSectionLabelFromQuery(i18nT: TranslateFunction, 
   searchParams: ReturnType<typeof useSearchParams> | null,
 ): string | undefined {
   const ctx = searchParams?.get('context');
 
   switch (ctx) {
     case 'keenkonnect':
-      return 'Project Teams';
+      return i18nT("ui.teambuilder.teambuilderpageshell.projectTeams");
     case 'ethikos':
-      return 'Debate Panels';
+      return i18nT("ui.teambuilder.teambuilderpageshell.debatePanels");
     case 'kreative':
-      return 'Art Collectives';
+      return i18nT("ui.teambuilder.teambuilderpageshell.artCollectives");
     default:
       return undefined;
   }
@@ -74,10 +76,11 @@ function TeamBuilderPageShell({
   children,
   maxWidth = 1200,
 }: TeamBuilderPageShellProps): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const searchParams = useSearchParams();
   const screens = useBreakpoint();
 
-  const inferredSectionLabel = inferSectionLabelFromQuery(searchParams);
+  const inferredSectionLabel = inferSectionLabelFromQuery(i18nT, searchParams);
   const effectiveSectionLabel = sectionLabel ?? inferredSectionLabel;
 
   const hasActions = Boolean(primaryAction || secondaryActions);

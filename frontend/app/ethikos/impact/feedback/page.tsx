@@ -1,5 +1,7 @@
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   PageContainer,
   ProCard,
@@ -39,24 +41,25 @@ type FeedbackFormValues = {
   rating?: number;
 };
 
-function toFriendlyErrorMessage(error: unknown): string {
+function toFriendlyErrorMessage(i18nT: TranslateFunction, error: unknown): string {
   const rawMessage =
     error instanceof Error
       ? error.message
-      : 'Unable to submit feedback. Please try again.';
+      : i18nT("ui.ethikos.impact.feedback.unableToSubmitFeedback");
 
   if (
     typeof rawMessage === 'string' &&
     rawMessage.includes('NEXT_PUBLIC_ETHIKOS_FEEDBACK_TOPIC_ID')
   ) {
-    return 'The feedback channel is not configured yet. Please contact an administrator.';
+    return i18nT("ui.ethikos.impact.feedback.feedbackChannelNotConfigured");
   }
 
   return rawMessage;
 }
 
 export default function FeedbackLoops(): JSX.Element {
-  usePageTitle('Impact · Feedback');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.ethikos.impact.feedback.impactFeedback"));
 
   const { message } = App.useApp();
   const [form] = Form.useForm<FeedbackFormValues>();
@@ -88,25 +91,25 @@ export default function FeedbackLoops(): JSX.Element {
 
     return (
       <Space size="middle">
-        <Tag>{items.length} entries</Tag>
+        <Tag>{items.length} {i18nT("ui.ethikos.impact.feedback.entries")}</Tag>
 
         {typeof averageRating === 'number' && (
           <Space size={4}>
-            <Text type="secondary">Avg. rating</Text>
+            <Text type="secondary">{i18nT("ui.ethikos.impact.feedback.avgRating")}</Text>
             <Rate disabled allowHalf value={averageRating} />
             <Text type="secondary">{averageRating.toFixed(1)}/5</Text>
           </Space>
         )}
       </Space>
     );
-  }, [averageRating, items.length]);
+  }, [averageRating, items.length, i18nT]);
 
   const handleFinish = useCallback(
     async (values: FeedbackFormValues): Promise<boolean> => {
       const trimmed = values.body?.trim();
 
       if (!trimmed) {
-        message.warning('Please enter your feedback before submitting.');
+        message.warning(i18nT("ui.ethikos.impact.feedback.pleaseEnterYourFeedbackBeforeSubmitting"));
         return false;
       }
 
@@ -118,29 +121,27 @@ export default function FeedbackLoops(): JSX.Element {
 
         form.resetFields();
         await refresh();
-        message.success('Thanks, your feedback has been recorded.');
+        message.success(i18nT("ui.ethikos.impact.feedback.thanksYourFeedbackHasBeenRecorded"));
         return true;
       } catch (error) {
-        message.error(toFriendlyErrorMessage(error));
+        message.error(toFriendlyErrorMessage(i18nT, error));
         return false;
       }
     },
-    [form, message, refresh],
+    [form, message, refresh, i18nT],
   );
 
   return (
     <EthikosPageShell
-      title="Feedback loop"
-      sectionLabel="Impact"
-      subtitle="Share how Ethikos works (or doesn’t) for you. Feedback is stored as anonymised arguments on a dedicated topic."
+      title={i18nT("ui.ethikos.impact.feedback.feedbackLoop")}
+      sectionLabel={i18nT("ui.ethikos.impact.feedback.impact")}
+      subtitle={i18nT("ui.ethikos.impact.feedback.shareHowEthikosWorksOrDoesnT")}
     >
       <PageContainer ghost loading={loading}>
-        <ProCard title="Share your feedback" ghost>
+        <ProCard title={i18nT("ui.ethikos.impact.feedback.shareYourFeedback")} ghost>
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-              This channel closes the feedback loop for the Ethikos module. Tell
-              us what worked, what felt confusing, or what is missing. Please
-              avoid sharing personal or sensitive data.
+              {i18nT("ui.ethikos.impact.feedback.thisChannelClosesTheFeedbackLoopFor")}
             </Paragraph>
 
             <ProForm<FeedbackFormValues>
@@ -159,8 +160,7 @@ export default function FeedbackLoops(): JSX.Element {
                     }}
                   >
                     <Text type="secondary">
-                      Feedback becomes an anonymised argument in a dedicated
-                      Ethikos topic.
+                      {i18nT("ui.ethikos.impact.feedback.feedbackBecomesAnAnonymisedArgumentInA")}
                     </Text>
                     <Space>{dom}</Space>
                   </Space>
@@ -168,7 +168,7 @@ export default function FeedbackLoops(): JSX.Element {
               }}
             >
               <Form.Item
-                label="Overall experience"
+                label={i18nT("ui.ethikos.impact.feedback.overallExperience")}
                 name="rating"
                 valuePropName="value"
               >
@@ -177,13 +177,13 @@ export default function FeedbackLoops(): JSX.Element {
 
               <ProFormTextArea
                 name="body"
-                label="Your feedback"
-                placeholder="Share a concrete story, suggestion or pain point…"
+                label={i18nT("ui.ethikos.impact.feedback.yourFeedback")}
+                placeholder={i18nT("ui.ethikos.impact.feedback.shareAConcreteStorySuggestionOrPain")}
                 fieldProps={{ rows: 4, maxLength: 2000, showCount: true }}
                 rules={[
                   {
                     required: true,
-                    message: 'Please enter your feedback.',
+                    message: i18nT("ui.ethikos.impact.feedback.pleaseEnterYourFeedback"),
                   },
                   {
                     validator: async (_: unknown, value: string | undefined) => {
@@ -200,7 +200,7 @@ export default function FeedbackLoops(): JSX.Element {
         </ProCard>
 
         <ProCard
-          title="Community feedback"
+          title={i18nT("ui.ethikos.impact.feedback.communityFeedback")}
           ghost
           style={{ marginTop: 24 }}
           extra={feedbackExtra}
@@ -246,11 +246,11 @@ export default function FeedbackLoops(): JSX.Element {
               <Divider style={{ marginTop: 16, marginBottom: 0 }} />
 
               <Text type="secondary">
-                Older feedback is kept as part of the impact audit trail.
+                {i18nT("ui.ethikos.impact.feedback.olderFeedbackIsKeptAsPartOf")}
               </Text>
             </>
           ) : (
-            <Empty description="No feedback yet. Be the first to share how Ethikos works for you." />
+            <Empty description={i18nT("ui.ethikos.impact.feedback.noFeedbackYetBeTheFirstTo")} />
           )}
         </ProCard>
       </PageContainer>

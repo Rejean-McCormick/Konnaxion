@@ -1,6 +1,7 @@
 // FILE: frontend/app/kontrol/moderation/community/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ClockCircleOutlined,
   EllipsisOutlined,
@@ -104,6 +105,7 @@ const PREVIEW_COMMUNITIES: CommunityContext[] = [
 ];
 
 export default function CommunityModerationPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const actionRef = useRef<ActionType>();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -118,7 +120,7 @@ export default function CommunityModerationPage(): JSX.Element {
 
   const columns: ProColumns<CommunityContext>[] = [
     {
-      title: 'Context name',
+      title: i18nT("ui.kontrol.moderation.community.contextName"),
       dataIndex: 'name',
       copyable: true,
       render: (dom, entity) => (
@@ -149,19 +151,19 @@ export default function CommunityModerationPage(): JSX.Element {
       ),
     },
     {
-      title: 'Module',
+      title: i18nT("ui.kontrol.moderation.community.module"),
       dataIndex: 'module',
       valueType: 'select',
       valueEnum: {
-        Ethikos: { text: 'Ethikos' },
-        Ekoh: { text: 'Ekoh' },
-        Konnected: { text: 'Konnected' },
-        Kreative: { text: 'Kreative' },
+        Ethikos: { text: i18nT("ui.kontrol.moderation.community.ethikos") },
+        Ekoh: { text: i18nT("ui.kontrol.moderation.community.ekoh") },
+        Konnected: { text: i18nT("ui.kontrol.moderation.community.konnected") },
+        Kreative: { text: i18nT("ui.kontrol.moderation.community.kreative") },
       },
       width: 140,
     },
     {
-      title: 'Health (toxicity)',
+      title: i18nT("ui.kontrol.moderation.community.healthToxicity"),
       dataIndex: 'toxicityScore',
       sorter: (a, b) => a.toxicityScore - b.toxicityScore,
       width: 200,
@@ -187,20 +189,20 @@ export default function CommunityModerationPage(): JSX.Element {
               }
             >
               {entity.toxicityScore > 80
-                ? 'Critical'
+                ? i18nT("ui.kontrol.moderation.community.critical")
                 : entity.toxicityScore > 50
-                ? 'Heated'
-                : 'Healthy'}
+                ? i18nT("ui.kontrol.moderation.community.heated")
+                : i18nT("ui.kontrol.moderation.community.healthy")}
             </Text>
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Higher score = more reported toxicity
+              {i18nT("ui.kontrol.moderation.community.higherScoreMoreReportedToxicity")}
             </Text>
           </Space>
         </Space>
       ),
     },
     {
-      title: 'Active flags',
+      title: i18nT("ui.kontrol.moderation.community.activeFlags"),
       dataIndex: 'openFlags',
       sorter: (a, b) => a.openFlags - b.openFlags,
       render: (val) => (
@@ -208,21 +210,21 @@ export default function CommunityModerationPage(): JSX.Element {
           color={Number(val) > 10 ? 'red' : 'default'}
           icon={<WarningOutlined />}
         >
-          {val} open
+          {val} {i18nT("ui.kontrol.moderation.community.open")}
         </Tag>
       ),
     },
     {
-      title: 'Status',
+      title: i18nT("ui.kontrol.moderation.community.status"),
       dataIndex: 'status',
       valueEnum: {
-        active: { text: 'Active', status: 'Success' },
-        locked: { text: 'Locked', status: 'Error' },
-        archived: { text: 'Archived', status: 'Default' },
+        active: { text: i18nT("ui.kontrol.moderation.community.active"), status: 'Success' },
+        locked: { text: i18nT("ui.kontrol.moderation.community.locked"), status: 'Error' },
+        archived: { text: i18nT("ui.kontrol.moderation.community.archived"), status: 'Default' },
       },
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.kontrol.moderation.community.actions"),
       valueType: 'option',
       width: 80,
       render: (_, record) => (
@@ -231,13 +233,13 @@ export default function CommunityModerationPage(): JSX.Element {
             items: [
               {
                 key: 'manage',
-                label: 'Manage context',
+                label: i18nT("ui.kontrol.moderation.community.manageContext"),
                 icon: <SafetyCertificateOutlined />,
                 onClick: () => handleOpenDrawer(record),
               },
               {
                 key: 'history',
-                label: 'View logs',
+                label: i18nT("ui.kontrol.moderation.community.viewLogs"),
                 icon: <ClockCircleOutlined />,
               },
               { type: 'divider' as const },
@@ -245,8 +247,8 @@ export default function CommunityModerationPage(): JSX.Element {
                 key: 'lock',
                 label:
                   record.status === 'locked'
-                    ? 'Unlock'
-                    : 'Lock thread',
+                    ? i18nT("ui.kontrol.moderation.community.unlock")
+                    : i18nT("ui.kontrol.moderation.community.lockThread"),
                 icon: <LockOutlined />,
                 danger: record.status !== 'locked',
               },
@@ -263,33 +265,32 @@ export default function CommunityModerationPage(): JSX.Element {
     },
   ];
 
-  const title = 'Community moderation';
+  const title = i18nT("ui.kontrol.moderation.community.communityModeration");
   const subtitle = (
     <>
-      Cross-module view of communities (Ethikos, Ekoh, Konnected,
-      Kreative) managed from Kontrol.
+      {i18nT("ui.kontrol.moderation.community.crossModuleViewOfCommunitiesEthikosEkoh")}
     </>
   );
 
   const primaryAction = (
-    <Button key="create" type="primary" disabled title="No community-moderation write contract is exposed.">
-      New report unavailable
+    <Button key="create" type="primary" disabled title={i18nT("ui.kontrol.moderation.community.noCommunityModerationWriteContractIsExposed")}>
+      {i18nT("ui.kontrol.moderation.community.newReportUnavailable")}
     </Button>
   );
 
   const secondaryActions = (
     <Space wrap>
       <Tag key="scope-platform" color="blue">
-        Moderation · cross-module
+        {i18nT("ui.kontrol.moderation.community.moderationCrossModule")}
       </Tag>
       <Tag key="scope-impact" color="geekblue">
-        Actions apply per context
+        {i18nT("ui.kontrol.moderation.community.actionsApplyPerContext")}
       </Tag>
       <Button
         key="refresh"
         onClick={() => actionRef.current?.reload()}
       >
-        Refresh metrics
+        {i18nT("ui.kontrol.moderation.community.refreshMetrics")}
       </Button>
     </Space>
   );
@@ -299,7 +300,7 @@ export default function CommunityModerationPage(): JSX.Element {
       title={title}
       subtitle={subtitle}
       scope="platform"
-      metaTitle="Kontrol · Platform · Community moderation"
+      metaTitle={i18nT("ui.kontrol.moderation.community.kontrolPlatformCommunityModeration")}
       primaryAction={primaryAction}
       secondaryActions={secondaryActions}
       maxWidth={1200}
@@ -308,8 +309,8 @@ export default function CommunityModerationPage(): JSX.Element {
         <Alert
           type="info"
           showIcon
-          message="Community moderation preview"
-          description="This cross-module moderation view uses declared preview data. No community-level moderation mutation contract is exposed, so lock, flag-clear, moderator assignment and freeze controls are read-only."
+          message={i18nT("ui.kontrol.moderation.community.communityModerationPreview")}
+          description={i18nT("ui.kontrol.moderation.community.thisCrossModuleModerationViewUsesDeclared")}
           style={{ marginBottom: 16 }}
         />
         <ProTable<CommunityContext>
@@ -333,10 +334,10 @@ export default function CommunityModerationPage(): JSX.Element {
             },
           }}
           pagination={{ pageSize: 10 }}
-          headerTitle="Context health monitor"
+          headerTitle={i18nT("ui.kontrol.moderation.community.contextHealthMonitor")}
           toolBarRender={() => [
             <Button key="filter" icon={<FireOutlined />}>
-              High toxicity only
+              {i18nT("ui.kontrol.moderation.community.highToxicityOnly")}
             </Button>,
           ]}
         />
@@ -351,8 +352,8 @@ export default function CommunityModerationPage(): JSX.Element {
           }}
           title={
             currentContext
-              ? `Manage: ${currentContext.name}`
-              : 'Context manager'
+              ? i18nT("ui.kontrol.moderation.community.manage", { name: currentContext.name })
+              : i18nT("ui.kontrol.moderation.community.contextManager")
           }
         >
           {currentContext && (
@@ -364,19 +365,19 @@ export default function CommunityModerationPage(): JSX.Element {
               {/* Scope / module context */}
               <Space>
                 <Tag color="blue">
-                  Module: {currentContext.module}
+                  {i18nT("ui.kontrol.moderation.community.module_d60cea")} {currentContext.module}
                 </Tag>
                 <Tag>{currentContext.type}</Tag>
                 <Tag color="geekblue">
-                  Scope: this community only
+                  {i18nT("ui.kontrol.moderation.community.scopeThisCommunityOnly")}
                 </Tag>
               </Space>
 
               {/* Health Banner */}
               {currentContext.toxicityScore > 70 && (
                 <Alert
-                  message="High toxicity detected"
-                  description="This context has an unusually high rate of reported content. Consider enabling Slow Mode or assigning temporary moderators."
+                  message={i18nT("ui.kontrol.moderation.community.highToxicityDetected")}
+                  description={i18nT("ui.kontrol.moderation.community.thisContextHasAnUnusuallyHighRate")}
                   type="error"
                   showIcon
                 />
@@ -384,7 +385,7 @@ export default function CommunityModerationPage(): JSX.Element {
 
               {/* Quick Controls */}
               <ProCard
-                title="Governance controls"
+                title={i18nT("ui.kontrol.moderation.community.governanceControls")}
                 bordered
                 headerBordered
               >
@@ -399,7 +400,7 @@ export default function CommunityModerationPage(): JSX.Element {
                     }}
                   >
                     <Text>
-                      <LockOutlined /> Lock context (read-only)
+                      <LockOutlined /> {i18nT("ui.kontrol.moderation.community.lockContextReadOnly")}
                     </Text>
                     <Switch
                       checked={currentContext.status === 'locked'}
@@ -413,8 +414,7 @@ export default function CommunityModerationPage(): JSX.Element {
                     }}
                   >
                     <Text>
-                      <ClockCircleOutlined /> Slow mode (1
-                      post/10m)
+                      <ClockCircleOutlined /> {i18nT("ui.kontrol.moderation.community.slowMode1Post10m")}
                     </Text>
                     <Switch disabled />
                   </div>
@@ -425,8 +425,7 @@ export default function CommunityModerationPage(): JSX.Element {
                     }}
                   >
                     <Text>
-                      <StopOutlined /> Require approval for new
-                      users
+                      <StopOutlined /> {i18nT("ui.kontrol.moderation.community.requireApprovalForNewUsers")}
                     </Text>
                     <Switch defaultChecked disabled />
                   </div>
@@ -435,33 +434,33 @@ export default function CommunityModerationPage(): JSX.Element {
 
               {/* Metrics */}
               <Descriptions
-                title="Live metrics"
+                title={i18nT("ui.kontrol.moderation.community.liveMetrics")}
                 bordered
                 size="small"
                 column={2}
               >
-                <Descriptions.Item label="Active users">
+                <Descriptions.Item label={i18nT("ui.kontrol.moderation.community.activeUsers")}>
                   {currentContext.activeUsers}
                 </Descriptions.Item>
-                <Descriptions.Item label="Open flags">
+                <Descriptions.Item label={i18nT("ui.kontrol.moderation.community.openFlags")}>
                   {currentContext.openFlags}
                 </Descriptions.Item>
-                <Descriptions.Item label="Last activity">
+                <Descriptions.Item label={i18nT("ui.kontrol.moderation.community.lastActivity")}>
                   {currentContext.lastActivity}
                 </Descriptions.Item>
-                <Descriptions.Item label="Total comments">
+                <Descriptions.Item label={i18nT("ui.kontrol.moderation.community.totalComments")}>
                   8,921
                 </Descriptions.Item>
               </Descriptions>
 
               {/* Moderators List */}
               <List
-                header={<Text strong>Assigned moderators</Text>}
+                header={<Text strong>{i18nT("ui.kontrol.moderation.community.assignedModerators")}</Text>}
                 bordered
                 dataSource={currentContext.moderators}
                 renderItem={(item) => (
                   <List.Item
-                    actions={[<Text key="remove" type="secondary">Read-only</Text>]}
+                    actions={[<Text key="remove" type="secondary">{i18nT("ui.kontrol.moderation.community.readOnly")}</Text>]}
                   >
                     <Space>
                       <Avatar
@@ -479,7 +478,7 @@ export default function CommunityModerationPage(): JSX.Element {
                     icon={<TeamOutlined />}
                     disabled
                   >
-                    Assign moderator unavailable
+                    {i18nT("ui.kontrol.moderation.community.assignModeratorUnavailable")}
                   </Button>
                 }
               />
@@ -492,7 +491,7 @@ export default function CommunityModerationPage(): JSX.Element {
                 icon={<StopOutlined />}
                 disabled
               >
-                Emergency freeze unavailable
+                {i18nT("ui.kontrol.moderation.community.emergencyFreezeUnavailable")}
               </Button>
             </Space>
           )}

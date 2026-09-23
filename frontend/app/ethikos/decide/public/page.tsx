@@ -1,6 +1,8 @@
 // FILE: frontend/app/ethikos/decide/public/page.tsx
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   BarChartOutlined,
   CheckCircleOutlined,
@@ -90,14 +92,14 @@ function isClosingSoon(closesAt?: string | null): boolean {
   return closes.diff(dayjs(), 'hour') <= CLOSING_SOON_HOURS;
 }
 
-function formatCloseDate(closesAt?: string | null): string {
+function formatCloseDate(i18nT: TranslateFunction, closesAt?: string | null): string {
   if (!closesAt) {
-    return 'Date unavailable';
+    return i18nT("ui.ethikos.decide.public.dateUnavailable");
   }
 
   const closes = dayjs(closesAt);
 
-  return closes.isValid() ? closes.format('YYYY-MM-DD HH:mm') : 'Date unavailable';
+  return closes.isValid() ? closes.format('YYYY-MM-DD HH:mm') : i18nT('ui.ethikos.decide.public.dateUnavailable');
 }
 
 function turnoutPercent(turnout?: number | null): number {
@@ -108,27 +110,28 @@ function turnoutPercent(turnout?: number | null): number {
   return Math.max(0, Math.min(100, Math.round(turnout)));
 }
 
-function ballotStatus(ballot: BallotRow): {
+function ballotStatus(i18nT: TranslateFunction, ballot: BallotRow): {
   label: string;
   color?: string;
   icon?: React.ReactNode;
 } {
   if (isClosingSoon(ballot.closesAt)) {
     return {
-      label: 'Closing soon',
+      label: i18nT('ui.ethikos.decide.public.closingSoon'),
       color: 'volcano',
       icon: <ClockCircleOutlined />,
     };
   }
 
   return {
-    label: 'Open',
+    label: i18nT('ui.ethikos.decide.public.open'),
     color: 'green',
     icon: <CheckCircleOutlined />,
   };
 }
 
 export default function PublicVotingPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const { message } = App.useApp();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -166,12 +169,12 @@ export default function PublicVotingPage(): JSX.Element {
     ).length;
 
     return [
-      { label: 'Open consultations', value: total },
-      { label: 'Average participation', value: avgTurnout, suffix: '%' },
-      { label: 'Closing soon', value: closingSoon },
-      { label: 'High participation', value: highParticipation },
+      { label: i18nT("ui.ethikos.decide.public.openConsultations"), value: total },
+      { label: i18nT("ui.ethikos.decide.public.averageParticipation"), value: avgTurnout, suffix: '%' },
+      { label: i18nT("ui.ethikos.decide.public.closingSoon"), value: closingSoon },
+      { label: i18nT("ui.ethikos.decide.public.highParticipation"), value: highParticipation },
     ];
-  }, [ballots]);
+  }, [ballots, i18nT]);
 
   const filteredBallots = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
@@ -212,7 +215,7 @@ export default function PublicVotingPage(): JSX.Element {
       const option = selectedOptions[id];
 
       if (!option) {
-        message.warning('Choose your stance before casting your vote.');
+        message.warning(i18nT("ui.ethikos.decide.public.chooseYourStanceBeforeCastingYourVote"));
         return;
       }
 
@@ -221,26 +224,26 @@ export default function PublicVotingPage(): JSX.Element {
 
         await submitPublicVote(id, option);
 
-        message.success('Your vote has been recorded.');
+        message.success(i18nT("ui.ethikos.decide.public.yourVoteHasBeenRecorded"));
         refresh();
       } catch {
-        message.error('Failed to submit your vote. Please try again.');
+        message.error(i18nT("ui.ethikos.decide.public.failedToSubmitYourVotePleaseTry"));
       } finally {
         setSubmittingId(null);
       }
     },
-    [message, refresh, selectedOptions],
+    [message, refresh, selectedOptions, i18nT],
   );
 
   const columns = useMemo<ProColumns<BallotRow>[]>(
     () => [
       {
-        title: 'Consultation',
+        title: i18nT("ui.ethikos.decide.public.consultation"),
         dataIndex: 'title',
         width: 340,
         ellipsis: true,
         render: (_dom, row) => {
-          const status = ballotStatus(row);
+          const status = ballotStatus(i18nT, row);
 
           return (
             <Space direction="vertical" size={4}>
@@ -250,7 +253,7 @@ export default function PublicVotingPage(): JSX.Element {
                   {status.label}
                 </Tag>
                 <Tag icon={<ClockCircleOutlined />}>
-                  Closes {formatCloseDate(row.closesAt)}
+                  {i18nT("ui.ethikos.decide.public.closes")} {formatCloseDate(i18nT, row.closesAt)}
                 </Tag>
               </Space>
             </Space>
@@ -258,7 +261,7 @@ export default function PublicVotingPage(): JSX.Element {
         },
       },
       {
-        title: 'Your vote',
+        title: i18nT("ui.ethikos.decide.public.yourVote"),
         dataIndex: 'id',
         width: 480,
         render: (_dom, row) => {
@@ -267,7 +270,7 @@ export default function PublicVotingPage(): JSX.Element {
           const selected = selectedOptions[id];
 
           if (options.length === 0) {
-            return <Tag color="default">No voting options configured</Tag>;
+            return <Tag color="default">{i18nT("ui.ethikos.decide.public.noVotingOptionsConfigured")}</Tag>;
           }
 
           return (
@@ -286,7 +289,7 @@ export default function PublicVotingPage(): JSX.Element {
 
               <Space size="small" wrap>
                 <Tag color={selected ? 'geekblue' : 'default'}>
-                  {selected ? `Selected: ${selected}` : 'No vote yet'}
+                  {selected ? i18nT("ui.ethikos.decide.public.selected", { selected: selected }) : i18nT("ui.ethikos.decide.public.noVoteYet")}
                 </Tag>
 
                 <Button
@@ -297,7 +300,7 @@ export default function PublicVotingPage(): JSX.Element {
                   disabled={!selected || submittingId === id}
                   onClick={() => handleSubmitVote(id)}
                 >
-                  Cast vote
+                  {i18nT("ui.ethikos.decide.public.castVote")}
                 </Button>
               </Space>
             </Space>
@@ -305,7 +308,7 @@ export default function PublicVotingPage(): JSX.Element {
         },
       },
       {
-        title: 'Participation',
+        title: i18nT("ui.ethikos.decide.public.participation"),
         dataIndex: 'turnout',
         width: 180,
         render: (_dom, row) => {
@@ -320,26 +323,26 @@ export default function PublicVotingPage(): JSX.Element {
                   percent >= HIGH_TURNOUT_THRESHOLD ? 'success' : 'normal'
                 }
               />
-              <Text type="secondary">{percent}% turnout</Text>
+              <Text type="secondary">{percent}{i18nT("ui.ethikos.decide.public.turnout")}</Text>
             </Space>
           );
         },
       },
       {
-        title: 'Next',
+        title: i18nT("ui.ethikos.decide.public.next"),
         key: 'actions',
         width: 180,
         render: (_dom, row) => (
           <Space direction="vertical" size={4}>
             <Link href={`/ethikos/deliberate/${row.id}?sidebar=ethikos`} prefetch={false}>
               <Button size="small" icon={<FileTextOutlined />}>
-                View debate
+                {i18nT("ui.ethikos.decide.public.viewDebate")}
               </Button>
             </Link>
 
             <Link href="/ethikos/decide/results?sidebar=ethikos" prefetch={false}>
               <Button size="small" type="link">
-                Results
+                {i18nT("ui.ethikos.decide.public.results")}
               </Button>
             </Link>
           </Space>
@@ -350,35 +353,33 @@ export default function PublicVotingPage(): JSX.Element {
       handleRadioChange,
       handleSubmitVote,
       selectedOptions,
-      submittingId,
+      submittingId,, i18nT
     ],
   );
 
   return (
     <EthikosPageShell
-      sectionLabel="Decide"
-      title="Public consultations"
+      sectionLabel={i18nT("ui.ethikos.decide.public.decide")}
+      title={i18nT("ui.ethikos.decide.public.publicConsultations")}
       subtitle={
         <span>
-          Review active public decisions, choose your stance, and cast a vote.
-          The raw result remains visible, and any enriched reading must be
-          explained separately.
+          {i18nT("ui.ethikos.decide.public.reviewActivePublicDecisionsChooseYourStance")}
         </span>
       }
       primaryAction={
         <Link href="/ethikos/decide/results?sidebar=ethikos" prefetch={false}>
           <Button type="primary" icon={<BarChartOutlined />}>
-            Open results
+            {i18nT("ui.ethikos.decide.public.openResults")}
           </Button>
         </Link>
       }
       secondaryActions={
         <Space>
           <Link href="/ethikos/decide/methodology?sidebar=ethikos" prefetch={false}>
-            <Button icon={<InfoCircleOutlined />}>Methodology</Button>
+            <Button icon={<InfoCircleOutlined />}>{i18nT("ui.ethikos.decide.public.methodology")}</Button>
           </Link>
           <Link href="/ethikos/decide/elite?sidebar=ethikos" prefetch={false}>
-            <Button>Expert decisions</Button>
+            <Button>{i18nT("ui.ethikos.decide.public.expertDecisions")}</Button>
           </Link>
         </Space>
       }
@@ -388,12 +389,10 @@ export default function PublicVotingPage(): JSX.Element {
           <Alert
             type="info"
             showIcon
-            message="Vote first, interpret later"
+            message={i18nT("ui.ethikos.decide.public.voteFirstInterpretLater")}
             description={
               <span>
-                This page records your vote on open public consultations.
-                Results are reviewed in Decide · Results, where baseline results
-                and declared Smart Vote readings should remain clearly separated.
+                {i18nT("ui.ethikos.decide.public.thisPageRecordsYourVoteOnOpen")}
               </span>
             }
           />
@@ -413,17 +412,16 @@ export default function PublicVotingPage(): JSX.Element {
           </ProCard>
 
           <ProCard
-            title="Choose a consultation"
+            title={i18nT("ui.ethikos.decide.public.chooseAConsultation")}
             extra={
               <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                Find an open consultation, review the question, then cast your
-                stance.
+                {i18nT("ui.ethikos.decide.public.findAnOpenConsultationReviewTheQuestion")}
               </Paragraph>
             }
           >
             <Space wrap>
               <Input.Search
-                placeholder="Search consultations…"
+                placeholder={i18nT("ui.ethikos.decide.public.searchConsultations")}
                 allowClear
                 style={{ width: 280 }}
                 value={searchTerm}
@@ -437,21 +435,21 @@ export default function PublicVotingPage(): JSX.Element {
                   setQuickFilter(event.target.value as QuickFilter)
                 }
               >
-                <Radio.Button value="all">All</Radio.Button>
-                <Radio.Button value="closing-soon">Closing soon</Radio.Button>
+                <Radio.Button value="all">{i18nT("ui.ethikos.decide.public.all")}</Radio.Button>
+                <Radio.Button value="closing-soon">{i18nT("ui.ethikos.decide.public.closingSoon")}</Radio.Button>
                 <Radio.Button value="high-turnout">
-                  High participation
+                  {i18nT("ui.ethikos.decide.public.highParticipation")}
                 </Radio.Button>
               </Radio.Group>
 
-              <Tooltip title="Refresh open consultations">
+              <Tooltip title={i18nT("ui.ethikos.decide.public.refreshOpenConsultations")}>
                 <Button
                   size="small"
                   icon={<SyncOutlined />}
                   onClick={() => refresh()}
                   loading={loading}
                 >
-                  Refresh
+                  {i18nT("ui.ethikos.decide.public.refresh")}
                 </Button>
               </Tooltip>
             </Space>
@@ -462,8 +460,8 @@ export default function PublicVotingPage(): JSX.Element {
               image={Empty.PRESENTED_IMAGE_SIMPLE}
               description={
                 ballots.length === 0
-                  ? 'No open public consultations right now.'
-                  : 'No consultations match your search or filters.'
+                  ? i18nT("ui.ethikos.decide.public.noOpenPublicConsultationsRightNow")
+                  : i18nT("ui.ethikos.decide.public.noConsultationsMatchYourSearchOrFilters")
               }
             />
           ) : (
@@ -478,22 +476,21 @@ export default function PublicVotingPage(): JSX.Element {
             />
           )}
 
-          <ProCard title="After voting">
+          <ProCard title={i18nT("ui.ethikos.decide.public.afterVoting")}>
             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
               <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                After a consultation closes, the result should stay traceable:
-                raw vote first, then any declared reading, then impact tracking.
+                {i18nT("ui.ethikos.decide.public.afterAConsultationClosesTheResultShould")}
               </Paragraph>
 
               <Space wrap>
                 <Link href="/ethikos/decide/results?sidebar=ethikos" prefetch={false}>
-                  <Button icon={<BarChartOutlined />}>Read results</Button>
+                  <Button icon={<BarChartOutlined />}>{i18nT("ui.ethikos.decide.public.readResults")}</Button>
                 </Link>
                 <Link href="/ethikos/impact/tracker?sidebar=ethikos" prefetch={false}>
-                  <Button>Track impact</Button>
+                  <Button>{i18nT("ui.ethikos.decide.public.trackImpact")}</Button>
                 </Link>
                 <Link href="/ethikos/learn/guides?sidebar=ethikos" prefetch={false}>
-                  <Button>How decisions work</Button>
+                  <Button>{i18nT("ui.ethikos.decide.public.howDecisionsWork")}</Button>
                 </Link>
               </Space>
             </Space>

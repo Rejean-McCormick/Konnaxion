@@ -1,5 +1,7 @@
 'use client';
 
+import type { TranslateFunction } from '@/i18n/runtime';
+import { useLanguage } from '@/context/LanguageContext';
 import { FileTextOutlined, FolderOpenOutlined } from '@ant-design/icons';
 import { type ProColumns, ProTable } from '@ant-design/pro-components';
 import { Alert, Card, Col, Input, Row, Select, Space, Tag, Tree, Typography } from 'antd';
@@ -42,73 +44,73 @@ type StatusFilter = 'all' | Status;
 /**
  * Arborescence du dépôt : domaine -> type de ressource
  */
-const treeData: DataNode[] = [
+const treeData = (i18nT: TranslateFunction): DataNode[] => ([
   {
     key: 'all' as TreeKey,
-    title: 'Tous les contenus',
+    title: i18nT("ui.keenkonnect.knowledge.browseRepository.tousLesContenus"),
     icon: <FolderOpenOutlined />,
   },
   {
-    key: 'Robotics' as TreeKey,
-    title: 'Robotics',
+    key: i18nT("ui.keenkonnect.knowledge.browseRepository.robotics") as TreeKey,
+    title: i18nT("ui.keenkonnect.knowledge.browseRepository.robotics"),
     icon: <FolderOpenOutlined />,
     children: [
-      { key: 'Robotics|Blueprint' as TreeKey, title: 'Blueprints', icon: <FileTextOutlined /> },
-      { key: 'Robotics|Protocol' as TreeKey, title: 'Protocols', icon: <FileTextOutlined /> },
-      { key: 'Robotics|Case Study' as TreeKey, title: 'Case Studies', icon: <FileTextOutlined /> },
-      { key: 'Robotics|Toolkit' as TreeKey, title: 'Toolkits', icon: <FileTextOutlined /> },
+      { key: 'Robotics|Blueprint' as TreeKey, title: i18nT("ui.keenkonnect.knowledge.browseRepository.blueprints"), icon: <FileTextOutlined /> },
+      { key: 'Robotics|Protocol' as TreeKey, title: i18nT("ui.keenkonnect.knowledge.browseRepository.protocols"), icon: <FileTextOutlined /> },
+      { key: 'Robotics|Case Study' as TreeKey, title: i18nT("ui.keenkonnect.knowledge.browseRepository.caseStudies"), icon: <FileTextOutlined /> },
+      { key: 'Robotics|Toolkit' as TreeKey, title: i18nT("ui.keenkonnect.knowledge.browseRepository.toolkits"), icon: <FileTextOutlined /> },
     ],
   },
   {
-    key: 'Healthcare' as TreeKey,
-    title: 'Healthcare',
+    key: i18nT("ui.keenkonnect.knowledge.browseRepository.healthcare") as TreeKey,
+    title: i18nT("ui.keenkonnect.knowledge.browseRepository.healthcare"),
     icon: <FolderOpenOutlined />,
     children: [
-      { key: 'Healthcare|Blueprint' as TreeKey, title: 'Blueprints', icon: <FileTextOutlined /> },
-      { key: 'Healthcare|Protocol' as TreeKey, title: 'Protocols', icon: <FileTextOutlined /> },
-      { key: 'Healthcare|Case Study' as TreeKey, title: 'Case Studies', icon: <FileTextOutlined /> },
-      { key: 'Healthcare|Toolkit' as TreeKey, title: 'Toolkits', icon: <FileTextOutlined /> },
+      { key: 'Healthcare|Blueprint' as TreeKey, title: i18nT("ui.keenkonnect.knowledge.browseRepository.blueprints"), icon: <FileTextOutlined /> },
+      { key: 'Healthcare|Protocol' as TreeKey, title: i18nT("ui.keenkonnect.knowledge.browseRepository.protocols"), icon: <FileTextOutlined /> },
+      { key: 'Healthcare|Case Study' as TreeKey, title: i18nT("ui.keenkonnect.knowledge.browseRepository.caseStudies"), icon: <FileTextOutlined /> },
+      { key: 'Healthcare|Toolkit' as TreeKey, title: i18nT("ui.keenkonnect.knowledge.browseRepository.toolkits"), icon: <FileTextOutlined /> },
     ],
   },
   {
-    key: 'Education' as TreeKey,
-    title: 'Education',
+    key: i18nT("ui.keenkonnect.knowledge.browseRepository.education") as TreeKey,
+    title: i18nT("ui.keenkonnect.knowledge.browseRepository.education"),
     icon: <FolderOpenOutlined />,
     children: [
-      { key: 'Education|Blueprint' as TreeKey, title: 'Blueprints', icon: <FileTextOutlined /> },
-      { key: 'Education|Protocol' as TreeKey, title: 'Protocols', icon: <FileTextOutlined /> },
-      { key: 'Education|Case Study' as TreeKey, title: 'Case Studies', icon: <FileTextOutlined /> },
-      { key: 'Education|Toolkit' as TreeKey, title: 'Toolkits', icon: <FileTextOutlined /> },
+      { key: 'Education|Blueprint' as TreeKey, title: i18nT("ui.keenkonnect.knowledge.browseRepository.blueprints"), icon: <FileTextOutlined /> },
+      { key: 'Education|Protocol' as TreeKey, title: i18nT("ui.keenkonnect.knowledge.browseRepository.protocols"), icon: <FileTextOutlined /> },
+      { key: 'Education|Case Study' as TreeKey, title: i18nT("ui.keenkonnect.knowledge.browseRepository.caseStudies"), icon: <FileTextOutlined /> },
+      { key: 'Education|Toolkit' as TreeKey, title: i18nT("ui.keenkonnect.knowledge.browseRepository.toolkits"), icon: <FileTextOutlined /> },
     ],
   },
   {
-    key: 'Civic Engagement' as TreeKey,
-    title: 'Civic Engagement',
+    key: i18nT("ui.keenkonnect.knowledge.browseRepository.civicEngagement") as TreeKey,
+    title: i18nT("ui.keenkonnect.knowledge.browseRepository.civicEngagement"),
     icon: <FolderOpenOutlined />,
     children: [
       {
         key: 'Civic Engagement|Blueprint' as TreeKey,
-        title: 'Blueprints',
+        title: i18nT("ui.keenkonnect.knowledge.browseRepository.blueprints"),
         icon: <FileTextOutlined />,
       },
       {
         key: 'Civic Engagement|Protocol' as TreeKey,
-        title: 'Protocols',
+        title: i18nT("ui.keenkonnect.knowledge.browseRepository.protocols"),
         icon: <FileTextOutlined />,
       },
       {
         key: 'Civic Engagement|Case Study' as TreeKey,
-        title: 'Case Studies',
+        title: i18nT("ui.keenkonnect.knowledge.browseRepository.caseStudies"),
         icon: <FileTextOutlined />,
       },
       {
         key: 'Civic Engagement|Toolkit' as TreeKey,
-        title: 'Toolkits',
+        title: i18nT("ui.keenkonnect.knowledge.browseRepository.toolkits"),
         icon: <FileTextOutlined />,
       },
     ],
   },
-];
+]);
 
 /**
  * Declared preview dataset aligned with KeenKonnect Knowledge
@@ -205,20 +207,21 @@ const PREVIEW_DOCUMENTS: KnowledgeDocument[] = [
   },
 ];
 
-const ACCESS_FILTER_OPTIONS: { label: string; value: AccessFilter }[] = [
-  { label: 'Tous les accès', value: 'all' },
-  { label: 'Public', value: 'Public' },
-  { label: 'Membres', value: 'Member' },
-  { label: 'Partenaires', value: 'Partner' },
-];
+const ACCESS_FILTER_OPTIONS = (i18nT: TranslateFunction): { label: string; value: AccessFilter }[] => ([
+  { label: i18nT("ui.keenkonnect.knowledge.browseRepository.tousLesAcces"), value: 'all' },
+  { label: i18nT("ui.keenkonnect.knowledge.browseRepository.public"), value: 'Public' },
+  { label: i18nT("ui.keenkonnect.knowledge.browseRepository.membres"), value: 'Member' },
+  { label: i18nT("ui.keenkonnect.knowledge.browseRepository.partenaires"), value: 'Partner' },
+]);
 
-const STATUS_FILTER_OPTIONS: { label: string; value: StatusFilter }[] = [
-  { label: 'Tous les statuts', value: 'all' },
-  { label: 'Publié', value: 'Published' },
-  { label: 'Brouillon', value: 'Draft' },
-];
+const STATUS_FILTER_OPTIONS = (i18nT: TranslateFunction): { label: string; value: StatusFilter }[] => ([
+  { label: i18nT("ui.keenkonnect.knowledge.browseRepository.tousLesStatuts"), value: 'all' },
+  { label: i18nT("ui.keenkonnect.knowledge.browseRepository.publie"), value: 'Published' },
+  { label: i18nT("ui.keenkonnect.knowledge.browseRepository.brouillon"), value: 'Draft' },
+]);
 
 function BrowseRepositoryPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
 
   const [selectedKey, setSelectedKey] = useState<TreeKey>('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -277,27 +280,27 @@ function BrowseRepositoryPage(): JSX.Element {
   const columns: ProColumns<KnowledgeDocument>[] = useMemo(
     () => [
       {
-        title: 'Titre',
+        title: i18nT("ui.keenkonnect.knowledge.browseRepository.titre"),
         dataIndex: 'title',
         ellipsis: true,
         width: 260,
       },
       {
-        title: 'Domaine',
+        title: i18nT("ui.keenkonnect.knowledge.browseRepository.domaine"),
         dataIndex: 'domain',
         width: 150,
         filters: DOMAINS.map((domain) => ({ text: domain, value: domain })),
         onFilter: (value, record) => record.domain === (value as Domain),
       },
       {
-        title: 'Type',
+        title: i18nT("ui.keenkonnect.knowledge.browseRepository.type"),
         dataIndex: 'kind',
         width: 150,
         filters: KINDS.map((kind) => ({ text: kind, value: kind })),
         onFilter: (value, record) => record.kind === (value as Kind),
       },
       {
-        title: 'Accès',
+        title: i18nT("ui.keenkonnect.knowledge.browseRepository.acces"),
         dataIndex: 'access',
         width: 120,
         render: (_dom, row) => {
@@ -311,28 +314,28 @@ function BrowseRepositoryPage(): JSX.Element {
         },
       },
       {
-        title: 'Statut',
+        title: i18nT("ui.keenkonnect.knowledge.browseRepository.statut"),
         dataIndex: 'status',
         width: 120,
         render: (_dom, row) => (
           <Tag color={row.status === 'Published' ? 'green' : 'gold'}>
-            {row.status === 'Published' ? 'Publié' : 'Brouillon'}
+            {row.status === 'Published' ? i18nT("ui.keenkonnect.knowledge.browseRepository.publie") : i18nT("ui.keenkonnect.knowledge.browseRepository.brouillon")}
           </Tag>
         ),
       },
       {
-        title: 'Mise à jour',
+        title: i18nT("ui.keenkonnect.knowledge.browseRepository.miseAJour"),
         dataIndex: 'updatedAt',
         valueType: 'date',
         width: 130,
       },
       {
-        title: 'Propriétaire',
+        title: i18nT("ui.keenkonnect.knowledge.browseRepository.proprietaire"),
         dataIndex: 'owner',
         width: 180,
       },
       {
-        title: 'Tags',
+        title: i18nT("ui.keenkonnect.knowledge.browseRepository.tags"),
         dataIndex: 'tags',
         search: false,
         render: (_dom, row) => (
@@ -344,29 +347,29 @@ function BrowseRepositoryPage(): JSX.Element {
         ),
       },
       {
-        title: 'Actions',
+        title: i18nT("ui.keenkonnect.knowledge.browseRepository.actions"),
         valueType: 'option',
         width: 120,
         render: () => [
           <Text key="preview" type="secondary">
-            Preview only
+            {i18nT("ui.keenkonnect.knowledge.browseRepository.previewOnly")}
           </Text>,
         ],
       },
     ],
-    [],
+    [i18nT],
   );
 
   return (
     <KeenPage
-      title="Parcourir le dépôt de connaissances"
-      description="Parcourez et filtrez les ressources KeenKonnect par domaine, type, niveau d’accès et statut."
+      title={i18nT("ui.keenkonnect.knowledge.browseRepository.parcourirLeDepotDeConnaissances")}
+      description={i18nT("ui.keenkonnect.knowledge.browseRepository.parcourezEtFiltrezLesRessourcesKeenkonnectPar")}
     >
       <Alert
         type="info"
         showIcon
-        message="Knowledge repository preview"
-        description="The general knowledge-document repository is not backed by a dedicated persistence contract in this build. The records below are declared preview data; project-attached resources remain separate."
+        message={i18nT("ui.keenkonnect.knowledge.browseRepository.knowledgeRepositoryPreview")}
+        description={i18nT("ui.keenkonnect.knowledge.browseRepository.theGeneralKnowledgeDocumentRepositoryIsNot")}
         style={{ marginBottom: 16 }}
       />
       <Row gutter={[24, 24]}>
@@ -375,12 +378,11 @@ function BrowseRepositoryPage(): JSX.Element {
           <Card
             size="small"
             bordered={false}
-            title="Arborescence du dépôt"
+            title={i18nT("ui.keenkonnect.knowledge.browseRepository.arborescenceDuDepot")}
             headStyle={{ fontWeight: 600 }}
           >
             <Text type="secondary">
-              Naviguez par domaine et type de ressource pour filtrer la liste à
-              droite.
+              {i18nT("ui.keenkonnect.knowledge.browseRepository.naviguezParDomaineEtTypeDeRessource")}
             </Text>
 
             <div style={{ marginTop: 16 }}>
@@ -390,7 +392,7 @@ function BrowseRepositoryPage(): JSX.Element {
                 defaultExpandAll
                 selectedKeys={[selectedKey]}
                 onSelect={handleTreeSelect}
-                treeData={treeData}
+                treeData={treeData(i18nT)}
               />
             </div>
           </Card>
@@ -404,11 +406,10 @@ function BrowseRepositoryPage(): JSX.Element {
             title={
               <Space direction="vertical" size={0}>
                 <Title level={4} style={{ margin: 0 }}>
-                  Parcourir les ressources
+                  {i18nT("ui.keenkonnect.knowledge.browseRepository.parcourirLesRessources")}
                 </Title>
                 <Text type="secondary">
-                  Combinez l’arborescence, la recherche et les filtres pour
-                  trouver rapidement les ressources KeenKonnect.
+                  {i18nT("ui.keenkonnect.knowledge.browseRepository.combinezLArborescenceLaRechercheEtLes")}
                 </Text>
               </Space>
             }
@@ -423,7 +424,7 @@ function BrowseRepositoryPage(): JSX.Element {
                 }}
               >
                 <Search
-                  placeholder="Rechercher par titre, tag, propriétaire…"
+                  placeholder={i18nT("ui.keenkonnect.knowledge.browseRepository.rechercherParTitreTagProprietaire")}
                   allowClear
                   style={{ maxWidth: 360 }}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -433,19 +434,19 @@ function BrowseRepositoryPage(): JSX.Element {
                 <Space wrap>
                   <Select<AccessFilter>
                     allowClear
-                    placeholder="Niveau d'accès"
+                    placeholder={i18nT("ui.keenkonnect.knowledge.browseRepository.niveauDAcces")}
                     style={{ minWidth: 160 }}
                     value={accessFilter === 'all' ? undefined : accessFilter}
                     onChange={(value) => setAccessFilter(value ?? 'all')}
-                    options={ACCESS_FILTER_OPTIONS}
+                    options={ACCESS_FILTER_OPTIONS(i18nT)}
                   />
                   <Select<StatusFilter>
                     allowClear
-                    placeholder="Statut"
+                    placeholder={i18nT("ui.keenkonnect.knowledge.browseRepository.statut")}
                     style={{ minWidth: 160 }}
                     value={statusFilter === 'all' ? undefined : statusFilter}
                     onChange={(value) => setStatusFilter(value ?? 'all')}
-                    options={STATUS_FILTER_OPTIONS}
+                    options={STATUS_FILTER_OPTIONS(i18nT)}
                   />
                 </Space>
               </Space>

@@ -59,30 +59,36 @@ export const KONNECTED_ROUTES = {
 const overview: Route = {
   path: KONNECTED_ROUTES.dashboard,
   name: 'Overview',
+  labelKey: 'navigation.overview',
   icon: <DashboardOutlined />,
 };
 
 const learningLibraryGroup: Route = {
   name: 'Learning Library',
+  labelKey: 'navigation.learningLibrary',
   views: [
     {
       path: KONNECTED_ROUTES.learningLibrary.browse,
       name: 'Browse resources',
+      labelKey: 'navigation.browseResources',
       icon: <BookOutlined />,
     },
     {
       path: KONNECTED_ROUTES.learningLibrary.search,
       name: 'Search / filters',
+      labelKey: 'navigation.searchFilters',
       icon: <SearchOutlined />,
     },
     {
       path: KONNECTED_ROUTES.learningLibrary.recommendations,
       name: 'Recommended resources',
+      labelKey: 'navigation.recommendedResources',
       icon: <LikeOutlined />,
     },
     {
       path: KONNECTED_ROUTES.learningLibrary.offline,
       name: 'Offline content',
+      labelKey: 'navigation.offlineContent',
       icon: <DownloadOutlined />,
     },
   ],
@@ -90,20 +96,24 @@ const learningLibraryGroup: Route = {
 
 const learningPathsGroup: Route = {
   name: 'Learning Paths',
+  labelKey: 'navigation.learningPaths',
   views: [
     {
       path: KONNECTED_ROUTES.learningPaths.mine,
       name: 'My learning path',
+      labelKey: 'navigation.myLearningPath',
       icon: <ProfileOutlined />,
     },
     {
       path: KONNECTED_ROUTES.learningPaths.create,
       name: 'Create learning path',
+      labelKey: 'navigation.createLearningPath',
       icon: <FormOutlined />,
     },
     {
       path: KONNECTED_ROUTES.learningPaths.manage,
       name: 'Manage existing paths',
+      labelKey: 'navigation.manageExistingPaths',
       icon: <BuildOutlined />,
     },
   ],
@@ -111,25 +121,30 @@ const learningPathsGroup: Route = {
 
 const certificationsGroup: Route = {
   name: 'Certifications',
+  labelKey: 'navigation.certifications',
   views: [
     {
       path: KONNECTED_ROUTES.certifications.programs,
       name: 'Certification programs',
+      labelKey: 'navigation.certificationPrograms',
       icon: <SafetyCertificateOutlined />,
     },
     {
       path: KONNECTED_ROUTES.certifications.examDashboard,
       name: 'Exam dashboard / results',
+      labelKey: 'navigation.examDashboardResults',
       icon: <TrophyOutlined />,
     },
     {
       path: KONNECTED_ROUTES.certifications.preparation,
       name: 'Exam preparation',
+      labelKey: 'navigation.examPreparation',
       icon: <BulbOutlined />,
     },
     {
       path: KONNECTED_ROUTES.certifications.registration,
       name: 'Exam registration',
+      labelKey: 'navigation.examRegistration',
       icon: <AuditOutlined />,
     },
   ],
@@ -137,20 +152,24 @@ const certificationsGroup: Route = {
 
 const communityGroup: Route = {
   name: 'Community Discussions',
+  labelKey: 'navigation.communityDiscussions',
   views: [
     {
       path: KONNECTED_ROUTES.communityDiscussions.activeThreads,
       name: 'Active threads',
+      labelKey: 'navigation.activeThreads',
       icon: <CommentOutlined />,
     },
     {
       path: KONNECTED_ROUTES.communityDiscussions.startDiscussion,
       name: 'Start new discussion',
+      labelKey: 'navigation.startNewDiscussion',
       icon: <EditOutlined />,
     },
     {
       path: KONNECTED_ROUTES.communityDiscussions.moderation,
       name: 'Moderation',
+      labelKey: 'navigation.moderation',
       icon: <FileDoneOutlined />,
     },
   ],
@@ -158,25 +177,30 @@ const communityGroup: Route = {
 
 const collaborationGroup: Route = {
   name: 'Teams Collaboration',
+  labelKey: 'navigation.teamsCollaboration',
   views: [
     {
       path: KONNECTED_ROUTES.teamsCollaboration.myTeams,
       name: 'My teams',
+      labelKey: 'navigation.myTeams',
       icon: <TeamOutlined />,
     },
     {
       path: KONNECTED_ROUTES.teamsCollaboration.activityPlanner,
       name: 'Activity planner',
+      labelKey: 'navigation.activityPlanner',
       icon: <FormOutlined />,
     },
     {
       path: KONNECTED_ROUTES.teamsCollaboration.projectWorkspaces,
       name: 'Project workspaces',
+      labelKey: 'navigation.projectWorkspaces',
       icon: <AppstoreOutlined />,
     },
     {
       path: KONNECTED_ROUTES.teamsCollaboration.createTeam,
       name: 'Create team',
+      labelKey: 'navigation.createTeam',
       icon: <PlusCircleOutlined />,
     },
   ],

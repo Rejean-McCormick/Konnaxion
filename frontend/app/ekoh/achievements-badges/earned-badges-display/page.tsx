@@ -1,6 +1,7 @@
 // FILE: frontend/app/ekoh/achievements-badges/earned-badges-display/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { Alert, Card, Empty, List, Space, Tag, Typography } from 'antd';
 
 import EkohPageShell from '@/app/ekoh/EkohPageShell';
@@ -16,20 +17,21 @@ function earnedDate(value?: string): string {
 }
 
 export default function EarnedBadgesDisplay(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const { data, isLoading, isError, error } = useReputationEvents();
   const badges = data?.badges ?? [];
 
   return (
     <EkohPageShell
-      title="Achievements & badges"
-      subtitle="Activity-backed achievements derived from your current Ethikos participation."
+      title={i18nT("ui.ekoh.achievementsBadges.earnedBadgesDisplay.achievementsBadges")}
+      subtitle={i18nT("ui.ekoh.achievementsBadges.earnedBadgesDisplay.activityBackedAchievementsDerivedFromYourCurrent")}
     >
       {isError && (
         <Alert
           type="error"
           showIcon
-          message="Unable to load achievements"
-          description={(error as Error | undefined)?.message ?? 'Please try again.'}
+          message={i18nT("ui.ekoh.achievementsBadges.earnedBadgesDisplay.unableToLoadAchievements")}
+          description={(error as Error | undefined)?.message ?? i18nT("ui.ekoh.achievementsBadges.earnedBadgesDisplay.pleaseTryAgain")}
           style={{ marginBottom: 16 }}
         />
       )}
@@ -37,8 +39,8 @@ export default function EarnedBadgesDisplay(): JSX.Element {
       <Alert
         type="info"
         showIcon
-        message="Badges are evidence-backed"
-        description="This page only shows achievements derived from observed Ethikos activity. It does not invent badge levels, dates, or awards."
+        message={i18nT("ui.ekoh.achievementsBadges.earnedBadgesDisplay.badgesAreEvidenceBacked")}
+        description={i18nT("ui.ekoh.achievementsBadges.earnedBadgesDisplay.thisPageOnlyShowsAchievementsDerivedFrom")}
         style={{ marginBottom: 16 }}
       />
 
@@ -52,7 +54,7 @@ export default function EarnedBadgesDisplay(): JSX.Element {
                   title={
                     <Space wrap>
                       <Text strong>{badge.label}</Text>
-                      <Tag color="green">Earned</Tag>
+                      <Tag color="green">{i18nT("ui.ekoh.achievementsBadges.earnedBadgesDisplay.earned")}</Tag>
                     </Space>
                   }
                   description={
@@ -61,7 +63,7 @@ export default function EarnedBadgesDisplay(): JSX.Element {
                         {badge.description}
                       </Paragraph>
                       <Text type="secondary">
-                        Earned: {earnedDate(badge.earnedAt ?? badge.createdAt)}
+                        {i18nT("ui.ekoh.achievementsBadges.earnedBadgesDisplay.earned_cc706a")} {earnedDate(badge.earnedAt ?? badge.createdAt)}
                       </Text>
                     </Space>
                   }
@@ -70,7 +72,7 @@ export default function EarnedBadgesDisplay(): JSX.Element {
             )}
           />
         ) : (
-          <Empty description="No earned activity-backed badges yet" />
+          <Empty description={i18nT("ui.ekoh.achievementsBadges.earnedBadgesDisplay.noEarnedActivityBackedBadgesYet")} />
         )}
       </Card>
     </EkohPageShell>

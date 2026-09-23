@@ -7,6 +7,7 @@
  * Author: Hieu Chu
  */
 
+import { useLanguage } from '@/context/LanguageContext';
 import React from 'react'
 
 import ChartCard from '@/components/charts/ChartCard'
@@ -37,13 +38,14 @@ export default function VisitCard({
   VISIT_DATA,
   SINGLE_SCULPTURE,
 }: Props) {
+  const { t: i18nT } = useLanguage();
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <MainIcon type="environment" style={{ color: '#F73F3F' }} />
-        <NumberInfoStyled subTitle="Total visits" total={TOTAL_VISITS} />
+        <NumberInfoStyled subTitle={i18nT("ui.dashboardComponents.visitcard.totalVisits")} total={TOTAL_VISITS} />
         {!SINGLE_SCULPTURE && (
-          <HelperIcon title="Total number of times sculptures have been visited" />
+          <HelperIcon title={i18nT("ui.dashboardComponents.visitcard.totalNumberOfTimesSculpturesHaveBeen")} />
         )}
       </div>
 
@@ -54,7 +56,7 @@ export default function VisitCard({
       <CardDivider />
 
       <CardFooter
-        title="Daily visits"
+        title={i18nT("ui.dashboardComponents.visitcard.dailyVisits")}
         value={DAILY_VISITS}
         change={DAILY_VISITS_CHANGE}
       />

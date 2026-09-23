@@ -2,6 +2,7 @@
 // app/konnected/learning-library/offline-content/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   DeleteOutlined,
   PlusOutlined,
@@ -281,6 +282,7 @@ async function fetchOfflineableResources(): Promise<OfflineableResource[]> {
 // ---- Page -----------------------------------------------------------------
 
 export default function OfflineContentPage(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const { message, modal } = App.useApp();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -354,7 +356,7 @@ export default function OfflineContentPage(): JSX.Element {
 
   const columnsPackages: ColumnsType<OfflinePackage> = [
     {
-      title: 'Package name',
+      title: i18nT("ui.konnected.learningLibrary.offlineContent.packageName"),
       dataIndex: 'name',
       key: 'name',
       render: (name: string, record) => (
@@ -369,7 +371,7 @@ export default function OfflineContentPage(): JSX.Element {
       ),
     },
     {
-      title: 'Status',
+      title: i18nT("ui.konnected.learningLibrary.offlineContent.status"),
       dataIndex: 'status',
       key: 'status',
       render: (status: OfflinePackageStatus, record) => {
@@ -408,29 +410,29 @@ export default function OfflineContentPage(): JSX.Element {
       },
     },
     {
-      title: 'Items',
+      title: i18nT("ui.konnected.learningLibrary.offlineContent.items"),
       dataIndex: 'itemCount',
       key: 'itemCount',
       render: (value: number) => <Text>{value ?? 0}</Text>,
     },
     {
-      title: 'Size',
+      title: i18nT("ui.konnected.learningLibrary.offlineContent.size"),
       dataIndex: 'totalSizeMb',
       key: 'totalSizeMb',
-      render: (value: number) => <Text>{(value ?? 0).toFixed(1)} MB</Text>,
+      render: (value: number) => <Text>{(value ?? 0).toFixed(1)} {i18nT("ui.konnected.learningLibrary.offlineContent.mb")}</Text>,
     },
     {
-      title: 'Target device',
+      title: i18nT("ui.konnected.learningLibrary.offlineContent.targetDevice"),
       dataIndex: 'targetDeviceType',
       key: 'targetDeviceType',
       render: (value?: OfflinePackage['targetDeviceType']) => (
         <Text type="secondary" style={{ textTransform: 'capitalize' }}>
-          {value || 'Not specified'}
+          {value || i18nT("ui.konnected.learningLibrary.offlineContent.notSpecified")}
         </Text>
       ),
     },
     {
-      title: 'Auto sync',
+      title: i18nT("ui.konnected.learningLibrary.offlineContent.autoSync"),
       dataIndex: 'autoSync',
       key: 'autoSync',
       render: (value: boolean | undefined, record) => (
@@ -443,15 +445,15 @@ export default function OfflineContentPage(): JSX.Element {
               await runUpdatePackage(record.id, { autoSync: checked });
               message.success(
                 checked
-                  ? 'Package enrolled in the weekly offline build.'
-                  : 'Package removed from the automatic offline build.',
+                  ? i18nT("ui.konnected.learningLibrary.offlineContent.packageEnrolledInTheWeeklyOfflineBuild")
+                  : i18nT("ui.konnected.learningLibrary.offlineContent.packageRemovedFromTheAutomaticOfflineBuild"),
               );
               refreshPackages();
             } catch (err) {
               const msg =
                 err instanceof Error
                   ? err.message
-                  : 'Failed to update auto-sync setting.';
+                  : i18nT("ui.konnected.learningLibrary.offlineContent.failedToUpdateAutoSyncSetting");
               message.error(msg);
             }
           }}
@@ -459,7 +461,7 @@ export default function OfflineContentPage(): JSX.Element {
       ),
     },
     {
-      title: 'Actions',
+      title: i18nT("ui.konnected.learningLibrary.offlineContent.actions"),
       key: 'actions',
       render: (_, record) => (
         <Space>
@@ -470,7 +472,7 @@ export default function OfflineContentPage(): JSX.Element {
             onClick={() => handleSyncPackage(record)}
             disabled={record.status === 'building'}
           >
-            Sync now
+            {i18nT("ui.konnected.learningLibrary.offlineContent.syncNow")}
           </Button>
           <Button
             icon={<DeleteOutlined />}
@@ -479,7 +481,7 @@ export default function OfflineContentPage(): JSX.Element {
             loading={deleting}
             onClick={() => handleDeletePackage(record)}
           >
-            Delete
+            {i18nT("ui.konnected.learningLibrary.offlineContent.delete")}
           </Button>
         </Space>
       ),
@@ -488,7 +490,7 @@ export default function OfflineContentPage(): JSX.Element {
 
   const columnsResources: ColumnsType<OfflineableResource> = [
     {
-      title: 'Title',
+      title: i18nT("ui.konnected.learningLibrary.offlineContent.title"),
       dataIndex: 'title',
       key: 'title',
       render: (value: string, record) => (
@@ -503,7 +505,7 @@ export default function OfflineContentPage(): JSX.Element {
       ),
     },
     {
-      title: 'Type',
+      title: i18nT("ui.konnected.learningLibrary.offlineContent.type"),
       dataIndex: 'type',
       key: 'type',
       render: (value: ResourceType) => (
@@ -513,26 +515,26 @@ export default function OfflineContentPage(): JSX.Element {
       ),
     },
     {
-      title: 'Size (MB)',
+      title: i18nT("ui.konnected.learningLibrary.offlineContent.sizeMb"),
       dataIndex: 'sizeMb',
       key: 'sizeMb',
       render: (value?: number) => (
-        <Text>{value != null ? value.toFixed(1) : 'N/A'}</Text>
+        <Text>{value != null ? value.toFixed(1) : i18nT("ui.konnected.learningLibrary.offlineContent.nA")}</Text>
       ),
     },
     {
-      title: 'Offline status',
+      title: i18nT("ui.konnected.learningLibrary.offlineContent.offlineStatus"),
       dataIndex: 'offlineEligible',
       key: 'offlineEligible',
       render: (value: boolean) =>
         value ? (
-          <Tag color="green">Eligible</Tag>
+          <Tag color="green">{i18nT("ui.konnected.learningLibrary.offlineContent.eligible")}</Tag>
         ) : (
-          <Tag color="default">Online only</Tag>
+          <Tag color="default">{i18nT("ui.konnected.learningLibrary.offlineContent.onlineOnly")}</Tag>
         ),
     },
     {
-      title: 'Included in packages',
+      title: i18nT("ui.konnected.learningLibrary.offlineContent.includedInPackages"),
       dataIndex: 'includedInPackages',
       key: 'includedInPackages',
       render: (packages?: string[]) =>
@@ -544,7 +546,7 @@ export default function OfflineContentPage(): JSX.Element {
           </Space>
         ) : (
           <Text type="secondary" style={{ fontSize: 12 }}>
-            Not yet packaged
+            {i18nT("ui.konnected.learningLibrary.offlineContent.notYetPackaged")}
           </Text>
         ),
     },
@@ -554,7 +556,7 @@ export default function OfflineContentPage(): JSX.Element {
     try {
       await runCreatePackage(values);
       message.success(
-        'Offline package created. It will appear here once builds start.',
+        i18nT("ui.konnected.learningLibrary.offlineContent.offlinePackageCreatedItWillAppearHere"),
       );
       setIsCreateModalOpen(false);
       createForm.resetFields();
@@ -570,14 +572,14 @@ export default function OfflineContentPage(): JSX.Element {
 
   const handleDeletePackage = async (pkg: OfflinePackage) => {
     modal.confirm({
-      title: 'Delete offline package',
-      content: `Are you sure you want to delete "${pkg.name}"? This will not remove already synced data from devices.`,
-      okText: 'Delete',
+      title: i18nT("ui.konnected.learningLibrary.offlineContent.deleteOfflinePackage"),
+      content: i18nT("ui.konnected.learningLibrary.offlineContent.areYouSureYouWantToDelete", { name: pkg.name }),
+      okText: i18nT("ui.konnected.learningLibrary.offlineContent.delete"),
       okButtonProps: { danger: true, loading: deleting },
       onOk: async () => {
         try {
           await runDeletePackage(pkg.id);
-          message.success('Offline package deleted.');
+          message.success(i18nT("ui.konnected.learningLibrary.offlineContent.offlinePackageDeleted"));
           refreshPackages();
         } catch (err) {
           const msg =
@@ -593,7 +595,7 @@ export default function OfflineContentPage(): JSX.Element {
   const handleSyncPackage = async (pkg: OfflinePackage) => {
     try {
       await runSyncPackage(pkg.id);
-      message.success('Sync request submitted.');
+      message.success(i18nT("ui.konnected.learningLibrary.offlineContent.syncRequestSubmitted"));
       refreshPackages();
     } catch (err) {
       const msg =
@@ -605,47 +607,47 @@ export default function OfflineContentPage(): JSX.Element {
   return (
     <>
       <Head>
-        <title>Offline content – KonnectED</title>
+        <title>{i18nT("ui.konnected.learningLibrary.offlineContent.offlineContentKonnected")}</title>
       </Head>
 
       <KonnectedPageShell
-        title="Offline content packages"
-        subtitle="Prepare resource bundles for low-connectivity environments (e.g. schools, field teams, community centers)."
+        title={i18nT("ui.konnected.learningLibrary.offlineContent.offlineContentPackages")}
+        subtitle={i18nT("ui.konnected.learningLibrary.offlineContent.prepareResourceBundlesForLowConnectivityEnvironments")}
         primaryAction={
           <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => setIsCreateModalOpen(true)}
           >
-            New offline package
+            {i18nT("ui.konnected.learningLibrary.offlineContent.newOfflinePackage")}
           </Button>
         }
       >
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={10}>
-            <ProCard title="Offline packages overview" bordered>
+            <ProCard title={i18nT("ui.konnected.learningLibrary.offlineContent.offlinePackagesOverview")} bordered>
               <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                <Statistic title="Total packages" value={stats.totalPackages} />
+                <Statistic title={i18nT("ui.konnected.learningLibrary.offlineContent.totalPackages")} value={stats.totalPackages} />
                 <Space size="large">
                   <StatisticCard
                     statistic={{
-                      title: 'Ready',
+                      title: i18nT("ui.konnected.learningLibrary.offlineContent.ready"),
                       value: stats.readyPackages,
                     }}
                   />
                   <StatisticCard
                     statistic={{
-                      title: 'In progress',
+                      title: i18nT("ui.konnected.learningLibrary.offlineContent.inProgress"),
                       value: stats.inProgressPackages,
                     }}
                   />
                 </Space>
                 <Statistic
-                  title="Total storage (MB)"
+                  title={i18nT("ui.konnected.learningLibrary.offlineContent.totalStorageMb")}
                   value={stats.totalSizeMb.toFixed(1)}
                 />
                 <Statistic
-                  title="Resources eligible for offline"
+                  title={i18nT("ui.konnected.learningLibrary.offlineContent.resourcesEligibleForOffline")}
                   value={stats.eligibleResourcesCount}
                 />
               </Space>
@@ -656,15 +658,15 @@ export default function OfflineContentPage(): JSX.Element {
                 type="warning"
                 showIcon
                 style={{ marginTop: 16 }}
-                message="Some offline APIs may not be fully wired yet"
-                description="Offline package management and resource eligibility depend on KonnectED’s Knowledge backend. Once all endpoints are live, this page will display real-time data."
+                message={i18nT("ui.konnected.learningLibrary.offlineContent.someOfflineApisMayNotBeFully")}
+                description={i18nT("ui.konnected.learningLibrary.offlineContent.offlinePackageManagementAndResourceEligibilityDepend")}
               />
             )}
           </Col>
 
           <Col xs={24} lg={14}>
             <Card
-              title="Offline packages"
+              title={i18nT("ui.konnected.learningLibrary.offlineContent.offlinePackages")}
               extra={
                 <Button
                   icon={<SyncOutlined />}
@@ -674,7 +676,7 @@ export default function OfflineContentPage(): JSX.Element {
                   }}
                   loading={loadingPackages || loadingResources}
                 >
-                  Refresh
+                  {i18nT("ui.konnected.learningLibrary.offlineContent.refresh")}
                 </Button>
               }
             >
@@ -684,10 +686,9 @@ export default function OfflineContentPage(): JSX.Element {
                 <Empty
                   description={
                     <Space direction="vertical">
-                      <Text>No offline packages yet.</Text>
+                      <Text>{i18nT("ui.konnected.learningLibrary.offlineContent.noOfflinePackagesYet")}</Text>
                       <Text type="secondary">
-                        Create a package to bundle resources for offline
-                        deployment to devices.
+                        {i18nT("ui.konnected.learningLibrary.offlineContent.createAPackageToBundleResourcesFor")}
                       </Text>
                     </Space>
                   }
@@ -702,13 +703,13 @@ export default function OfflineContentPage(): JSX.Element {
               )}
             </Card>
 
-            <Card title="Candidate resources for offline" style={{ marginTop: 16 }}>
+            <Card title={i18nT("ui.konnected.learningLibrary.offlineContent.candidateResourcesForOffline")} style={{ marginTop: 16 }}>
               {loadingResources ? (
                 <Skeleton active />
               ) : resourceList.length === 0 ? (
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="No resources available for offline packaging yet."
+                  description={i18nT("ui.konnected.learningLibrary.offlineContent.noResourcesAvailableForOfflinePackagingYet")}
                 />
               ) : (
                 <Table<OfflineableResource>
@@ -725,18 +726,16 @@ export default function OfflineContentPage(): JSX.Element {
 
         {/* Creation modal */}
         <Modal
-          title="New offline package"
+          title={i18nT("ui.konnected.learningLibrary.offlineContent.newOfflinePackage")}
           open={isCreateModalOpen}
           onCancel={() => setIsCreateModalOpen(false)}
           destroyOnClose
-          okText="Create package"
+          okText={i18nT("ui.konnected.learningLibrary.offlineContent.createPackage")}
           okButtonProps={{ loading: creating }}
           onOk={() => createForm.submit()}
         >
           <Paragraph type="secondary" style={{ marginBottom: 16 }}>
-            Select filters and constraints for this offline bundle. The backend
-            will resolve concrete resources and schedule builds according to the
-            global offline cron.
+            {i18nT("ui.konnected.learningLibrary.offlineContent.selectFiltersAndConstraintsForThisOffline")}
           </Paragraph>
 
           <Form<CreateOfflinePackagePayload>
@@ -750,34 +749,34 @@ export default function OfflineContentPage(): JSX.Element {
             }}
           >
             <Form.Item
-              label="Package name"
+              label={i18nT("ui.konnected.learningLibrary.offlineContent.packageName")}
               name="name"
-              rules={[{ required: true, message: 'Please enter a package name.' }]}
+              rules={[{ required: true, message: i18nT("ui.konnected.learningLibrary.offlineContent.pleaseEnterAPackageName") }]}
             >
-              <Input placeholder="e.g. Robotics basics – offline pack for School A" />
+              <Input placeholder={i18nT("ui.konnected.learningLibrary.offlineContent.eGRoboticsBasicsOfflinePackFor")} />
             </Form.Item>
 
-            <Form.Item label="Description" name="description">
+            <Form.Item label={i18nT("ui.konnected.learningLibrary.offlineContent.description")} name="description">
               <Input.TextArea
                 rows={3}
-                placeholder="Short description for administrators and field teams."
+                placeholder={i18nT("ui.konnected.learningLibrary.offlineContent.shortDescriptionForAdministratorsAndFieldTeams")}
               />
             </Form.Item>
 
-            <Form.Item label="Target device type" name="targetDeviceType">
+            <Form.Item label={i18nT("ui.konnected.learningLibrary.offlineContent.targetDeviceType")} name="targetDeviceType">
               <Select>
-                <Option value="laptop">Laptop / desktop (lab PCs)</Option>
-                <Option value="tablet">Tablet devices</Option>
-                <Option value="usb">USB drive / external media</Option>
-                <Option value="other">Other / mixed devices</Option>
+                <Option value="laptop">{i18nT("ui.konnected.learningLibrary.offlineContent.laptopDesktopLabPcs")}</Option>
+                <Option value="tablet">{i18nT("ui.konnected.learningLibrary.offlineContent.tabletDevices")}</Option>
+                <Option value="usb">{i18nT("ui.konnected.learningLibrary.offlineContent.usbDriveExternalMedia")}</Option>
+                <Option value="other">{i18nT("ui.konnected.learningLibrary.offlineContent.otherMixedDevices")}</Option>
               </Select>
             </Form.Item>
 
             <Form.Item
               label={
                 <Space>
-                  Maximum bundle size (MB)
-                  <Tooltip title="Helps avoid exceeding storage on low-spec devices. Backend enforces final limits.">
+                  {i18nT("ui.konnected.learningLibrary.offlineContent.maximumBundleSizeMb")}
+                  <Tooltip title={i18nT("ui.konnected.learningLibrary.offlineContent.helpsAvoidExceedingStorageOnLowSpec")}>
                     <WarningOutlined />
                   </Tooltip>
                 </Space>
@@ -788,33 +787,33 @@ export default function OfflineContentPage(): JSX.Element {
                   type: 'number',
                   transform: (v) => (v === '' ? undefined : Number(v)),
                   min: 0,
-                  message: 'Please enter a valid size in MB.',
+                  message: i18nT("ui.konnected.learningLibrary.offlineContent.pleaseEnterAValidSizeInMb"),
                 },
               ]}
             >
-              <Input placeholder="e.g. 2048" type="number" min={0} />
+              <Input placeholder={i18nT("ui.konnected.learningLibrary.offlineContent.eG2048")} type="number" min={0} />
             </Form.Item>
 
-            <Form.Item label="Include resource types" name="includeTypes">
-              <Select mode="multiple" placeholder="Select one or more types">
-                <Option value="article">Articles</Option>
-                <Option value="video">Videos</Option>
-                <Option value="lesson">Lessons</Option>
-                <Option value="quiz">Quizzes</Option>
-                <Option value="dataset">Datasets</Option>
+            <Form.Item label={i18nT("ui.konnected.learningLibrary.offlineContent.includeResourceTypes")} name="includeTypes">
+              <Select mode="multiple" placeholder={i18nT("ui.konnected.learningLibrary.offlineContent.selectOneOrMoreTypes")}>
+                <Option value="article">{i18nT("ui.konnected.learningLibrary.offlineContent.articles")}</Option>
+                <Option value="video">{i18nT("ui.konnected.learningLibrary.offlineContent.videos")}</Option>
+                <Option value="lesson">{i18nT("ui.konnected.learningLibrary.offlineContent.lessons")}</Option>
+                <Option value="quiz">{i18nT("ui.konnected.learningLibrary.offlineContent.quizzes")}</Option>
+                <Option value="dataset">{i18nT("ui.konnected.learningLibrary.offlineContent.datasets")}</Option>
               </Select>
             </Form.Item>
 
-            <Form.Item label="Subject filter" name="subjectFilter">
-              <Input placeholder="Optional subject filter, e.g. Robotics" />
+            <Form.Item label={i18nT("ui.konnected.learningLibrary.offlineContent.subjectFilter")} name="subjectFilter">
+              <Input placeholder={i18nT("ui.konnected.learningLibrary.offlineContent.optionalSubjectFilterEGRobotics")} />
             </Form.Item>
 
-            <Form.Item label="Level filter" name="levelFilter">
-              <Input placeholder="Optional level filter, e.g. Beginner" />
+            <Form.Item label={i18nT("ui.konnected.learningLibrary.offlineContent.levelFilter")} name="levelFilter">
+              <Input placeholder={i18nT("ui.konnected.learningLibrary.offlineContent.optionalLevelFilterEGBeginner")} />
             </Form.Item>
 
-            <Form.Item label="Language filter" name="languageFilter">
-              <Input placeholder="Optional language filter, e.g. en, fr" />
+            <Form.Item label={i18nT("ui.konnected.learningLibrary.offlineContent.languageFilter")} name="languageFilter">
+              <Input placeholder={i18nT("ui.konnected.learningLibrary.offlineContent.optionalLanguageFilterEGEnFr")} />
             </Form.Item>
           </Form>
         </Modal>

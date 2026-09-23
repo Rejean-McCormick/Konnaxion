@@ -1,6 +1,7 @@
 // FILE: frontend/app/konnected/dashboard/page.tsx
 ﻿"use client";
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
@@ -539,11 +540,12 @@ function useUsageSummary() {
 // ---------- Tiles ----------
 
 function CertificationsTile() {
+  const { t: i18nT } = useLanguage();
   const { data, isLoading, isError } = useCertificationSummary();
 
   if (isLoading) {
     return (
-      <ProCard title="Certifications" bordered>
+      <ProCard title={i18nT("ui.konnected.dashboard.certifications")} bordered>
         <Skeleton active />
       </ProCard>
     );
@@ -552,21 +554,21 @@ function CertificationsTile() {
   if (isError || !data) {
     return (
       <ProCard
-        title="Certifications"
+        title={i18nT("ui.konnected.dashboard.certifications")}
         bordered
         extra={
           <Button
             type="link"
             href="/konnected/certifications/certification-programs"
           >
-            View programs
+            {i18nT("ui.konnected.dashboard.viewPrograms")}
           </Button>
         }
       >
         <Alert
           type="warning"
           showIcon
-          message="Unable to load certification summary."
+          message={i18nT("ui.konnected.dashboard.unableToLoadCertificationSummary")}
         />
       </ProCard>
     );
@@ -579,7 +581,7 @@ function CertificationsTile() {
 
   return (
     <ProCard
-      title="Certifications"
+      title={i18nT("ui.konnected.dashboard.certifications")}
       bordered
       extra={
         <Space>
@@ -587,27 +589,27 @@ function CertificationsTile() {
             type="default"
             href="/konnected/certifications/exam-dashboard-results"
           >
-            Exam results
+            {i18nT("ui.konnected.dashboard.examResults")}
           </Button>
           <Button
             type="primary"
             href="/konnected/certifications/certification-programs"
           >
-            View programs
+            {i18nT("ui.konnected.dashboard.viewPrograms")}
           </Button>
         </Space>
       }
     >
       {!hasAny ? (
         <Empty
-          description="No certifications yet"
+          description={i18nT("ui.konnected.dashboard.noCertificationsYet")}
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         >
           <Button
             type="primary"
             href="/konnected/certifications/certification-programs"
           >
-            Explore certification programs
+            {i18nT("ui.konnected.dashboard.exploreCertificationPrograms")}
           </Button>
         </Empty>
       ) : (
@@ -615,21 +617,21 @@ function CertificationsTile() {
           <Space size="large" wrap>
             <StatisticCard
               statistic={{
-                title: "Active paths",
+                title: i18nT("ui.konnected.dashboard.activePaths"),
                 value: data.activePaths,
                 prefix: <ReadOutlined />,
               }}
             />
             <StatisticCard
               statistic={{
-                title: "Completed paths",
+                title: i18nT("ui.konnected.dashboard.completedPaths"),
                 value: data.completedPaths,
                 prefix: <CheckCircleOutlined />,
               }}
             />
             <StatisticCard
               statistic={{
-                title: "Certificates",
+                title: i18nT("ui.konnected.dashboard.certificates"),
                 value: data.certificatesCount,
                 prefix: <FileTextOutlined />,
               }}
@@ -639,11 +641,11 @@ function CertificationsTile() {
           <Space style={{ marginTop: 16 }} direction="vertical">
             <Space size="large" wrap>
               <Space>
-                <Text strong>Upcoming evaluations:</Text>
+                <Text strong>{i18nT("ui.konnected.dashboard.upcomingEvaluations")}</Text>
                 <Badge count={data.upcomingEvaluations} />
               </Space>
               <Space>
-                <Text strong>Pending peer validations:</Text>
+                <Text strong>{i18nT("ui.konnected.dashboard.pendingPeerValidations")}</Text>
                 <Badge
                   count={data.pendingPeerValidations}
                   status={
@@ -654,7 +656,7 @@ function CertificationsTile() {
             </Space>
             {data.nextEvaluationDate && (
               <Text type="secondary">
-                Next scheduled evaluation:{" "}
+                {i18nT("ui.konnected.dashboard.nextScheduledEvaluation")}{" "}
                 <Text code>{data.nextEvaluationDate}</Text>
               </Text>
             )}
@@ -666,11 +668,12 @@ function CertificationsTile() {
 }
 
 function LearningTile() {
+  const { t: i18nT } = useLanguage();
   const { data, isLoading, isError } = useLearningSummary();
 
   if (isLoading) {
     return (
-      <ProCard title="Learning progress & recommendations" bordered>
+      <ProCard title={i18nT("ui.konnected.dashboard.learningProgressRecommendations")} bordered>
         <Skeleton active />
       </ProCard>
     );
@@ -679,18 +682,18 @@ function LearningTile() {
   if (isError || !data) {
     return (
       <ProCard
-        title="Learning progress & recommendations"
+        title={i18nT("ui.konnected.dashboard.learningProgressRecommendations")}
         bordered
         extra={
           <Button type="link" href="/konnected/learning-library/browse-resources">
-            Browse library
+            {i18nT("ui.konnected.dashboard.browseLibrary")}
           </Button>
         }
       >
         <Alert
           type="warning"
           showIcon
-          message="Unable to load learning summary."
+          message={i18nT("ui.konnected.dashboard.unableToLoadLearningSummary")}
         />
       </ProCard>
     );
@@ -703,7 +706,7 @@ function LearningTile() {
 
   return (
     <ProCard
-      title="Learning progress & recommendations"
+      title={i18nT("ui.konnected.dashboard.learningProgressRecommendations")}
       bordered
       extra={
         <Space>
@@ -711,13 +714,13 @@ function LearningTile() {
             type="default"
             href="/konnected/learning-library/recommended-resources"
           >
-            Recommendations
+            {i18nT("ui.konnected.dashboard.recommendations")}
           </Button>
           <Button
             type="primary"
             href="/konnected/learning-library/browse-resources"
           >
-            Browse library
+            {i18nT("ui.konnected.dashboard.browseLibrary")}
           </Button>
         </Space>
       }
@@ -727,21 +730,21 @@ function LearningTile() {
           <Space direction="vertical" size="middle" style={{ width: "100%" }}>
             <StatisticCard
               statistic={{
-                title: "Resources started",
+                title: i18nT("ui.konnected.dashboard.resourcesStarted"),
                 value: data.startedCount,
                 prefix: <ReadOutlined />,
               }}
             />
             <StatisticCard
               statistic={{
-                title: "Resources completed",
+                title: i18nT("ui.konnected.dashboard.resourcesCompleted"),
                 value: data.completedCount,
                 prefix: <CheckCircleOutlined />,
               }}
             />
             <StatisticCard
               statistic={{
-                title: "Average progress",
+                title: i18nT("ui.konnected.dashboard.averageProgress"),
                 value: Math.round(data.averageProgressPercent),
                 suffix: "%",
                 prefix: <LineChartOutlined />,
@@ -753,13 +756,13 @@ function LearningTile() {
           {!hasProgress ? (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No learning activity yet"
+              description={i18nT("ui.konnected.dashboard.noLearningActivityYet")}
             >
               <Button
                 type="primary"
                 href="/konnected/learning-library/browse-resources"
               >
-                Start learning
+                {i18nT("ui.konnected.dashboard.startLearning")}
               </Button>
             </Empty>
           ) : (
@@ -768,21 +771,21 @@ function LearningTile() {
               items={[
                 {
                   key: "inProgress",
-                  label: "In progress",
+                  label: i18nT("ui.konnected.dashboard.inProgress"),
                   children: (
                     <List
                       size="small"
                       dataSource={data.inProgress}
-                      locale={{ emptyText: "No resources in progress" }}
+                      locale={{ emptyText: i18nT("ui.konnected.dashboard.noResourcesInProgress") }}
                       renderItem={(item) => (
                         <List.Item
                           actions={[
                             typeof item.progressPercent === "number" ? (
                               <Tooltip
                                 key="progress"
-                                title={`${Math.round(
+                                title={i18nT("ui.konnected.dashboard.complete", { value1: Math.round(
                                   item.progressPercent
-                                )}% complete`}
+                                ) })}
                               >
                                 <Progress
                                   percent={Math.round(item.progressPercent)}
@@ -796,7 +799,7 @@ function LearningTile() {
                               type="link"
                               href={`/course/${encodeURIComponent(item.id)}`}
                             >
-                              Open
+                              {i18nT("ui.konnected.dashboard.open")}
                             </Button>,
                           ]}
                         >
@@ -815,12 +818,12 @@ function LearningTile() {
                 },
                 {
                   key: "recommended",
-                  label: "Recommended",
+                  label: i18nT("ui.konnected.dashboard.recommended"),
                   children: (
                     <List
                       size="small"
                       dataSource={data.recommended}
-                      locale={{ emptyText: "No recommendations available" }}
+                      locale={{ emptyText: i18nT("ui.konnected.dashboard.noRecommendationsAvailable") }}
                       renderItem={(item) => (
                         <List.Item
                           actions={[
@@ -829,7 +832,7 @@ function LearningTile() {
                               type="link"
                               href={`/course/${encodeURIComponent(item.id)}`}
                             >
-                              Open
+                              {i18nT("ui.konnected.dashboard.open")}
                             </Button>,
                           ]}
                         >
@@ -837,7 +840,7 @@ function LearningTile() {
                             title={
                               <Space>
                                 <Text strong>{item.title}</Text>
-                                <Tag color="blue">Recommended</Tag>
+                                <Tag color="blue">{i18nT("ui.konnected.dashboard.recommended")}</Tag>
                                 <Tag>{item.type}</Tag>
                               </Space>
                             }
@@ -857,11 +860,12 @@ function LearningTile() {
 }
 
 function LearningPathsTile() {
+  const { t: i18nT } = useLanguage();
   const { data, isLoading, isError } = useLearningPathSummary();
 
   if (isLoading) {
     return (
-      <ProCard title="Learning paths" bordered>
+      <ProCard title={i18nT("ui.konnected.dashboard.learningPaths")} bordered>
         <Skeleton active />
       </ProCard>
     );
@@ -870,15 +874,15 @@ function LearningPathsTile() {
   if (isError || !data) {
     return (
       <ProCard
-        title="Learning paths"
+        title={i18nT("ui.konnected.dashboard.learningPaths")}
         bordered
         extra={
           <Button type="link" href="/konnected/learning-paths/my-learning-path">
-            My learning paths
+            {i18nT("ui.konnected.dashboard.myLearningPaths")}
           </Button>
         }
       >
-        <Alert type="warning" showIcon message="Unable to load learning paths." />
+        <Alert type="warning" showIcon message={i18nT("ui.konnected.dashboard.unableToLoadLearningPaths")} />
       </ProCard>
     );
   }
@@ -890,7 +894,7 @@ function LearningPathsTile() {
 
   return (
     <ProCard
-      title="Learning paths"
+      title={i18nT("ui.konnected.dashboard.learningPaths")}
       bordered
       extra={
         <Space>
@@ -899,7 +903,7 @@ function LearningPathsTile() {
               type="default"
               href="/konnected/learning-paths/manage-existing-paths"
             >
-              Manage paths
+              {i18nT("ui.konnected.dashboard.managePaths")}
             </Button>
           )}
           {data.isEducator && (
@@ -907,7 +911,7 @@ function LearningPathsTile() {
               type="primary"
               href="/konnected/learning-paths/create-learning-path"
             >
-              Create path
+              {i18nT("ui.konnected.dashboard.createPath")}
             </Button>
           )}
           {!data.isEducator && (
@@ -915,7 +919,7 @@ function LearningPathsTile() {
               type="primary"
               href="/konnected/learning-paths/my-learning-path"
             >
-              View my paths
+              {i18nT("ui.konnected.dashboard.viewMyPaths")}
             </Button>
           )}
         </Space>
@@ -923,14 +927,14 @@ function LearningPathsTile() {
     >
       {!hasPaths ? (
         <Empty
-          description="No learning paths yet"
+          description={i18nT("ui.konnected.dashboard.noLearningPathsYet")}
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         >
           <Button
             type="primary"
             href="/konnected/learning-library/browse-resources"
           >
-            Start from library
+            {i18nT("ui.konnected.dashboard.startFromLibrary")}
           </Button>
         </Empty>
       ) : (
@@ -938,14 +942,14 @@ function LearningPathsTile() {
           <Space size="large" wrap>
             <StatisticCard
               statistic={{
-                title: "My active paths",
+                title: i18nT("ui.konnected.dashboard.myActivePaths"),
                 value: data.myActivePaths,
                 prefix: <ReadOutlined />,
               }}
             />
             <StatisticCard
               statistic={{
-                title: "Completed paths",
+                title: i18nT("ui.konnected.dashboard.completedPaths"),
                 value: data.myCompletedPaths,
                 prefix: <CheckCircleOutlined />,
               }}
@@ -953,7 +957,7 @@ function LearningPathsTile() {
             {data.isEducator && (
               <StatisticCard
                 statistic={{
-                  title: "Paths I manage",
+                  title: i18nT("ui.konnected.dashboard.pathsIManage"),
                   value: data.managedPathsCount,
                   prefix: <FileTextOutlined />,
                 }}
@@ -963,9 +967,9 @@ function LearningPathsTile() {
           {data.myCurrentPathTitle && (
             <div>
               <Space align="center">
-                <Text strong>Current path:</Text>
+                <Text strong>{i18nT("ui.konnected.dashboard.currentPath")}</Text>
                 <Text>{data.myCurrentPathTitle}</Text>
-                <Badge status="processing" text="In progress" />
+                <Badge status="processing" text={i18nT("ui.konnected.dashboard.inProgress")} />
               </Space>
               {typeof data.myCurrentPathProgressPercent === "number" && (
                 <div style={{ marginTop: 8 }}>
@@ -984,11 +988,12 @@ function LearningPathsTile() {
 }
 
 function CommunityTile() {
+  const { t: i18nT } = useLanguage();
   const { data, isLoading, isError } = useCommunitySummary();
 
   if (isLoading) {
     return (
-      <ProCard title="Community & co-creation" bordered>
+      <ProCard title={i18nT("ui.konnected.dashboard.communityCoCreation")} bordered>
         <Skeleton active />
       </ProCard>
     );
@@ -997,18 +1002,18 @@ function CommunityTile() {
   if (isError || !data) {
     return (
       <ProCard
-        title="Community & co-creation"
+        title={i18nT("ui.konnected.dashboard.communityCoCreation")}
         bordered
         extra={
           <Button type="link" href="/konnected/community-discussions/active-threads">
-            View community
+            {i18nT("ui.konnected.dashboard.viewCommunity")}
           </Button>
         }
       >
         <Alert
           type="warning"
           showIcon
-          message="Unable to load community activity."
+          message={i18nT("ui.konnected.dashboard.unableToLoadCommunityActivity")}
         />
       </ProCard>
     );
@@ -1021,7 +1026,7 @@ function CommunityTile() {
 
   return (
     <ProCard
-      title="Community & co-creation"
+      title={i18nT("ui.konnected.dashboard.communityCoCreation")}
       bordered
       extra={
         <Space>
@@ -1029,13 +1034,13 @@ function CommunityTile() {
             type="default"
             href="/konnected/community-discussions/active-threads"
           >
-            Active threads
+            {i18nT("ui.konnected.dashboard.activeThreads")}
           </Button>
           <Button
             type="primary"
             href="/konnected/community-discussions/start-new-discussion"
           >
-            Start discussion
+            {i18nT("ui.konnected.dashboard.startDiscussion")}
           </Button>
         </Space>
       }
@@ -1043,13 +1048,13 @@ function CommunityTile() {
       {!hasAny ? (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="No community activity yet"
+          description={i18nT("ui.konnected.dashboard.noCommunityActivityYet")}
         >
           <Button
             type="primary"
             href="/konnected/community-discussions/start-new-discussion"
           >
-            Start the first discussion
+            {i18nT("ui.konnected.dashboard.startTheFirstDiscussion")}
           </Button>
         </Empty>
       ) : (
@@ -1058,12 +1063,12 @@ function CommunityTile() {
           items={[
             {
               key: "forums",
-              label: "Forums",
+              label: i18nT("ui.konnected.dashboard.forums"),
               children: (
                 <List
                   size="small"
                   dataSource={data.recentTopics}
-                  locale={{ emptyText: "No recent topics" }}
+                  locale={{ emptyText: i18nT("ui.konnected.dashboard.noRecentTopics") }}
                   renderItem={(topic) => (
                     <List.Item
                       actions={[
@@ -1079,7 +1084,7 @@ function CommunityTile() {
                           type="link"
                           href="/konnected/community-discussions/active-threads"
                         >
-                          Open
+                          {i18nT("ui.konnected.dashboard.open")}
                         </Button>,
                       ]}
                     >
@@ -1088,7 +1093,7 @@ function CommunityTile() {
                         title={topic.title}
                         description={
                           <Text type="secondary">
-                            Last activity: {topic.lastActivity}
+                            {i18nT("ui.konnected.dashboard.lastActivity")} {topic.lastActivity}
                           </Text>
                         }
                       />
@@ -1099,12 +1104,12 @@ function CommunityTile() {
             },
             {
               key: "coCreation",
-              label: "Co-creation projects",
+              label: i18nT("ui.konnected.dashboard.coCreationProjects"),
               children: (
                 <List
                   size="small"
                   dataSource={data.activeCoCreationProjects}
-                  locale={{ emptyText: "No active co-creation projects" }}
+                  locale={{ emptyText: i18nT("ui.konnected.dashboard.noActiveCoCreationProjects") }}
                   renderItem={(project) => (
                     <List.Item
                       actions={[
@@ -1113,7 +1118,7 @@ function CommunityTile() {
                           type="link"
                           href="/konnected/community-discussions/active-threads"
                         >
-                          Open
+                          {i18nT("ui.konnected.dashboard.open")}
                         </Button>,
                       ]}
                     >
@@ -1140,11 +1145,12 @@ function CommunityTile() {
 }
 
 function TeamsTile() {
+  const { t: i18nT } = useLanguage();
   const { data, isLoading, isError } = useTeamsSummary();
 
   if (isLoading) {
     return (
-      <ProCard title="Teams & collaboration" bordered>
+      <ProCard title={i18nT("ui.konnected.dashboard.teamsCollaboration")} bordered>
         <Skeleton active />
       </ProCard>
     );
@@ -1153,21 +1159,21 @@ function TeamsTile() {
   if (isError || !data) {
     return (
       <ProCard
-        title="Teams & collaboration"
+        title={i18nT("ui.konnected.dashboard.teamsCollaboration")}
         bordered
         extra={
           <Button
             type="link"
             href="/konnected/teams-collaboration/team-builder"
           >
-            Discover teams
+            {i18nT("ui.konnected.dashboard.discoverTeams")}
           </Button>
         }
       >
         <Alert
           type="warning"
           showIcon
-          message="Unable to load your teams."
+          message={i18nT("ui.konnected.dashboard.unableToLoadYourTeams")}
         />
       </ProCard>
     );
@@ -1177,7 +1183,7 @@ function TeamsTile() {
 
   return (
     <ProCard
-      title="Teams & collaboration"
+      title={i18nT("ui.konnected.dashboard.teamsCollaboration")}
       bordered
       extra={
         <Space>
@@ -1185,13 +1191,13 @@ function TeamsTile() {
             type="default"
             href="/konnected/teams-collaboration/project-workspaces"
           >
-            Project workspaces
+            {i18nT("ui.konnected.dashboard.projectWorkspaces")}
           </Button>
           <Button
             type="primary"
             href="/konnected/teams-collaboration/my-teams"
           >
-            My teams
+            {i18nT("ui.konnected.dashboard.myTeams")}
           </Button>
         </Space>
       }
@@ -1199,13 +1205,13 @@ function TeamsTile() {
       {!hasTeams ? (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="You are not in any team yet"
+          description={i18nT("ui.konnected.dashboard.youAreNotInAnyTeamYet")}
         >
           <Button
             type="primary"
             href="/konnected/teams-collaboration/team-builder"
           >
-            Discover teams
+            {i18nT("ui.konnected.dashboard.discoverTeams")}
           </Button>
         </Empty>
       ) : (
@@ -1213,7 +1219,7 @@ function TeamsTile() {
           <Space size="large" wrap>
             <StatisticCard
               statistic={{
-                title: "My teams",
+                title: i18nT("ui.konnected.dashboard.myTeams"),
                 value: data.myTeamsCount,
                 prefix: <TeamOutlined />,
               }}
@@ -1222,7 +1228,7 @@ function TeamsTile() {
           {data.nextTeamActivityTitle && (
             <div style={{ marginTop: 16 }}>
               <Space>
-                <Text strong>Next team activity:</Text>
+                <Text strong>{i18nT("ui.konnected.dashboard.nextTeamActivity")}</Text>
                 <Text>{data.nextTeamActivityTitle}</Text>
                 {data.nextTeamActivityDate && (
                   <Tag icon={<LineChartOutlined />}>
@@ -1236,7 +1242,7 @@ function TeamsTile() {
             style={{ marginTop: 16 }}
             size="small"
             dataSource={data.teams}
-            locale={{ emptyText: "No teams to display" }}
+            locale={{ emptyText: i18nT("ui.konnected.dashboard.noTeamsToDisplay") }}
             renderItem={(team) => (
               <List.Item
                 actions={[
@@ -1245,7 +1251,7 @@ function TeamsTile() {
                     type="link"
                     href="/konnected/teams-collaboration/project-workspaces"
                   >
-                    Open workspace
+                    {i18nT("ui.konnected.dashboard.openWorkspace")}
                   </Button>,
                 ]}
               >
@@ -1258,12 +1264,10 @@ function TeamsTile() {
                   title={team.name}
                   description={
                     team.memberCount != null
-                      ? `${team.memberCount} member${
-                          team.memberCount === 1 ? "" : "s"
-                        }`
+                      ? i18nT("ui.konnected.dashboard.member", { memberCount: team.memberCount, value1: team.memberCount === 1 ? "" : "s" })
                       : team.role
-                      ? `Role: ${team.role}`
-                      : "Team member"
+                      ? i18nT("ui.konnected.dashboard.role", { role: team.role })
+                      : i18nT("ui.konnected.dashboard.teamMember")
                   }
                 />
               </List.Item>
@@ -1276,11 +1280,12 @@ function TeamsTile() {
 }
 
 function UsageTile() {
+  const { t: i18nT } = useLanguage();
   const { data, isLoading, isError } = useUsageSummary();
 
   if (isLoading) {
     return (
-      <ProCard title="Your usage in KonnectED" bordered>
+      <ProCard title={i18nT("ui.konnected.dashboard.yourUsageInKonnected")} bordered>
         <Skeleton active />
       </ProCard>
     );
@@ -1289,10 +1294,10 @@ function UsageTile() {
   if (isError || !data) {
     return (
       <ProCard
-        title="Your usage in KonnectED"
+        title={i18nT("ui.konnected.dashboard.yourUsageInKonnected")}
         bordered
         extra={
-          <Tooltip title="Usage analytics provided by the Insights module">
+          <Tooltip title={i18nT("ui.konnected.dashboard.usageAnalyticsProvidedByTheInsightsModule")}>
             <ExclamationCircleOutlined />
           </Tooltip>
         }
@@ -1300,7 +1305,7 @@ function UsageTile() {
         <Alert
           type="info"
           showIcon
-          message="Per-user usage analytics are not exposed by the current KonnectED API."
+          message={i18nT("ui.konnected.dashboard.perUserUsageAnalyticsAreNotExposed")}
         />
       </ProCard>
     );
@@ -1308,10 +1313,10 @@ function UsageTile() {
 
   return (
     <ProCard
-      title="Your usage in KonnectED"
+      title={i18nT("ui.konnected.dashboard.yourUsageInKonnected")}
       bordered
       extra={
-        <Tooltip title="Usage analytics provided by the Insights module">
+        <Tooltip title={i18nT("ui.konnected.dashboard.usageAnalyticsProvidedByTheInsightsModule")}>
           <ExclamationCircleOutlined />
         </Tooltip>
       }
@@ -1319,21 +1324,21 @@ function UsageTile() {
       <Space size="large" wrap>
         <StatisticCard
           statistic={{
-            title: "Active days (last 30)",
+            title: i18nT("ui.konnected.dashboard.activeDaysLast30"),
             value: data.daysActiveLast30,
             prefix: <LineChartOutlined />,
           }}
         />
         <StatisticCard
           statistic={{
-            title: "Resources completed (last 30)",
+            title: i18nT("ui.konnected.dashboard.resourcesCompletedLast30"),
             value: data.resourcesCompletedLast30,
             prefix: <ReadOutlined />,
           }}
         />
         <StatisticCard
           statistic={{
-            title: "Certifications earned (last 30)",
+            title: i18nT("ui.konnected.dashboard.certificationsEarnedLast30"),
             value: data.certificationsEarnedLast30,
             prefix: <CheckCircleOutlined />,
           }}
@@ -1346,25 +1351,26 @@ function UsageTile() {
 // ---------- Page ----------
 
 export default function KonnectedDashboardPage() {
+  const { t: i18nT } = useLanguage();
   return (
     <KonnectedPageShell
-      title="KonnectED dashboard"
-      subtitle="Overview of your certifications, learning, community, and teams."
+      title={i18nT("ui.konnected.dashboard.konnectedDashboard")}
+      subtitle={i18nT("ui.konnected.dashboard.overviewOfYourCertificationsLearningCommunityAnd")}
       primaryAction={
         <Button
           type="primary"
           href="/konnected/learning-library/recommended-resources"
         >
-          Continue learning
+          {i18nT("ui.konnected.dashboard.continueLearning")}
         </Button>
       }
       secondaryActions={
         <Space>
           <Button href="/konnected/certifications/certification-programs">
-            Certifications
+            {i18nT("ui.konnected.dashboard.certifications")}
           </Button>
           <Button href="/konnected/learning-library/browse-resources">
-            Library
+            {i18nT("ui.konnected.dashboard.library")}
           </Button>
         </Space>
       }

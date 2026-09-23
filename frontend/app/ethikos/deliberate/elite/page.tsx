@@ -1,6 +1,7 @@
 // FILE: frontend/app/ethikos/deliberate/elite/page.tsx
 'use client'
 
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ArrowRightOutlined,
   BranchesOutlined,
@@ -250,6 +251,7 @@ function topicUrl(topicId: string): string {
 }
 
 export default function EliteAgora(): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const router = useRouter()
   const { message } = App.useApp()
 
@@ -274,7 +276,7 @@ export default function EliteAgora(): JSX.Element {
     manual: true,
     onError: (requestError) => {
       console.error('Failed to load topic preview', requestError)
-      message.error('Could not load topic preview.')
+      message.error(i18nT("ui.ethikos.deliberate.elite.couldNotLoadTopicPreview"))
     },
   })
 
@@ -307,12 +309,12 @@ export default function EliteAgora(): JSX.Element {
   const headerStats = React.useMemo(
     () => [
       {
-        label: 'Open topics',
+        label: i18nT("ui.ethikos.deliberate.elite.openTopics"),
         value: openRows.length,
-        description: 'Available for stance and argument contributions',
+        description: i18nT("ui.ethikos.deliberate.elite.availableForStanceAndArgumentContributions"),
       },
       {
-        label: 'Avg stances / topic',
+        label: i18nT("ui.ethikos.deliberate.elite.avgStancesTopic"),
         value: rows.length
           ? Number(
               (
@@ -321,20 +323,20 @@ export default function EliteAgora(): JSX.Element {
               ).toFixed(1),
             )
           : 0,
-        description: 'Participation signal across listed topics',
+        description: i18nT("ui.ethikos.deliberate.elite.participationSignalAcrossListedTopics"),
       },
       {
-        label: 'Needs attention',
+        label: i18nT("ui.ethikos.deliberate.elite.needsAttention"),
         value: openRows.filter((topic) => topic.stanceCount === 0).length,
-        description: 'Open topics without recorded stances',
+        description: i18nT("ui.ethikos.deliberate.elite.openTopicsWithoutRecordedStances"),
       },
       {
-        label: 'Trending',
+        label: i18nT("ui.ethikos.deliberate.elite.trending"),
         value: rows.filter((topic) => topic.hot).length,
-        description: 'Active in the last 24 hours',
+        description: i18nT("ui.ethikos.deliberate.elite.activeInTheLast24Hours"),
       },
     ],
-    [openRows, rows],
+    [openRows, rows, i18nT],
   )
 
   const categoryFilters = React.useMemo(
@@ -355,7 +357,7 @@ export default function EliteAgora(): JSX.Element {
   const columns = React.useMemo<ProColumns<TopicRow>[]>(
     () => [
       {
-        title: 'Topic',
+        title: i18nT("ui.ethikos.deliberate.elite.topic"),
         dataIndex: 'title',
         ellipsis: true,
         render: (_dom, row) => (
@@ -375,22 +377,22 @@ export default function EliteAgora(): JSX.Element {
 
             <Space size={6} wrap>
               {row.hot ? (
-                <Tooltip title="Recent activity">
+                <Tooltip title={i18nT("ui.ethikos.deliberate.elite.recentActivity")}>
                   <Tag icon={<FireOutlined />} color="volcano">
-                    Active
+                    {i18nT("ui.ethikos.deliberate.elite.active")}
                   </Tag>
                 </Tooltip>
               ) : null}
 
               {row.stanceCount === 0 && row.status === 'open' ? (
-                <Tag color="gold">Needs first stance</Tag>
+                <Tag color="gold">{i18nT("ui.ethikos.deliberate.elite.needsFirstStance")}</Tag>
               ) : null}
             </Space>
           </Space>
         ),
       },
       {
-        title: 'Theme',
+        title: i18nT("ui.ethikos.deliberate.elite.theme"),
         dataIndex: 'categoryLabel',
         filters: categoryFilters,
         onFilter: (value, row) =>
@@ -399,17 +401,17 @@ export default function EliteAgora(): JSX.Element {
           row.categoryLabel ? (
             <Tag color="geekblue">{row.categoryLabel}</Tag>
           ) : (
-            <Text type="secondary">Uncategorised</Text>
+            <Text type="secondary">{i18nT("ui.ethikos.deliberate.elite.uncategorised")}</Text>
           ),
       },
       {
-        title: 'Status',
+        title: i18nT("ui.ethikos.deliberate.elite.status"),
         dataIndex: 'status',
         width: 120,
         filters: [
-          { text: 'Open', value: 'open' },
-          { text: 'Closed', value: 'closed' },
-          { text: 'Archived', value: 'archived' },
+          { text: i18nT("ui.ethikos.deliberate.elite.open"), value: 'open' },
+          { text: i18nT("ui.ethikos.deliberate.elite.closed"), value: 'closed' },
+          { text: i18nT("ui.ethikos.deliberate.elite.archived"), value: 'archived' },
         ],
         onFilter: (value, row) => row.status === String(value),
         render: (_dom, row) => (
@@ -417,14 +419,14 @@ export default function EliteAgora(): JSX.Element {
         ),
       },
       {
-        title: 'Stances',
+        title: i18nT("ui.ethikos.deliberate.elite.stances"),
         dataIndex: 'stanceCount',
         sorter: (a, b) => a.stanceCount - b.stanceCount,
         align: 'right',
         width: 110,
       },
       {
-        title: 'Last activity',
+        title: i18nT("ui.ethikos.deliberate.elite.lastActivity"),
         dataIndex: 'lastActivity',
         sorter: (a, b) =>
           dayjs(a.lastActivity).valueOf() - dayjs(b.lastActivity).valueOf(),
@@ -435,7 +437,7 @@ export default function EliteAgora(): JSX.Element {
           return lastActivity.isValid() ? (
             lastActivity.fromNow()
           ) : (
-            <Text type="secondary">Unknown</Text>
+            <Text type="secondary">{i18nT("ui.ethikos.deliberate.elite.unknown")}</Text>
           )
         },
       },
@@ -448,12 +450,12 @@ export default function EliteAgora(): JSX.Element {
             size="small"
             onClick={() => router.push(topicUrl(row.id))}
           >
-            Open thread
+            {i18nT("ui.ethikos.deliberate.elite.openThread")}
           </Button>
         ),
       },
     ],
-    [categoryFilters, openPreview, router],
+    [categoryFilters, openPreview, router, i18nT],
   )
 
   const openedAt = previewOpenedAt(preview)
@@ -464,18 +466,17 @@ export default function EliteAgora(): JSX.Element {
 
   return (
     <EthikosPageShell
-      title="Expert deliberation"
-      metaTitle="Expert deliberation"
+      title={i18nT("ui.ethikos.deliberate.elite.expertDeliberation")}
+      metaTitle={i18nT("ui.ethikos.deliberate.elite.expertDeliberation")}
       subtitle={
         <span>
-          Choose a structured debate topic, review the question, then open the
-          thread to record a stance, add a reason, or reply to an argument.
+          {i18nT("ui.ethikos.deliberate.elite.chooseAStructuredDebateTopicReviewThe")}
         </span>
       }
-      sectionLabel="Deliberate"
+      sectionLabel={i18nT("ui.ethikos.deliberate.elite.deliberate")}
       primaryAction={
         <Link href="/ethikos/deliberate/guidelines?sidebar=ethikos" prefetch={false}>
-          <Button icon={<ReadOutlined />}>Participation guidelines</Button>
+          <Button icon={<ReadOutlined />}>{i18nT("ui.ethikos.deliberate.elite.participationGuidelines")}</Button>
         </Link>
       }
     >
@@ -488,7 +489,7 @@ export default function EliteAgora(): JSX.Element {
               icon={<ReloadOutlined />}
               onClick={() => refresh()}
               type="text"
-              title="Refresh topics"
+              title={i18nT("ui.ethikos.deliberate.elite.refreshTopics")}
             />
             <NewTopicButton onCreated={refresh} />
           </Space>
@@ -498,7 +499,7 @@ export default function EliteAgora(): JSX.Element {
           title={
             <Space>
               <BranchesOutlined />
-              <span>Deliberation workflow</span>
+              <span>{i18nT("ui.ethikos.deliberate.elite.deliberationWorkflow")}</span>
             </Space>
           }
           style={{ marginBottom: 16 }}
@@ -508,11 +509,10 @@ export default function EliteAgora(): JSX.Element {
               <Space direction="vertical" size={8}>
                 <Space>
                   <StarOutlined />
-                  <Text strong>1. Choose a topic</Text>
+                  <Text strong>{i18nT("ui.ethikos.deliberate.elite.text1ChooseATopic")}</Text>
                 </Space>
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  Start from an open public or expert question that needs
-                  reasons, objections, and nuance.
+                  {i18nT("ui.ethikos.deliberate.elite.startFromAnOpenPublicOrExpert")}
                 </Paragraph>
               </Space>
             </ProCard>
@@ -521,11 +521,10 @@ export default function EliteAgora(): JSX.Element {
               <Space direction="vertical" size={8}>
                 <Space>
                   <SafetyCertificateOutlined />
-                  <Text strong>2. Form a stance</Text>
+                  <Text strong>{i18nT("ui.ethikos.deliberate.elite.text2FormAStance")}</Text>
                 </Space>
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  Use the −3 to +3 scale to express direction and intensity
-                  before moving toward decision.
+                  {i18nT("ui.ethikos.deliberate.elite.useThe3To3ScaleTo")}
                 </Paragraph>
               </Space>
             </ProCard>
@@ -534,11 +533,10 @@ export default function EliteAgora(): JSX.Element {
               <Space direction="vertical" size={8}>
                 <Space>
                   <ArrowRightOutlined />
-                  <Text strong>3. Add reasons</Text>
+                  <Text strong>{i18nT("ui.ethikos.deliberate.elite.text3AddReasons")}</Text>
                 </Space>
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  Add arguments, replies, sources, and suggestions so the debate
-                  becomes readable and traceable.
+                  {i18nT("ui.ethikos.deliberate.elite.addArgumentsRepliesSourcesAndSuggestionsSo")}
                 </Paragraph>
               </Space>
             </ProCard>
@@ -550,8 +548,8 @@ export default function EliteAgora(): JSX.Element {
             type="error"
             showIcon
             style={{ marginBottom: 16 }}
-            message="Unable to load deliberation topics."
-            description="Check the Deliberate service and the canonical Ethikos topics endpoint."
+            message={i18nT("ui.ethikos.deliberate.elite.unableToLoadDeliberationTopics")}
+            description={i18nT("ui.ethikos.deliberate.elite.checkTheDeliberateServiceAndTheCanonical")}
           />
         ) : null}
 
@@ -570,11 +568,10 @@ export default function EliteAgora(): JSX.Element {
         </ProCard>
 
         <ProCard
-          title="Topics ready for deliberation"
+          title={i18nT("ui.ethikos.deliberate.elite.topicsReadyForDeliberation")}
           extra={
             <Text type="secondary">
-              Open a thread to read the question, record a stance, and add
-              reasons.
+              {i18nT("ui.ethikos.deliberate.elite.openAThreadToReadTheQuestion")}
             </Text>
           }
         >
@@ -589,7 +586,7 @@ export default function EliteAgora(): JSX.Element {
               emptyText: (
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="No deliberation topics available yet"
+                  description={i18nT("ui.ethikos.deliberate.elite.noDeliberationTopicsAvailableYet")}
                 />
               ),
             }}
@@ -600,25 +597,25 @@ export default function EliteAgora(): JSX.Element {
           width={560}
           open={previewOpen}
           onClose={closePreview}
-          title="Topic preview"
+          title={i18nT("ui.ethikos.deliberate.elite.topicPreview")}
           extra={
             resolvedPreviewId ? (
               <Button
                 type="primary"
                 onClick={() => router.push(topicUrl(resolvedPreviewId))}
               >
-                Open thread
+                {i18nT("ui.ethikos.deliberate.elite.openThread")}
               </Button>
             ) : null
           }
         >
           {previewLoading ? (
-            <Empty description="Loading preview…" />
+            <Empty description={i18nT("ui.ethikos.deliberate.elite.loadingPreview")} />
           ) : preview || previewState ? (
             <>
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                 <div>
-                  <Text type="secondary">Question</Text>
+                  <Text type="secondary">{i18nT("ui.ethikos.deliberate.elite.question")}</Text>
                   <h3 style={{ marginTop: 4 }}>{drawerTitle}</h3>
                 </div>
 
@@ -631,7 +628,7 @@ export default function EliteAgora(): JSX.Element {
 
                 {preview?.description ? (
                   <div>
-                    <Text type="secondary">Context</Text>
+                    <Text type="secondary">{i18nT("ui.ethikos.deliberate.elite.context")}</Text>
                     <Paragraph style={{ marginTop: 4 }}>
                       {preview.description}
                     </Paragraph>
@@ -640,7 +637,7 @@ export default function EliteAgora(): JSX.Element {
 
                 {preview?.latest && preview.latest.length > 0 ? (
                   <div>
-                    <Text type="secondary">Latest statements</Text>
+                    <Text type="secondary">{i18nT("ui.ethikos.deliberate.elite.latestStatements")}</Text>
                     <ul style={{ paddingLeft: 20, marginTop: 8 }}>
                       {preview.latest.map((statement) => (
                         <li key={statement.id}>
@@ -653,7 +650,7 @@ export default function EliteAgora(): JSX.Element {
                 ) : hasPreviewBody ? null : (
                   <Empty
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description="No statements yet. Open the thread to start the discussion."
+                    description={i18nT("ui.ethikos.deliberate.elite.noStatementsYetOpenTheThreadTo")}
                   />
                 )}
 
@@ -665,12 +662,12 @@ export default function EliteAgora(): JSX.Element {
                     router.push(topicUrl(resolvedPreviewId))
                   }
                 >
-                  Open topic thread
+                  {i18nT("ui.ethikos.deliberate.elite.openTopicThread")}
                 </Button>
               </Space>
             </>
           ) : (
-            <Empty description="No preview data available." />
+            <Empty description={i18nT("ui.ethikos.deliberate.elite.noPreviewDataAvailable")} />
           )}
         </Drawer>
       </PageContainer>
@@ -679,6 +676,7 @@ export default function EliteAgora(): JSX.Element {
 }
 
 function NewTopicButton({ onCreated }: { onCreated: () => void }): JSX.Element {
+  const { t: i18nT } = useLanguage();
   const [visible, setVisible] = React.useState(false)
   const { message } = App.useApp()
 
@@ -693,13 +691,13 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }): JSX.Element {
   >(createEliteTopic, {
     manual: true,
     onSuccess: () => {
-      message.success('Topic created')
+      message.success(i18nT("ui.ethikos.deliberate.elite.topicCreated"))
       setVisible(false)
       onCreated()
     },
     onError: (requestError) => {
       console.error('Failed to create topic', requestError)
-      message.error('Could not create topic.')
+      message.error(i18nT("ui.ethikos.deliberate.elite.couldNotCreateTopic"))
     },
   })
 
@@ -710,11 +708,11 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }): JSX.Element {
         type="primary"
         onClick={() => setVisible(true)}
       >
-        New topic
+        {i18nT("ui.ethikos.deliberate.elite.newTopic")}
       </Button>
 
       <ModalForm<CreateTopicForm>
-        title="Create new deliberation topic"
+        title={i18nT("ui.ethikos.deliberate.elite.createNewDeliberationTopic")}
         open={visible}
         onOpenChange={setVisible}
         onFinish={async (values) => {
@@ -731,29 +729,29 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }): JSX.Element {
           type="info"
           showIcon
           style={{ marginBottom: 16 }}
-          message="Create a question that can be debated."
-          description="A good deliberation topic is specific enough to discuss, but open enough to allow arguments, objections, and nuance."
+          message={i18nT("ui.ethikos.deliberate.elite.createAQuestionThatCanBeDebated")}
+          description={i18nT("ui.ethikos.deliberate.elite.aGoodDeliberationTopicIsSpecificEnough")}
         />
 
         <ProFormText
           name="title"
-          label="Question or topic title"
-          placeholder="Example: Should public datasets require consent receipts?"
+          label={i18nT("ui.ethikos.deliberate.elite.questionOrTopicTitle")}
+          placeholder={i18nT("ui.ethikos.deliberate.elite.exampleShouldPublicDatasetsRequireConsentReceipts")}
           rules={[{ required: true, min: 10 }]}
         />
 
         <ProFormSelect
           name="categoryId"
-          label="Theme"
+          label={i18nT("ui.ethikos.deliberate.elite.theme")}
           fieldProps={{
             loading: loadingCategories,
-            placeholder: 'Select a theme',
+            placeholder: i18nT("ui.ethikos.deliberate.elite.selectATheme"),
           }}
           options={(categories ?? []).map((category) => ({
             label: category.name,
             value: category.id,
           }))}
-          rules={[{ required: true, message: 'Please select a theme' }]}
+          rules={[{ required: true, message: i18nT("ui.ethikos.deliberate.elite.pleaseSelectATheme") }]}
         />
       </ModalForm>
     </>

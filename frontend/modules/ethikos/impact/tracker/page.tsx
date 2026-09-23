@@ -1,6 +1,7 @@
 // FILE: frontend/modules/ethikos/impact/tracker/page.tsx
 'use client';
 
+import { useLanguage } from '@/context/LanguageContext';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
@@ -27,7 +28,8 @@ type TrackerResponse = {
 };
 
 export default function ImpactTracker() {
-  usePageTitle('Impact · Tracker');
+  const { t: i18nT } = useLanguage();
+  usePageTitle(i18nT("ui.ethikos.impact.tracker.impactTracker_9590e1"));
 
   // ahooks: useRequest<TData, TParams>
   const { data, loading, mutate } = useRequest<TrackerResponse, []>(fetchImpactTracker);
@@ -43,17 +45,17 @@ export default function ImpactTracker() {
   };
 
   const statusOptions: { value: TrackerRow['status']; label: string }[] = [
-    { value: 'Planned', label: 'Planned' },
-    { value: 'In-Progress', label: 'In-Progress' },
-    { value: 'Completed', label: 'Completed' },
-    { value: 'Blocked', label: 'Blocked' },
+    { value: 'Planned', label: i18nT("ui.ethikos.impact.tracker.planned") },
+    { value: 'In-Progress', label: i18nT("ui.ethikos.impact.tracker.inProgress_eb5332") },
+    { value: 'Completed', label: i18nT("ui.ethikos.impact.tracker.completed") },
+    { value: 'Blocked', label: i18nT("ui.ethikos.impact.tracker.blocked") },
   ];
 
   const columns: ProColumns<TrackerRow>[] = [
-    { title: 'Title', dataIndex: 'title', width: 260 },
-    { title: 'Owner', dataIndex: 'owner', width: 160 },
+    { title: i18nT("ui.ethikos.impact.tracker.title"), dataIndex: 'title', width: 260 },
+    { title: i18nT("ui.ethikos.impact.tracker.owner"), dataIndex: 'owner', width: 160 },
     {
-      title: 'Status',
+      title: i18nT("ui.ethikos.impact.tracker.status"),
       dataIndex: 'status',
       width: 180,
       render: (_, row) => (
@@ -66,7 +68,7 @@ export default function ImpactTracker() {
       ),
     },
     {
-      title: 'Updated',
+      title: i18nT("ui.ethikos.impact.tracker.updated"),
       dataIndex: 'updatedAt',
       sorter: (a, b) => dayjs(a.updatedAt).valueOf() - dayjs(b.updatedAt).valueOf(),
       render: (_, row) => dayjs(row.updatedAt).fromNow(),
