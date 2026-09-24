@@ -10,6 +10,7 @@ from django.utils import timezone
 from .db import world_db_scope
 from .models import WorldPersonaBridge, WorldRelease
 from .resolver import WorldUnavailable, resolve_world_runtime
+from .services.schema import WorldSchemaNotReady, assert_runtime_schema_ready
 
 _WORLD_ROUTE_RE = re.compile(
     r"^/(?:api/)?w/(?P<world_key>[a-z0-9](?:[a-z0-9-]{0,118}[a-z0-9])?)(?:/|$)"
@@ -17,25 +18,34 @@ _WORLD_ROUTE_RE = re.compile(
 
 _SAFE_METHODS = {"GET", "HEAD", "OPTIONS", "TRACE"}
 _NON_DIRTY_RUNTIME_PATHS = ("/runtime/view-as/",)
+_RUNTIME_CONTROL_SUFFIXES = ("/runtime/", "/runtime/view-as/")
 
 _WORLD_OWNED_API_PREFIXES = (
-    "/api/ethikos/",
-    "/api/deliberate/",
-    "/api/teambuilder/",
-    "/api/keenkonnect/",
-    "/api/konnected/",
-    "/api/kreative/",
-    "/api/kollective/",
-    "/api/v1/ekoh/",
-    "/api/v1/smart-vote/",
-    "/api/reports/",
-    "/api/admin/moderation/",
-    "/api/admin/konsensus-config/",
+    "/api/ethikos",
+    "/api/deliberate",
+    "/api/teambuilder",
+    "/api/keenkonnect",
+    # Legacy alias of /api/keenkonnect/projects/. It is still World-owned.
+    "/api/projects",
+    "/api/konnected",
+    "/api/kreative",
+    "/api/kollective",
+    "/api/v1/ekoh",
+    "/api/v1/smart-vote",
+    "/api/reports",
+    "/api/admin/moderation",
+    "/api/admin/konsensus-config",
 )
 
 
 def _requires_world_route(path: str) -> bool:
-    return any(path.startswith(prefix) for prefix in _WORLD_OWNED_API_PREFIXES)
+    # Match an API ownership boundary, not a raw string prefix (for example,
+    # /api/projects-old must not be classified as /api/projects).
+    normalized = path.rstrip("/") or "/"
+    return any(
+        normalized == prefix or normalized.startswith(f"{prefix}/")
+        for prefix in _WORLD_OWNED_API_PREFIXES
+    )
 
 
 def _error(code: str, detail: str, *, status: int) -> JsonResponse:
@@ -139,6 +149,16 @@ class WorldRouteMiddleware:
 
         request.world_runtime = runtime
         request.world_key = runtime.world_key
+
+        # Runtime metadata remains inspectable while a release is being repaired,
+        # but no World-owned ORM route may execute until the release-local schema
+        # pair has complete scoped migrations/tables. This prevents PostgreSQL
+        # from satisfying a missing World table from public.
+        if not any(path.endswith(suffix) for suffix in _RUNTIME_CONTROL_SUFFIXES):
+            try:
+                assert_runtime_schema_ready(runtime)
+            except WorldSchemaNotReady as exc:
+                return _error("WORLD_SCHEMA_NOT_READY", str(exc), status=503)
 
         with world_db_scope(runtime):
             _load_view_as(request, runtime)

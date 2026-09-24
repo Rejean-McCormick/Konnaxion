@@ -6,6 +6,8 @@ from django.db import models
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
+from konnaxion.worlds.services.media import world_media_path
+
 
 def kreative_artwork_upload_to(instance, filename: str) -> str:
     """
@@ -21,7 +23,10 @@ def kreative_artwork_upload_to(instance, filename: str) -> str:
     safe_name = slugify(name_part) or "artwork"
 
     pk_part = instance.pk or "new"
-    return f"kreative/artworks/{artist_id}/{pk_part}/{safe_name}{ext}"
+    return world_media_path(
+        f"{safe_name}{ext}",
+        category=f"kreative/artworks/{artist_id}/{pk_part}",
+    )
 
 
 def tradition_media_upload_to(instance, filename: str) -> str:
@@ -38,7 +43,10 @@ def tradition_media_upload_to(instance, filename: str) -> str:
     name_part, ext = os.path.splitext(filename)
     safe_name = slugify(name_part) or "media"
 
-    return f"kreative/traditions/{safe_region}/{safe_name}{ext}"
+    return world_media_path(
+        f"{safe_name}{ext}",
+        category=f"kreative/traditions/{safe_region}",
+    )
 
 
 # -- Simple reusable tag --

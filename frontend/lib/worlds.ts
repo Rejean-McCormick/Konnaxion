@@ -229,3 +229,61 @@ export function scopeBrowserApiUrl(value: string): string {
     return value;
   }
 }
+
+/** Build the canonical release-pinned WebSocket route for the active World. */
+export function scopeWorldWebSocketPath(
+  path: string,
+  worldKey: string | null | undefined,
+): string | null {
+  if (!worldKey || !isWorldKey(worldKey)) return null;
+
+  const { pathname, suffix } = splitSuffix(path || '/ws/reports/custom');
+  const clean = pathname.replace(/^\/+/, '');
+  const alreadyScoped = clean.match(/^ws\/w\/[^/]+\/(.+)$/i);
+  const socketPath = alreadyScoped
+    ? alreadyScoped[1]
+    : clean.startsWith('ws/')
+      ? clean.slice(3)
+      : clean;
+  return `/ws/w/${worldKey}/${socketPath}${suffix}`;
+}
+
+/** Resolve a browser WebSocket URL that cannot silently drop World context. */
+export function resolveWorldWebSocketUrl(
+  path = '/ws/reports/custom',
+  base?: string | null,
+): string | null {
+  if (typeof window === 'undefined') return null;
+
+  const worldKey = getWorldKeyFromPathname(window.location.pathname);
+  const scopedPath = scopeWorldWebSocketPath(path, worldKey);
+  if (!scopedPath) return null;
+
+  const rawBase = base?.trim();
+  if (!rawBase) {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${protocol}//${window.location.host}${scopedPath}`;
+  }
+
+  try {
+    let normalized = rawBase;
+    if (normalized.startsWith('http://')) {
+      normalized = `ws://${normalized.slice('http://'.length)}`;
+    } else if (normalized.startsWith('https://')) {
+      normalized = `wss://${normalized.slice('https://'.length)}`;
+    } else if (!normalized.startsWith('ws://') && !normalized.startsWith('wss://')) {
+      normalized = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${normalized}`;
+    }
+
+    const url = new URL(normalized);
+    const wsIndex = url.pathname.indexOf('/ws/');
+    const basePath = wsIndex >= 0
+      ? url.pathname.slice(0, wsIndex)
+      : url.pathname === '/'
+        ? ''
+        : url.pathname.replace(/\/+$/, '');
+    return `${url.protocol}//${url.host}${basePath}${scopedPath}`;
+  } catch {
+    return null;
+  }
+}

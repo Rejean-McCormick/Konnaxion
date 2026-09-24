@@ -3,6 +3,8 @@ import {
   isGlobalApiPath,
   parseWorldPath,
   scopeApiPath,
+  resolveWorldWebSocketUrl,
+  scopeWorldWebSocketPath,
   stripWorldPrefix,
   switchWorldPath,
   withWorldPath,
@@ -52,6 +54,35 @@ describe('World API scoping', () => {
     );
     expect(scopeApiPath('w/demo-alpha/ethikos/topics/', 'demo-alpha')).toBe(
       'w/demo-alpha/ethikos/topics/',
+    );
+    expect(scopeApiPath('/projects/', 'demo-alpha')).toBe(
+      '/w/demo-alpha/projects/',
+    );
+  });
+});
+
+
+describe('World WebSocket scoping', () => {
+  test('builds a release-routed socket path and refuses missing World identity', () => {
+    expect(scopeWorldWebSocketPath('/ws/reports/custom', 'demo-alpha')).toBe(
+      '/ws/w/demo-alpha/reports/custom',
+    );
+    expect(scopeWorldWebSocketPath('/ws/reports/custom?preview=1', 'demo-alpha')).toBe(
+      '/ws/w/demo-alpha/reports/custom?preview=1',
+    );
+    expect(scopeWorldWebSocketPath('/ws/w/stale-world/reports/custom', 'demo-alpha')).toBe(
+      '/ws/w/demo-alpha/reports/custom',
+    );
+    expect(scopeWorldWebSocketPath('/ws/reports/custom', null)).toBeNull();
+  });
+
+  test('derives a scoped ws URL from the active World browser route', () => {
+    window.history.replaceState({}, '', '/w/demo-alpha/reports/custom');
+    expect(resolveWorldWebSocketUrl('/ws/reports/custom')).toBe(
+      'ws://localhost/ws/w/demo-alpha/reports/custom',
+    );
+    expect(resolveWorldWebSocketUrl('/ws/reports/custom', 'https://api.example.test/ws/reports/custom')).toBe(
+      'wss://api.example.test/ws/w/demo-alpha/reports/custom',
     );
   });
 });

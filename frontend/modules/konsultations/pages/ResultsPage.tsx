@@ -1,6 +1,7 @@
 // FILE: frontend/modules/konsultations/pages/ResultsPage.tsx
 ﻿'use client';
 
+import { apiFetch } from '@/api';
 import { useLanguage } from '@/context/LanguageContext';
 import { Alert, Spin } from 'antd';
 import { useRouter } from 'next/router';
@@ -75,8 +76,8 @@ export default function ConsultationResultsPage(): JSX.Element {
         setError(null);
 
         const [res1, res2] = await Promise.all([
-          fetch(`/api/konsultations/consultations/${id}`),
-          fetch(`/api/konsultations/consultations/${id}/results`),
+          apiFetch(`/api/konsultations/consultations/${id}`),
+          apiFetch(`/api/konsultations/consultations/${id}/results`),
         ]);
 
         if (!res1.ok || !res2.ok) {

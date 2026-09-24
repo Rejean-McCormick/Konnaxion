@@ -1,6 +1,8 @@
 // FILE: frontend/shared/services/search.ts
 // File: shared/services/search.ts
 
+import { apiFetch } from '@/api';
+
 /**
  * Canonical global-search result shape used by the Next.js route and hooks.
  * Matches modules/global/hooks/useGlobalSearch.ts and app/_api/search/route.ts.
@@ -98,7 +100,7 @@ async function fetchKnowledgeResults(q: string, limit = 10): Promise<KnowledgeRe
     const url = qs ? `${base}?${qs}` : base;
 
     try {
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method: "GET",
         headers: {
           Accept: "application/json",

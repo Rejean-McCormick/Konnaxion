@@ -11,6 +11,10 @@ from celery import shared_task
 from django.conf import settings
 from django.utils import timezone
 
+from konnaxion.worlds.runtime import require_world_runtime
+from konnaxion.worlds.services.media import world_media_fs_directory
+from konnaxion.worlds.services.tasks import PinnedWorldTask, enqueue_for_current_releases
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -34,13 +38,8 @@ except Exception:  # pragma: no cover - model may not exist yet
 
 
 def _offline_root() -> Path:
-    """
-    Resolve the directory where offline exports/manifests are written.
-
-    By default this is <MEDIA_ROOT>/offline_packages.
-    """
-    media_root = Path(getattr(settings, "MEDIA_ROOT", "."))
-    base = media_root / "offline_packages"
+    """Return the release-namespaced directory for offline artifacts."""
+    base = world_media_fs_directory(category="konnected/offline-packages")
     base.mkdir(parents=True, exist_ok=True)
     return base
 
@@ -346,7 +345,14 @@ def _write_package_manifest(package: Any, resources: Sequence[Any]) -> Path:
         "language_filter": getattr(package, "language_filter", None),
     }
 
+    runtime = require_world_runtime()
     manifest = {
+        "world": {
+            "id": runtime.world_id,
+            "key": runtime.world_key,
+            "release_id": runtime.release_id,
+            "release_number": runtime.release_number,
+        },
         "package": package_meta,
         "generated_at": timezone.now().isoformat(),
         "items": [_serialize_resource(res) for res in resources],
@@ -436,12 +442,12 @@ def _set_package_status(
 # ---------------------------------------------------------------------------
 
 
-@shared_task()
-def export_knowledge_resources_for_offline() -> str:
+@shared_task(base=PinnedWorldTask, name="konnaxion.konnected.tasks.export_knowledge_resources_for_offline")
+def export_knowledge_resources_for_offline(*, world_id: int, release_id: int) -> str:
     """
     Generate a JSON dump of all KnowledgeResource rows for offline use.
 
-    The resulting file is written into <MEDIA_ROOT>/offline_packages and the
+    The resulting file is written into <MEDIA_ROOT>/worlds/<world>/releases/<release>/konnected/offline-packages and the
     absolute filesystem path is returned as the task result.
     """
     if KnowledgeResource is None:
@@ -459,7 +465,14 @@ def export_knowledge_resources_for_offline() -> str:
     for res in qs.iterator():
         items.append(_serialize_resource(res))
 
+    runtime = require_world_runtime()
     payload = {
+        "world": {
+            "id": int(world_id),
+            "key": runtime.world_key,
+            "release_id": int(release_id),
+            "release_number": runtime.release_number,
+        },
         "generated_at": timezone.now().isoformat(),
         "count": len(items),
         "items": items,
@@ -472,19 +485,20 @@ def export_knowledge_resources_for_offline() -> str:
     return str(out_path)
 
 
-@shared_task()
-def build_offline_package(package_id: Union[int, str]) -> Dict[str, Any]:
+@shared_task(base=PinnedWorldTask, name="konnaxion.konnected.tasks.build_offline_package")
+def build_offline_package(package_id: Union[int, str], *, world_id: int, release_id: int) -> Dict[str, Any]:
     """
     Build or rebuild a single OfflinePackage.
 
     This task:
     - Resolves candidate KnowledgeResource rows according to the package filters.
     - Applies an optional maxSizeMb constraint.
-    - Writes a JSON manifest for the bundle under <MEDIA_ROOT>/offline_packages.
+    - Writes a JSON manifest for the bundle under <MEDIA_ROOT>/worlds/<world>/releases/<release>/konnected/offline-packages.
     - Updates the package's status / counts / size metrics.
 
     The return value is a small summary dict suitable for logging or debugging.
     """
+    del world_id, release_id  # scope is established by PinnedWorldTask
     model = _ensure_offline_package_model()
 
     try:
@@ -581,41 +595,52 @@ def build_offline_package(package_id: Union[int, str]) -> Dict[str, Any]:
         }
 
 
-@shared_task()
-def build_offline_packages_for_auto_sync() -> int:
-    """
-    Enqueue builds for all OfflinePackage objects enrolled in automatic sync.
-
-    This task is intended to be scheduled by Celery beat according to the
-    OFFLINE_PACKAGE_CRON setting (see Global Parameter Reference).
-    """
+@shared_task(
+    base=PinnedWorldTask,
+    name="konnaxion.konnected.auto_sync_world",
+)
+def build_offline_packages_for_release_auto_sync(
+    *,
+    world_id: int,
+    release_id: int,
+) -> int:
+    """Queue package builds only inside the exact pinned WorldRelease."""
     model = OfflinePackage
     if model is None:
         logger.warning(
-            "OfflinePackage model not available; auto-sync task has nothing to do.",
+            "OfflinePackage model not available; auto-sync task has nothing to do."
         )
         return 0
 
     qs = model.objects.all()  # type: ignore[union-attr]
-
-    # Prefer packages explicitly opted into automatic sync.
     try:
         qs = qs.filter(auto_sync=True)
     except Exception:
-        # If the field does not exist yet, fall back to all packages.
         pass
-
-    # Avoid scheduling duplicate work for packages already building.
     try:
         qs = qs.exclude(status="building")
     except Exception:
-        # If there is no status field, just proceed with the base queryset.
         pass
 
     count = 0
     for pkg in qs.iterator():
-        build_offline_package.delay(pkg.pk)
+        build_offline_package.delay(
+            pkg.pk,
+            world_id=world_id,
+            release_id=release_id,
+        )
         count += 1
 
-    logger.info("Scheduled builds for %s auto-sync offline packages.", count)
+    logger.info(
+        "Scheduled %s auto-sync offline package builds world=%s release=%s.",
+        count,
+        world_id,
+        release_id,
+    )
     return count
+
+
+@shared_task(name="konnaxion.konnected.tasks.build_offline_packages_for_auto_sync")
+def build_offline_packages_for_auto_sync() -> int:
+    """Celery Beat coordinator across all current WorldReleases."""
+    return enqueue_for_current_releases(build_offline_packages_for_release_auto_sync)

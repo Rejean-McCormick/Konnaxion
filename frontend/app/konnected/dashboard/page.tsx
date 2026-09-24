@@ -1,6 +1,7 @@
 // FILE: frontend/app/konnected/dashboard/page.tsx
 ﻿"use client";
 
+import { apiFetch } from '@/api';
 import { useLanguage } from '@/context/LanguageContext';
 import {
   CheckCircleOutlined,
@@ -177,7 +178,7 @@ type ProjectTeamApi = {
 // ---------- Generic helpers ----------
 
 async function fetchJSON<T>(url: string): Promise<T> {
-  const res = await fetch(url, { credentials: "include" });
+  const res = await apiFetch(url, { credentials: "include" });
   if (!res.ok) {
     throw new Error(`Failed to fetch ${url}: ${res.status}`);
   }

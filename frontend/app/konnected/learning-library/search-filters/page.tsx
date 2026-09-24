@@ -1,6 +1,7 @@
 // FILE: frontend/app/konnected/learning-library/search-filters/page.tsx
 'use client';
 
+import { apiFetch } from '@/api';
 import type { TranslateFunction } from '@/i18n/runtime';
 import { useLanguage } from '@/context/LanguageContext';
 import { FilterOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
@@ -180,7 +181,7 @@ async function searchKnowledgeResources(i18nT: TranslateFunction, query: QuerySt
     const url = qs ? `${base}?${qs}` : base;
 
     try {
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

@@ -13,12 +13,14 @@ from __future__ import annotations
 import logging
 from decimal import Decimal
 from functools import lru_cache
+from threading import RLock
 from typing import Mapping
 
 from konnaxion.ekoh.db import ekoh_smartvote_db_scope
 from konnaxion.ekoh.models.config import ScoreConfiguration
 from konnaxion.ekoh.models.scores import UserExpertiseScore
 from konnaxion.ekoh.models.taxonomy import ExpertiseCategory
+from konnaxion.worlds.services.cache import require_world_cache_scope_token
 
 LOGGER = logging.getLogger(__name__)
 
@@ -27,9 +29,24 @@ ZERO = Decimal("0")
 ONE = Decimal("1")
 HUNDRED = Decimal("100")
 
+_WEIGHT_CACHE_GENERATIONS: dict[tuple[int, int], int] = {}
+_WEIGHT_CACHE_LOCK = RLock()
 
-@lru_cache(maxsize=1)
-def _weights_cache() -> Mapping[str, Decimal]:
+
+def _weight_cache_generation(scope: tuple[int, int], *, bump: bool = False) -> int:
+    with _WEIGHT_CACHE_LOCK:
+        if bump:
+            _WEIGHT_CACHE_GENERATIONS[scope] = _WEIGHT_CACHE_GENERATIONS.get(scope, 0) + 1
+        return _WEIGHT_CACHE_GENERATIONS.get(scope, 0)
+
+
+@lru_cache(maxsize=256)
+def _weights_cache(
+    world_id: int,
+    release_id: int,
+    generation: int,
+) -> Mapping[str, Decimal]:
+    del world_id, release_id, generation
     rows = (
         ScoreConfiguration.objects.filter(weight_name__startswith="RAW_WEIGHT_")
         .values_list("weight_name", "weight_value")
@@ -38,9 +55,9 @@ def _weights_cache() -> Mapping[str, Decimal]:
 
 
 def get_raw_weights(force_refresh: bool = False) -> Mapping[str, Decimal]:
-    if force_refresh:
-        _weights_cache.cache_clear()
-    return _weights_cache()
+    scope = require_world_cache_scope_token()
+    generation = _weight_cache_generation(scope, bump=force_refresh)
+    return _weights_cache(*scope, generation)
 
 
 def _normalise_metric(value: Decimal | int | float | str) -> Decimal:

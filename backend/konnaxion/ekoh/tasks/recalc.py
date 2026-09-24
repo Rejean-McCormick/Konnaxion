@@ -17,6 +17,7 @@ from django.db.models import QuerySet
 from konnaxion.ekoh.db import ekoh_smartvote_db_scope
 from konnaxion.ekoh.models.taxonomy import ExpertiseCategory
 from konnaxion.ekoh.services.multidimensional_scoring import compute_user_domain_score
+from konnaxion.worlds.services.tasks import PinnedWorldTask, enqueue_for_current_releases
 
 LOGGER = logging.getLogger(__name__)
 User = get_user_model()
@@ -42,12 +43,18 @@ def _collect_metrics(
     return None
 
 
-@shared_task(name="ekoh_score_recalc")
-def recalc_all_scores() -> dict[str, int]:
+@shared_task(
+    base=PinnedWorldTask,
+    name="konnaxion.ekoh.score_recalc_world",
+)
+def recalc_world_scores(*, world_id: int, release_id: int) -> dict[str, int]:
+    del world_id, release_id
     LOGGER.info("EkoH score rebuild started")
     processed = 0
     skipped = 0
 
+    # PinnedWorldTask already established the World DB scope.  The nested
+    # EkoH helper preserves that exact release rather than falling back global.
     with ekoh_smartvote_db_scope():
         domains: QuerySet[ExpertiseCategory] = ExpertiseCategory.objects.filter(
             depth__gte=1
@@ -73,3 +80,10 @@ def recalc_all_scores() -> dict[str, int]:
         skipped,
     )
     return {"processed": processed, "skipped": skipped}
+
+
+@shared_task(name="ekoh_score_recalc")
+def recalc_all_scores() -> dict[str, int]:
+    """Celery Beat coordinator; never recalculates against a global schema."""
+    scheduled = enqueue_for_current_releases(recalc_world_scores)
+    return {"scheduled_worlds": scheduled}

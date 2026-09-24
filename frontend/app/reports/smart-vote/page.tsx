@@ -1,5 +1,6 @@
 'use client'
 
+import { apiFetch } from '@/api';
 import { useLanguage } from '@/context/LanguageContext';
 import { ReloadOutlined } from '@ant-design/icons'
 import { ProCard, StatisticCard } from '@ant-design/pro-components'
@@ -83,7 +84,7 @@ export default function SmartVoteReportPage(): JSX.Element {
     setError(false)
 
     try {
-      const res = await fetch(`/api/reports/smart-vote/?range=${key}`)
+      const res = await apiFetch(`/api/reports/smart-vote/?range=${key}`)
       if (!res.ok) throw new Error('Failed to fetch Smart Vote report')
       setData((await res.json()) as ApiSmartVoteResponse)
     } catch (err) {

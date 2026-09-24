@@ -8,6 +8,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from konnaxion.integrations.interaction_kernel.transport import deliver_to_orgo
+from konnaxion.worlds.services.tasks import PinnedWorldTask
 from .models import InteractionEmission
 
 
@@ -17,8 +18,22 @@ def _retry_seconds(attempts: int) -> int:
     return min(maximum, base * (2 ** max(0, attempts - 1)))
 
 
-@shared_task(bind=True, name="konnaxion.ethikos.deliver_interaction_emission", max_retries=None, acks_late=True, reject_on_worker_lost=True)
-def deliver_interaction_emission_task(self, emission_id: int):
+@shared_task(
+    bind=True,
+    base=PinnedWorldTask,
+    name="konnaxion.ethikos.deliver_interaction_emission",
+    max_retries=None,
+    acks_late=True,
+    reject_on_worker_lost=True,
+)
+def deliver_interaction_emission_task(
+    self,
+    emission_id: int,
+    *,
+    world_id: int,
+    release_id: int,
+):
+    del world_id, release_id  # scope is established by PinnedWorldTask
     max_attempts = max(1, int(getattr(settings, "IK_DELIVERY_MAX_ATTEMPTS", 8) or 8))
     retry_countdown: int | None = None
     with transaction.atomic():

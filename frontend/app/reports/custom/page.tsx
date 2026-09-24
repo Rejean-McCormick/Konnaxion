@@ -2,6 +2,7 @@
 
 import type { TranslateFunction } from '@/i18n/runtime';
 import { useLanguage } from '@/context/LanguageContext';
+import { resolveWorldWebSocketUrl } from '@/lib/worlds';
 import {
   LineChartOutlined,
   PlayCircleOutlined,
@@ -147,18 +148,10 @@ function metricValueKey(metric?: BackendMetric): string {
 }
 
 function buildWsUrl(): string {
-  if (typeof window === 'undefined') {
-    return '';
-  }
-
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const host = window.location.host;
-  const wsPath = '/ws/reports/custom';
-
-  const baseFromEnv = process.env.NEXT_PUBLIC_REPORTS_WS_BASE;
-  return baseFromEnv && baseFromEnv.length > 0
-    ? `${baseFromEnv.replace(/\/$/, '')}${wsPath}`
-    : `${protocol}//${host}${wsPath}`;
+  return resolveWorldWebSocketUrl(
+    '/ws/reports/custom',
+    process.env.NEXT_PUBLIC_REPORTS_WS_BASE,
+  ) ?? '';
 }
 
 function toIsoRange(range?: [Dayjs, Dayjs]): { from?: string; to?: string } {
@@ -234,7 +227,11 @@ export default function CustomReportBuilderPage(): JSX.Element {
     if (typeof window === 'undefined') return;
 
     const url = buildWsUrl();
-    if (!url) return;
+    if (!url) {
+      setStreamStatus('error');
+      setStreamError('World context is required for the report WebSocket.');
+      return;
+    }
 
     setStreamStatus('connecting');
 
@@ -521,7 +518,7 @@ export default function CustomReportBuilderPage(): JSX.Element {
                   ) : (
                     <Text>
                       {i18nT("ui.reports.custom.thisPanelIsNowWiredToThe")}{' '}
-                      <code>/ws/reports/custom</code>{i18nT("ui.reports.custom.currentDataIsStillAPreviewStream")}
+                      <code>/ws/w/&lt;world&gt;/reports/custom</code>{i18nT("ui.reports.custom.currentDataIsStillAPreviewStream")}
                     </Text>
                   )
                 }

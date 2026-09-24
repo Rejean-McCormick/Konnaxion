@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import {
+  DEFAULT_LANGUAGE,
+  detectLanguageFromAcceptLanguage,
+  isLanguage,
+  LANGUAGE_COOKIE_KEY,
+  LANGUAGE_COOKIE_MAX_AGE,
+} from './i18n/config';
 import { getWorldKeyFromPathname, isGlobalApiPath, withWorldPath } from './lib/worlds';
 
 const STATIC_FILE_RE = /\.[a-z0-9]{2,10}$/i;
@@ -13,6 +20,26 @@ const GLOBAL_UI_PREFIXES = [
   '/health',
   '/ping',
 ] as const;
+
+function withDetectedLanguageCookie(
+  request: NextRequest,
+  response: NextResponse,
+): NextResponse {
+  const persisted = request.cookies.get(LANGUAGE_COOKIE_KEY)?.value;
+  if (isLanguage(persisted)) return response;
+
+  const detected =
+    detectLanguageFromAcceptLanguage(request.headers.get('accept-language')) ??
+    DEFAULT_LANGUAGE;
+
+  response.cookies.set(LANGUAGE_COOKIE_KEY, detected, {
+    path: '/',
+    maxAge: LANGUAGE_COOKIE_MAX_AGE,
+    sameSite: 'lax',
+  });
+
+  return response;
+}
 
 function sourceWorld(request: NextRequest): string | null {
   const referer = request.headers.get('referer');
@@ -62,11 +89,13 @@ export function middleware(request: NextRequest) {
 
   if (pathname.startsWith('/api/')) {
     const apiPath = pathname.slice('/api/'.length);
-    if (!worldKey || isGlobalApiPath(apiPath)) return NextResponse.next();
+    if (!worldKey || isGlobalApiPath(apiPath)) {
+      return withDetectedLanguageCookie(request, NextResponse.next());
+    }
 
     const target = request.nextUrl.clone();
     target.pathname = `/api/w/${worldKey}/${apiPath}`;
-    return NextResponse.rewrite(target);
+    return withDetectedLanguageCookie(request, NextResponse.rewrite(target));
   }
 
   if (
@@ -76,10 +105,10 @@ export function middleware(request: NextRequest) {
   ) {
     const target = request.nextUrl.clone();
     target.pathname = withWorldPath(pathname, worldKey);
-    return NextResponse.redirect(target);
+    return withDetectedLanguageCookie(request, NextResponse.redirect(target));
   }
 
-  return NextResponse.next();
+  return withDetectedLanguageCookie(request, NextResponse.next());
 }
 
 export const config = {

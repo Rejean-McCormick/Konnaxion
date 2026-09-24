@@ -1,5 +1,7 @@
 // frontend/features/ethikos/demo-importer/api.ts
 
+import { apiFetch } from '@/api';
+
 import {
   ETHIKOS_DEMO_SCHEMA_VERSION_V1,
   ETHIKOS_DEMO_SCHEMA_VERSION_V3,
@@ -179,7 +181,7 @@ async function postEthikosDemoJson<TPayload>(
   let response: Response;
 
   try {
-    response = await fetch(normalizedEndpoint, {
+    response = await apiFetch(normalizedEndpoint, {
       method: "POST",
       headers,
       credentials: "include",

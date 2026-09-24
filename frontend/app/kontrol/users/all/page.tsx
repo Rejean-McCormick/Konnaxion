@@ -1,6 +1,7 @@
 // FILE: frontend/app/kontrol/users/all/page.tsx
 'use client';
 
+import { apiFetch } from '@/api';
 import { useLanguage } from '@/context/LanguageContext';
 import {
   EllipsisOutlined,
@@ -278,7 +279,7 @@ export default function AllUsersPage(): JSX.Element {
           }
 
           try {
-            const response = await fetch(
+            const response = await apiFetch(
               `/api/admin/users/?${searchParams.toString()}`,
             );
             if (!response.ok)

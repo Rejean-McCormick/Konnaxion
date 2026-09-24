@@ -7,6 +7,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from konnaxion.ethikos.models import DecisionRecord, InteractionEmission
+from konnaxion.worlds.runtime import get_world_runtime, require_world_runtime
 
 from .contracts import build_decision_execute_envelope
 from .fingerprint import request_fingerprint
@@ -27,6 +28,25 @@ def _iso(value) -> str | None:
     return value.isoformat().replace("+00:00", "Z")
 
 
+def _source_world_release() -> tuple[str | None, str | None]:
+    """Return explicit World provenance for IK exports/emissions.
+
+    In strict multi-World mode, World-owned IK operations may not fall back to
+    process settings because that would become hidden cross-request authority.
+    The settings fallback remains only for explicit legacy/single-World mode.
+    """
+    runtime = get_world_runtime()
+    if runtime is not None:
+        return runtime.world_key, str(runtime.release_number)
+
+    if bool(getattr(settings, "KONNAXION_WORLDS_ENFORCE_SCOPED_API", False)):
+        require_world_runtime()  # raises a clear fail-closed error
+
+    source_world = str(getattr(settings, "IK_KONNAXION_WORLD", "") or "").strip() or None
+    source_release = str(getattr(settings, "IK_KONNAXION_RELEASE", "") or "").strip() or None
+    return source_world, source_release
+
+
 def decision_artifact_payload(record: DecisionRecord) -> dict[str, Any]:
     return {
         "artifact_type": "konnaxion.decision_record",
@@ -43,6 +63,8 @@ def decision_artifact_payload(record: DecisionRecord) -> dict[str, Any]:
 
 
 def publish_decision_record(*, decision_id: int) -> DecisionRecord:
+    # Trust boundary: source state is World-owned.
+    require_world_runtime()
     with transaction.atomic():
         record = DecisionRecord.objects.select_for_update().get(pk=decision_id)
         if record.status == DecisionRecord.STATUS_PUBLISHED:
@@ -61,14 +83,14 @@ def publish_decision_record(*, decision_id: int) -> DecisionRecord:
 
 
 def enqueue_decision_execution(*, decision_id: int, target_organization: str, target_world: str | None = None, execution_scope: Mapping[str, Any] | None = None) -> InteractionEmission:
+    runtime = require_world_runtime()
+    source_world, source_release = _source_world_release()
     with transaction.atomic():
         record = DecisionRecord.objects.select_for_update().get(pk=decision_id)
         if record.status != DecisionRecord.STATUS_PUBLISHED:
             raise DecisionLifecycleError("Decision must be published before execution is requested.")
         if not record.artifact_digest or not record.published_payload:
             raise DecisionLifecycleError("Published decision artifact is incomplete.")
-        source_world = str(getattr(settings, "IK_KONNAXION_WORLD", "") or "").strip() or None
-        source_release = str(getattr(settings, "IK_KONNAXION_RELEASE", "") or "").strip() or None
         envelope = build_decision_execute_envelope(
             decision_id=str(record.pk), revision=str(record.revision), artifact_digest=record.artifact_digest,
             source_world=source_world, source_release=source_release, target_organization=target_organization,
@@ -88,21 +110,29 @@ def enqueue_decision_execution(*, decision_id: int, target_organization: str, ta
             subject_id=envelope["subject"]["id"], idempotency_key=key, request_fingerprint=fingerprint,
             envelope_json=envelope, status=InteractionEmission.STATUS_QUEUED,
         )
+
         def _schedule() -> None:
             from konnaxion.ethikos.tasks import deliver_interaction_emission_task
-            deliver_interaction_emission_task.delay(emission.pk)
+            deliver_interaction_emission_task.delay(
+                emission.pk,
+                world_id=runtime.world_id,
+                release_id=runtime.release_id,
+            )
+
         transaction.on_commit(_schedule)
         return emission
 
 
 def build_konnaxion_export(*, decision: DecisionRecord) -> dict[str, Any]:
+    require_world_runtime()
     if decision.status != DecisionRecord.STATUS_PUBLISHED or not decision.artifact_digest:
         raise DecisionLifecycleError("Only a fully published decision can be exported.")
-    source_world = str(getattr(settings, "IK_KONNAXION_WORLD", "") or "").strip() or None
-    source_release = str(getattr(settings, "IK_KONNAXION_RELEASE", "") or "").strip() or None
+    source_world, source_release = _source_world_release()
     scope = {}
-    if source_world: scope["world"] = source_world
-    if source_release: scope["release"] = source_release
+    if source_world:
+        scope["world"] = source_world
+    if source_release:
+        scope["release"] = source_release
     return {
         "id": f"kx-export:decision:{decision.pk}:r{decision.revision}", "profile": "konnaxion.export/1.0.0",
         "producer": {"system": "konnaxion"}, "snapshot_at": _iso(decision.published_at),

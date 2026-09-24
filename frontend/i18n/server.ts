@@ -1,7 +1,8 @@
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 import {
   DEFAULT_LANGUAGE,
+  detectLanguageFromAcceptLanguage,
   FALLBACK_LANGUAGE,
   isLanguage,
   LANGUAGE_COOKIE_KEY,
@@ -21,7 +22,13 @@ const catalogs = { en: enCatalog, fr: frCatalog } as const;
 export async function getServerLanguage() {
   const store = await cookies();
   const value = store.get(LANGUAGE_COOKIE_KEY)?.value;
-  return isLanguage(value) ? value : DEFAULT_LANGUAGE;
+  if (isLanguage(value)) return value;
+
+  const requestHeaders = await headers();
+  return (
+    detectLanguageFromAcceptLanguage(requestHeaders.get('accept-language')) ??
+    DEFAULT_LANGUAGE
+  );
 }
 
 export async function getServerI18n() {

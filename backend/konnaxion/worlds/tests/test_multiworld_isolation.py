@@ -10,7 +10,7 @@ from konnaxion.worlds.models import World
 from konnaxion.worlds.services.builder import build_world_release, promote_release, purge_release
 from konnaxion.worlds.services.schema import read_canary
 
-pytestmark = pytest.mark.django_db
+pytestmark = pytest.mark.django_db(transaction=True)
 
 
 def _require_postgres():

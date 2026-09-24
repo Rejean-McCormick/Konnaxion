@@ -9,6 +9,11 @@ from ..models import World, WorldBuildJob, WorldRelease
 from .schema import validate_release_schemas
 
 
+def strict_world_routing_enabled() -> bool:
+    """Return the actual fail-closed setting enforced by WorldRouteMiddleware."""
+    return bool(getattr(settings, "KONNAXION_WORLDS_ENFORCE_SCOPED_API", False))
+
+
 def world_liveness() -> dict:
     """Constant-cost process liveness; deliberately does not touch the catalog."""
     return {
@@ -24,10 +29,16 @@ def world_readiness() -> dict:
         "architecture_lock": "KX-WORLDS-1",
         "kind": "readiness",
         "database_vendor": connection.vendor,
-        "strict_routing": bool(getattr(settings, "KONNAXION_WORLDS_STRICT_ROUTING", False)),
+        "strict_routing": strict_world_routing_enabled(),
         "ok": True,
         "errors": [],
     }
+    if not result["strict_routing"]:
+        result["ok"] = False
+        result["errors"].append(
+            "World-owned APIs are not fail-closed; enable KONNAXION_WORLDS_ENFORCE_SCOPED_API."
+        )
+
     if connection.vendor != "postgresql":
         result["ok"] = False
         result["errors"].append(
@@ -124,13 +135,22 @@ def world_system_health() -> dict:
         "architecture_lock": "KX-WORLDS-1",
         "kind": "deep",
         "database_vendor": connection.vendor,
-        "strict_routing": bool(getattr(settings, "KONNAXION_WORLDS_STRICT_ROUTING", False)),
+        "strict_routing": strict_world_routing_enabled(),
         "worlds": [],
         "ok": True,
+        "errors": [],
     }
+    if not result["strict_routing"]:
+        result["ok"] = False
+        result["errors"].append(
+            "World-owned APIs are not fail-closed; enable KONNAXION_WORLDS_ENFORCE_SCOPED_API."
+        )
+
     if connection.vendor != "postgresql":
         result["ok"] = False
-        result["errors"] = ["Konnaxion Worlds requires PostgreSQL schema/search_path support."]
+        result["errors"].append(
+            "Konnaxion Worlds requires PostgreSQL schema/search_path support."
+        )
         return result
 
     for world in World.objects.select_related("current_release").order_by("key"):

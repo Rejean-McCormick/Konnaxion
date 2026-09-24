@@ -1,6 +1,7 @@
 // FILE: frontend/app/konnected/learning-paths/my-learning-path/page.tsx
 'use client';
 
+import { apiFetch } from '@/api';
 import { useLanguage } from '@/context/LanguageContext';
 import { ClockCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import {
@@ -255,7 +256,7 @@ type FetchResult = {
  */
 async function fetchMyLearningPaths(): Promise<FetchResult> {
   try {
-    const res = await fetch('/api/konnected/learning-paths/my', {
+    const res = await apiFetch('/api/konnected/learning-paths/my', {
       method: 'GET',
       cache: 'no-store',
     });

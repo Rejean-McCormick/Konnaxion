@@ -3,6 +3,8 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from konnaxion.worlds.services.media import world_media_path
+
 class Project(models.Model):
     class Status(models.TextChoices):
         IDEA = "idea", _("Idea")
@@ -33,7 +35,10 @@ class Project(models.Model):
         return self.title
 
 def project_file_path(instance, filename):
-    return f"projects/{instance.project_id}/{filename}"
+    return world_media_path(
+        filename,
+        category=f"keenkonnect/projects/{instance.project_id}",
+    )
 
 class ProjectResource(models.Model):
     class FileType(models.TextChoices):

@@ -1,6 +1,7 @@
 // FILE: frontend/app/kontrol/audit-log/page.tsx
 'use client';
 
+import { apiFetch } from '@/api';
 import { useLanguage } from '@/context/LanguageContext';
 import {
   CloudDownloadOutlined,
@@ -259,7 +260,7 @@ export default function AuditLogPage(): JSX.Element {
               // (Assuming backend supports ?ordering=-created)
               searchParams.append('ordering', '-created');
 
-              const response = await fetch(
+              const response = await apiFetch(
                 `/api/admin/audit-log/?${searchParams.toString()}`,
               );
 

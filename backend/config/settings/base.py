@@ -481,9 +481,12 @@ KONNAXION_WORLDS_DATA_PLANE_ENABLED = env.bool(
     "KONNAXION_WORLDS_DATA_PLANE_ENABLED",
     default=False,
 )
+# Multi-World deployments are fail-closed by default.  Legacy unscoped
+# World-owned APIs may only be re-enabled through an explicit compatibility
+# override; they must never silently select a default World.
 KONNAXION_WORLDS_ENFORCE_SCOPED_API = env.bool(
     "KONNAXION_WORLDS_ENFORCE_SCOPED_API",
-    default=False,
+    default=True,
 )
 KONNAXION_WORLD_SEED_ROOT = env(
     "KONNAXION_WORLD_SEED_ROOT",

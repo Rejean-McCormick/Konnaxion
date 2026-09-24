@@ -1,5 +1,6 @@
 'use client';
 
+import { apiFetch } from '@/api';
 import type { TranslateFunction } from '@/i18n/runtime';
 import { useLanguage } from '@/context/LanguageContext';
 import { InfoCircleOutlined, ReloadOutlined } from '@ant-design/icons';
@@ -183,7 +184,7 @@ export default function PerfReportPage(): JSX.Element {
     setError(null);
 
     try {
-      const perfRes = await fetch(`/api/reports/perf/?range=${nextRange}`, {
+      const perfRes = await apiFetch(`/api/reports/perf/?range=${nextRange}`, {
         cache: 'no-store',
         credentials: 'include',
       });

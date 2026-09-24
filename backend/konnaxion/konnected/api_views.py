@@ -8,6 +8,8 @@ from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from konnaxion.worlds.runtime import require_world_runtime
+
 from .models import (
     CertificationPath,
     Evaluation,
@@ -349,7 +351,12 @@ class OfflinePackageViewSet(viewsets.ModelViewSet):
         executed by Celery workers. This endpoint simply enqueues the task.
         """
         package = self.get_object()
-        build_offline_package.delay(package.pk)
+        runtime = require_world_runtime()
+        build_offline_package.delay(
+            package.pk,
+            world_id=runtime.world_id,
+            release_id=runtime.release_id,
+        )
 
         # Optionally, we can mark the package as scheduled here; the task
         # itself will update status/progress as it runs.

@@ -5,9 +5,9 @@ import dayjs from "dayjs";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import MainLayout from "@/shared/layout/MainLayout";
+import { resolveWorldWebSocketUrl } from "@/lib/worlds";
 
 import TimeRangePicker from "../components/TimeRangePicker";
-import useReportStream from "../hooks/useReportStream";
 
 type Range = [dayjs.Dayjs, dayjs.Dayjs];
 
@@ -29,9 +29,6 @@ interface StreamMessage {
 
 export default function CustomBuilderPage() {
   const { t: i18nT } = useLanguage();
-  // Keep the hook wired so it can evolve to manage the stream internally.
-  useReportStream();
-
   const [builder, setBuilder] = useState<BuilderState>({
     metric: "smart-vote",
     groupBy: "day",
@@ -52,13 +49,20 @@ export default function CustomBuilderPage() {
       return;
     }
 
-    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-    const host = window.location.host;
+    const url = resolveWorldWebSocketUrl(
+      "/ws/reports/custom",
+      process.env.NEXT_PUBLIC_REPORTS_WS_BASE,
+    );
+    if (!url) {
+      setConnectionStatus("error");
+      setLastError("World context is required for the report WebSocket.");
+      return;
+    }
 
     setConnectionStatus("connecting");
     setLastError(null);
 
-    const ws = new WebSocket(`${protocol}://${host}/ws/reports/custom`);
+    const ws = new WebSocket(url);
     wsRef.current = ws;
 
     ws.onopen = () => {
@@ -67,7 +71,7 @@ export default function CustomBuilderPage() {
 
     ws.onerror = () => {
       setConnectionStatus("error");
-      setLastError("Unable to open /ws/reports/custom WebSocket.");
+      setLastError("Unable to open the World-scoped report WebSocket.");
     };
 
     ws.onclose = () => {

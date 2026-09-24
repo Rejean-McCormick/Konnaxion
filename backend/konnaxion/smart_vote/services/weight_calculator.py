@@ -20,12 +20,14 @@ from __future__ import annotations
 import logging
 from decimal import Decimal
 from functools import lru_cache
+from threading import RLock
 from typing import Dict
 
 from konnaxion.ekoh.db import ekoh_smartvote_db_scope
 from konnaxion.ekoh.models.config import ScoreConfiguration
 from konnaxion.ekoh.models.scores import UserEthicsScore, UserExpertiseScore
 from konnaxion.smart_vote.models.consultation_relevance import ConsultationRelevance
+from konnaxion.worlds.services.cache import require_world_cache_scope_token
 
 LOGGER = logging.getLogger(__name__)
 
@@ -33,10 +35,27 @@ ONE = Decimal("1.0")
 ZERO = Decimal("0.0")
 HUNDRED = Decimal("100.0")
 
+_CACHE_GENERATIONS: dict[tuple[int, int], int] = {}
+_CACHE_GENERATION_LOCK = RLock()
 
-@lru_cache(maxsize=32)
-def _fetch_param(name: str, default: Decimal = ONE) -> Decimal:
+
+def _cache_generation(scope: tuple[int, int], *, bump: bool = False) -> int:
+    with _CACHE_GENERATION_LOCK:
+        if bump:
+            _CACHE_GENERATIONS[scope] = _CACHE_GENERATIONS.get(scope, 0) + 1
+        return _CACHE_GENERATIONS.get(scope, 0)
+
+
+@lru_cache(maxsize=256)
+def _fetch_param(
+    world_id: int,
+    release_id: int,
+    generation: int,
+    name: str,
+    default: Decimal = ONE,
+) -> Decimal:
     """Read a numeric runtime parameter without hitting DB at import time."""
+    del world_id, release_id, generation
     obj = ScoreConfiguration.objects.filter(weight_name=name).first()
     if obj is None:
         return default
@@ -45,12 +64,20 @@ def _fetch_param(name: str, default: Decimal = ONE) -> Decimal:
 
 def expertise_bonus_cap() -> Decimal:
     """Maximum expertise bonus added on top of the 1.0 baseline."""
-    value = _fetch_param("EKOH_MULTIPLIER_CAP", ONE)
+    scope = require_world_cache_scope_token()
+    generation = _cache_generation(scope)
+    value = _fetch_param(*scope, generation, "EKOH_MULTIPLIER_CAP", ONE)
     return max(ZERO, value)
 
 
-@lru_cache(maxsize=512)
-def _relevance_vector(consultation_id) -> Dict[int, Decimal]:
+@lru_cache(maxsize=4_096)
+def _relevance_vector(
+    world_id: int,
+    release_id: int,
+    generation: int,
+    consultation_id,
+) -> Dict[int, Decimal]:
+    del world_id, release_id, generation
     rows = ConsultationRelevance.objects.filter(
         consultation_id=consultation_id
     ).values_list("category_id", "weight")
@@ -68,8 +95,14 @@ def _normalise_expertise_score(value: Decimal) -> Decimal:
     return min(ONE, value)
 
 
-@lru_cache(maxsize=5_000)
-def _expertise_vector(user_id: int) -> Dict[int, Decimal]:
+@lru_cache(maxsize=20_000)
+def _expertise_vector(
+    world_id: int,
+    release_id: int,
+    generation: int,
+    user_id: int,
+) -> Dict[int, Decimal]:
+    del world_id, release_id, generation
     rows = UserExpertiseScore.objects.filter(user_id=user_id).values_list(
         "category_id",
         "weighted_score",
@@ -89,8 +122,10 @@ def _ethics_multiplier(user_id: int) -> Decimal:
 
 
 def _get_expertise_alignment_core(user_id: int, consultation_id) -> Decimal:
-    rel_vec = _relevance_vector(consultation_id)
-    exp_vec = _expertise_vector(user_id)
+    scope = require_world_cache_scope_token()
+    generation = _cache_generation(scope)
+    rel_vec = _relevance_vector(*scope, generation, consultation_id)
+    exp_vec = _expertise_vector(*scope, generation, user_id)
     dot = sum(
         rel_vec.get(category_id, ZERO) * exp_vec.get(category_id, ZERO)
         for category_id in rel_vec
@@ -129,7 +164,6 @@ def get_weight(user_id: int, consultation_id) -> Decimal:
 
 
 def clear_weight_caches() -> None:
-    """Clear cached relevance/expertise/config values after profile changes."""
-    _fetch_param.cache_clear()
-    _relevance_vector.cache_clear()
-    _expertise_vector.cache_clear()
+    """Invalidate only the active World/Release cache partition."""
+    scope = require_world_cache_scope_token()
+    _cache_generation(scope, bump=True)

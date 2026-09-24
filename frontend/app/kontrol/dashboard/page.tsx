@@ -1,5 +1,6 @@
 'use client'
 
+import { apiFetch } from '@/api';
 import { useLanguage } from '@/context/LanguageContext';
 import {
   AuditOutlined,
@@ -71,7 +72,7 @@ function count<T>(payload: ApiList<T>): number {
 }
 
 async function getJson<T>(url: string): Promise<T> {
-  const response = await fetch(url, { credentials: 'include' })
+  const response = await apiFetch(url, { credentials: 'include' })
   if (!response.ok) {
     throw new Error(`${url} returned HTTP ${response.status}`)
   }

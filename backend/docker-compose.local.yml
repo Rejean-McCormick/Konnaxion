@@ -18,6 +18,8 @@ services:
       - ./.envs/.local/.django
       # contains only DATABASE_URL for Neon
       - ./.envs/.local/.postgres
+    environment:
+      KONNAXION_WORLDS_ENFORCE_SCOPED_API: "${KONNAXION_WORLDS_ENFORCE_SCOPED_API:-true}"
     ports:
       - "127.0.0.1:8000:8000"
     command: /start

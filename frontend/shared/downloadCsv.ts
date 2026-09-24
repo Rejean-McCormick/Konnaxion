@@ -1,6 +1,8 @@
 // FILE: frontend/shared/downloadCsv.ts
 'use client'
 
+import { apiFetch } from '@/api';
+
 export async function downloadCsv(endpoint: string, params?: Record<string, unknown>) {
   const search = new URLSearchParams();
 
@@ -18,7 +20,7 @@ export async function downloadCsv(endpoint: string, params?: Record<string, unkn
 
   const url = `/api/reports/export?${search.toString()}`;
 
-  const res = await fetch(url);
+  const res = await apiFetch(url);
   if (!res.ok) throw new Error("CSV export failed");
 
   const blob = await res.blob();

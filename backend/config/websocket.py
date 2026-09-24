@@ -1,11 +1,25 @@
 # FILE: backend/config/websocket.py
+from __future__ import annotations
+
 import json
+import logging
+import re
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-REPORTS_WS_PATH = "/ws/reports/custom"
+from django.core.exceptions import PermissionDenied
+
+from konnaxion.worlds.resolver import WorldUnavailable
+from konnaxion.worlds.runtime import reset_world_runtime, set_world_runtime
+from konnaxion.worlds.services.cache import world_channel_name
+from konnaxion.worlds.services.websocket import resolve_websocket_world_runtime
+
+REPORTS_WS_RE = re.compile(
+    r"^/ws/w/(?P<world_key>[a-z0-9](?:[a-z0-9-]{0,118}[a-z0-9])?)/reports/custom/?$"
+)
 SUPPORTED_METRICS = {"smart-vote", "usage", "perf"}
 SUPPORTED_GROUP_BY = {"day", "week"}
+LOGGER = logging.getLogger(__name__)
 
 
 def _iso_now() -> str:
@@ -74,7 +88,7 @@ def _build_preview_samples(request_payload: dict[str, Any]) -> list[dict[str, An
     elif metric == "usage":
         values = [120, 136, 149, 162, 171]
         metric_key = "active_users"
-    else:  # perf
+    else:
         values = [280, 265, 250, 242, 238]
         metric_key = "p95_latency_ms"
 
@@ -103,6 +117,8 @@ def _build_preview_samples(request_payload: dict[str, Any]) -> list[dict[str, An
 def _build_summary(
     request_payload: dict[str, Any],
     samples: list[dict[str, Any]],
+    *,
+    runtime,
 ) -> dict[str, Any]:
     metric = request_payload["metric"]
 
@@ -128,7 +144,7 @@ def _build_summary(
         }
 
     return {
-        "queryId": f'{metric}:{request_payload["group_by"]}',
+        "queryId": f'w{runtime.world_id}.r{runtime.release_id}:{metric}:{request_payload["group_by"]}',
         "sampleCount": len(samples),
         "durationMs": 5,
         "aggregates": aggregates,
@@ -137,118 +153,156 @@ def _build_summary(
             "group_by": request_payload["group_by"],
             "range": request_payload["range"],
             "preview": True,
+            "world_id": runtime.world_id,
+            "world_key": runtime.world_key,
+            "release_id": runtime.release_id,
+            "release_number": runtime.release_number,
         },
     }
 
 
 async def websocket_application(scope, receive, send):
+    first_event = await receive()
+    if first_event.get("type") != "websocket.connect":
+        return
+
     path = scope.get("path", "")
-    accepted = False
+    match = REPORTS_WS_RE.fullmatch(path)
+    if match is None:
+        await send({"type": "websocket.close", "code": 4404})
+        return
 
-    while True:
-        event = await receive()
-        event_type = event.get("type")
+    world_key = match.group("world_key")
+    try:
+        runtime = await resolve_websocket_world_runtime(
+            world_key=world_key,
+            headers=scope.get("headers", ()),
+        )
+    except (WorldUnavailable, PermissionDenied):
+        # Do not disclose whether an inaccessible private World exists.
+        await send({"type": "websocket.close", "code": 4404})
+        return
+    except Exception:
+        LOGGER.exception("World WebSocket resolution failed for %s", world_key)
+        await send({"type": "websocket.close", "code": 1011})
+        return
 
-        if event_type == "websocket.connect":
-            if path != REPORTS_WS_PATH:
-                await send({"type": "websocket.close", "code": 4404})
-                return
+    token = set_world_runtime(runtime)
+    channel = world_channel_name("reports.custom", runtime=runtime)
 
-            await send({"type": "websocket.accept"})
-            accepted = True
-
-            await _send_json(
-                send,
-                {
-                    "kind": "connected",
-                    "at": _iso_now(),
-                    "path": path,
-                },
-            )
-            continue
-
-        if event_type == "websocket.disconnect":
-            return
-
-        if event_type != "websocket.receive" or not accepted:
-            continue
-
-        text = _coerce_text(event)
-        if text is None:
-            await _send_json(
-                send,
-                {
-                    "kind": "error",
-                    "at": _iso_now(),
-                    "error": {
-                        "code": "UNSUPPORTED_FRAME",
-                        "message": "Only text websocket frames are supported.",
-                    },
-                },
-            )
-            continue
-
-        if text == "ping":
-            await send({"type": "websocket.send", "text": "pong!"})
-            await _send_json(
-                send,
-                {
-                    "kind": "keepalive",
-                    "at": _iso_now(),
-                    "payload": {"path": path},
-                },
-            )
-            continue
-
-        try:
-            payload = json.loads(text)
-        except json.JSONDecodeError:
-            await _send_json(
-                send,
-                {
-                    "kind": "error",
-                    "at": _iso_now(),
-                    "error": {
-                        "code": "INVALID_JSON",
-                        "message": "Expected JSON payload or the literal 'ping'.",
-                    },
-                },
-            )
-            continue
-
-        if not isinstance(payload, dict):
-            await _send_json(
-                send,
-                {
-                    "kind": "error",
-                    "at": _iso_now(),
-                    "error": {
-                        "code": "INVALID_PAYLOAD",
-                        "message": "Expected a JSON object payload.",
-                    },
-                },
-            )
-            continue
-
-        request_payload = _normalize_request(payload)
-        samples = _build_preview_samples(request_payload)
-        summary = _build_summary(request_payload, samples)
-
+    try:
+        await send({"type": "websocket.accept"})
         await _send_json(
             send,
             {
-                "kind": "summary",
+                "kind": "connected",
                 "at": _iso_now(),
-                "summary": summary,
+                "path": path,
+                "channel": channel,
+                "world": {
+                    "id": runtime.world_id,
+                    "key": runtime.world_key,
+                    "release_id": runtime.release_id,
+                    "release_number": runtime.release_number,
+                },
             },
         )
 
-        for sample in samples:
+        while True:
+            event = await receive()
+            event_type = event.get("type")
+
+            if event_type == "websocket.disconnect":
+                return
+
+            if event_type != "websocket.receive":
+                continue
+
+            text = _coerce_text(event)
+            if text is None:
+                await _send_json(
+                    send,
+                    {
+                        "kind": "error",
+                        "at": _iso_now(),
+                        "error": {
+                            "code": "UNSUPPORTED_FRAME",
+                            "message": "Only text websocket frames are supported.",
+                        },
+                    },
+                )
+                continue
+
+            if text == "ping":
+                await send({"type": "websocket.send", "text": "pong!"})
+                await _send_json(
+                    send,
+                    {
+                        "kind": "keepalive",
+                        "at": _iso_now(),
+                        "payload": {
+                            "path": path,
+                            "channel": channel,
+                            "world_id": runtime.world_id,
+                            "release_id": runtime.release_id,
+                        },
+                    },
+                )
+                continue
+
+            try:
+                payload = json.loads(text)
+            except json.JSONDecodeError:
+                await _send_json(
+                    send,
+                    {
+                        "kind": "error",
+                        "at": _iso_now(),
+                        "error": {
+                            "code": "INVALID_JSON",
+                            "message": "Expected JSON payload or the literal 'ping'.",
+                        },
+                    },
+                )
+                continue
+
+            if not isinstance(payload, dict):
+                await _send_json(
+                    send,
+                    {
+                        "kind": "error",
+                        "at": _iso_now(),
+                        "error": {
+                            "code": "INVALID_PAYLOAD",
+                            "message": "Expected a JSON object payload.",
+                        },
+                    },
+                )
+                continue
+
+            request_payload = _normalize_request(payload)
+            samples = _build_preview_samples(request_payload)
+            summary = _build_summary(request_payload, samples, runtime=runtime)
+
             await _send_json(
                 send,
                 {
-                    "kind": "sample",
-                    "at": sample["ts"],
-                    "sample": sample,
+                    "kind": "summary",
+                    "at": _iso_now(),
+                    "summary": summary,
                 },
             )
+
+            for sample in samples:
+                await _send_json(
+                    send,
+                    {
+                        "kind": "sample",
+                        "at": sample["ts"],
+                        "world_id": runtime.world_id,
+                        "release_id": runtime.release_id,
+                        "sample": sample,
+                    },
+                )
+    finally:
+        reset_world_runtime(token)

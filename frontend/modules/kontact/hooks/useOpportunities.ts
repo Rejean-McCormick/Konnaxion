@@ -1,6 +1,7 @@
 // FILE: frontend/modules/kontact/hooks/useOpportunities.ts
 ﻿// modules/kontact/hooks/useOpportunities.ts
 
+import { apiFetch } from '@/api';
 import { useQuery } from '@tanstack/react-query';
 
 export interface Opportunity {
@@ -359,7 +360,7 @@ async function fetchOpportunities(
 
   for (const base of endpoints) {
     try {
-      const res = await fetch(`${base}${suffix}`, {
+      const res = await apiFetch(`${base}${suffix}`, {
         method: 'GET',
         credentials: 'include',
         headers: {

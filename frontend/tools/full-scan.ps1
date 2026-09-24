@@ -1,5 +1,6 @@
 param(
-  [switch]$KeepFrontend
+  [switch]$KeepFrontend,
+  [switch]$DeepOnly
 )
 
 # tools/full-scan.ps1
@@ -178,93 +179,100 @@ function Start-SmokeServer([int]$port) {
   }
 }
 
-# 1) TypeScript
-Run-Step `
-  "TypeScript" `
-  "pnpm exec tsc -p tsconfig.json --noEmit --pretty false" `
-  "1_typescript.txt" | Out-Null
-
-# 2) ESLint
-if (Test-Path ".\node_modules\.bin\eslint.cmd") {
-  # ESLint 9: use the supported default formatter.
+if (-not $DeepOnly) {
+  # 1) TypeScript
   Run-Step `
-    "ESLint" `
-    "pnpm exec eslint . --ext .ts,.tsx --max-warnings=0" `
-    "2_eslint.txt" | Out-Null
-} else {
-  Add-Content -Path $summaryFile -Value "[ESLint] SKIPPED (non installé)"
-}
+    "TypeScript" `
+    "pnpm exec tsc -p tsconfig.json --noEmit --pretty false" `
+    "1_typescript.txt" | Out-Null
 
-# 3) Next build
-# A running `next start` must be stopped before replacing .next; otherwise the
-# server can keep references to chunks from the previous build.
-$frontendWasRunning = Stop-ExistingFrontend3000
-
-$buildCode = Run-Step `
-  "Next build" `
-  'set "CI=1" && pnpm exec next build' `
-  "3_next_build.txt"
-
-# 4) Jest
-if (Test-Path ".\node_modules\.bin\jest.cmd") {
-  Run-Step `
-    "Jest" `
-    "pnpm exec jest --passWithNoTests" `
-    "4_jest.txt" | Out-Null
-} else {
-  Add-Content -Path $summaryFile -Value "[Jest] SKIPPED (non installé)"
-}
-
-# 5) Playwright smoke
-if (Test-Path ".\node_modules\.bin\playwright.cmd") {
-  $smokeServer = $null
-  $oldSmokeBase = $env:SMOKE_BASE_URL
-  $oldSmokeGate = $env:SMOKE_GATE
-  $oldCi = $env:CI
-
-  try {
-    if ($buildCode -ne 0) {
-      Add-Content -Path $summaryFile -Value "[Playwright SMOKE] SKIPPED (Next build failed)"
-    } else {
-      Write-Host "▶ Playwright smoke server"
-      $smokeServer = Start-SmokeServer 3000
-
-      $env:SMOKE_BASE_URL = $smokeServer.BaseUrl
-      $env:SMOKE_GATE = "1"
-      $env:CI = "1"
-
-      Run-Step `
-        "Playwright SMOKE" `
-        "pnpm exec playwright test -c playwright.smoke.config.ts --reporter=line" `
-        "5_playwright_smoke.txt" | Out-Null
-    }
+  # 2) ESLint
+  if (Test-Path ".\node_modules\.bin\eslint.cmd") {
+    # ESLint 9: use the supported default formatter.
+    Run-Step `
+      "ESLint" `
+      "pnpm exec eslint . --ext .ts,.tsx --max-warnings=0" `
+      "2_eslint.txt" | Out-Null
+  } else {
+    Add-Content -Path $summaryFile -Value "[ESLint] SKIPPED (non installé)"
   }
-  catch {
-    Add-Content -Path $summaryFile -Value "[Playwright SMOKE] exit=1"
-    Add-Content -Path (Join-Path $reports "5_playwright_smoke.txt") -Value $_.Exception.Message
-    Set-StepFailure "Playwright SMOKE"
+
+  # 3) Next build
+  # A running `next start` must be stopped before replacing .next; otherwise the
+  # server can keep references to chunks from the previous build.
+  $frontendWasRunning = Stop-ExistingFrontend3000
+
+  $buildCode = Run-Step `
+    "Next build" `
+    'set "CI=1" && pnpm exec next build' `
+    "3_next_build.txt"
+
+  # 4) Jest
+  if (Test-Path ".\node_modules\.bin\jest.cmd") {
+    Run-Step `
+      "Jest" `
+      "pnpm exec jest --passWithNoTests" `
+      "4_jest.txt" | Out-Null
+  } else {
+    Add-Content -Path $summaryFile -Value "[Jest] SKIPPED (non installé)"
   }
-  finally {
-    $env:SMOKE_BASE_URL = $oldSmokeBase
-    $env:SMOKE_GATE = $oldSmokeGate
-    $env:CI = $oldCi
 
-    if ($null -ne $smokeServer -and $null -ne $smokeServer.Process) {
-      $pidToStop = $smokeServer.Process.Id
+  # 5) Playwright smoke
+  if (Test-Path ".\node_modules\.bin\playwright.cmd") {
+    $smokeServer = $null
+    $oldSmokeBase = $env:SMOKE_BASE_URL
+    $oldSmokeGate = $env:SMOKE_GATE
+    $oldCi = $env:CI
 
-      if ($frontendWasRunning -and $KeepFrontend) {
-        Write-Host (
-          "Next frais conservé sur http://localhost:3000 (PID {0}) (-KeepFrontend)" -f $pidToStop
-        )
-      }
-      elseif (Get-Process -Id $pidToStop -ErrorAction SilentlyContinue) {
-        Write-Host ("▶ Arrêt du serveur Next smoke (PID {0})" -f $pidToStop)
-        Stop-ProcessTree $pidToStop
+    try {
+      if ($buildCode -ne 0) {
+        Add-Content -Path $summaryFile -Value "[Playwright SMOKE] SKIPPED (Next build failed)"
+      } else {
+        Write-Host "▶ Playwright smoke server"
+        $smokeServer = Start-SmokeServer 3000
+
+        $env:SMOKE_BASE_URL = $smokeServer.BaseUrl
+        $env:SMOKE_GATE = "1"
+        $env:CI = "1"
+
+        Run-Step `
+          "Playwright SMOKE" `
+          "pnpm exec playwright test -c playwright.smoke.config.ts --reporter=line" `
+          "5_playwright_smoke.txt" | Out-Null
       }
     }
+    catch {
+      Add-Content -Path $summaryFile -Value "[Playwright SMOKE] exit=1"
+      Add-Content -Path (Join-Path $reports "5_playwright_smoke.txt") -Value $_.Exception.Message
+      Set-StepFailure "Playwright SMOKE"
+    }
+    finally {
+      $env:SMOKE_BASE_URL = $oldSmokeBase
+      $env:SMOKE_GATE = $oldSmokeGate
+      $env:CI = $oldCi
+
+      if ($null -ne $smokeServer -and $null -ne $smokeServer.Process) {
+        $pidToStop = $smokeServer.Process.Id
+
+        if ($frontendWasRunning -and $KeepFrontend) {
+          Write-Host (
+            "Next frais conservé sur http://localhost:3000 (PID {0}) (-KeepFrontend)" -f $pidToStop
+          )
+        }
+        elseif (Get-Process -Id $pidToStop -ErrorAction SilentlyContinue) {
+          Write-Host ("▶ Arrêt du serveur Next smoke (PID {0})" -f $pidToStop)
+          Stop-ProcessTree $pidToStop
+        }
+      }
+    }
+  } else {
+    Add-Content -Path $summaryFile -Value "[Playwright SMOKE] SKIPPED (non installé)"
   }
-} else {
-  Add-Content -Path $summaryFile -Value "[Playwright SMOKE] SKIPPED (non installé)"
+
+}
+else {
+  Add-Content -Path $summaryFile -Value "[TypeScript/ESLint/Build/Jest/Playwright] SKIPPED (-DeepOnly; covered by LevelUpDiag N03/N05)"
+  Write-Host "▶ DeepOnly: étapes frontend standard ignorées; scan de patterns seulement"
 }
 
 # 6) Scan patterns PowerShell (anti-patterns ciblés)
