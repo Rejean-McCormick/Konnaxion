@@ -454,16 +454,15 @@ from .settings_addons import (
 # Merge Apps
 INSTALLED_APPS += EKOH_INSTALLED_APPS
 
-# Apply DB search_path for EkoH / Smart-Vote schema
+# Database schema routing
+# ------------------------------------------------------------------------------
+# Never set a process-wide PostgreSQL search_path here. Global/control Django
+# tables must remain in ``public``. EkoH / Smart Vote and Konnaxion Worlds set
+# transaction-local search paths explicitly in their DB-scope helpers. A global
+# ``ekoh_smartvote,public`` startup path causes fresh production migrations to
+# create unrelated global tables in ``ekoh_smartvote`` and can shadow the
+# canonical public tables after a restore.
 DATABASES["default"].setdefault("OPTIONS", {})
-
-existing_options = DATABASES["default"]["OPTIONS"].get("options", "").strip()
-search_path_option = f"-c search_path={EKOH_DB_SEARCH_PATH}"
-
-if search_path_option not in existing_options:
-    DATABASES["default"]["OPTIONS"]["options"] = (
-        f"{existing_options} {search_path_option}".strip()
-    )
 
 # Merge Celery Schedule
 if "CELERY_BEAT_SCHEDULE" not in locals():
