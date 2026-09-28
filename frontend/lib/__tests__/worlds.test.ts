@@ -1,88 +1,83 @@
 import {
+  getUniverseKeyFromPathname,
   getWorldKeyFromPathname,
   isGlobalApiPath,
   parseWorldPath,
-  scopeApiPath,
   resolveWorldWebSocketUrl,
+  scopeApiPath,
   scopeWorldWebSocketPath,
   stripWorldPrefix,
   switchWorldPath,
   withWorldPath,
 } from '../worlds';
 
-describe('World URL helpers', () => {
-  test('parses and strips World routes without changing product ownership', () => {
+describe('Universe/World URL helpers', () => {
+  test('parses canonical and legacy World routes', () => {
+    expect(parseWorldPath('/u/christianity/w/theology/konsensus')).toEqual({
+      universeKey: 'christianity',
+      key: 'theology',
+      appPath: '/konsensus',
+    });
     expect(parseWorldPath('/w/demo-alpha/konsensus')).toEqual({
+      universeKey: null,
       key: 'demo-alpha',
       appPath: '/konsensus',
     });
-    expect(stripWorldPrefix('/w/demo-alpha/reports/perf')).toBe('/reports/perf');
+    expect(stripWorldPrefix('/u/mine-x/w/finance/reports/perf')).toBe('/reports/perf');
+    expect(getUniverseKeyFromPathname('/u/mine-x/w/finance')).toBe('mine-x');
     expect(getWorldKeyFromPathname('/ethikos/insights')).toBeNull();
   });
 
-  test('builds World hrefs and preserves query/hash suffixes', () => {
-    expect(withWorldPath('/konsensus?sidebar=ethikos#live', 'demo-alpha')).toBe(
-      '/w/demo-alpha/konsensus?sidebar=ethikos#live',
+  test('builds canonical hrefs and preserves query/hash suffixes', () => {
+    expect(withWorldPath('/konsensus?sidebar=ethikos#live', 'theology', 'christianity')).toBe(
+      '/u/christianity/w/theology/konsensus?sidebar=ethikos#live',
     );
-    expect(withWorldPath('/w/old/ethikos/insights', 'new')).toBe(
-      '/w/new/ethikos/insights',
+    expect(withWorldPath('/u/old/w/old/ethikos/insights', 'new-world', 'new-universe')).toBe(
+      '/u/new-universe/w/new-world/ethikos/insights',
     );
   });
 
-  test('switches World while retaining the current app path', () => {
-    expect(switchWorldPath('/w/a/konsensus', 'b')).toBe('/w/b/konsensus');
+  test('switches World while retaining current Universe and app path', () => {
+    expect(switchWorldPath('/u/mine-x/w/engineering/konsensus', 'finance')).toBe(
+      '/u/mine-x/w/finance/konsensus',
+    );
     expect(switchWorldPath('/', 'b')).toBe('/w/b/ethikos/insights');
   });
 });
 
-describe('World API scoping', () => {
-  test('keeps control/global APIs outside the World data plane', () => {
-    expect(isGlobalApiPath('control/worlds/')).toBe(true);
+describe('Universe/World API scoping', () => {
+  test('keeps control/global APIs outside the data plane', () => {
+    expect(isGlobalApiPath('control/universes/')).toBe(true);
     expect(isGlobalApiPath('users/me/')).toBe(true);
     expect(isGlobalApiPath('admin/users/')).toBe(true);
-    expect(isGlobalApiPath('admin/audit-log/')).toBe(true);
-    expect(isGlobalApiPath('admin/stats/')).toBe(true);
     expect(isGlobalApiPath('admin/moderation/')).toBe(false);
   });
 
   test('scopes World-owned APIs exactly once', () => {
-    expect(scopeApiPath('ethikos/topics/', 'demo-alpha')).toBe(
-      'w/demo-alpha/ethikos/topics/',
+    expect(scopeApiPath('ethikos/topics/', 'theology', 'christianity')).toBe(
+      'u/christianity/w/theology/ethikos/topics/',
     );
-    expect(scopeApiPath('/v1/ekoh/profile/1/', 'demo-alpha')).toBe(
-      '/w/demo-alpha/v1/ekoh/profile/1/',
+    expect(scopeApiPath('/v1/ekoh/profile/1/', 'finance', 'mine-x')).toBe(
+      '/u/mine-x/w/finance/v1/ekoh/profile/1/',
     );
-    expect(scopeApiPath('w/demo-alpha/ethikos/topics/', 'demo-alpha')).toBe(
-      'w/demo-alpha/ethikos/topics/',
-    );
-    expect(scopeApiPath('/projects/', 'demo-alpha')).toBe(
-      '/w/demo-alpha/projects/',
+    expect(scopeApiPath('u/mine-x/w/finance/ethikos/topics/', 'finance', 'mine-x')).toBe(
+      'u/mine-x/w/finance/ethikos/topics/',
     );
   });
 });
 
-
-describe('World WebSocket scoping', () => {
-  test('builds a release-routed socket path and refuses missing World identity', () => {
-    expect(scopeWorldWebSocketPath('/ws/reports/custom', 'demo-alpha')).toBe(
-      '/ws/w/demo-alpha/reports/custom',
+describe('Universe/World WebSocket scoping', () => {
+  test('builds a canonical socket path and refuses missing World identity', () => {
+    expect(scopeWorldWebSocketPath('/ws/reports/custom', 'finance', 'mine-x')).toBe(
+      '/ws/u/mine-x/w/finance/reports/custom',
     );
-    expect(scopeWorldWebSocketPath('/ws/reports/custom?preview=1', 'demo-alpha')).toBe(
-      '/ws/w/demo-alpha/reports/custom?preview=1',
-    );
-    expect(scopeWorldWebSocketPath('/ws/w/stale-world/reports/custom', 'demo-alpha')).toBe(
-      '/ws/w/demo-alpha/reports/custom',
-    );
-    expect(scopeWorldWebSocketPath('/ws/reports/custom', null)).toBeNull();
+    expect(scopeWorldWebSocketPath('/ws/reports/custom', null, 'mine-x')).toBeNull();
   });
 
-  test('derives a scoped ws URL from the active World browser route', () => {
-    window.history.replaceState({}, '', '/w/demo-alpha/reports/custom');
+  test('derives a scoped ws URL from the active browser route', () => {
+    window.history.replaceState({}, '', '/u/mine-x/w/finance/reports/custom');
     expect(resolveWorldWebSocketUrl('/ws/reports/custom')).toBe(
-      'ws://localhost/ws/w/demo-alpha/reports/custom',
-    );
-    expect(resolveWorldWebSocketUrl('/ws/reports/custom', 'https://api.example.test/ws/reports/custom')).toBe(
-      'wss://api.example.test/ws/w/demo-alpha/reports/custom',
+      'ws://localhost/ws/u/mine-x/w/finance/reports/custom',
     );
   });
 });

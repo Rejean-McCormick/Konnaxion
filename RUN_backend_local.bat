@@ -33,6 +33,21 @@ if errorlevel 1 (
   exit /b 1
 )
 
+if not exist "%~dp0..\Konnaxion_Worlds\backend\pyproject.toml" (
+  echo [ERROR] Konnaxion_Worlds sibling repository not found at "%~dp0..\Konnaxion_Worlds\backend".
+  echo [ERROR] Konnaxion no longer vendors the Universe/World engine.
+  pause
+  exit /b 1
+)
+
+echo [INFO] Installing canonical Konnaxion_Worlds engine...
+uv pip install --python ".venv\Scripts\python.exe" -e "%~dp0..\Konnaxion_Worlds\backend"
+if errorlevel 1 (
+  echo [ERROR] Konnaxion_Worlds package install failed.
+  pause
+  exit /b 1
+)
+
 echo [INFO] Applying migrations...
 ".venv\Scripts\python.exe" manage.py migrate
 if errorlevel 1 (

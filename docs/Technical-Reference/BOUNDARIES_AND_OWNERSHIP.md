@@ -4,6 +4,17 @@
 
 Konnaxion owns its domain data and executes mutations through its own services/APIs. A foreign tool or ecosystem system may request work, provide an artifact, ask a query, or consume a result; it does not write Konnaxion internal tables directly.
 
+
+## 1A. Universe / World infrastructure boundary
+
+Canonical owner: the separately versioned sibling repository/package **`Konnaxion_Worlds`**.
+
+It owns Universe/World/WorldRelease models and migrations, request/task runtime resolution, isolation primitives, control-plane lifecycle, World relations/publications/subscriptions and the canonical architecture specification.
+
+Main Konnaxion owns only host integration: route mounting, configured product-domain adapters, navigation/context UI and product tests. It MUST NOT contain a second `backend/konnaxion/worlds/` implementation or a copied `docs/Technical-Reference/Worlds/` specification tree. See `UNIVERSES_WORLDS_INTEGRATION.md`.
+
+This infrastructure ownership does not transfer ethiKos, EkoH, Smart Vote or other product-domain source-state ownership to `Konnaxion_Worlds`.
+
 ## 2. Internal ownership
 
 ### ethiKos / Korum

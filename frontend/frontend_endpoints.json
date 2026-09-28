@@ -14,13 +14,6 @@
     ]
   },
   {
-    "method": "FETCH",
-    "url": "/api/admin/audit-log/?${searchParams.toString()}",
-    "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/app/kontrol/audit-log/page.tsx"
-    ]
-  },
-  {
     "method": "GET",
     "url": "/api/admin/moderation",
     "files": [
@@ -32,48 +25,6 @@
     "url": "/api/admin/stats",
     "files": [
       "C:/mycode/Konnaxion/Konnaxion/frontend/modules/admin/hooks/useStats.ts"
-    ]
-  },
-  {
-    "method": "FETCH",
-    "url": "/api/admin/users/?${searchParams.toString()}",
-    "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/app/kontrol/users/all/page.tsx"
-    ]
-  },
-  {
-    "method": "FETCH",
-    "url": "/api/konnected/learning-paths/my",
-    "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-paths/my-learning-path/page.tsx"
-    ]
-  },
-  {
-    "method": "FETCH",
-    "url": "/api/konsultations/consultations/${id}",
-    "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/pages/ResultsPage.tsx"
-    ]
-  },
-  {
-    "method": "FETCH",
-    "url": "/api/konsultations/consultations/${id}/results",
-    "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/pages/ResultsPage.tsx"
-    ]
-  },
-  {
-    "method": "FETCH",
-    "url": "/api/reports/perf/?range=${nextRange}",
-    "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/app/reports/perf/page.tsx"
-    ]
-  },
-  {
-    "method": "FETCH",
-    "url": "/api/reports/smart-vote/?range=${key}",
-    "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/app/reports/smart-vote/page.tsx"
     ]
   },
   {
@@ -144,13 +95,6 @@
     "url": "${BASE_URL}/teams/",
     "files": [
       "C:/mycode/Konnaxion/Konnaxion/frontend/services/teambuilder/index.ts"
-    ]
-  },
-  {
-    "method": "FETCH",
-    "url": "${base}${suffix}",
-    "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/kontact/hooks/useOpportunities.ts"
     ]
   },
   {

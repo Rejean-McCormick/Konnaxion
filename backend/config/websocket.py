@@ -14,8 +14,9 @@ from konnaxion.worlds.runtime import reset_world_runtime, set_world_runtime
 from konnaxion.worlds.services.cache import world_channel_name
 from konnaxion.worlds.services.websocket import resolve_websocket_world_runtime
 
+_KEY = r"[a-z0-9](?:[a-z0-9-]{0,118}[a-z0-9])?"
 REPORTS_WS_RE = re.compile(
-    r"^/ws/w/(?P<world_key>[a-z0-9](?:[a-z0-9-]{0,118}[a-z0-9])?)/reports/custom/?$"
+    rf"^/ws/(?:u/(?P<universe_key>{_KEY})/)?w/(?P<world_key>{_KEY})/reports/custom/?$"
 )
 SUPPORTED_METRICS = {"smart-vote", "usage", "perf"}
 SUPPORTED_GROUP_BY = {"day", "week"}
@@ -172,9 +173,11 @@ async def websocket_application(scope, receive, send):
         await send({"type": "websocket.close", "code": 4404})
         return
 
+    universe_key = match.groupdict().get("universe_key")
     world_key = match.group("world_key")
     try:
         runtime = await resolve_websocket_world_runtime(
+            universe_key=universe_key,
             world_key=world_key,
             headers=scope.get("headers", ()),
         )
@@ -199,6 +202,10 @@ async def websocket_application(scope, receive, send):
                 "at": _iso_now(),
                 "path": path,
                 "channel": channel,
+                "universe": {
+                    "id": runtime.universe_id,
+                    "key": runtime.universe_key,
+                },
                 "world": {
                     "id": runtime.world_id,
                     "key": runtime.world_key,

@@ -7,7 +7,7 @@ import {
   LANGUAGE_COOKIE_KEY,
   LANGUAGE_COOKIE_MAX_AGE,
 } from './i18n/config';
-import { getWorldKeyFromPathname, isGlobalApiPath, withWorldPath } from './lib/worlds';
+import { isGlobalApiPath, parseWorldPath, withWorldPath } from './lib/worlds';
 
 const STATIC_FILE_RE = /\.[a-z0-9]{2,10}$/i;
 const GLOBAL_UI_PREFIXES = [
@@ -20,6 +20,8 @@ const GLOBAL_UI_PREFIXES = [
   '/health',
   '/ping',
 ] as const;
+
+type SourceContext = { universeKey: string | null; worldKey: string } | null;
 
 function withDetectedLanguageCookie(
   request: NextRequest,
@@ -41,12 +43,17 @@ function withDetectedLanguageCookie(
   return response;
 }
 
-function sourceWorld(request: NextRequest): string | null {
+function parseSourcePath(pathname: string): SourceContext {
+  const parsed = parseWorldPath(pathname);
+  return parsed ? { universeKey: parsed.universeKey, worldKey: parsed.key } : null;
+}
+
+function sourceContext(request: NextRequest): SourceContext {
   const referer = request.headers.get('referer');
   if (referer) {
     try {
-      const key = getWorldKeyFromPathname(new URL(referer).pathname);
-      if (key) return key;
+      const context = parseSourcePath(new URL(referer).pathname);
+      if (context) return context;
     } catch {
       // Ignore malformed/untrusted Referer and try Next's navigation header.
     }
@@ -55,8 +62,8 @@ function sourceWorld(request: NextRequest): string | null {
   const nextUrl = request.headers.get('next-url');
   if (nextUrl) {
     try {
-      const key = getWorldKeyFromPathname(new URL(nextUrl, request.nextUrl.origin).pathname);
-      if (key) return key;
+      const context = parseSourcePath(new URL(nextUrl, request.nextUrl.origin).pathname);
+      if (context) return context;
     } catch {
       // No usable navigation context.
     }
@@ -66,7 +73,7 @@ function sourceWorld(request: NextRequest): string | null {
 }
 
 function isUiCarryoverCandidate(pathname: string): boolean {
-  if (pathname.startsWith('/w/')) return false;
+  if (pathname.startsWith('/w/') || pathname.startsWith('/u/')) return false;
   if (STATIC_FILE_RE.test(pathname)) return false;
   return !GLOBAL_UI_PREFIXES.some(
     (prefix) => pathname === prefix.replace(/\/$/, '') || pathname.startsWith(prefix),
@@ -74,37 +81,33 @@ function isUiCarryoverCandidate(pathname: string): boolean {
 }
 
 /**
- * World routing safety net.
- *
- * 1) Legacy same-origin /api/* calls made from a World page are rewritten to
- *    /api/w/<world>/* unless the API is explicitly global.
- * 2) Legacy hard-coded internal links preserve the active World with a redirect.
- *
- * Canonical helpers remain the primary path; this middleware protects older
- * call-sites while the application is incrementally normalized.
+ * Universe/World routing safety net for legacy hard-coded links and API calls.
+ * Canonical helpers remain the primary path.
  */
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  const worldKey = sourceWorld(request);
+  const context = sourceContext(request);
 
   if (pathname.startsWith('/api/')) {
     const apiPath = pathname.slice('/api/'.length);
-    if (!worldKey || isGlobalApiPath(apiPath)) {
+    if (!context || isGlobalApiPath(apiPath)) {
       return withDetectedLanguageCookie(request, NextResponse.next());
     }
 
     const target = request.nextUrl.clone();
-    target.pathname = `/api/w/${worldKey}/${apiPath}`;
+    target.pathname = context.universeKey
+      ? `/api/u/${context.universeKey}/w/${context.worldKey}/${apiPath}`
+      : `/api/w/${context.worldKey}/${apiPath}`;
     return withDetectedLanguageCookie(request, NextResponse.rewrite(target));
   }
 
   if (
-    worldKey &&
+    context &&
     (request.method === 'GET' || request.method === 'HEAD') &&
     isUiCarryoverCandidate(pathname)
   ) {
     const target = request.nextUrl.clone();
-    target.pathname = withWorldPath(pathname, worldKey);
+    target.pathname = withWorldPath(pathname, context.worldKey, context.universeKey);
     return withDetectedLanguageCookie(request, NextResponse.redirect(target));
   }
 

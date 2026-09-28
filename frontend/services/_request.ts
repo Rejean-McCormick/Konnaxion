@@ -41,6 +41,7 @@ client.interceptors.response.use(
     assertCurrentWorldResponse(
       res.headers?.['x-konnaxion-world'],
       res.headers?.['x-konnaxion-world-release-id'],
+      res.headers?.['x-konnaxion-universe'],
     )
     return res
   },

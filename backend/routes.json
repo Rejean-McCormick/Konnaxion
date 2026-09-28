@@ -3081,6 +3081,30 @@
   },
   {
     "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/runtime/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_runtime_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/runtime/personas/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_runtime_personas_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/runtime/view-as/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_runtime_view_as_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
     "path": "/api/users/",
     "method": "GET",
     "operationId": "users_list",
@@ -3145,25 +3169,25 @@
   },
   {
     "source": "openapi",
-    "path": "/api/w/{world_key}/runtime/",
+    "path": "/api/w/[a-z0-9]/runtime/",
     "method": "GET",
-    "operationId": "w_runtime_retrieve",
+    "operationId": "w_[a_z0_9]_runtime_retrieve",
     "summary": "",
     "tags": "w"
   },
   {
     "source": "openapi",
-    "path": "/api/w/{world_key}/runtime/personas/",
+    "path": "/api/w/[a-z0-9]/runtime/personas/",
     "method": "GET",
-    "operationId": "w_runtime_personas_retrieve",
+    "operationId": "w_[a_z0_9]_runtime_personas_retrieve",
     "summary": "",
     "tags": "w"
   },
   {
     "source": "openapi",
-    "path": "/api/w/{world_key}/runtime/view-as/",
+    "path": "/api/w/[a-z0-9]/runtime/view-as/",
     "method": "POST",
-    "operationId": "w_runtime_view_as_create",
+    "operationId": "w_[a_z0_9]_runtime_view_as_create",
     "summary": "",
     "tags": "w"
   }

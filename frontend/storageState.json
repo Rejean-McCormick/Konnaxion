@@ -1,8 +1,18 @@
 {
   "cookies": [
     {
+      "name": "konnaxion.language",
+      "value": "en",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1822145722.05506,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
       "name": "messages",
-      "value": "W1siX19qc29uX21lc3NhZ2UiLDAsMjUsIlN1Y2Nlc3NmdWxseSBzaWduZWQgaW4gYXMgZXRoaWtvc19zZWVkX3VzZXIuIiwiIl1d:1x96r3:ypIvkSTdCghxcD43iMH8MpvHre9UnXkGxoeL6rW1FKU",
+      "value": "W1siX19qc29uX21lc3NhZ2UiLDAsMjUsIlN1Y2Nlc3NmdWxseSBzaWduZWQgaW4gYXMgZXRoaWtvc19zZWVkX3VzZXIuIiwiIl1d:1xBDNz:CxFISp7C9zbDNaqqMWjV3YADGkHtpTmNeMLOd_Xv-Io",
       "domain": "localhost",
       "path": "/",
       "expires": -1,
@@ -12,30 +22,20 @@
     },
     {
       "name": "csrftoken",
-      "value": "xWnvKpd6pIg0q3tOfd3d6JLag9aIL7gv",
+      "value": "qb2IgXshJhuOdpETlLxwh3urzmyh8uFQ",
       "domain": "localhost",
       "path": "/",
-      "expires": 1821557561.685472,
+      "expires": 1822059323.76182,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
     },
     {
       "name": "sessionid",
-      "value": "uaydbqdeq89oftgbo0gzrgws49j1fe94",
+      "value": "6dzuxpxiwdd7c88qokj72japkh3hgkwi",
       "domain": "localhost",
       "path": "/",
       "expires": -1,
-      "httpOnly": true,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "orgo_session",
-      "value": "Mcs4wwjBLtIe14gvNxncRyAvcrQJly1U8p8xDx1Z0BM",
-      "domain": "localhost",
-      "path": "/",
-      "expires": 1790136761.904638,
       "httpOnly": true,
       "secure": false,
       "sameSite": "Lax"

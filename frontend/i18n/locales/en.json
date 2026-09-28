@@ -10211,6 +10211,10 @@
     "theWorldCatalogueIsUnavailable": "The World catalogue is unavailable.",
     "thisWorldReleaseHasChangesSinceItsLast": "This World release has changes since its last clean build/snapshot.",
     "worldCatalogueUnavailable": "World catalogue unavailable",
-    "worldRoutingIsActiveButTheBusinessData": "World routing is active, but the business data plane is not enabled yet."
+    "worldRoutingIsActiveButTheBusinessData": "World routing is active, but the business data plane is not enabled yet.",
+    "activeUniverseAria": "Active Universe",
+    "selectUniverse": "Select Universe",
+    "noUniverses": "No Universes",
+    "universe": "Universe"
   }
 }

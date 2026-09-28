@@ -7,6 +7,24 @@ Alongside its technical architecture, Konnaxion includes a fictional origin myth
 
 ---
 
+## Universe / World engine dependency
+
+Konnaxion is the **host product**, not the owner of the Universe/World isolation engine.
+The canonical implementation and specification live in the sibling repository
+`Konnaxion_Worlds`, distributed as the `konnaxion-worlds` Python package.
+
+Konnaxion may own host adapters, route mounting, navigation and product-domain
+integrations, but it MUST NOT vendor or independently implement:
+
+- `backend/konnaxion/worlds/`;
+- canonical Universe/World models, migrations, resolvers or release lifecycle;
+- `docs/Technical-Reference/Worlds/`.
+
+For local development, keep `Konnaxion_Worlds` beside this repository.
+`RUN_backend_local.bat` installs its backend package in editable mode before
+starting Konnaxion. Run `python scripts/check_worlds_ownership.py` to verify the
+repository boundary.
+
 ## Current maturity & release status
 
 **Release target:** `v0.8.0` Release Candidate  

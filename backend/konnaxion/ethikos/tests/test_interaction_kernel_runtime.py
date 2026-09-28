@@ -35,6 +35,8 @@ class DecisionInteractionRuntimeTests(TestCase):
             baseline_result_json={"result": "approved"},
         )
         runtime = WorldRuntime(
+            universe_id=2,
+            universe_key="ik-universe",
             world_id=7,
             world_key="ik-test",
             release_id=12,

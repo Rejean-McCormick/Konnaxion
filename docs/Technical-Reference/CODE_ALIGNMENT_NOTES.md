@@ -4,6 +4,13 @@
 
 This note identifies code areas that should be changed so the implementation matches the current Konnaxion architecture. It is an architecture/code-alignment ledger, not a release-status report. Current executable qualification evidence is recorded in `QUALIFICATION_STATUS.md`.
 
+
+## 0. Universe / World engine ownership — resolved boundary
+
+The former duplicated `backend/konnaxion/worlds/` implementation and copied canonical Worlds documentation are not valid Konnaxion owners. Canonical ownership is the sibling `Konnaxion_Worlds` package.
+
+Konnaxion retains only host adapters/navigation. `scripts/check_worlds_ownership.py` is the executable anti-drift guard and MUST stay green. If Universe/World engine behavior changes, modify the sibling package/spec first; do not reintroduce a local fork to solve an integration problem.
+
 ## 1. Canonical EkoH taxonomy reference
 
 ### `backend/konnaxion/ethikos/models.py`

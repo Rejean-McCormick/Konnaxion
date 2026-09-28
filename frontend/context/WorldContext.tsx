@@ -12,9 +12,11 @@ import React, {
 
 import api from '@/api';
 import {
+  getUniverseKeyFromPathname,
   getWorldKeyFromPathname,
   stripWorldPrefix,
   switchWorldPath,
+  type UniverseSummary,
   type WorldRuntime,
   type WorldSummary,
   withWorldPath,
@@ -26,8 +28,10 @@ const MAX_RECENT_WORLDS = 8;
 type WorldContextValue = {
   pathname: string;
   appPath: string;
+  universeKey: string | null;
   worldKey: string | null;
   runtime: WorldRuntime | null;
+  universes: UniverseSummary[];
   worlds: WorldSummary[];
   recentWorldKeys: string[];
   loadingCatalog: boolean;
@@ -35,6 +39,7 @@ type WorldContextValue = {
   catalogError: boolean;
   runtimeError: boolean;
   href: (path: string) => string;
+  switchUniverse: (key: string) => void;
   switchWorld: (key: string) => void;
 };
 
@@ -52,7 +57,16 @@ function readRecentWorlds(): string[] {
   }
 }
 
-function rememberWorld(key: string, current: string[]): string[] {
+function worldRef(universeKey: string, worldKey: string): string {
+  return `${universeKey}/${worldKey}`;
+}
+
+function rememberWorld(
+  universeKey: string,
+  worldKey: string,
+  current: string[],
+): string[] {
+  const key = worldRef(universeKey, worldKey);
   const next = [key, ...current.filter((item) => item !== key)].slice(
     0,
     MAX_RECENT_WORLDS,
@@ -65,16 +79,20 @@ function rememberWorld(key: string, current: string[]): string[] {
 
 export function WorldProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? '/';
+  const routeUniverseKey = getUniverseKeyFromPathname(pathname);
   const worldKey = getWorldKeyFromPathname(pathname);
   const appPath = stripWorldPrefix(pathname);
 
   const [runtime, setRuntime] = useState<WorldRuntime | null>(null);
+  const [universes, setUniverses] = useState<UniverseSummary[]>([]);
   const [worlds, setWorlds] = useState<WorldSummary[]>([]);
   const [recentWorldKeys, setRecentWorldKeys] = useState<string[]>([]);
   const [loadingCatalog, setLoadingCatalog] = useState(true);
   const [loadingRuntime, setLoadingRuntime] = useState(Boolean(worldKey));
   const [catalogError, setCatalogError] = useState(false);
   const [runtimeError, setRuntimeError] = useState(false);
+
+  const universeKey = routeUniverseKey ?? runtime?.universe.key ?? null;
 
   useEffect(() => {
     setRecentWorldKeys(readRecentWorlds());
@@ -85,13 +103,18 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
     setLoadingCatalog(true);
     setCatalogError(false);
 
-    void api
-      .get<WorldSummary[]>('control/worlds/')
-      .then((rows) => {
-        if (!cancelled) setWorlds(rows);
+    void Promise.all([
+      api.get<UniverseSummary[]>('control/universes/'),
+      api.get<WorldSummary[]>('control/worlds/'),
+    ])
+      .then(([universeRows, worldRows]) => {
+        if (cancelled) return;
+        setUniverses(universeRows);
+        setWorlds(worldRows);
       })
       .catch(() => {
         if (!cancelled) {
+          setUniverses([]);
           setWorlds([]);
           setCatalogError(true);
         }
@@ -110,6 +133,7 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
       setRuntime(null);
       setRuntimeError(false);
       setLoadingRuntime(false);
+      delete document.documentElement.dataset.kxUniverse;
       delete document.documentElement.dataset.kxWorld;
       delete document.documentElement.dataset.kxWorldReleaseId;
       return;
@@ -118,13 +142,21 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false;
     setLoadingRuntime(true);
     setRuntimeError(false);
-    setRecentWorldKeys((current) => rememberWorld(worldKey, current));
+    if (routeUniverseKey) {
+      setRecentWorldKeys((current) =>
+        rememberWorld(routeUniverseKey, worldKey, current),
+      );
+    }
 
     void api
       .get<WorldRuntime>('runtime/')
       .then((value) => {
         if (cancelled) return;
         setRuntime(value);
+        setRecentWorldKeys((current) =>
+          rememberWorld(value.universe.key, value.world.key, current),
+        );
+        document.documentElement.dataset.kxUniverse = value.universe.key;
         document.documentElement.dataset.kxWorld = value.world.key;
         document.documentElement.dataset.kxWorldReleaseId = String(value.release.id);
       })
@@ -132,6 +164,11 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
         if (cancelled) return;
         setRuntime(null);
         setRuntimeError(true);
+        if (routeUniverseKey) {
+          document.documentElement.dataset.kxUniverse = routeUniverseKey;
+        } else {
+          delete document.documentElement.dataset.kxUniverse;
+        }
         document.documentElement.dataset.kxWorld = worldKey;
         delete document.documentElement.dataset.kxWorldReleaseId;
       })
@@ -142,7 +179,7 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [worldKey]);
+  }, [routeUniverseKey, worldKey]);
 
   useEffect(() => {
     let reloading = false;
@@ -158,28 +195,78 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const href = useCallback(
-    (path: string) => withWorldPath(path, worldKey),
-    [worldKey],
+    (path: string) => withWorldPath(path, worldKey, universeKey),
+    [universeKey, worldKey],
   );
+
+  const navigate = useCallback((target: string) => {
+    const search = typeof window !== 'undefined' ? window.location.search : '';
+    const hash = typeof window !== 'undefined' ? window.location.hash : '';
+    window.location.assign(`${target}${search}${hash}`);
+  }, []);
 
   const switchWorld = useCallback(
     (key: string) => {
       if (key === worldKey) return;
-      setRecentWorldKeys((current) => rememberWorld(key, current));
-      const target = switchWorldPath(pathname, key);
-      const search = typeof window !== 'undefined' ? window.location.search : '';
-      const hash = typeof window !== 'undefined' ? window.location.hash : '';
-      window.location.assign(`${target}${search}${hash}`);
+      const targetWorld = worlds.find(
+        (world) =>
+          world.key === key &&
+          (!universeKey || world.universe_key === universeKey),
+      );
+      if (!targetWorld) return;
+      setRecentWorldKeys((current) =>
+        rememberWorld(targetWorld.universe_key, key, current),
+      );
+      navigate(
+        switchWorldPath(
+          pathname,
+          key,
+          '/ethikos/insights',
+          targetWorld.universe_key,
+        ),
+      );
     },
-    [pathname, worldKey],
+    [navigate, pathname, universeKey, worldKey, worlds],
+  );
+
+  const switchUniverse = useCallback(
+    (key: string) => {
+      if (key === universeKey) return;
+      const universe = universes.find((item) => item.key === key);
+      if (!universe) return;
+      const candidates = worlds.filter(
+        (world) =>
+          world.universe_key === key &&
+          world.current_release?.status === 'current' &&
+          (world.status === 'active' || world.can_manage),
+      );
+      const targetWorld =
+        candidates.find((world) => world.key === universe.default_world_key) ??
+        candidates[0];
+      if (!targetWorld) return;
+      setRecentWorldKeys((current) =>
+        rememberWorld(key, targetWorld.key, current),
+      );
+      navigate(
+        switchWorldPath(
+          pathname,
+          targetWorld.key,
+          '/ethikos/insights',
+          key,
+        ),
+      );
+    },
+    [navigate, pathname, universeKey, universes, worlds],
   );
 
   const value = useMemo<WorldContextValue>(
     () => ({
       pathname,
       appPath,
+      universeKey,
       worldKey,
       runtime,
+      universes,
       worlds,
       recentWorldKeys,
       loadingCatalog,
@@ -187,13 +274,16 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
       catalogError,
       runtimeError,
       href,
+      switchUniverse,
       switchWorld,
     }),
     [
       pathname,
       appPath,
+      universeKey,
       worldKey,
       runtime,
+      universes,
       worlds,
       recentWorldKeys,
       loadingCatalog,
@@ -201,6 +291,7 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
       catalogError,
       runtimeError,
       href,
+      switchUniverse,
       switchWorld,
     ],
   );

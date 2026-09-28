@@ -4,7 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
@@ -33,7 +33,19 @@ urlpatterns += [
     # Konnaxion Worlds control plane is global; runtime/business requests carry
     # the World key explicitly in the URL and are pinned by WorldRouteMiddleware.
     path("api/control/", include("konnaxion.worlds.urls")),
-    path("api/w/<slug:world_key>/", include("config.world_urls")),
+    # These parent routes intentionally do not capture Universe/World kwargs.
+    # WorldRouteMiddleware is the single runtime resolver; child product views
+    # must not need route-key parameters in their method signatures.
+    re_path(
+        r"^api/u/[a-z0-9](?:[a-z0-9-]{0,118}[a-z0-9])?/w/"
+        r"[a-z0-9](?:[a-z0-9-]{0,118}[a-z0-9])?/",
+        include("config.world_urls"),
+    ),
+    # Phase-U1 compatibility route. Remove after legacy World URLs retire.
+    re_path(
+        r"^api/w/[a-z0-9](?:[a-z0-9-]{0,118}[a-z0-9])?/",
+        include("config.world_urls"),
+    ),
 
     # Orgo -> Konnaxion Interaction Kernel ingress. Machine-authenticated and
     # intentionally owned by the main Konnaxion product, not Konnaxion_Worlds.

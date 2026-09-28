@@ -14,23 +14,31 @@ const Wrapper = styled.div`
   gap: 6px;
   min-width: 0;
 
-  .k-world-select {
-    width: clamp(160px, 18vw, 280px);
+  .k-universe-select {
+    width: clamp(150px, 15vw, 230px);
   }
 
-  .k-world-select .ant-select-selector {
+  .k-world-select {
+    width: clamp(150px, 16vw, 250px);
+  }
+
+  .ant-select-selector {
     border-radius: 999px !important;
   }
 
   @media (max-width: 980px) {
+    .k-universe-select,
     .k-world-select {
-      width: 150px;
+      width: 140px;
     }
   }
 
   @media (max-width: 760px) {
+    .k-universe-select {
+      display: none;
+    }
     .k-world-select {
-      width: 126px;
+      width: 132px;
     }
   }
 `;
@@ -38,35 +46,50 @@ const Wrapper = styled.div`
 export default function WorldSwitcher() {
   const { t } = useLanguage();
   const {
+    universeKey,
     worldKey,
     runtime,
+    universes,
     worlds,
     recentWorldKeys,
     loadingCatalog,
     loadingRuntime,
     catalogError,
     runtimeError,
+    switchUniverse,
     switchWorld,
   } = useWorld();
+
+  const universeOptions = useMemo(
+    () =>
+      universes.map((universe) => ({
+        value: universe.key,
+        label: universe.title,
+        searchText: `${universe.title} ${universe.key}`.toLowerCase(),
+        disabled: universe.status === 'archived',
+      })),
+    [universes],
+  );
 
   const orderedWorlds = useMemo(() => {
     const recentRank = new Map(
       recentWorldKeys.map((key, index) => [key, index]),
     );
+    return worlds
+      .filter((world) => !universeKey || world.universe_key === universeKey)
+      .sort((left, right) => {
+        const leftRank = recentRank.get(`${left.universe_key}/${left.key}`);
+        const rightRank = recentRank.get(`${right.universe_key}/${right.key}`);
+        if (leftRank !== undefined || rightRank !== undefined) {
+          if (leftRank === undefined) return 1;
+          if (rightRank === undefined) return -1;
+          return leftRank - rightRank;
+        }
+        return left.title.localeCompare(right.title);
+      });
+  }, [recentWorldKeys, universeKey, worlds]);
 
-    return [...worlds].sort((left, right) => {
-      const leftRank = recentRank.get(left.key);
-      const rightRank = recentRank.get(right.key);
-      if (leftRank !== undefined || rightRank !== undefined) {
-        if (leftRank === undefined) return 1;
-        if (rightRank === undefined) return -1;
-        return leftRank - rightRank;
-      }
-      return left.title.localeCompare(right.title);
-    });
-  }, [recentWorldKeys, worlds]);
-
-  const options = useMemo(
+  const worldOptions = useMemo(
     () =>
       orderedWorlds.map((world) => ({
         value: world.key,
@@ -89,6 +112,11 @@ export default function WorldSwitcher() {
         ? t('worlds.dataPlaneDisabled')
         : t('worlds.switchTooltip');
 
+  const filter = (input: string, option?: unknown) =>
+    String((option as { searchText?: string } | undefined)?.searchText ?? '').includes(
+      input.trim().toLowerCase(),
+    );
+
   return (
     <Wrapper>
       <Tooltip title={title}>
@@ -99,6 +127,22 @@ export default function WorldSwitcher() {
         )}
       </Tooltip>
       <Select<string>
+        className="k-universe-select"
+        aria-label={t('worlds.activeUniverseAria')}
+        loading={loadingCatalog}
+        value={universeKey ?? undefined}
+        placeholder={t('worlds.selectUniverse')}
+        showSearch
+        allowClear={false}
+        onChange={switchUniverse}
+        status={catalogError ? 'error' : undefined}
+        filterOption={filter}
+        options={universeOptions}
+        notFoundContent={
+          catalogError ? t('worlds.catalogUnavailable') : t('worlds.noUniverses')
+        }
+      />
+      <Select<string>
         className="k-world-select"
         aria-label={t('worlds.activeAria')}
         loading={loadingCatalog || loadingRuntime}
@@ -108,13 +152,8 @@ export default function WorldSwitcher() {
         allowClear={false}
         onChange={switchWorld}
         status={runtimeError ? 'error' : undefined}
-        filterOption={(input, option) => {
-          const searchText = String(
-            (option as { searchText?: string })?.searchText ?? '',
-          );
-          return searchText.includes(input.trim().toLowerCase());
-        }}
-        options={options}
+        filterOption={filter}
+        options={worldOptions}
         notFoundContent={
           catalogError ? t('worlds.catalogUnavailable') : t('worlds.none')
         }

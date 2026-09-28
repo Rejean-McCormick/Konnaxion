@@ -19,6 +19,7 @@ Older documents that call themselves `canonical`, `definitive`, or `single sourc
 | What is currently implemented, qualified, failing, preview, or deferred? | `docs/Technical-Reference/QUALIFICATION_STATUS.md` |
 | What does the software actually do now? | Active implementation + nearest executable tests |
 | What architecture and ownership must be preserved? | `docs/README.md` → canonical architecture documents |
+| Who owns Universe/World semantics? | `docs/Technical-Reference/UNIVERSES_WORLDS_INTEGRATION.md` → sibling `Konnaxion_Worlds` canonical spec |
 | What are the ecosystem interoperability rules? | `docs/Technical-Reference/INTERACTION_KERNEL_INTEGRATION.md` |
 | Where does code differ from the intended architecture? | `docs/Technical-Reference/CODE_ALIGNMENT_NOTES.md` |
 | What API/contract should exist? | `docs/Technical-Reference/CONTRACTS.txt` + actual router/service implementation |
@@ -86,6 +87,20 @@ Then use:
 ### Caveat
 
 Architecture describes structure, ownership, invariants, and intended contracts. It does not prove every described capability is currently implemented or qualified.
+
+---
+
+## 2A. Universe / World host boundary
+
+### Start here
+
+`docs/Technical-Reference/UNIVERSES_WORLDS_INTEGRATION.md`
+
+Then inspect the installed/sibling `Konnaxion_Worlds` package and its canonical `20_UNIVERSES.md` for engine semantics.
+
+### Rule
+
+Do not create `backend/konnaxion/worlds/` or `docs/Technical-Reference/Worlds/` in this repository. Konnaxion owns only host adapters, route mounting and product navigation. Run `python scripts/check_worlds_ownership.py` after related changes.
 
 ---
 

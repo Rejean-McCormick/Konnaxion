@@ -28,6 +28,7 @@ api.interceptors.response.use((response) => {
   assertCurrentWorldResponse(
     response.headers?.['x-konnaxion-world'],
     response.headers?.['x-konnaxion-world-release-id'],
+    response.headers?.['x-konnaxion-universe'],
   );
   return response;
 });

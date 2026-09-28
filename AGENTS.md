@@ -44,7 +44,25 @@ Use active source instead.
 
 Do not modify an archive, dump, generated inventory, or diagnostic artifact to change current application behavior.
 
-## 3. Preserve ownership boundaries
+## 3. Universe / World engine ownership is external to this repository
+
+`Konnaxion_Worlds` is the **single canonical owner** of the Universe/World/WorldRelease engine, including its Django models, migrations, resolver/runtime, isolation primitives, control-plane APIs, build/snapshot machinery, and canonical architecture specification.
+
+This repository MAY contain only **product-host integration adapters** such as:
+
+- route mounting under `backend/config/`;
+- host settings and scenario-import adapter configuration;
+- browser context/navigation such as the Universe/World switcher;
+- product integration tests that exercise those adapters.
+
+This repository MUST NOT recreate either of these owned surfaces:
+
+- `backend/konnaxion/worlds/`;
+- `docs/Technical-Reference/Worlds/`.
+
+Before changing Universe/World semantics, data models, migrations, resolver behavior, isolation, releases, relations, publications, subscriptions, or canonical documentation, change the sibling `Konnaxion_Worlds` package first and consume that version here. Run `python scripts/check_worlds_ownership.py` before considering such work complete.
+
+## 4. Preserve ownership boundaries
 
 Konnaxion is an ecosystem system and, within its own scope, a multi-domain platform.
 
@@ -60,7 +78,7 @@ Do not create a second canonical model, service, or state owner when one already
 
 Cross-domain state changes must respect explicit service/API boundaries rather than directly mutating another domain's state.
 
-## 4. Preserve source, baseline, and reading semantics
+## 5. Preserve source, baseline, and reading semantics
 
 Maintain this distinction:
 
@@ -83,7 +101,7 @@ Before changing EkoH or Smart Vote semantics, inspect:
 - `docs/Technical-Reference/CONTRACTS.txt`
 - `docs/Technical-Reference/CODE_ALIGNMENT_NOTES.md`
 
-## 5. Do not invent ecosystem integrations
+## 6. Do not invent ecosystem integrations
 
 Orgo, Kristal, SemantiK Architect, and kOA-Linux are external ecosystem systems relative to Konnaxion.
 
@@ -102,7 +120,7 @@ For Interaction Kernel work, start with:
 
 `docs/Technical-Reference/INTERACTION_KERNEL_INTEGRATION.md`
 
-## 6. Before editing implementation
+## 7. Before editing implementation
 
 For non-trivial implementation work:
 
@@ -121,7 +139,7 @@ A visible UI route does not prove backend completeness, persistence, qualificati
 
 Preserve intentional preview, read-only, placeholder, or deferred behavior rather than fabricating persistence or success responses.
 
-## 7. Validation
+## 8. Validation
 
 Run validation appropriate to the changed surface. Never claim a command, test layer, gate, or workflow passed unless it was actually run successfully.
 

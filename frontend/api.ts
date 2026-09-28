@@ -253,6 +253,7 @@ export async function apiFetch(
   assertCurrentWorldResponse(
     response.headers.get('X-Konnaxion-World'),
     response.headers.get('X-Konnaxion-World-Release-Id'),
+    response.headers.get('X-Konnaxion-Universe'),
   );
 
   return response;

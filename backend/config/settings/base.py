@@ -498,10 +498,18 @@ KONNAXION_WORLD_BUILD_RETRY_SECONDS = max(
     1, env.int("KONNAXION_WORLD_BUILD_RETRY_SECONDS", default=5)
 )
 
+# Host-domain adapters consumed by the external Konnaxion_Worlds package.
+KONNAXION_WORLDS_SCENARIO_IMPORTER = "config.world_adapters.import_world_scenario"
+KONNAXION_WORLDS_FIXTURE_LOADER = "config.world_adapters.load_world_auxiliary_fixture"
+KONNAXION_WORLDS_FIXTURE_CHECKSUM_PROVIDER = (
+    "config.world_adapters.world_auxiliary_fixture_checksum"
+)
+
 # Make World/Release response guards visible when the browser talks directly
 # to Django instead of the same-origin Next.js proxy.
 CORS_EXPOSE_HEADERS = [
     *globals().get("CORS_EXPOSE_HEADERS", []),
+    "X-Konnaxion-Universe",
     "X-Konnaxion-World",
     "X-Konnaxion-World-Release",
     "X-Konnaxion-World-Release-Id",

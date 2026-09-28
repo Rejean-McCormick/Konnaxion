@@ -1,6 +1,18 @@
 export type WorldRouteContext = {
+  universeKey: string | null;
   key: string;
   appPath: string;
+};
+
+export type UniverseSummary = {
+  id: number;
+  key: string;
+  title: string;
+  status: string;
+  visibility: string;
+  default_world_key: string | null;
+  world_count?: number;
+  can_manage: boolean;
 };
 
 export type WorldReleaseSummary = {
@@ -12,6 +24,9 @@ export type WorldReleaseSummary = {
 
 export type WorldSummary = {
   id: number;
+  universe_id: number;
+  universe_key: string;
+  universe_title: string;
   key: string;
   title: string;
   status: string;
@@ -22,14 +37,19 @@ export type WorldSummary = {
 
 export type WorldRuntime = {
   architecture_lock: string;
+  universe: { id: number; key: string; title: string };
   world: { id: number; key: string; title: string };
   release: { id: number; number: number; dirty: boolean };
   view_as: null | { persona_id: number; display_name: string };
   capabilities?: { data_plane_enabled: boolean; scoped_api_enforced: boolean };
 };
 
-const WORLD_KEY_PATTERN = '[a-z0-9](?:[a-z0-9-]{0,118}[a-z0-9])?';
-const WORLD_PATH_RE = new RegExp(`^/w/(${WORLD_KEY_PATTERN})(/.*)?$`, 'i');
+const KEY_PATTERN = '[a-z0-9](?:[a-z0-9-]{0,118}[a-z0-9])?';
+const UNIVERSE_WORLD_PATH_RE = new RegExp(
+  `^/u/(${KEY_PATTERN})/w/(${KEY_PATTERN})(/.*)?$`,
+  'i',
+);
+const LEGACY_WORLD_PATH_RE = new RegExp(`^/w/(${KEY_PATTERN})(/.*)?$`, 'i');
 
 /** APIs that remain owned by the global/control plane even inside a World URL. */
 const GLOBAL_API_PREFIXES = [
@@ -63,19 +83,36 @@ function trimApiPrefix(path: string): string {
 
 export function isWorldKey(value: string | null | undefined): value is string {
   if (!value) return false;
-  return new RegExp(`^${WORLD_KEY_PATTERN}$`, 'i').test(value);
+  return new RegExp(`^${KEY_PATTERN}$`, 'i').test(value);
 }
+
+export const isUniverseKey = isWorldKey;
 
 export function parseWorldPath(
   pathname: string | null | undefined,
 ): WorldRouteContext | null {
   const path = pathname || '/';
-  const match = WORLD_PATH_RE.exec(path);
-  if (!match?.[1]) return null;
+  const canonical = UNIVERSE_WORLD_PATH_RE.exec(path);
+  if (canonical?.[1] && canonical?.[2]) {
+    return {
+      universeKey: canonical[1].toLowerCase(),
+      key: canonical[2].toLowerCase(),
+      appPath: canonical[3] || '/',
+    };
+  }
+  const legacy = LEGACY_WORLD_PATH_RE.exec(path);
+  if (!legacy?.[1]) return null;
   return {
-    key: match[1].toLowerCase(),
-    appPath: match[2] || '/',
+    universeKey: null,
+    key: legacy[1].toLowerCase(),
+    appPath: legacy[2] || '/',
   };
+}
+
+export function getUniverseKeyFromPathname(
+  pathname: string | null | undefined,
+): string | null {
+  return parseWorldPath(pathname)?.universeKey ?? null;
 }
 
 export function getWorldKeyFromPathname(
@@ -94,6 +131,7 @@ export function stripWorldPrefix(
 export function withWorldPath(
   path: string,
   worldKey: string | null | undefined,
+  universeKey?: string | null,
 ): string {
   if (!worldKey || !isWorldKey(worldKey)) return path || '/';
   if (/^https?:\/\//i.test(path)) return path;
@@ -101,23 +139,31 @@ export function withWorldPath(
   const { pathname, suffix } = splitSuffix(path || '/');
   const existing = parseWorldPath(pathname);
   const appPath = existing?.appPath ?? (pathname.startsWith('/') ? pathname : `/${pathname}`);
-  const scoped = `/w/${worldKey}${appPath === '/' ? '' : appPath}`;
-  return `${scoped}${suffix}`;
+  const resolvedUniverse = universeKey === undefined ? existing?.universeKey : universeKey;
+  const prefix = resolvedUniverse && isUniverseKey(resolvedUniverse)
+    ? `/u/${resolvedUniverse}/w/${worldKey}`
+    : `/w/${worldKey}`;
+  return `${prefix}${appPath === '/' ? '' : appPath}${suffix}`;
 }
 
 export function switchWorldPath(
   currentPath: string,
   targetWorldKey: string,
   fallbackPath = '/ethikos/insights',
+  targetUniverseKey?: string | null,
 ): string {
-  const appPath = stripWorldPrefix(currentPath);
+  const parsed = parseWorldPath(currentPath);
+  const appPath = parsed?.appPath ?? currentPath;
   const usefulPath = appPath === '/' ? fallbackPath : appPath;
-  return withWorldPath(usefulPath, targetWorldKey);
+  const universeKey = targetUniverseKey === undefined
+    ? parsed?.universeKey
+    : targetUniverseKey;
+  return withWorldPath(usefulPath, targetWorldKey, universeKey);
 }
 
 export function isGlobalApiPath(path: string): boolean {
   const clean = trimApiPrefix(path);
-  if (clean.startsWith('w/')) return true;
+  if (clean.startsWith('w/') || clean.startsWith('u/')) return true;
 
   if (
     GLOBAL_API_EXACT_PREFIXES.some(
@@ -135,19 +181,23 @@ export function isGlobalApiPath(path: string): boolean {
 export function scopeApiPath(
   path: string,
   worldKey: string | null | undefined,
+  universeKey?: string | null,
 ): string {
   if (!worldKey || !isWorldKey(worldKey) || isGlobalApiPath(path)) return path;
 
   const { pathname, suffix } = splitSuffix(path);
   const hadLeadingSlash = pathname.startsWith('/');
   const clean = trimApiPrefix(pathname);
-  const scoped = `w/${worldKey}/${clean}`;
+  const scoped = universeKey && isUniverseKey(universeKey)
+    ? `u/${universeKey}/w/${worldKey}/${clean}`
+    : `w/${worldKey}/${clean}`;
   return `${hadLeadingSlash ? '/' : ''}${scoped}${suffix}`;
 }
 
 export function scopeApiPathForBrowser(path: string): string {
   if (typeof window === 'undefined') return path;
-  return scopeApiPath(path, getWorldKeyFromPathname(window.location.pathname));
+  const route = parseWorldPath(window.location.pathname);
+  return scopeApiPath(path, route?.key, route?.universeKey);
 }
 
 export class StaleWorldReleaseError extends Error {
@@ -178,12 +228,39 @@ export class StaleWorldResponseError extends Error {
   }
 }
 
+export class StaleUniverseResponseError extends Error {
+  readonly responseUniverse: string;
+  readonly activeUniverse: string;
+
+  constructor(responseUniverse: string, activeUniverse: string) {
+    super(
+      `Discarded response for Universe ${responseUniverse}; active Universe is ${activeUniverse}.`,
+    );
+    this.name = 'StaleUniverseResponseError';
+    this.responseUniverse = responseUniverse;
+    this.activeUniverse = activeUniverse;
+  }
+}
+
 export function assertCurrentWorldResponse(
   responseWorld: string | null | undefined,
   responseReleaseId?: string | number | null,
+  responseUniverse?: string | null,
 ): void {
   if (typeof window === 'undefined' || !responseWorld) return;
-  const activeWorld = getWorldKeyFromPathname(window.location.pathname);
+  const route = parseWorldPath(window.location.pathname);
+  const activeWorld = route?.key ?? null;
+  const activeUniverse =
+    route?.universeKey ?? document.documentElement.dataset.kxUniverse ?? null;
+
+  if (
+    activeUniverse &&
+    responseUniverse &&
+    responseUniverse.toLowerCase() !== activeUniverse.toLowerCase()
+  ) {
+    throw new StaleUniverseResponseError(responseUniverse, activeUniverse);
+  }
+
   if (activeWorld && responseWorld.toLowerCase() !== activeWorld.toLowerCase()) {
     throw new StaleWorldResponseError(responseWorld, activeWorld);
   }
@@ -199,6 +276,7 @@ export function assertCurrentWorldResponse(
     window.dispatchEvent(
       new CustomEvent('konnaxion:world-release-changed', {
         detail: {
+          universe: activeUniverse,
           world: activeWorld,
           expectedReleaseId: expectedRelease,
           responseReleaseId: actual,
@@ -230,33 +308,39 @@ export function scopeBrowserApiUrl(value: string): string {
   }
 }
 
-/** Build the canonical release-pinned WebSocket route for the active World. */
+/** Build the canonical release-pinned WebSocket route for the active context. */
 export function scopeWorldWebSocketPath(
   path: string,
   worldKey: string | null | undefined,
+  universeKey?: string | null,
 ): string | null {
   if (!worldKey || !isWorldKey(worldKey)) return null;
 
   const { pathname, suffix } = splitSuffix(path || '/ws/reports/custom');
   const clean = pathname.replace(/^\/+/, '');
-  const alreadyScoped = clean.match(/^ws\/w\/[^/]+\/(.+)$/i);
+  const alreadyScoped = clean.match(
+    /^ws\/(?:u\/[^/]+\/)?w\/[^/]+\/(.+)$/i,
+  );
   const socketPath = alreadyScoped
     ? alreadyScoped[1]
     : clean.startsWith('ws/')
       ? clean.slice(3)
       : clean;
-  return `/ws/w/${worldKey}/${socketPath}${suffix}`;
+  const context = universeKey && isUniverseKey(universeKey)
+    ? `u/${universeKey}/w/${worldKey}`
+    : `w/${worldKey}`;
+  return `/ws/${context}/${socketPath}${suffix}`;
 }
 
-/** Resolve a browser WebSocket URL that cannot silently drop World context. */
+/** Resolve a browser WebSocket URL that cannot silently drop context. */
 export function resolveWorldWebSocketUrl(
   path = '/ws/reports/custom',
   base?: string | null,
 ): string | null {
   if (typeof window === 'undefined') return null;
 
-  const worldKey = getWorldKeyFromPathname(window.location.pathname);
-  const scopedPath = scopeWorldWebSocketPath(path, worldKey);
+  const route = parseWorldPath(window.location.pathname);
+  const scopedPath = scopeWorldWebSocketPath(path, route?.key, route?.universeKey);
   if (!scopedPath) return null;
 
   const rawBase = base?.trim();

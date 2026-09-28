@@ -23,12 +23,13 @@ In particular, `Technical-Reference/EkoH Smart Vote/ekoh-smart-vote-definitive-m
 3. `Technical-Reference/DocV14/Konnaxion v14 - Full-Stack Technical Specification.md`
 4. `Technical-Reference/GLOSSARY.md`
 5. `Technical-Reference/BOUNDARIES_AND_OWNERSHIP.md`
-6. `Technical-Reference/CONTRACTS.txt`
-7. `Technical-Reference/EkoH Smart Vote/EkoH and Smart Vote - Technical Specification.md`
-8. `Technical-Reference/CODE_ALIGNMENT_NOTES.md`
-9. `Technical-Reference/NAVIGATION_AND_SHELL_CONTRACT.md`
-10. `Technical-Reference/DocV14/Konnaxion v14 - Site Navigation Map.md`
-11. `Konnaxion_User_Workflows.md`
+6. `Technical-Reference/UNIVERSES_WORLDS_INTEGRATION.md`
+7. `Technical-Reference/CONTRACTS.txt`
+8. `Technical-Reference/EkoH Smart Vote/EkoH and Smart Vote - Technical Specification.md`
+9. `Technical-Reference/CODE_ALIGNMENT_NOTES.md`
+10. `Technical-Reference/NAVIGATION_AND_SHELL_CONTRACT.md`
+11. `Technical-Reference/DocV14/Konnaxion v14 - Site Navigation Map.md`
+12. `Konnaxion_User_Workflows.md`
 
 ## Status and evidence rule
 
@@ -41,6 +42,7 @@ Konnaxion does not currently publish a single global engineering-maturity percen
 ## Architectural invariants
 
 - One authoritative owner per state.
+- Universe/World engine semantics have one external canonical owner: `Konnaxion_Worlds`; Konnaxion only hosts adapters/navigation.
 - No direct write across ownership boundaries.
 - Source facts and derived readings are distinct.
 - A reading never retroactively becomes a source fact.

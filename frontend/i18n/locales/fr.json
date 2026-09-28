@@ -10211,6 +10211,10 @@
     "theWorldCatalogueIsUnavailable": "Le catalogue des Worlds est indisponible.",
     "thisWorldReleaseHasChangesSinceItsLast": "Cette version du World comporte des changements depuis sa dernière compilation/instantané propre.",
     "worldCatalogueUnavailable": "Catalogue des Worlds indisponible",
-    "worldRoutingIsActiveButTheBusinessData": "Le routage des Worlds est actif, mais le plan de données métier n’est pas encore activé."
+    "worldRoutingIsActiveButTheBusinessData": "Le routage des Worlds est actif, mais le plan de données métier n’est pas encore activé.",
+    "activeUniverseAria": "Univers actif",
+    "selectUniverse": "Sélectionner un univers",
+    "noUniverses": "Aucun univers",
+    "universe": "Univers"
   }
 }
