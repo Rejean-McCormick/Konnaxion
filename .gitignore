@@ -168,3 +168,16 @@ compose/**/nginx/certs/
 
 GitSink.bat
 /SmartSnap.pyw
+
+##############################################################################
+# 10) Local migration / consolidation backup trees
+##############################################################################
+.koali-ks4-backup/
+_konnaxion_consolidation_backups/
+_konnaxion_i18n_backups/
+
+# Additional backup naming variants
+*.bak-*
+*.backup
+*.backup-*
+*.backup_*

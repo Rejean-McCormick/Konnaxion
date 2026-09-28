@@ -61,3 +61,8 @@ OVERLAY_TREE.txt
 docs/status/
 docs/demo-scenarios/
 
+##############################################################################
+# 5) Snapshot bookkeeping
+##############################################################################
+CODE_SNAPSHOT_MANIFEST.md
+SMARTDUMP_INDEX.txt
