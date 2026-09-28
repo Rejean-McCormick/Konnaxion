@@ -167,3 +167,4 @@ compose/**/nginx/certs/
 *.zip
 
 GitSink.bat
+/SmartSnap.pyw

@@ -177,6 +177,126 @@
   },
   {
     "source": "openapi",
+    "path": "/api/control/universes/",
+    "method": "GET",
+    "operationId": "control_universes_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/universes/",
+    "method": "POST",
+    "operationId": "control_universes_create",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/universes/{universe_key}/",
+    "method": "GET",
+    "operationId": "control_universes_retrieve_2",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/universes/{universe_key}/",
+    "method": "PATCH",
+    "operationId": "control_universes_partial_update",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/universes/{universe_key}/memberships/",
+    "method": "GET",
+    "operationId": "control_universes_memberships_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/universes/{universe_key}/memberships/",
+    "method": "POST",
+    "operationId": "control_universes_memberships_create",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/universes/{universe_key}/memberships/{membership_id}/",
+    "method": "DELETE",
+    "operationId": "control_universes_memberships_destroy",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/universes/{universe_key}/publications/",
+    "method": "GET",
+    "operationId": "control_universes_publications_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/universes/{universe_key}/publications/",
+    "method": "POST",
+    "operationId": "control_universes_publications_create",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/universes/{universe_key}/relations/",
+    "method": "GET",
+    "operationId": "control_universes_relations_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/universes/{universe_key}/relations/",
+    "method": "POST",
+    "operationId": "control_universes_relations_create",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/universes/{universe_key}/subscriptions/",
+    "method": "GET",
+    "operationId": "control_universes_subscriptions_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/universes/{universe_key}/subscriptions/",
+    "method": "POST",
+    "operationId": "control_universes_subscriptions_create",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/universes/{universe_key}/worlds/",
+    "method": "GET",
+    "operationId": "control_universes_worlds_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/universes/{universe_key}/worlds/",
+    "method": "POST",
+    "operationId": "control_universes_worlds_create",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
     "path": "/api/control/worlds/",
     "method": "GET",
     "operationId": "control_worlds_retrieve",

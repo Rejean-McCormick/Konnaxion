@@ -9,6 +9,8 @@ from konnaxion.worlds.runtime import WorldRuntime, get_world_runtime
 
 def _runtime() -> WorldRuntime:
     return WorldRuntime(
+        universe_id=3,
+        universe_key="research",
         world_id=7,
         world_key="research-innovation-commons",
         release_id=17,
@@ -47,7 +49,8 @@ def test_reports_websocket_pins_world_release_for_socket_lifetime(monkeypatch):
     ]
     sent = []
 
-    async def fake_resolve(*, world_key, headers):
+    async def fake_resolve(*, world_key, universe_key=None, headers):
+        assert universe_key is None
         assert world_key == runtime.world_key
         assert headers == []
         return runtime
@@ -89,4 +92,54 @@ def test_reports_websocket_pins_world_release_for_socket_lifetime(monkeypatch):
     keepalive = json.loads(sent[3]["text"])
     assert keepalive["payload"]["world_id"] == 7
     assert keepalive["payload"]["release_id"] == 17
+    assert get_world_runtime() is None
+
+
+def test_reports_websocket_accepts_universe_scoped_path(monkeypatch):
+    runtime = _runtime()
+    events = [
+        {"type": "websocket.connect"},
+        {"type": "websocket.disconnect"},
+    ]
+    sent = []
+
+    async def fake_resolve(*, world_key, universe_key=None, headers):
+        assert universe_key == runtime.universe_key
+        assert world_key == runtime.world_key
+        assert headers == []
+        return runtime
+
+    async def receive():
+        return events.pop(0)
+
+    async def send(event):
+        sent.append(event)
+
+    monkeypatch.setattr(
+        websocket_config,
+        "resolve_websocket_world_runtime",
+        fake_resolve,
+    )
+
+    asyncio.run(
+        websocket_config.websocket_application(
+            {
+                "path": (
+                    f"/ws/u/{runtime.universe_key}/w/{runtime.world_key}/"
+                    "reports/custom"
+                ),
+                "headers": [],
+            },
+            receive,
+            send,
+        )
+    )
+
+    assert sent[0] == {"type": "websocket.accept"}
+    connected = json.loads(sent[1]["text"])
+    assert connected["universe"] == {
+        "id": runtime.universe_id,
+        "key": runtime.universe_key,
+    }
+    assert connected["world"]["release_id"] == runtime.release_id
     assert get_world_runtime() is None

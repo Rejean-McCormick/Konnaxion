@@ -58,10 +58,10 @@
     {
       "id": "kx.tool.python",
       "severity": "PASS",
-      "message": "Python available: C:\\Users\\rejea\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+      "message": "Python available: C:\\Users\\rejea\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
       "category": "toolchain",
-      "path": "C:\\Users\\rejea\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
-      "evidence": "3.14.3"
+      "path": "C:\\Users\\rejea\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "evidence": "3.13.15"
     },
     {
       "id": "kx.discovery.capsule-manager",
@@ -72,15 +72,15 @@
     }
   ],
   "artifacts": [],
-  "started_at": "2026-09-28T11:27:01-04:00",
-  "ended_at": "2026-09-28T11:27:01-04:00",
-  "duration_seconds": 0.106128,
+  "started_at": "2026-09-28T18:45:57-04:00",
+  "ended_at": "2026-09-28T18:45:57-04:00",
+  "duration_seconds": 0.11161,
   "cwd": "C:\\mycode\\Konnaxion\\Konnaxion",
   "output_tail": "",
   "metadata": {
-    "diagnostic_session_id": "kxdiag-20260928_112701-fe74095f",
+    "diagnostic_session_id": "kxdiag-20260928_184557-35e5a98c",
     "cwd": "C:\\mycode\\Konnaxion\\Konnaxion",
-    "python": "3.14.3",
+    "python": "3.13.15",
     "platform": "Windows-11-10.0.26200-SP0"
   }
 }
