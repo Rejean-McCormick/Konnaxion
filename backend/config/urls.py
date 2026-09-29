@@ -44,7 +44,7 @@ urlpatterns += [
     # Phase-U1 compatibility route. Remove after legacy World URLs retire.
     re_path(
         r"^api/w/[a-z0-9](?:[a-z0-9-]{0,118}[a-z0-9])?/",
-        include("config.world_urls"),
+        include(("config.world_urls", "world_legacy"), namespace="world_legacy"),
     ),
 
     # Orgo -> Konnaxion Interaction Kernel ingress. Machine-authenticated and
