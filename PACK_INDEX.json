@@ -1,6 +1,6 @@
 {
   "pack_contract": "konnaxion-all-universe-seeds-import-pack/v1",
-  "pack_version": "1.0.0",
+  "pack_version": "1.0.1",
   "target": "Konnaxion repository root overlay",
   "platform_contracts": [
     "kx-universe-pack/v1",
@@ -277,5 +277,9 @@
       "source_zip": "levis-konnaxion-universe-seed-v0.4.0.zip",
       "source_root": "levis-konnaxion-universe-seed-v0.4.0"
     }
-  ]
+  ],
+  "verifier_policy": {
+    "strict_scope": "Worlds referenced by kx-universe-pack/v1",
+    "legacy_worlds": "reported as warnings; not required to declare kx-world-personas/v1"
+  }
 }
