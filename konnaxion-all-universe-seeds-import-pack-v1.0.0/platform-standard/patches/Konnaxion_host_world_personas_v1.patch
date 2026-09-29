@@ -1,0 +1,319 @@
+--- a/backend/config/world_adapters.py
++++ b/backend/config/world_adapters.py
+@@ -1,26 +1,310 @@
+ """Konnaxion host adapters for the external Konnaxion_Worlds engine.
+ 
+-This module is intentionally the product-side dependency inversion point.  The
++This module is intentionally the product-side dependency inversion point. The
+ engine owns Universe/World/Release mechanics; Konnaxion owns ethiKos/EkoH domain
+ imports and fixtures.
++
++The generic ``kx-world-personas/v1`` host contract projects scenario actors into
++stable WorldPersona identities with release-local auth bridge Users. The logic is
++Universe-agnostic: UNESCO, fictional simulations, project portfolios and future
++Universes use the same adapter.
+ """
+ from __future__ import annotations
+ 
++from copy import deepcopy
+ import hashlib
+ import json
+ from pathlib import Path
+ 
++from django.contrib.auth import get_user_model
+ from django.db import transaction
++
++PERSONA_CONTRACT = "kx-world-personas/v1"
++PROJECTION_MODE_STANDARD = "standard"
++PROJECTION_MODE_IDENTITY_BINDING_ONLY = "identity_binding_only"
++PROJECTION_MODES = {PROJECTION_MODE_STANDARD, PROJECTION_MODE_IDENTITY_BINDING_ONLY}
++STRICT_EPISTEMIC_KEYS = {
++    "role", "institutional_role", "institutional_scope", "role_status",
++    "expertise", "expertise_claims", "credentials", "credential_claims",
++    "provenance", "source_basis", "claims", "assertions", "certainty",
++    "validated_as", "authority_recognition", "panel_eligibility",
++}
++
++
++def _persona_projection_requested(payload) -> bool:
++    if not isinstance(payload, dict):
++        return False
++    metadata = payload.get("metadata") or {}
++    if metadata.get("persona_contract"):
++        return True
++    if metadata.get("actor_profiles"):
++        return True
++    # Compatibility for early seeds that placed host persona hints inline.
++    return any(
++        any(name in actor for name in ("persona_type", "account_type", "is_klone", "representation_type", "actor_kind"))
++        for actor in (payload.get("actors") or [])
++        if isinstance(actor, dict)
++    )
++
++
++def _infer_account_type(profile: dict, persona_type: str) -> str:
++    explicit = str(profile.get("account_type") or "").strip().lower()
++    if explicit:
++        return explicit
++    entity_type = str(profile.get("entity_type") or profile.get("actor_kind") or "").lower()
++    if persona_type == "organization" or any(token in entity_type for token in ("organization", "institution", "office", "state", "body", "ngo", "company", "sector")):
++        return "service"
++    return "human"
++
++
++def _persona_projection_policy(payload) -> dict:
++    metadata = (payload or {}).get("metadata") or {}
++    policy = metadata.get("persona_projection") or {}
++    if not isinstance(policy, dict):
++        raise ValueError("metadata.persona_projection must be an object.")
++    mode = str(policy.get("mode") or PROJECTION_MODE_STANDARD).strip()
++    if mode not in PROJECTION_MODES:
++        raise ValueError(f"Unsupported persona projection mode: {mode!r}")
++    return {**policy, "mode": mode}
++
++
++def _nested_forbidden_keys(value) -> set[str]:
++    found = set()
++    if isinstance(value, dict):
++        for key, nested in value.items():
++            if str(key) in STRICT_EPISTEMIC_KEYS:
++                found.add(str(key))
++            found.update(_nested_forbidden_keys(nested))
++    elif isinstance(value, list):
++        for nested in value:
++            found.update(_nested_forbidden_keys(nested))
++    return found
++
++
++def _validate_persona_contract(payload):
++    from konnaxion.worlds.models import WorldPersona
++
++    metadata = (payload or {}).get("metadata") or {}
++    contract = str(metadata.get("persona_contract") or "").strip()
++    profiles = metadata.get("actor_profiles") or {}
++    if contract and contract != PERSONA_CONTRACT:
++        raise ValueError(f"Unsupported persona_contract: {contract!r}")
++    if not isinstance(profiles, dict):
++        raise ValueError("metadata.actor_profiles must be an object.")
++    projection = _persona_projection_policy(payload)
++    if contract == PERSONA_CONTRACT:
++        actors = (payload or {}).get("actors") or []
++        actor_keys = {str(actor.get("key") or "").strip() for actor in actors if isinstance(actor, dict)}
++        missing = actor_keys - set(profiles)
++        extra = set(profiles) - actor_keys
++        if missing:
++            raise ValueError(f"Missing actor profiles under {PERSONA_CONTRACT}: {sorted(missing)!r}")
++        if extra:
++            raise ValueError(f"actor_profiles contains unknown actor keys: {sorted(extra)!r}")
++        valid_types = {value for value, _label in WorldPersona.TYPE_CHOICES}
++        for key, profile in profiles.items():
++            if not isinstance(profile, dict):
++                raise ValueError(f"actor_profiles[{key!r}] must be an object.")
++            persona_type = str(profile.get("persona_type") or WorldPersona.TYPE_DEMO_ACTOR).strip()
++            if persona_type not in valid_types:
++                raise ValueError(f"Unsupported persona_type {persona_type!r} for actor {key!r}.")
++            if projection["mode"] == PROJECTION_MODE_IDENTITY_BINDING_ONLY:
++                leaked = _nested_forbidden_keys(profile)
++                if leaked:
++                    raise ValueError(
++                        f"Epistemic fields are forbidden in identity_binding_only profile {key!r}: "
++                        f"{sorted(leaked)!r}"
++                    )
++                knowledge = profile.get("knowledge_projection") or {}
++                if not isinstance(knowledge, dict) or not str(knowledge.get("authority") or "").strip():
++                    raise ValueError(
++                        f"identity_binding_only profile {key!r} requires knowledge_projection.authority."
++                    )
++                if knowledge.get("runtime_pack_required_for_epistemic_claims") is not True:
++                    raise ValueError(
++                        f"identity_binding_only profile {key!r} must require runtime knowledge for epistemic claims."
++                    )
++                referents = profile.get("external_referents") or {}
++                if not isinstance(referents, dict) or not any(str(v or "").strip() for v in referents.values()):
++                    raise ValueError(
++                        f"identity_binding_only profile {key!r} requires at least one external_referents binding."
++                    )
++    return contract, profiles
++
++
++def _prepare_persona_import(payload):
++    from konnaxion.worlds.models import WorldPersona
++    from konnaxion.worlds.runtime import require_world_runtime
++    from konnaxion.worlds.services.personas import bridge_username
++
++    runtime = require_world_runtime()
++    transformed = deepcopy(payload)
++    metadata = transformed.get("metadata") or {}
++    contract, profiles = _validate_persona_contract(transformed)
++    projection = _persona_projection_policy(transformed)
++    strict = contract == PERSONA_CONTRACT
++    actors = transformed.get("actors") or []
++    actor_keys = {str(actor.get("key") or "").strip() for actor in actors if isinstance(actor, dict)}
++    valid_types = {value for value, _label in WorldPersona.TYPE_CHOICES}
++    valid_account_types = {value for value, _label in get_user_model().ACCOUNT_TYPE_CHOICES}
++    specs = []
++    inline_keys = (
++        "persona_type", "account_type", "is_klone", "actor_kind", "entity_type",
++        "representation_type", "role", "speaking_policy", "simulation_eligible",
++        "source_basis", "verified_at", "global_entity_key", "ethikos_elite", "ethikos_write",
++    )
++
++    for actor in actors:
++        source_key = str(actor.get("key") or "").strip()
++        if not source_key:
++            continue
++        profile = dict(profiles.get(source_key) or {})
++        if strict and source_key not in profiles:
++            raise ValueError(f"Missing actor profile for {source_key!r} under {PERSONA_CONTRACT}.")
++        for key in inline_keys:
++            if key not in profile and key in actor:
++                profile[key] = actor[key]
++
++        requested_username = str(actor.get("username") or source_key).strip()
++        persona_type = str(profile.get("persona_type") or WorldPersona.TYPE_DEMO_ACTOR).strip()
++        if persona_type not in valid_types:
++            raise ValueError(f"Unsupported persona_type {persona_type!r} for actor {source_key!r}.")
++
++        account_type = _infer_account_type(profile, persona_type)
++        if account_type not in valid_account_types:
++            raise ValueError(f"Unsupported account_type {account_type!r} for actor {source_key!r}.")
++
++        simulation_eligible = bool(profile.get("simulation_eligible", True))
++        is_klone = bool(profile.get("is_klone", persona_type == WorldPersona.TYPE_SIMULATED))
++        if account_type == "service" and is_klone:
++            raise ValueError(f"Service actor {source_key!r} cannot also be a human klone.")
++        if not simulation_eligible:
++            is_klone = False
++
++        # Canonical primitive is the actual Konnaxion User flag. ``ethikos_write``
++        # remains a compatibility alias for early v1 seed packages. Klone personas
++        # may participate independently via User.can_participate_in_ethikos.
++        ethikos_elite = bool(
++            profile.get(
++                "ethikos_elite",
++                profile.get("ethikos_write", actor.get("is_ethikos_elite", False)),
++            )
++        )
++        if not simulation_eligible:
++            ethikos_elite = False
++
++        existing_persona = WorldPersona.objects.filter(
++            world_id=runtime.world_id, source_key=source_key
++        ).first()
++        if existing_persona is not None and existing_persona.persona_type != persona_type:
++            raise ValueError(
++                "WorldPersona type is immutable across releases: "
++                f"{source_key!r} is {existing_persona.persona_type!r}, seed requested {persona_type!r}."
++            )
++
++        internal_username = bridge_username(
++            source_key=source_key,
++            requested_username=requested_username,
++        )
++        actor["username"] = internal_username
++        actor["is_ethikos_elite"] = ethikos_elite
++
++        bridge_metadata = {
++            **profile,
++            "persona_contract": PERSONA_CONTRACT,
++            "source_key": source_key,
++            "requested_username": requested_username,
++            "account_type": account_type,
++            "is_klone": is_klone,
++            "simulation_eligible": simulation_eligible,
++            "ethikos_elite": ethikos_elite,
++            "persona_projection_mode": projection["mode"],
++        }
++        specs.append({
++            "source_key": source_key,
++            "display_name": str(actor.get("display_name") or requested_username),
++            "username": internal_username,
++            "persona_type": persona_type,
++            "account_type": account_type,
++            "is_klone": is_klone,
++            "ethikos_elite": ethikos_elite,
++            "metadata": bridge_metadata,
++            "persona_preexisted": existing_persona is not None,
++        })
++    return transformed, specs
++
++
++def _register_persona_specs(specs):
++    from konnaxion.worlds.services.personas import register_persona_bridge
++
++    User = get_user_model()
++    user_fields = {field.name for field in User._meta.concrete_fields}
++    registered = 0
++    for spec in specs:
++        user = User.objects.get(username=spec["username"])
++        update_fields = []
++        if "account_type" in user_fields and user.account_type != spec["account_type"]:
++            user.account_type = spec["account_type"]
++            update_fields.append("account_type")
++        if "is_klone" in user_fields and user.is_klone != spec["is_klone"]:
++            user.is_klone = spec["is_klone"]
++            update_fields.append("is_klone")
++        if "is_ethikos_elite" in user_fields and user.is_ethikos_elite != spec["ethikos_elite"]:
++            user.is_ethikos_elite = spec["ethikos_elite"]
++            update_fields.append("is_ethikos_elite")
++
++        # A release bridge User is never the human authentication principal.
++        user.set_unusable_password()
++        update_fields.append("password")
++        if update_fields:
++            user.save(update_fields=sorted(set(update_fields)))
++
++        persona = register_persona_bridge(
++            source_key=spec["source_key"],
++            display_name=spec["display_name"],
++            bridge_user=user,
++            metadata=spec["metadata"],
++        )
++        if not spec["persona_preexisted"] and persona.persona_type != spec["persona_type"]:
++            persona.persona_type = spec["persona_type"]
++            persona.save(update_fields=["persona_type", "updated_at"])
++        registered += 1
++    return registered
+ 
+ 
+ def import_world_scenario(payload, *, imported_by=None, dry_run=False):
+     from konnaxion.ethikos.demo_import.importer import import_ethikos_demo_scenario
+ 
+-    return import_ethikos_demo_scenario(
+-        payload,
+-        imported_by=imported_by,
+-        dry_run=dry_run,
+-    )
++    if not _persona_projection_requested(payload):
++        return import_ethikos_demo_scenario(
++            payload, imported_by=imported_by, dry_run=dry_run
++        )
++
++    if dry_run:
++        _validate_persona_contract(payload)
++        return import_ethikos_demo_scenario(
++            payload, imported_by=imported_by, dry_run=True
++        )
++
++    transformed, specs = _prepare_persona_import(payload)
++    with transaction.atomic():
++        result = import_ethikos_demo_scenario(
++            transformed,
++            imported_by=imported_by,
++            dry_run=False,
++        )
++        if not isinstance(result, dict) or not result.get("ok"):
++            return result
++        registered = _register_persona_specs(specs)
++        result = dict(result)
++        summary = dict(result.get("summary") or {})
++        summary["world_persona_bridges"] = registered
++        result["summary"] = summary
++        result["persona_bridge"] = {
++            "contract": PERSONA_CONTRACT,
++            "registered": registered,
++        }
++        return result
+ 
+ 
+ def _canonical_isced_fixture_path() -> Path:

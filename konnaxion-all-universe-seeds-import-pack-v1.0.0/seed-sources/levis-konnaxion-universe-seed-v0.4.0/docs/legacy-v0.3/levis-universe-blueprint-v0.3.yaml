@@ -1,0 +1,167 @@
+schema: konnaxion-universe-bootstrap-blueprint/v2
+universe:
+  key: levis
+  title: Ville de Lévis
+  description: Simulation civique dynamique de la Ville de Lévis. Les Worlds suivent les unités administratives actuelles; la Direction générale est le World d’intégration.
+  status: active
+  visibility: public
+  default_world_key: levis-direction-generale
+  metadata_json:
+    host: levis.konnaxion.com
+    host_binding_status: declared_not_enforced_by_seed
+    jurisdiction: Ville de Lévis, Québec, Canada
+    baseline_date: '2026-09-29'
+    seed_version: 0.3.0
+    purpose: civic_simulation
+    source_of_structure: city_orgchart_2026_02
+worlds:
+- key: levis-direction-generale
+  title: Ville de Lévis — Direction générale
+  description: Gouvernance, coordination municipale, conseil municipal et enjeux transversaux.
+  municipal_group: direction-generale
+  visibility: public
+- key: levis-capital-humain
+  title: Ville de Lévis — Gestion du capital humain
+  description: Gestion des talents, relations de travail et développement organisationnel.
+  municipal_group: direction-generale-direct
+  visibility: public
+- key: levis-finances
+  title: Ville de Lévis — Finances et trésorerie
+  description: Budget, trésorerie, comptabilité, évaluation et planification financière.
+  municipal_group: direction-generale-direct
+  visibility: public
+- key: levis-developpement-economique
+  title: Ville de Lévis — Développement économique et promotion
+  description: Développement économique, entreprises, tourisme et promotion du territoire.
+  municipal_group: dga-planification-territoire
+  visibility: public
+- key: levis-environnement
+  title: Ville de Lévis — Environnement
+  description: Biodiversité, matières résiduelles, suivi environnemental et transition climatique.
+  municipal_group: dga-planification-territoire
+  visibility: public
+- key: levis-genie
+  title: Ville de Lévis — Génie
+  description: Analyse, planification, conception et réalisation des infrastructures municipales.
+  municipal_group: dga-planification-territoire
+  visibility: public
+- key: levis-urbanisme
+  title: Ville de Lévis — Urbanisme
+  description: Aménagement du territoire, urbanisme, patrimoine, cadre bâti, permis et développement.
+  municipal_group: dga-planification-territoire
+  visibility: public
+- key: levis-mobilite
+  title: Ville de Lévis — Transports et mobilité durable
+  description: Planification des transports, circulation, mobilité durable, sécurité et accessibilité des déplacements.
+  municipal_group: dga-planification-territoire
+  visibility: public
+- key: levis-securite-civile
+  title: Ville de Lévis — Bureau de la sécurité civile
+  description: Préparation aux sinistres, gestion des risques, coordination des ressources et résilience municipale.
+  municipal_group: dga-securite-corporatif
+  visibility: public
+- key: levis-police
+  title: Ville de Lévis — Service de police
+  description: Sécurité publique, prévention et opérations policières.
+  municipal_group: dga-securite-corporatif
+  visibility: public
+- key: levis-incendie
+  title: Ville de Lévis — Sécurité incendie
+  description: Prévention incendie, protection des personnes et des biens, et intervention d’urgence.
+  municipal_group: dga-securite-corporatif
+  visibility: public
+- key: levis-approvisionnement-immobilier
+  title: Ville de Lévis — Approvisionnement et gestion immobilière
+  description: Approvisionnement public, contrats, immeubles municipaux, espaces et projets immobiliers.
+  municipal_group: dga-securite-corporatif
+  visibility: public
+- key: levis-affaires-juridiques-greffe
+  title: Ville de Lévis — Affaires juridiques et greffe
+  description: Droit municipal, litiges, cour municipale, greffe, accès aux documents et gouvernance documentaire.
+  municipal_group: dga-securite-corporatif
+  visibility: public
+- key: levis-entretien-infrastructures
+  title: Ville de Lévis — Entretien des infrastructures
+  description: Voirie, aqueducs et égouts, équipements, bâtiments, parcs, déneigement et traitement des eaux.
+  municipal_group: dga-services-communaute
+  visibility: public
+- key: levis-vie-communautaire
+  title: Ville de Lévis — Vie communautaire
+  description: Culture, sports, plein air, bibliothèques, loisirs et développement communautaire.
+  municipal_group: dga-services-communaute
+  visibility: public
+- key: levis-communications-citoyens
+  title: Ville de Lévis — Communications et interaction citoyenne
+  description: Communications publiques, médias, interaction citoyenne, plateformes numériques et image de marque.
+  municipal_group: dga-services-communaute
+  visibility: public
+- key: levis-ti-transformation
+  title: Ville de Lévis — Technologies de l’information et transformation numérique
+  description: Infrastructure TI, cybersécurité, données, solutions numériques et transformation des services.
+  municipal_group: dga-services-communaute
+  visibility: public
+relations:
+- source_world: levis-direction-generale
+  target_world: levis-capital-humain
+  relation_type: coordinates
+  title: Coordination municipale
+- source_world: levis-direction-generale
+  target_world: levis-finances
+  relation_type: coordinates
+  title: Coordination municipale
+- source_world: levis-direction-generale
+  target_world: levis-developpement-economique
+  relation_type: coordinates
+  title: Coordination municipale
+- source_world: levis-direction-generale
+  target_world: levis-environnement
+  relation_type: coordinates
+  title: Coordination municipale
+- source_world: levis-direction-generale
+  target_world: levis-genie
+  relation_type: coordinates
+  title: Coordination municipale
+- source_world: levis-direction-generale
+  target_world: levis-urbanisme
+  relation_type: coordinates
+  title: Coordination municipale
+- source_world: levis-direction-generale
+  target_world: levis-mobilite
+  relation_type: coordinates
+  title: Coordination municipale
+- source_world: levis-direction-generale
+  target_world: levis-securite-civile
+  relation_type: coordinates
+  title: Coordination municipale
+- source_world: levis-direction-generale
+  target_world: levis-police
+  relation_type: coordinates
+  title: Coordination municipale
+- source_world: levis-direction-generale
+  target_world: levis-incendie
+  relation_type: coordinates
+  title: Coordination municipale
+- source_world: levis-direction-generale
+  target_world: levis-approvisionnement-immobilier
+  relation_type: coordinates
+  title: Coordination municipale
+- source_world: levis-direction-generale
+  target_world: levis-affaires-juridiques-greffe
+  relation_type: coordinates
+  title: Coordination municipale
+- source_world: levis-direction-generale
+  target_world: levis-entretien-infrastructures
+  relation_type: coordinates
+  title: Coordination municipale
+- source_world: levis-direction-generale
+  target_world: levis-vie-communautaire
+  relation_type: coordinates
+  title: Coordination municipale
+- source_world: levis-direction-generale
+  target_world: levis-communications-citoyens
+  relation_type: coordinates
+  title: Coordination municipale
+- source_world: levis-direction-generale
+  target_world: levis-ti-transformation
+  relation_type: coordinates
+  title: Coordination municipale

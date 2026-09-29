@@ -1,0 +1,2219 @@
+{
+  "schema_version": "5.0",
+  "artifact_type": "referent_registry",
+  "profile_version": "1.0.0",
+  "registry_id": "sha256:c943d398f1cd712e21706a014d1d7a42045ba12ec352654f22457d23ab0f9232",
+  "scope": {
+    "domain": "civic"
+  },
+  "referents": [
+    {
+      "ref": "credential:levis/ing",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "ing.",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "professional_designation"
+      ]
+    },
+    {
+      "ref": "credential:levis/ingenieur",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "ingénieur",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "professional_designation"
+      ]
+    },
+    {
+      "ref": "expertise:levis/administration-financiere",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "administration financière",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "041"
+      }
+    },
+    {
+      "ref": "expertise:levis/administration-municipale",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "administration municipale",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "0413"
+      }
+    },
+    {
+      "ref": "expertise:levis/architecture-et-amenagement-urbain",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "architecture et aménagement urbain",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "0731"
+      }
+    },
+    {
+      "ref": "expertise:levis/architecture-et-construction",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "architecture et construction",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "073"
+      }
+    },
+    {
+      "ref": "expertise:levis/coordination-organisationnelle",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "coordination organisationnelle",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "0413"
+      }
+    },
+    {
+      "ref": "expertise:levis/droit",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "droit",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "0421"
+      }
+    },
+    {
+      "ref": "expertise:levis/eau-potable-et-eaux-usees",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "eau potable et eaux usées",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "071"
+      }
+    },
+    {
+      "ref": "expertise:levis/economie",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "économie",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "0311"
+      }
+    },
+    {
+      "ref": "expertise:levis/genie-civil-et-infrastructures",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "génie civil et infrastructures",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "071"
+      }
+    },
+    {
+      "ref": "expertise:levis/genie-et-techniques-apparentees",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "génie et techniques apparentées",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "071"
+      }
+    },
+    {
+      "ref": "expertise:levis/genie-municipal",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "génie municipal",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "071"
+      }
+    },
+    {
+      "ref": "expertise:levis/gestion-de-projets",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "gestion de projets",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "0413"
+      }
+    },
+    {
+      "ref": "expertise:levis/gestion-de-projets-majeurs",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "gestion de projets majeurs",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "0413"
+      }
+    },
+    {
+      "ref": "expertise:levis/gestion-et-administration",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "gestion et administration",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "0413"
+      }
+    },
+    {
+      "ref": "expertise:levis/infrastructures-municipales",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "infrastructures municipales",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "071"
+      }
+    },
+    {
+      "ref": "expertise:levis/ingenierie-et-planification-des-transports",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "ingénierie et planification des transports",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "071"
+      }
+    },
+    {
+      "ref": "expertise:levis/journalisme-et-information",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "journalisme et information",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "032"
+      }
+    },
+    {
+      "ref": "expertise:levis/protection-des-personnes-et-des-biens",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "protection des personnes et des biens",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "1032"
+      }
+    },
+    {
+      "ref": "expertise:levis/sciences-environnementales",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "sciences environnementales",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "0521"
+      }
+    },
+    {
+      "ref": "expertise:levis/securite-et-services-durgence",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "sécurité et services d’urgence",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "1032"
+      }
+    },
+    {
+      "ref": "expertise:levis/technologies-de-linformation-et-de-la-communication",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "technologies de l’information et de la communication",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "061"
+      }
+    },
+    {
+      "ref": "expertise:levis/transport-et-circulation",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "transport et circulation",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "expertise_domain"
+      ],
+      "attributes": {
+        "isced_f_code": "071"
+      }
+    },
+    {
+      "ref": "levis:organization:affaires-juridiques-greffe",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Direction des affaires juridiques et du greffe",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:approvisionnement-immobilier",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Direction de l’approvisionnement et de la gestion immobilière",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:communications-interaction-citoyenne",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Direction des communications et de l’interaction citoyenne",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:developpement-economique-promotion",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Direction du développement économique et de la promotion",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:direction-generale",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Direction générale",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:entretien-infrastructures",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Direction de l’entretien des infrastructures",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:environnement",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Direction de l’environnement",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:finances-tresorerie",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Direction des finances et trésorerie",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:genie",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Direction du génie",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:gestion-capital-humain",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Direction de la gestion du capital humain",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:securite-civile",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Bureau de la sécurité civile",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:securite-incendie",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Direction du service de la sécurité incendie",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:service-police",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Direction du service de police",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:ti-transformation",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Direction des technologies de l’information et transformation numérique",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:transports-mobilite",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Direction des transports et de la mobilité durable",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:urbanisme",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Direction de l’urbanisme",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:vie-communautaire",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Direction de la vie communautaire",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:organization:ville-de-levis",
+      "kind": "collective",
+      "labels": [
+        {
+          "text": "Ville de Lévis",
+          "lang": "fr"
+        }
+      ],
+      "description": "Organisation municipale utilisée comme juridiction du corpus Lévis."
+    },
+    {
+      "ref": "levis:person:alain-quirion",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Alain Quirion",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:anick-tremblay",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Anick Tremblay",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:anne-marie-tremblay",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Anne-Marie Tremblay",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:annie-bergeron",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Annie Bergeron",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:annie-gaudreault",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Annie Gaudreault",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:anthony-dufour",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Anthony Dufour",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:audrey-bedard",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Audrey Bédard",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:benoit-forget-chiasson",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Benoit Forget-Chiasson",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:charles-lemoyne",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Charles Lemoyne",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:daniel-saindon",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Daniel Saindon",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:dany-lachance",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Dany Lachance",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:david-boudreault",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "David Boudreault",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:denis-deschenes",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Denis Deschênes",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:dominic-deslauriers",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Dominic Deslauriers",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:dominique-marceau",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Dominique Marceau",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:eric-nadeau",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Éric Nadeau",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:erik-bilodeau",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Erik Bilodeau",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:etienne-talbot",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Étienne Talbot",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:francis-joud",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Francis Joud",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:francois-dube",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "François Dubé",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:frederic-moisan",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Frédéric Moisan",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:genevieve-coude-levesque",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Geneviève Coudé-Lévesque",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:houda-slaoui",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Houda Slaoui",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:isabelle-lefebvre",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Isabelle Lefebvre",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:jean-demers",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Jean Demers",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:jean-francois-gagnon",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Jean-François Gagnon",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:jean-leblond",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Jean Leblond",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:jean-sebastien-roy",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Jean-Sébastien Roy",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:josee-bilodeau",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Josée Bilodeau",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:karine-lavertu",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Karine Lavertu",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:lysandre-arseneau",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Lysandre Arseneau",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:manon-gauvreau",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Manon Gauvreau",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:marie-jeanne-gagnon-beaulieu",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Marie-Jeanne Gagnon-Beaulieu",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:marie-noelle-caron",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Marie-Noëlle Caron",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:marlyne-turgeon",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Marlyne Turgeon",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:melanie-sicotte",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Mélanie Sicotte",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:noemie-goulet",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Noémie Goulet",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:olivier-biron",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Olivier Biron",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:olivier-laviolette",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Olivier Laviolette",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:patrick-hamelin",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Patrick Hamelin",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:pierre-lefevre",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Pierre Lefèvre",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:rejean-perusse",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Réjean Pérusse",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:simon-gauthier",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Simon Gauthier",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:simon-roberge-vallieres",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Simon Roberge-Vallières",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:steve-larose",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Steve Larose",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:steven-blaney",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Steven Blaney",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:suzanne-breton",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Suzanne Breton",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:sylvie-bernatchez",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Sylvie Bernatchez",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "levis:person:vincent-vu",
+      "kind": "person",
+      "labels": [
+        {
+          "text": "Vincent Vu",
+          "lang": "fr"
+        }
+      ]
+    },
+    {
+      "ref": "role:levis/affaires-juridiques-greffe/chef-de-service-cour-municipale-et-greffes",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Chef de service — cour municipale et greffes",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-affaires-juridiques-greffe"
+      }
+    },
+    {
+      "ref": "role:levis/affaires-juridiques-greffe/directeur-des-affaires-juridiques-et-du-greffe",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directeur des affaires juridiques et du greffe",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-affaires-juridiques-greffe"
+      }
+    },
+    {
+      "ref": "role:levis/affaires-juridiques-greffe/direction-des-affaires-juridiques-et-du-greffe",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Direction des affaires juridiques et du greffe",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-affaires-juridiques-greffe"
+      }
+    },
+    {
+      "ref": "role:levis/affaires-juridiques-greffe/greffiere-et-responsable-de-lacces-aux-documents-et-de-la-protection-des-renseignements-personnels",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Greffière et responsable de l’accès aux documents et de la protection des renseignements personnels",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-affaires-juridiques-greffe"
+      }
+    },
+    {
+      "ref": "role:levis/approvisionnement-immobilier/directeur-de-lapprovisionnement-et-de-la-gestion-immobiliere",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directeur de l’approvisionnement et de la gestion immobilière",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-approvisionnement-immobilier"
+      }
+    },
+    {
+      "ref": "role:levis/approvisionnement-immobilier/direction-de-lapprovisionnement-et-de-la-gestion-immobiliere",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Direction de l’approvisionnement et de la gestion immobilière",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-approvisionnement-immobilier"
+      }
+    },
+    {
+      "ref": "role:levis/capital-humain/direction-de-la-gestion-du-capital-humain",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Direction de la gestion du capital humain",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-capital-humain"
+      }
+    },
+    {
+      "ref": "role:levis/capital-humain/directrice-de-la-gestion-du-capital-humain",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directrice de la gestion du capital humain",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-capital-humain"
+      }
+    },
+    {
+      "ref": "role:levis/communications-citoyens/chef-de-service-interaction-citoyenne",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Chef de service — interaction citoyenne",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-communications-citoyens"
+      }
+    },
+    {
+      "ref": "role:levis/communications-citoyens/conseillere-en-gestion-des-communications-et-de-la-relation-citoyenne",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Conseillère en gestion des communications et de la relation citoyenne",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-communications-citoyens"
+      }
+    },
+    {
+      "ref": "role:levis/communications-citoyens/direction-des-communications-et-de-linteraction-citoyenne",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Direction des communications et de l’interaction citoyenne",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-communications-citoyens"
+      }
+    },
+    {
+      "ref": "role:levis/communications-citoyens/directrice-des-communications-et-de-linteraction-citoyenne",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directrice des communications et de l’interaction citoyenne",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-communications-citoyens"
+      }
+    },
+    {
+      "ref": "role:levis/developpement-economique/directeur-du-developpement-economique-et-de-la-promotion",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directeur du développement économique et de la promotion",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-developpement-economique"
+      }
+    },
+    {
+      "ref": "role:levis/developpement-economique/direction-du-developpement-economique-et-de-la-promotion",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Direction du développement économique et de la promotion",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-developpement-economique"
+      }
+    },
+    {
+      "ref": "role:levis/developpement-economique/technicienne-en-tourisme",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Technicienne en tourisme",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-developpement-economique"
+      }
+    },
+    {
+      "ref": "role:levis/direction-generale/conseiller-municipal",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Conseiller municipal",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-direction-generale"
+      }
+    },
+    {
+      "ref": "role:levis/direction-generale/conseillere-municipale",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Conseillère municipale",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-direction-generale"
+      }
+    },
+    {
+      "ref": "role:levis/direction-generale/directeur-general",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directeur général",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-direction-generale"
+      }
+    },
+    {
+      "ref": "role:levis/direction-generale/directeur-general-adjoint-planification-integree-du-territoire",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directeur général adjoint — Planification intégrée du territoire",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-direction-generale"
+      }
+    },
+    {
+      "ref": "role:levis/direction-generale/direction-generale",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Direction générale",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-direction-generale"
+      }
+    },
+    {
+      "ref": "role:levis/direction-generale/directrice-generale-adjointe-services-a-la-communaute-et-intelligence-daffaires",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directrice générale adjointe — Services à la communauté et intelligence d’affaires",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-direction-generale"
+      }
+    },
+    {
+      "ref": "role:levis/direction-generale/maire-de-levis",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Maire de Lévis",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-direction-generale"
+      }
+    },
+    {
+      "ref": "role:levis/entretien-infrastructures/coordonnateur-aux-biens-immobiliers",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Coordonnateur aux biens immobiliers",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-entretien-infrastructures"
+      }
+    },
+    {
+      "ref": "role:levis/entretien-infrastructures/direction-de-lentretien-des-infrastructures",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Direction de l’entretien des infrastructures",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-entretien-infrastructures"
+      }
+    },
+    {
+      "ref": "role:levis/entretien-infrastructures/directrice-par-interim-de-lentretien-des-infrastructures",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directrice par intérim de l’entretien des infrastructures",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-entretien-infrastructures"
+      }
+    },
+    {
+      "ref": "role:levis/environnement/direction-de-lenvironnement",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Direction de l’environnement",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-environnement"
+      }
+    },
+    {
+      "ref": "role:levis/environnement/directrice-de-lenvironnement",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directrice de l’environnement",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-environnement"
+      }
+    },
+    {
+      "ref": "role:levis/finances/directeur-des-finances-et-tresorier",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directeur des finances et trésorier",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-finances"
+      }
+    },
+    {
+      "ref": "role:levis/finances/direction-des-finances-et-tresorerie",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Direction des finances et trésorerie",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-finances"
+      }
+    },
+    {
+      "ref": "role:levis/genie/charge-de-projets-ingenieur",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Chargé de projets, ingénieur",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-genie"
+      }
+    },
+    {
+      "ref": "role:levis/genie/chef-de-service-realisation-de-projets-de-batiments-et-damenagements",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Chef de service — réalisation de projets de bâtiments et d’aménagements",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-genie"
+      }
+    },
+    {
+      "ref": "role:levis/genie/conseiller-en-gestion-de-projets",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Conseiller en gestion de projets",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-genie"
+      }
+    },
+    {
+      "ref": "role:levis/genie/directeur-adjoint-aux-projets-majeurs-actifs-de-leau",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directeur adjoint aux projets majeurs — actifs de l’eau",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-genie"
+      }
+    },
+    {
+      "ref": "role:levis/genie/directeur-du-genie",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directeur du génie",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-genie"
+      }
+    },
+    {
+      "ref": "role:levis/genie/direction-du-genie",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Direction du génie",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-genie"
+      }
+    },
+    {
+      "ref": "role:levis/genie/technicien-en-genie-civil-et-agent-de-liaison",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Technicien en génie civil et agent de liaison",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-genie"
+      }
+    },
+    {
+      "ref": "role:levis/incendie/chef-de-division-prevention",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Chef de division — prévention",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-incendie"
+      }
+    },
+    {
+      "ref": "role:levis/incendie/directeur-du-service-de-la-securite-incendie",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directeur du service de la sécurité incendie",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-incendie"
+      }
+    },
+    {
+      "ref": "role:levis/incendie/direction-du-service-de-la-securite-incendie",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Direction du service de la sécurité incendie",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-incendie"
+      }
+    },
+    {
+      "ref": "role:levis/mobilite/conseiller-en-transport-et-circulation",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Conseiller en transport et circulation",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-mobilite"
+      }
+    },
+    {
+      "ref": "role:levis/mobilite/direction-des-transports-et-de-la-mobilite-durable",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Direction des transports et de la mobilité durable",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-mobilite"
+      }
+    },
+    {
+      "ref": "role:levis/mobilite/directrice-des-transports-et-de-la-mobilite-durable",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directrice des transports et de la mobilité durable",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-mobilite"
+      }
+    },
+    {
+      "ref": "role:levis/police/agente-dadministration-service-de-police",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Agente d’administration — Service de police",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-police"
+      }
+    },
+    {
+      "ref": "role:levis/police/directeur-du-service-de-police",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directeur du service de police",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-police"
+      }
+    },
+    {
+      "ref": "role:levis/police/direction-du-service-de-police",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Direction du service de police",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-police"
+      }
+    },
+    {
+      "ref": "role:levis/securite-civile/bureau-de-la-securite-civile",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Bureau de la sécurité civile",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-securite-civile"
+      }
+    },
+    {
+      "ref": "role:levis/securite-civile/directeur-par-interim-du-bureau-de-la-securite-civile",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directeur par intérim du Bureau de la sécurité civile",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-securite-civile"
+      }
+    },
+    {
+      "ref": "role:levis/ti-transformation/directeur-des-technologies-de-linformation-et-de-la-transformation-numerique",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directeur des technologies de l’information et de la transformation numérique",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-ti-transformation"
+      }
+    },
+    {
+      "ref": "role:levis/ti-transformation/direction-des-technologies-de-linformation-et-transformation-numerique",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Direction des technologies de l’information et transformation numérique",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-ti-transformation"
+      }
+    },
+    {
+      "ref": "role:levis/urbanisme/conseillere-en-amenagement-du-territoire",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Conseillère en aménagement du territoire",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-urbanisme"
+      }
+    },
+    {
+      "ref": "role:levis/urbanisme/conseillere-en-urbanisme",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Conseillère en urbanisme",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-urbanisme"
+      }
+    },
+    {
+      "ref": "role:levis/urbanisme/directeur-de-lurbanisme",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directeur de l’urbanisme",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-urbanisme"
+      }
+    },
+    {
+      "ref": "role:levis/urbanisme/direction-de-lurbanisme",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Direction de l’urbanisme",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-urbanisme"
+      }
+    },
+    {
+      "ref": "role:levis/vie-communautaire/direction-de-la-vie-communautaire",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Direction de la vie communautaire",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-vie-communautaire"
+      }
+    },
+    {
+      "ref": "role:levis/vie-communautaire/directrice-de-la-vie-communautaire",
+      "kind": "concept",
+      "labels": [
+        {
+          "text": "Directrice de la vie communautaire",
+          "lang": "fr"
+        }
+      ],
+      "classifications": [
+        "municipal_institutional_role"
+      ],
+      "attributes": {
+        "world_key": "levis-vie-communautaire"
+      }
+    },
+    {
+      "ref": "source:aimq_dany_lachance_2026",
+      "kind": "document",
+      "labels": [
+        {
+          "text": "Implantation d’un cadre de gestion de projets uniformisés à la Ville de Lévis",
+          "lang": "fr"
+        }
+      ],
+      "external_ids": [
+        {
+          "system": "url",
+          "id": "https://www.aimq.net/genial-les-conferences-implantation-dun-cadre-de-gestion-de-projets-uniformises-a-la-ville-de-levis/",
+          "url": "https://www.aimq.net/genial-les-conferences-implantation-dun-cadre-de-gestion-de-projets-uniformises-a-la-ville-de-levis/"
+        }
+      ],
+      "attributes": {
+        "publisher": "Association des ingénieurs municipaux du Québec",
+        "source_type": "professional_association"
+      }
+    },
+    {
+      "ref": "source:city_access_documents_current_2026_09",
+      "kind": "document",
+      "labels": [
+        {
+          "text": "Accès aux documents — Ville de Lévis",
+          "lang": "fr"
+        }
+      ],
+      "external_ids": [
+        {
+          "system": "url",
+          "id": "https://levis.ca/fr/ville/organisation-municipale/acces-aux-documents",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/acces-aux-documents"
+        }
+      ],
+      "attributes": {
+        "publisher": "Ville de Lévis",
+        "source_type": "official_municipal_webpage"
+      }
+    },
+    {
+      "ref": "source:city_accessibility_2025_2026",
+      "kind": "document",
+      "labels": [
+        {
+          "text": "Plan d'action 2025-2026 à l'égard des personnes handicapées — Annexe 1",
+          "lang": "fr"
+        }
+      ],
+      "external_ids": [
+        {
+          "system": "url",
+          "id": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf"
+        }
+      ],
+      "attributes": {
+        "publisher": "Ville de Lévis",
+        "source_type": "official_municipal_document"
+      }
+    },
+    {
+      "ref": "source:city_budget_2026",
+      "kind": "document",
+      "labels": [
+        {
+          "text": "Budget 2026 — Ville de Lévis",
+          "lang": "fr"
+        }
+      ],
+      "external_ids": [
+        {
+          "system": "url",
+          "id": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf"
+        }
+      ],
+      "attributes": {
+        "publisher": "Ville de Lévis",
+        "source_type": "official_municipal_document"
+      }
+    },
+    {
+      "ref": "source:city_council_2025_2029",
+      "kind": "document",
+      "labels": [
+        {
+          "text": "Membres du conseil municipal 2025-2029",
+          "lang": "fr"
+        }
+      ],
+      "external_ids": [
+        {
+          "system": "url",
+          "id": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf"
+        }
+      ],
+      "attributes": {
+        "publisher": "Ville de Lévis",
+        "source_type": "official_municipal_document"
+      }
+    },
+    {
+      "ref": "source:city_development_infra_2025",
+      "kind": "document",
+      "labels": [
+        {
+          "text": "Projet de règlement de contribution au développement — Saint-Nicolas",
+          "lang": "fr"
+        }
+      ],
+      "external_ids": [
+        {
+          "system": "url",
+          "id": "https://www.ville.levis.qc.ca/fileadmin/documents/developpement/Contribution_au_developpement/Projet_de_reglement_contribution_au_developpement_Saint-Nicolas.pdf",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/developpement/Contribution_au_developpement/Projet_de_reglement_contribution_au_developpement_Saint-Nicolas.pdf"
+        }
+      ],
+      "attributes": {
+        "publisher": "Ville de Lévis",
+        "source_type": "official_municipal_document"
+      }
+    },
+    {
+      "ref": "source:city_etienne_dallaire_2025",
+      "kind": "document",
+      "labels": [
+        {
+          "text": "Séance d'information — Prolongement Étienne-Dallaire",
+          "lang": "fr"
+        }
+      ],
+      "external_ids": [
+        {
+          "system": "url",
+          "id": "https://www.ville.levis.qc.ca/fileadmin/documents/ville/Seance_d_information_du_20_mai_2025_Prolongement_Etienne-Dallaire.pdf",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/ville/Seance_d_information_du_20_mai_2025_Prolongement_Etienne-Dallaire.pdf"
+        }
+      ],
+      "attributes": {
+        "publisher": "Ville de Lévis",
+        "source_type": "official_municipal_document"
+      }
+    },
+    {
+      "ref": "source:city_orgchart_2025_07",
+      "kind": "document",
+      "labels": [
+        {
+          "text": "Organigramme — Ville de Lévis (juillet 2025)",
+          "lang": "fr"
+        }
+      ],
+      "external_ids": [
+        {
+          "system": "url",
+          "id": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf"
+        }
+      ],
+      "attributes": {
+        "publisher": "Ville de Lévis",
+        "source_type": "official_municipal_document"
+      }
+    },
+    {
+      "ref": "source:city_orgchart_2026_02",
+      "kind": "document",
+      "labels": [
+        {
+          "text": "Organigramme général — Ville de Lévis (MAJ 18-02-2026)",
+          "lang": "fr"
+        }
+      ],
+      "external_ids": [
+        {
+          "system": "url",
+          "id": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf"
+        }
+      ],
+      "attributes": {
+        "publisher": "Ville de Lévis",
+        "source_type": "official_municipal_document"
+      }
+    },
+    {
+      "ref": "source:city_road_safety_strategy",
+      "kind": "document",
+      "labels": [
+        {
+          "text": "Stratégie lévisienne de sécurité routière 2024-2028",
+          "lang": "fr"
+        }
+      ],
+      "external_ids": [
+        {
+          "system": "url",
+          "id": "https://www.ville.levis.qc.ca/fileadmin/documents/Images/actualites/transport-infrastructure/Strategie-securite-routiere.pdf",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/Images/actualites/transport-infrastructure/Strategie-securite-routiere.pdf"
+        }
+      ],
+      "attributes": {
+        "publisher": "Ville de Lévis",
+        "source_type": "official_municipal_document"
+      }
+    },
+    {
+      "ref": "source:city_security_civil_current_2026_09",
+      "kind": "document",
+      "labels": [
+        {
+          "text": "Sécurité civile — Ville de Lévis",
+          "lang": "fr"
+        }
+      ],
+      "external_ids": [
+        {
+          "system": "url",
+          "id": "https://levis.ca/fr/services/securite-publique/securite-civile",
+          "url": "https://levis.ca/fr/services/securite-publique/securite-civile"
+        }
+      ],
+      "attributes": {
+        "publisher": "Ville de Lévis",
+        "source_type": "official_municipal_webpage"
+      }
+    },
+    {
+      "ref": "source:city_structure_admin_current_2026_09",
+      "kind": "document",
+      "labels": [
+        {
+          "text": "Structure administrative — Ville de Lévis",
+          "lang": "fr"
+        }
+      ],
+      "external_ids": [
+        {
+          "system": "url",
+          "id": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative"
+        }
+      ],
+      "attributes": {
+        "publisher": "Ville de Lévis",
+        "source_type": "official_municipal_webpage"
+      }
+    },
+    {
+      "ref": "source:city_urbanisme_fpd_2025_092",
+      "kind": "document",
+      "labels": [
+        {
+          "text": "Fiche de prise de décision URBA-SAT-2025-092",
+          "lang": "fr"
+        }
+      ],
+      "external_ids": [
+        {
+          "system": "url",
+          "id": "https://www.ville.levis.qc.ca/fileadmin/documents/fpd/2025/URBA-SAT-2025-092.pdf",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/fpd/2025/URBA-SAT-2025-092.pdf"
+        }
+      ],
+      "attributes": {
+        "publisher": "Ville de Lévis",
+        "source_type": "official_municipal_document"
+      }
+    }
+  ],
+  "external_sources": [],
+  "extensions": {
+    "jurisdiction": "Ville de Lévis, Québec, Canada",
+    "authoring_bundle_version": "0.3.0",
+    "status": "authoring_input_not_runtime_pack"
+  }
+}

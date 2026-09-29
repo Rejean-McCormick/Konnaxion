@@ -1,0 +1,52 @@
+contract: unesco-flagship-index/source-v1
+version: 1.4.0
+count: 12
+items:
+- key: flagship_culture_digital_heritage
+  world: unesco-culture-heritage
+  topic_key: digital_cultural_collections
+  path: source/flagships/unesco-culture-heritage/flagship_culture_digital_heritage.yaml
+- key: flagship_culture_reconstruction
+  world: unesco-culture-heritage
+  topic_key: heritage_reconstruction
+  path: source/flagships/unesco-culture-heritage/flagship_culture_reconstruction.yaml
+- key: flagship_edu_ai_assessment
+  world: unesco-education
+  topic_key: ai_assessment_governance
+  path: source/flagships/unesco-education/flagship_edu_ai_assessment.yaml
+- key: flagship_edu_digital_inclusion
+  world: unesco-education
+  topic_key: digital_inclusion_learning
+  path: source/flagships/unesco-education/flagship_edu_digital_inclusion.yaml
+- key: flagship_humanity_neurotechnology
+  world: unesco-humanity-society
+  topic_key: bioethics_emerging_technology
+  path: source/flagships/unesco-humanity-society/flagship_humanity_neurotechnology.yaml
+- key: flagship_humanity_youth_participation
+  world: unesco-humanity-society
+  topic_key: youth_public_decisions
+  path: source/flagships/unesco-humanity-society/flagship_humanity_youth_participation.yaml
+- key: flagship_info_journalist_safety
+  world: unesco-information-digital
+  topic_key: journalist_safety_accountability
+  path: source/flagships/unesco-information-digital/flagship_info_journalist_safety.yaml
+- key: flagship_info_platform_governance
+  world: unesco-information-digital
+  topic_key: expression_platform_harms
+  path: source/flagships/unesco-information-digital/flagship_info_platform_governance.yaml
+- key: flagship_ocean_coastal_resilience
+  world: unesco-ocean
+  topic_key: coastal_resilience_planning
+  path: source/flagships/unesco-ocean/flagship_ocean_coastal_resilience.yaml
+- key: flagship_ocean_data
+  world: unesco-ocean
+  topic_key: ocean_observation_data_sharing
+  path: source/flagships/unesco-ocean/flagship_ocean_data.yaml
+- key: flagship_sci_biodiversity_knowledge
+  world: unesco-science-planet
+  topic_key: biodiversity_evidence_thresholds
+  path: source/flagships/unesco-science-planet/flagship_sci_biodiversity_knowledge.yaml
+- key: flagship_sci_open_science
+  world: unesco-science-planet
+  topic_key: open_science_access_integrity
+  path: source/flagships/unesco-science-planet/flagship_sci_open_science.yaml

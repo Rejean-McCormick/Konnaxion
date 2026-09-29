@@ -1,0 +1,96 @@
+{
+  "ok": true,
+  "seed_version": "0.4.0",
+  "world_count": 17,
+  "errors": [],
+  "warnings": [
+    "Kristal repo not supplied; Kristal schema revalidation skipped (original v0.3 validation report preserved)."
+  ],
+  "worlds": {
+    "levis-direction-generale": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 20
+    },
+    "levis-capital-humain": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 2
+    },
+    "levis-finances": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 2
+    },
+    "levis-developpement-economique": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 3
+    },
+    "levis-environnement": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 2
+    },
+    "levis-genie": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 7
+    },
+    "levis-urbanisme": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 4
+    },
+    "levis-mobilite": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 3
+    },
+    "levis-securite-civile": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 2
+    },
+    "levis-police": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 3
+    },
+    "levis-incendie": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 3
+    },
+    "levis-approvisionnement-immobilier": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 2
+    },
+    "levis-affaires-juridiques-greffe": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 4
+    },
+    "levis-entretien-infrastructures": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 3
+    },
+    "levis-vie-communautaire": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 2
+    },
+    "levis-communications-citoyens": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 4
+    },
+    "levis-ti-transformation": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 2
+    }
+  }
+}

@@ -1,0 +1,33 @@
+universe_contract: kx-universe-pack/v1
+universe_key: cuba-2026
+title: Cuba 2026 — Simulation civique
+description: Universe fictif de simulation d’une transition civique et d’une architecture de gouvernement provisoire utilisant
+  Koali/Konnaxion/Orgo en mode offline.
+pack_version: 0.2.0
+visibility: private
+default_world: cuba-koali-offline
+requires:
+  world_contract: kx-world-pack/v1
+  host_contracts:
+  - kx-world-personas/v1
+worlds:
+- world_key: cuba-koali-offline
+  seed_pack_key: cuba-koali-offline
+  seed_version: 0.2.0
+  title: Cuba 2026 — Koali Offline
+  description: ''
+  visibility: private
+relations: []
+subscriptions: []
+metadata:
+  simulation: true
+  offline: true
+  fiction_boundary: No claim that the simulated organization exists in Cuba.
+  worlds:
+  - cuba-koali-offline
+  future_world_candidates:
+  - constitution
+  - services-essentiels
+  - economie-transition
+  - municipalites
+  - relations-exterieures

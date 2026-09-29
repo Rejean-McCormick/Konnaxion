@@ -1,0 +1,661 @@
+{
+  "schema_version": "ethikos-demo-scenario/v3",
+  "scenario_key": "levis-direction-generale-baseline-v3",
+  "scenario_title": "Ville de Lévis — Direction générale — baseline opérationnelle v3",
+  "mode": "replace_scenario",
+  "metadata": {
+    "seed_kind": "municipal_persona_projection_baseline",
+    "baseline_date": "2026-09-29",
+    "seed_version": "0.4.0",
+    "generated_statements": false,
+    "registry_fingerprint": "68b77f1c607a4195ddc4da46b0429f2fe8308e2c259af670ecd6e7b2b19d75a9",
+    "generated_from_registry": true,
+    "knowledge_authority": "kristal_v5_runtime_pack",
+    "simulation_policy": {
+      "all_real_person_interventions_must_be_labelled_simulated": true,
+      "do_not_infer_personal_opinions": true,
+      "require_kristal_source_basis_for_reconstructed_positions": true
+    },
+    "persona_contract": "kx-world-personas/v1",
+    "persona_projection": {
+      "mode": "identity_binding_only",
+      "epistemic_authority": "external",
+      "authority_ref": "kristal_v5_runtime_pack"
+    },
+    "actor_profiles": {
+      "direction-generale": {
+        "persona_type": "organization",
+        "account_type": "service",
+        "simulation_eligible": false,
+        "ethikos_elite": false,
+        "entity_type": "organization",
+        "representation_type": "institutional_role",
+        "representation": {
+          "real_person": false,
+          "simulated_voice": false,
+          "attribution_mode": "institutional_role",
+          "must_label_simulated": false,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:organization:direction-generale",
+        "external_referents": {
+          "kristal": "levis:organization:direction-generale"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "alain-quirion": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:alain-quirion",
+        "external_referents": {
+          "kristal": "levis:person:alain-quirion"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "anick-tremblay": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:anick-tremblay",
+        "external_referents": {
+          "kristal": "levis:person:anick-tremblay"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "anne-marie-tremblay": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:anne-marie-tremblay",
+        "external_referents": {
+          "kristal": "levis:person:anne-marie-tremblay"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "annie-gaudreault": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:annie-gaudreault",
+        "external_referents": {
+          "kristal": "levis:person:annie-gaudreault"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "anthony-dufour": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:anthony-dufour",
+        "external_referents": {
+          "kristal": "levis:person:anthony-dufour"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "audrey-bedard": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:audrey-bedard",
+        "external_referents": {
+          "kristal": "levis:person:audrey-bedard"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "benoit-forget-chiasson": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:benoit-forget-chiasson",
+        "external_referents": {
+          "kristal": "levis:person:benoit-forget-chiasson"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "daniel-saindon": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:daniel-saindon",
+        "external_referents": {
+          "kristal": "levis:person:daniel-saindon"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "david-boudreault": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:david-boudreault",
+        "external_referents": {
+          "kristal": "levis:person:david-boudreault"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "dominic-deslauriers": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:dominic-deslauriers",
+        "external_referents": {
+          "kristal": "levis:person:dominic-deslauriers"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "erik-bilodeau": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:erik-bilodeau",
+        "external_referents": {
+          "kristal": "levis:person:erik-bilodeau"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "isabelle-lefebvre": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:isabelle-lefebvre",
+        "external_referents": {
+          "kristal": "levis:person:isabelle-lefebvre"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "jean-demers": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:jean-demers",
+        "external_referents": {
+          "kristal": "levis:person:jean-demers"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "jean-leblond": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:jean-leblond",
+        "external_referents": {
+          "kristal": "levis:person:jean-leblond"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "karine-lavertu": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:karine-lavertu",
+        "external_referents": {
+          "kristal": "levis:person:karine-lavertu"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "melanie-sicotte": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:melanie-sicotte",
+        "external_referents": {
+          "kristal": "levis:person:melanie-sicotte"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "olivier-biron": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:olivier-biron",
+        "external_referents": {
+          "kristal": "levis:person:olivier-biron"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "steven-blaney": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:steven-blaney",
+        "external_referents": {
+          "kristal": "levis:person:steven-blaney"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "eric-nadeau": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:eric-nadeau",
+        "external_referents": {
+          "kristal": "levis:person:eric-nadeau"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      }
+    }
+  },
+  "actors": [
+    {
+      "key": "direction-generale",
+      "username": "direction-generale",
+      "display_name": "Direction générale",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "alain-quirion",
+      "username": "alain-quirion",
+      "display_name": "Alain Quirion",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "anick-tremblay",
+      "username": "anick-tremblay",
+      "display_name": "Anick Tremblay",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "anne-marie-tremblay",
+      "username": "anne-marie-tremblay",
+      "display_name": "Anne-Marie Tremblay",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "annie-gaudreault",
+      "username": "annie-gaudreault",
+      "display_name": "Annie Gaudreault",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "anthony-dufour",
+      "username": "anthony-dufour",
+      "display_name": "Anthony Dufour",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "audrey-bedard",
+      "username": "audrey-bedard",
+      "display_name": "Audrey Bédard",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "benoit-forget-chiasson",
+      "username": "benoit-forget-chiasson",
+      "display_name": "Benoit Forget-Chiasson",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "daniel-saindon",
+      "username": "daniel-saindon",
+      "display_name": "Daniel Saindon",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "david-boudreault",
+      "username": "david-boudreault",
+      "display_name": "David Boudreault",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "dominic-deslauriers",
+      "username": "dominic-deslauriers",
+      "display_name": "Dominic Deslauriers",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "erik-bilodeau",
+      "username": "erik-bilodeau",
+      "display_name": "Erik Bilodeau",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "isabelle-lefebvre",
+      "username": "isabelle-lefebvre",
+      "display_name": "Isabelle Lefebvre",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "jean-demers",
+      "username": "jean-demers",
+      "display_name": "Jean Demers",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "jean-leblond",
+      "username": "jean-leblond",
+      "display_name": "Jean Leblond",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "karine-lavertu",
+      "username": "karine-lavertu",
+      "display_name": "Karine Lavertu",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "melanie-sicotte",
+      "username": "melanie-sicotte",
+      "display_name": "Mélanie Sicotte",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "olivier-biron",
+      "username": "olivier-biron",
+      "display_name": "Olivier Biron",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "steven-blaney",
+      "username": "steven-blaney",
+      "display_name": "Steven Blaney",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "eric-nadeau",
+      "username": "eric-nadeau",
+      "display_name": "Éric Nadeau",
+      "is_ethikos_elite": false
+    }
+  ],
+  "categories": [],
+  "topics": [],
+  "stances": [],
+  "arguments": [],
+  "argument_sources": [],
+  "consultations": [],
+  "consultation_votes": [],
+  "impact_items": [],
+  "ekoh_profiles": [],
+  "consultation_relevance": [],
+  "topic_relevance": [],
+  "reading_exclusions": []
+}

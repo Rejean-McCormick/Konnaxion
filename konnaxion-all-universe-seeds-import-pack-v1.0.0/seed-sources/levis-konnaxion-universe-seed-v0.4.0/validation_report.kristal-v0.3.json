@@ -1,0 +1,98 @@
+{
+  "ok": true,
+  "seed_version": "0.3.0",
+  "world_count": 17,
+  "unique_operational_actors": 66,
+  "persona_instances": 68,
+  "kristal_referents": 159,
+  "claim_ir_files": 68,
+  "errors": [],
+  "warnings": [],
+  "worlds": {
+    "levis-affaires-juridiques-greffe": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 4
+    },
+    "levis-approvisionnement-immobilier": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 2
+    },
+    "levis-capital-humain": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 2
+    },
+    "levis-communications-citoyens": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 4
+    },
+    "levis-developpement-economique": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 3
+    },
+    "levis-direction-generale": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 20
+    },
+    "levis-entretien-infrastructures": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 3
+    },
+    "levis-environnement": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 2
+    },
+    "levis-finances": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 2
+    },
+    "levis-genie": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 7
+    },
+    "levis-incendie": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 3
+    },
+    "levis-mobilite": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 3
+    },
+    "levis-police": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 3
+    },
+    "levis-securite-civile": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 2
+    },
+    "levis-ti-transformation": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 2
+    },
+    "levis-urbanisme": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 4
+    },
+    "levis-vie-communautaire": {
+      "ok": true,
+      "errors": [],
+      "actor_count": 2
+    }
+  }
+}

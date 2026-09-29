@@ -1,0 +1,258 @@
+{
+  "schema_version": "ethikos-demo-scenario/v3",
+  "scenario_key": "levis-genie-baseline-v3",
+  "scenario_title": "Ville de Lévis — Génie — baseline opérationnelle v3",
+  "mode": "replace_scenario",
+  "metadata": {
+    "seed_kind": "municipal_persona_projection_baseline",
+    "baseline_date": "2026-09-29",
+    "seed_version": "0.4.0",
+    "generated_statements": false,
+    "registry_fingerprint": "68b77f1c607a4195ddc4da46b0429f2fe8308e2c259af670ecd6e7b2b19d75a9",
+    "generated_from_registry": true,
+    "knowledge_authority": "kristal_v5_runtime_pack",
+    "simulation_policy": {
+      "all_real_person_interventions_must_be_labelled_simulated": true,
+      "do_not_infer_personal_opinions": true,
+      "require_kristal_source_basis_for_reconstructed_positions": true
+    },
+    "persona_contract": "kx-world-personas/v1",
+    "persona_projection": {
+      "mode": "identity_binding_only",
+      "epistemic_authority": "external",
+      "authority_ref": "kristal_v5_runtime_pack"
+    },
+    "actor_profiles": {
+      "genie": {
+        "persona_type": "organization",
+        "account_type": "service",
+        "simulation_eligible": false,
+        "ethikos_elite": false,
+        "entity_type": "organization",
+        "representation_type": "institutional_role",
+        "representation": {
+          "real_person": false,
+          "simulated_voice": false,
+          "attribution_mode": "institutional_role",
+          "must_label_simulated": false,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:organization:genie",
+        "external_referents": {
+          "kristal": "levis:organization:genie"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "charles-lemoyne": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:charles-lemoyne",
+        "external_referents": {
+          "kristal": "levis:person:charles-lemoyne"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "dany-lachance": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:dany-lachance",
+        "external_referents": {
+          "kristal": "levis:person:dany-lachance"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "dominique-marceau": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:dominique-marceau",
+        "external_referents": {
+          "kristal": "levis:person:dominique-marceau"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "jean-francois-gagnon": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:jean-francois-gagnon",
+        "external_referents": {
+          "kristal": "levis:person:jean-francois-gagnon"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "jean-sebastien-roy": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:jean-sebastien-roy",
+        "external_referents": {
+          "kristal": "levis:person:jean-sebastien-roy"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "pierre-lefevre": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:pierre-lefevre",
+        "external_referents": {
+          "kristal": "levis:person:pierre-lefevre"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      }
+    }
+  },
+  "actors": [
+    {
+      "key": "genie",
+      "username": "genie",
+      "display_name": "Direction du génie",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "charles-lemoyne",
+      "username": "charles-lemoyne",
+      "display_name": "Charles Lemoyne",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "dany-lachance",
+      "username": "dany-lachance",
+      "display_name": "Dany Lachance",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "dominique-marceau",
+      "username": "dominique-marceau",
+      "display_name": "Dominique Marceau",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "jean-francois-gagnon",
+      "username": "jean-francois-gagnon",
+      "display_name": "Jean-François Gagnon",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "jean-sebastien-roy",
+      "username": "jean-sebastien-roy",
+      "display_name": "Jean-Sébastien Roy",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "pierre-lefevre",
+      "username": "pierre-lefevre",
+      "display_name": "Pierre Lefèvre",
+      "is_ethikos_elite": false
+    }
+  ],
+  "categories": [],
+  "topics": [],
+  "stances": [],
+  "arguments": [],
+  "argument_sources": [],
+  "consultations": [],
+  "consultation_votes": [],
+  "impact_items": [],
+  "ekoh_profiles": [],
+  "consultation_relevance": [],
+  "topic_relevance": [],
+  "reading_exclusions": []
+}

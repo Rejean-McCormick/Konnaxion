@@ -1,0 +1,981 @@
+{
+  "schema": "konnaxion-levis-operational-actor-registry/v3",
+  "seed_version": "0.3.0",
+  "baseline_date": "2026-09-29",
+  "universe_key": "levis",
+  "actors": [
+    {
+      "actor_id": "levis:organization:affaires-juridiques-greffe",
+      "canonical_actor_key": "levis:organization:affaires-juridiques-greffe",
+      "display_name": "Direction des affaires juridiques et du greffe",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:organization:approvisionnement-immobilier",
+      "canonical_actor_key": "levis:organization:approvisionnement-immobilier",
+      "display_name": "Direction de l’approvisionnement et de la gestion immobilière",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:organization:communications-interaction-citoyenne",
+      "canonical_actor_key": "levis:organization:communications-interaction-citoyenne",
+      "display_name": "Direction des communications et de l’interaction citoyenne",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:organization:developpement-economique-promotion",
+      "canonical_actor_key": "levis:organization:developpement-economique-promotion",
+      "display_name": "Direction du développement économique et de la promotion",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:organization:direction-generale",
+      "canonical_actor_key": "levis:organization:direction-generale",
+      "display_name": "Direction générale",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:organization:entretien-infrastructures",
+      "canonical_actor_key": "levis:organization:entretien-infrastructures",
+      "display_name": "Direction de l’entretien des infrastructures",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:organization:environnement",
+      "canonical_actor_key": "levis:organization:environnement",
+      "display_name": "Direction de l’environnement",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:organization:finances-tresorerie",
+      "canonical_actor_key": "levis:organization:finances-tresorerie",
+      "display_name": "Direction des finances et trésorerie",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:organization:genie",
+      "canonical_actor_key": "levis:organization:genie",
+      "display_name": "Direction du génie",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:organization:gestion-capital-humain",
+      "canonical_actor_key": "levis:organization:gestion-capital-humain",
+      "display_name": "Direction de la gestion du capital humain",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:organization:securite-civile",
+      "canonical_actor_key": "levis:organization:securite-civile",
+      "display_name": "Bureau de la sécurité civile",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:organization:securite-incendie",
+      "canonical_actor_key": "levis:organization:securite-incendie",
+      "display_name": "Direction du service de la sécurité incendie",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:organization:service-police",
+      "canonical_actor_key": "levis:organization:service-police",
+      "display_name": "Direction du service de police",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:organization:ti-transformation",
+      "canonical_actor_key": "levis:organization:ti-transformation",
+      "display_name": "Direction des technologies de l’information et transformation numérique",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:organization:transports-mobilite",
+      "canonical_actor_key": "levis:organization:transports-mobilite",
+      "display_name": "Direction des transports et de la mobilité durable",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:organization:urbanisme",
+      "canonical_actor_key": "levis:organization:urbanisme",
+      "display_name": "Direction de l’urbanisme",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:organization:vie-communautaire",
+      "canonical_actor_key": "levis:organization:vie-communautaire",
+      "display_name": "Direction de la vie communautaire",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:alain-quirion",
+      "canonical_actor_key": "levis:person:alain-quirion",
+      "display_name": "Alain Quirion",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:anick-tremblay",
+      "canonical_actor_key": "levis:person:anick-tremblay",
+      "display_name": "Anick Tremblay",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:anne-marie-tremblay",
+      "canonical_actor_key": "levis:person:anne-marie-tremblay",
+      "display_name": "Anne-Marie Tremblay",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:annie-bergeron",
+      "canonical_actor_key": "levis:person:annie-bergeron",
+      "display_name": "Annie Bergeron",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:annie-gaudreault",
+      "canonical_actor_key": "levis:person:annie-gaudreault",
+      "display_name": "Annie Gaudreault",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:anthony-dufour",
+      "canonical_actor_key": "levis:person:anthony-dufour",
+      "display_name": "Anthony Dufour",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:audrey-bedard",
+      "canonical_actor_key": "levis:person:audrey-bedard",
+      "display_name": "Audrey Bédard",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:benoit-forget-chiasson",
+      "canonical_actor_key": "levis:person:benoit-forget-chiasson",
+      "display_name": "Benoit Forget-Chiasson",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:charles-lemoyne",
+      "canonical_actor_key": "levis:person:charles-lemoyne",
+      "display_name": "Charles Lemoyne",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:daniel-saindon",
+      "canonical_actor_key": "levis:person:daniel-saindon",
+      "display_name": "Daniel Saindon",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:dany-lachance",
+      "canonical_actor_key": "levis:person:dany-lachance",
+      "display_name": "Dany Lachance",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:david-boudreault",
+      "canonical_actor_key": "levis:person:david-boudreault",
+      "display_name": "David Boudreault",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:denis-deschenes",
+      "canonical_actor_key": "levis:person:denis-deschenes",
+      "display_name": "Denis Deschênes",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:dominic-deslauriers",
+      "canonical_actor_key": "levis:person:dominic-deslauriers",
+      "display_name": "Dominic Deslauriers",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:dominique-marceau",
+      "canonical_actor_key": "levis:person:dominique-marceau",
+      "display_name": "Dominique Marceau",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:eric-nadeau",
+      "canonical_actor_key": "levis:person:eric-nadeau",
+      "display_name": "Éric Nadeau",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:erik-bilodeau",
+      "canonical_actor_key": "levis:person:erik-bilodeau",
+      "display_name": "Erik Bilodeau",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:etienne-talbot",
+      "canonical_actor_key": "levis:person:etienne-talbot",
+      "display_name": "Étienne Talbot",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:francis-joud",
+      "canonical_actor_key": "levis:person:francis-joud",
+      "display_name": "Francis Joud",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:francois-dube",
+      "canonical_actor_key": "levis:person:francois-dube",
+      "display_name": "François Dubé",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:frederic-moisan",
+      "canonical_actor_key": "levis:person:frederic-moisan",
+      "display_name": "Frédéric Moisan",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:genevieve-coude-levesque",
+      "canonical_actor_key": "levis:person:genevieve-coude-levesque",
+      "display_name": "Geneviève Coudé-Lévesque",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:houda-slaoui",
+      "canonical_actor_key": "levis:person:houda-slaoui",
+      "display_name": "Houda Slaoui",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:isabelle-lefebvre",
+      "canonical_actor_key": "levis:person:isabelle-lefebvre",
+      "display_name": "Isabelle Lefebvre",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:jean-demers",
+      "canonical_actor_key": "levis:person:jean-demers",
+      "display_name": "Jean Demers",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:jean-francois-gagnon",
+      "canonical_actor_key": "levis:person:jean-francois-gagnon",
+      "display_name": "Jean-François Gagnon",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:jean-leblond",
+      "canonical_actor_key": "levis:person:jean-leblond",
+      "display_name": "Jean Leblond",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:jean-sebastien-roy",
+      "canonical_actor_key": "levis:person:jean-sebastien-roy",
+      "display_name": "Jean-Sébastien Roy",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:josee-bilodeau",
+      "canonical_actor_key": "levis:person:josee-bilodeau",
+      "display_name": "Josée Bilodeau",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:karine-lavertu",
+      "canonical_actor_key": "levis:person:karine-lavertu",
+      "display_name": "Karine Lavertu",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:lysandre-arseneau",
+      "canonical_actor_key": "levis:person:lysandre-arseneau",
+      "display_name": "Lysandre Arseneau",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:manon-gauvreau",
+      "canonical_actor_key": "levis:person:manon-gauvreau",
+      "display_name": "Manon Gauvreau",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:marie-jeanne-gagnon-beaulieu",
+      "canonical_actor_key": "levis:person:marie-jeanne-gagnon-beaulieu",
+      "display_name": "Marie-Jeanne Gagnon-Beaulieu",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:marie-noelle-caron",
+      "canonical_actor_key": "levis:person:marie-noelle-caron",
+      "display_name": "Marie-Noëlle Caron",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:marlyne-turgeon",
+      "canonical_actor_key": "levis:person:marlyne-turgeon",
+      "display_name": "Marlyne Turgeon",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:melanie-sicotte",
+      "canonical_actor_key": "levis:person:melanie-sicotte",
+      "display_name": "Mélanie Sicotte",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:noemie-goulet",
+      "canonical_actor_key": "levis:person:noemie-goulet",
+      "display_name": "Noémie Goulet",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:olivier-biron",
+      "canonical_actor_key": "levis:person:olivier-biron",
+      "display_name": "Olivier Biron",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:olivier-laviolette",
+      "canonical_actor_key": "levis:person:olivier-laviolette",
+      "display_name": "Olivier Laviolette",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:patrick-hamelin",
+      "canonical_actor_key": "levis:person:patrick-hamelin",
+      "display_name": "Patrick Hamelin",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:pierre-lefevre",
+      "canonical_actor_key": "levis:person:pierre-lefevre",
+      "display_name": "Pierre Lefèvre",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:rejean-perusse",
+      "canonical_actor_key": "levis:person:rejean-perusse",
+      "display_name": "Réjean Pérusse",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:simon-gauthier",
+      "canonical_actor_key": "levis:person:simon-gauthier",
+      "display_name": "Simon Gauthier",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:simon-roberge-vallieres",
+      "canonical_actor_key": "levis:person:simon-roberge-vallieres",
+      "display_name": "Simon Roberge-Vallières",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:steve-larose",
+      "canonical_actor_key": "levis:person:steve-larose",
+      "display_name": "Steve Larose",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:steven-blaney",
+      "canonical_actor_key": "levis:person:steven-blaney",
+      "display_name": "Steven Blaney",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:suzanne-breton",
+      "canonical_actor_key": "levis:person:suzanne-breton",
+      "display_name": "Suzanne Breton",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:sylvie-bernatchez",
+      "canonical_actor_key": "levis:person:sylvie-bernatchez",
+      "display_name": "Sylvie Bernatchez",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    },
+    {
+      "actor_id": "levis:person:vincent-vu",
+      "canonical_actor_key": "levis:person:vincent-vu",
+      "display_name": "Vincent Vu",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      }
+    }
+  ]
+}

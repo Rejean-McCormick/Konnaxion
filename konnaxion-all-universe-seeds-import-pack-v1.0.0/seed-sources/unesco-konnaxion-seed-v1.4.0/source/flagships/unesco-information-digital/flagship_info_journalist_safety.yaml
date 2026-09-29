@@ -1,0 +1,100 @@
+flagship_contract: unesco-flagship-simulation/source-v1
+version: 1.4.0
+key: flagship_info_journalist_safety
+world: unesco-information-digital
+topic_key: journalist_safety_accountability
+i18n:
+  fr:
+    title: 'Sécurité des journalistes : de la réaction à un mécanisme durable'
+    question: Quels mécanismes de prévention, protection, enquête et reddition de comptes réduisent durablement les risques
+      contre les journalistes ?
+  en:
+    title: 'Journalist safety: from reaction to durable mechanisms'
+    question: What prevention, protection, investigation and accountability mechanisms can sustainably reduce risks to journalists?
+context: UNESCO maintains global monitoring on killings of journalists and judicial follow-up, reports regularly on impunity,
+  and documents national safety mechanisms and action plans.
+trigger: A fictional country is designing or reforming a national safety mechanism after threats and attacks expose fragmented
+  institutional responsibilities.
+decision_task: Agree on institutional roles, emergency protection, independent oversight, investigation follow-up, data/reporting
+  and safeguards against misuse.
+scope:
+  baseline_date: '2026-09-29'
+  geography: global / adaptable per scenario variant
+uncertainties:
+- Underreporting of threats
+- Different risk profiles
+- Institutional trust deficits
+- Independence/confidentiality concerns
+tensions:
+- Protection vs surveillance risk
+- State coordination vs independence
+- Emergency response vs structural prevention
+- Transparency vs victim/source confidentiality
+casting:
+  core_actor_keys:
+  - unesco_ci_sector
+  - ohchr
+  - stakeholder_journalists
+  - stakeholder_civil_society
+  - stakeholder_local_communities
+  optional_actor_keys:
+  - stakeholder_youth
+  - stakeholder_private_sector
+  real_person_policy: No named real person is activated by default; use sourced reconstructed personas only when explicitly
+    selected.
+evidence_refs:
+- journalist_observatory
+- journalist_dg_report
+- journalist_safety_mechanisms_2025
+- world_trends_2025
+round_plan:
+- round: 0
+  key: briefing
+  purpose: Read common evidence, scope and uncertainties; no position yet.
+- round: 1
+  key: opening
+  purpose: Actors state initial positions and explicit objectives.
+- round: 2
+  key: challenge
+  purpose: Cross-examination, objections and requests for evidence.
+- round: 3
+  key: evidence_inject
+  purpose: Release one scenario inject; actors may revise positions.
+- round: 4
+  key: options
+  purpose: Generate options and make trade-offs explicit.
+- round: 5
+  key: negotiation
+  purpose: Coalitions, amendments and negotiated language.
+- round: 6
+  key: deliberation
+  purpose: Final argument map and Smart Vote baseline/EkoH readings.
+- round: 7
+  key: outcome
+  purpose: Decision/proposal, dissent, unresolved questions and follow-up.
+event_injects:
+- key: threat_surge
+  description: Coordinated online threats escalate against several journalists.
+- key: confidentiality_failure
+  description: A protection referral inadvertently exposes sensitive contact information.
+- key: investigation_delay
+  description: A high-profile attack remains unresolved, intensifying demands for oversight.
+cross_world_links:
+- target_world: unesco-humanity-society
+  relation: references
+  reason: rights, institutional trust and protection
+ekoh:
+  relevance_source: existing topic_relevance in the World scenario
+  seed_scores: false
+  coverage_gap: null
+outputs:
+  ethikos: Outcome / proposal / dissent / unresolved questions
+  keenkonnect_candidate: Create/reform a journalist-safety mechanism with emergency response, monitoring, oversight and evaluation.
+  konnected_case:
+    enabled: true
+    role_replay:
+    - journalist
+    - protection-mechanism operator
+    - investigator
+    - civil-society monitor
+    evidence_rule: KonnectED learning evidence does not directly mutate EkoH scores.

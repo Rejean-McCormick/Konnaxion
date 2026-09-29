@@ -1,0 +1,221 @@
+{
+  "schema_version": "5.0",
+  "artifact_type": "claim_ir",
+  "profile_role": "extractor_proposal_profile",
+  "canonicalization_profile": "kristal.v5:jcs-rfc8785",
+  "scope": {
+    "domain": "civic",
+    "subdomain": "levis-communications-citoyens",
+    "jurisdiction": "Ville de Lévis, Québec, Canada",
+    "tenant_id": "levis",
+    "environment": "seed",
+    "language": "fr"
+  },
+  "subject": {
+    "surface": "Noémie Goulet",
+    "lang": "fr",
+    "external_id": "levis:person:noemie-goulet",
+    "source_ref": {
+      "ref": "sha256:c943d398f1cd712e21706a014d1d7a42045ba12ec352654f22457d23ab0f9232",
+      "kind": "artifact"
+    }
+  },
+  "claims": [
+    {
+      "claim_id": "claim:levis-communications-citoyens:noemie-goulet:role",
+      "predicate": {
+        "surface": "occupe la fonction institutionnelle",
+        "lang": "fr"
+      },
+      "object": {
+        "kind": "item",
+        "value": {
+          "surface": "Conseillère en gestion des communications et de la relation citoyenne",
+          "lang": "fr",
+          "external_id": "role:levis/communications-citoyens/conseillere-en-gestion-des-communications-et-de-la-relation-citoyenne",
+          "source_ref": {
+            "ref": "sha256:c943d398f1cd712e21706a014d1d7a42045ba12ec352654f22457d23ab0f9232",
+            "kind": "artifact"
+          }
+        }
+      },
+      "proposed_assertion_status": "sourced",
+      "proposed_certainty_level": "unknown",
+      "proposed_validated_as": "sourced_claim",
+      "scope": {
+        "domain": "civic",
+        "subdomain": "levis-communications-citoyens",
+        "jurisdiction": "Ville de Lévis, Québec, Canada",
+        "tenant_id": "levis",
+        "environment": "seed",
+        "language": "fr"
+      },
+      "qualifiers": [
+        {
+          "predicate": {
+            "surface": "statut de rôle",
+            "lang": "fr"
+          },
+          "object": {
+            "kind": "string",
+            "value": "last_verified"
+          }
+        }
+      ],
+      "evidence": [
+        {
+          "source": {
+            "source_id": "source:city_accessibility_2025_2026",
+            "source_url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+            "title": "Plan d'action 2025-2026 à l'égard des personnes handicapées — Annexe 1"
+          },
+          "evidence_type": "document_reference",
+          "strength": "unknown"
+        }
+      ],
+      "notes": "Proposition sourcée pour résolution Kristal; le seed Konnaxion ne fait pas autorité sur ce rôle.",
+      "extensions": {
+        "verification_status": "verified_2025_2026_document",
+        "last_reviewed_at": "2026-09-29"
+      }
+    },
+    {
+      "claim_id": "claim:levis-communications-citoyens:noemie-goulet:scope:1",
+      "predicate": {
+        "surface": "a pour périmètre institutionnel",
+        "lang": "fr"
+      },
+      "object": {
+        "kind": "string",
+        "value": "communications"
+      },
+      "proposed_assertion_status": "claimed",
+      "proposed_certainty_level": "unknown",
+      "proposed_validated_as": "claim",
+      "scope": {
+        "domain": "civic",
+        "subdomain": "levis-communications-citoyens",
+        "jurisdiction": "Ville de Lévis, Québec, Canada",
+        "tenant_id": "levis",
+        "environment": "seed",
+        "language": "fr"
+      },
+      "evidence": [
+        {
+          "source": {
+            "source_id": "source:city_accessibility_2025_2026",
+            "source_url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+            "title": "Plan d'action 2025-2026 à l'égard des personnes handicapées — Annexe 1"
+          },
+          "evidence_type": "document_reference",
+          "strength": "unknown"
+        }
+      ],
+      "notes": "Projection d’auteur issue du corpus de seed; nécessite résolution/validation Kristal."
+    },
+    {
+      "claim_id": "claim:levis-communications-citoyens:noemie-goulet:scope:2",
+      "predicate": {
+        "surface": "a pour périmètre institutionnel",
+        "lang": "fr"
+      },
+      "object": {
+        "kind": "string",
+        "value": "relation citoyenne"
+      },
+      "proposed_assertion_status": "claimed",
+      "proposed_certainty_level": "unknown",
+      "proposed_validated_as": "claim",
+      "scope": {
+        "domain": "civic",
+        "subdomain": "levis-communications-citoyens",
+        "jurisdiction": "Ville de Lévis, Québec, Canada",
+        "tenant_id": "levis",
+        "environment": "seed",
+        "language": "fr"
+      },
+      "evidence": [
+        {
+          "source": {
+            "source_id": "source:city_accessibility_2025_2026",
+            "source_url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+            "title": "Plan d'action 2025-2026 à l'égard des personnes handicapées — Annexe 1"
+          },
+          "evidence_type": "document_reference",
+          "strength": "unknown"
+        }
+      ],
+      "notes": "Projection d’auteur issue du corpus de seed; nécessite résolution/validation Kristal."
+    },
+    {
+      "claim_id": "claim:levis-communications-citoyens:noemie-goulet:expertise:1",
+      "predicate": {
+        "surface": "a pour domaine d’expertise",
+        "lang": "fr"
+      },
+      "object": {
+        "kind": "item",
+        "value": {
+          "surface": "journalisme et information",
+          "lang": "fr",
+          "external_id": "expertise:levis/journalisme-et-information",
+          "source_ref": {
+            "ref": "sha256:c943d398f1cd712e21706a014d1d7a42045ba12ec352654f22457d23ab0f9232",
+            "kind": "artifact"
+          }
+        }
+      },
+      "proposed_assertion_status": "claimed",
+      "proposed_certainty_level": "unknown",
+      "proposed_validated_as": "claim",
+      "scope": {
+        "domain": "civic",
+        "subdomain": "levis-communications-citoyens",
+        "jurisdiction": "Ville de Lévis, Québec, Canada",
+        "tenant_id": "levis",
+        "environment": "seed",
+        "language": "fr"
+      },
+      "evidence": [
+        {
+          "source": {
+            "source_id": "source:city_accessibility_2025_2026",
+            "source_url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+            "title": "Plan d'action 2025-2026 à l'égard des personnes handicapées — Annexe 1"
+          },
+          "evidence_type": "document_reference",
+          "strength": "unknown"
+        }
+      ],
+      "notes": "Claim-IR de type institutional_role_derived; aucune note EkoH n’est déduite.",
+      "extensions": {
+        "isced_f_code": "032",
+        "authoring_claim_type": "institutional_role_derived"
+      }
+    }
+  ],
+  "provenance_refs": [
+    {
+      "ref": "source:city_accessibility_2025_2026",
+      "kind": "source"
+    }
+  ],
+  "target_state": {
+    "artifact_type": "structured_epistemic_state",
+    "conversion_policy_ref": {
+      "ref": "policy:kristal.v5:claim-ir-to-structured-epistemic-state@1",
+      "kind": "policy"
+    },
+    "notes": "Requires Kristal resolution/validation; Claim-IR does not imply authority recognition."
+  },
+  "warnings": [],
+  "errors": [],
+  "extensions": {
+    "bundle": "levis",
+    "bundle_version": "0.3.0",
+    "world_key": "levis-communications-citoyens",
+    "actor_key": "noemie-goulet",
+    "source_registry": "../source-registry.json",
+    "authoring_only": true
+  }
+}

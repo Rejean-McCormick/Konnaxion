@@ -1,0 +1,103 @@
+{
+  "schema_version": "ethikos-demo-scenario/v3",
+  "scenario_key": "levis-securite-civile-baseline-v3",
+  "scenario_title": "Ville de Lévis — Bureau de la sécurité civile — baseline opérationnelle v3",
+  "mode": "replace_scenario",
+  "metadata": {
+    "seed_kind": "municipal_persona_projection_baseline",
+    "baseline_date": "2026-09-29",
+    "seed_version": "0.4.0",
+    "generated_statements": false,
+    "registry_fingerprint": "68b77f1c607a4195ddc4da46b0429f2fe8308e2c259af670ecd6e7b2b19d75a9",
+    "generated_from_registry": true,
+    "knowledge_authority": "kristal_v5_runtime_pack",
+    "simulation_policy": {
+      "all_real_person_interventions_must_be_labelled_simulated": true,
+      "do_not_infer_personal_opinions": true,
+      "require_kristal_source_basis_for_reconstructed_positions": true
+    },
+    "persona_contract": "kx-world-personas/v1",
+    "persona_projection": {
+      "mode": "identity_binding_only",
+      "epistemic_authority": "external",
+      "authority_ref": "kristal_v5_runtime_pack"
+    },
+    "actor_profiles": {
+      "securite-civile": {
+        "persona_type": "organization",
+        "account_type": "service",
+        "simulation_eligible": false,
+        "ethikos_elite": false,
+        "entity_type": "organization",
+        "representation_type": "institutional_role",
+        "representation": {
+          "real_person": false,
+          "simulated_voice": false,
+          "attribution_mode": "institutional_role",
+          "must_label_simulated": false,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:organization:securite-civile",
+        "external_referents": {
+          "kristal": "levis:organization:securite-civile"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "rejean-perusse": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "simulation_eligible": true,
+        "ethikos_elite": false,
+        "entity_type": "person",
+        "representation_type": "role_simulation",
+        "representation": {
+          "real_person": true,
+          "simulated_voice": true,
+          "attribution_mode": "role_simulation",
+          "must_label_simulated": true,
+          "no_personal_opinion_inference": true,
+          "source_bound": true
+        },
+        "global_entity_key": "levis:person:rejean-perusse",
+        "external_referents": {
+          "kristal": "levis:person:rejean-perusse"
+        },
+        "knowledge_projection": {
+          "authority": "kristal_v5_runtime_pack",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      }
+    }
+  },
+  "actors": [
+    {
+      "key": "securite-civile",
+      "username": "securite-civile",
+      "display_name": "Bureau de la sécurité civile",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "rejean-perusse",
+      "username": "rejean-perusse",
+      "display_name": "Réjean Pérusse",
+      "is_ethikos_elite": false
+    }
+  ],
+  "categories": [],
+  "topics": [],
+  "stances": [],
+  "arguments": [],
+  "argument_sources": [],
+  "consultations": [],
+  "consultation_votes": [],
+  "impact_items": [],
+  "ekoh_profiles": [],
+  "consultation_relevance": [],
+  "topic_relevance": [],
+  "reading_exclusions": []
+}

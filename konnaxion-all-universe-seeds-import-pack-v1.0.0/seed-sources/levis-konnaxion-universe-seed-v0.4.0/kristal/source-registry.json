@@ -1,0 +1,161 @@
+{
+  "city_orgchart_2025_07": {
+    "title": "Organigramme — Ville de Lévis (juillet 2025)",
+    "source_type": "official_municipal_document",
+    "publisher": "Ville de Lévis",
+    "source_date": "2025-07",
+    "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+    "supports": [
+      "administrative structure",
+      "director titles",
+      "director names"
+    ]
+  },
+  "city_budget_2026": {
+    "title": "Budget 2026 — Ville de Lévis",
+    "source_type": "official_municipal_document",
+    "publisher": "Ville de Lévis",
+    "source_date": "2025-11-26",
+    "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+    "supports": [
+      "2026 department mandates",
+      "director names",
+      "functional scope"
+    ]
+  },
+  "city_council_2025_2029": {
+    "title": "Membres du conseil municipal 2025-2029",
+    "source_type": "official_municipal_document",
+    "publisher": "Ville de Lévis",
+    "source_date": "2025-12",
+    "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+    "supports": [
+      "mayor",
+      "council members",
+      "districts",
+      "executive committee"
+    ]
+  },
+  "city_accessibility_2025_2026": {
+    "title": "Plan d'action 2025-2026 à l'égard des personnes handicapées — Annexe 1",
+    "source_type": "official_municipal_document",
+    "publisher": "Ville de Lévis",
+    "source_date": null,
+    "document_period": "2025-2026",
+    "retrieved_at": "2026-09-29",
+    "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+    "supports": [
+      "named municipal professionals",
+      "job titles",
+      "cross-direction committee representation"
+    ]
+  },
+  "city_etienne_dallaire_2025": {
+    "title": "Séance d'information — Prolongement Étienne-Dallaire",
+    "source_type": "official_municipal_document",
+    "publisher": "Ville de Lévis",
+    "source_date": "2025-05-20",
+    "url": "https://www.ville.levis.qc.ca/fileadmin/documents/ville/Seance_d_information_du_20_mai_2025_Prolongement_Etienne-Dallaire.pdf",
+    "supports": [
+      "Charles Lemoyne role",
+      "Jean-Sébastien Roy role",
+      "project delivery expertise"
+    ]
+  },
+  "city_urbanisme_fpd_2025_092": {
+    "title": "Fiche de prise de décision URBA-SAT-2025-092",
+    "source_type": "official_municipal_document",
+    "publisher": "Ville de Lévis",
+    "source_date": "2025",
+    "url": "https://www.ville.levis.qc.ca/fileadmin/documents/fpd/2025/URBA-SAT-2025-092.pdf",
+    "supports": [
+      "Marie-Jeanne Gagnon-Beaulieu role",
+      "urban planning context"
+    ]
+  },
+  "city_development_infra_2025": {
+    "title": "Projet de règlement de contribution au développement — Saint-Nicolas",
+    "source_type": "official_municipal_document",
+    "publisher": "Ville de Lévis",
+    "source_date": "2025",
+    "url": "https://www.ville.levis.qc.ca/fileadmin/documents/developpement/Contribution_au_developpement/Projet_de_reglement_contribution_au_developpement_Saint-Nicolas.pdf",
+    "supports": [
+      "Jean-François Gagnon role",
+      "infrastructure and investment context"
+    ]
+  },
+  "aimq_dany_lachance_2026": {
+    "title": "Implantation d’un cadre de gestion de projets uniformisés à la Ville de Lévis",
+    "source_type": "professional_association",
+    "publisher": "Association des ingénieurs municipaux du Québec",
+    "source_date": "2026-04-14",
+    "url": "https://www.aimq.net/genial-les-conferences-implantation-dun-cadre-de-gestion-de-projets-uniformises-a-la-ville-de-levis/",
+    "supports": [
+      "Dany Lachance current role",
+      "engineering credential",
+      "water asset project expertise"
+    ]
+  },
+  "city_road_safety_strategy": {
+    "title": "Stratégie lévisienne de sécurité routière 2024-2028",
+    "source_type": "official_municipal_document",
+    "publisher": "Ville de Lévis",
+    "source_date": "2024",
+    "url": "https://www.ville.levis.qc.ca/fileadmin/documents/Images/actualites/transport-infrastructure/Strategie-securite-routiere.pdf",
+    "supports": [
+      "Francis Joud transport/circulation role",
+      "transport team context"
+    ]
+  },
+  "city_orgchart_2026_02": {
+    "title": "Organigramme général — Ville de Lévis (MAJ 18-02-2026)",
+    "source_type": "official_municipal_document",
+    "publisher": "Ville de Lévis",
+    "source_date": "2026-02-18",
+    "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+    "retrieved_at": "2026-09-29",
+    "supports": [
+      "current 2026 administrative structure",
+      "Bureau de la sécurité civile",
+      "combined Direction des affaires juridiques et du greffe",
+      "removal of standalone strategic-planning direction"
+    ]
+  },
+  "city_structure_admin_current_2026_09": {
+    "title": "Structure administrative — Ville de Lévis",
+    "source_type": "official_municipal_webpage",
+    "publisher": "Ville de Lévis",
+    "source_date": null,
+    "retrieved_at": "2026-09-29",
+    "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+    "supports": [
+      "current director names",
+      "current direction mandates",
+      "current DGA names and interim roles"
+    ]
+  },
+  "city_security_civil_current_2026_09": {
+    "title": "Sécurité civile — Ville de Lévis",
+    "source_type": "official_municipal_webpage",
+    "publisher": "Ville de Lévis",
+    "source_date": null,
+    "retrieved_at": "2026-09-29",
+    "url": "https://levis.ca/fr/services/securite-publique/securite-civile",
+    "supports": [
+      "Bureau de la sécurité civile exists as a dedicated administrative unit",
+      "security-civil mission and scope"
+    ]
+  },
+  "city_access_documents_current_2026_09": {
+    "title": "Accès aux documents — Ville de Lévis",
+    "source_type": "official_municipal_webpage",
+    "publisher": "Ville de Lévis",
+    "source_date": null,
+    "retrieved_at": "2026-09-29",
+    "url": "https://levis.ca/fr/ville/organisation-municipale/acces-aux-documents",
+    "supports": [
+      "Marlyne Turgeon current greffière role",
+      "access-to-information responsibility"
+    ]
+  }
+}

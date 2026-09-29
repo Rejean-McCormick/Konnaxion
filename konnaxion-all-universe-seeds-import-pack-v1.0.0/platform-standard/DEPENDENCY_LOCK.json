@@ -1,0 +1,21 @@
+{
+  "standard": "Konnaxion Universe Seed Standard v1.1",
+  "contracts": [
+    "kx-universe-pack/v1",
+    "kx-world-pack/v1",
+    "ethikos-demo-scenario/v3",
+    "kx-world-personas/v1"
+  ],
+  "source_snapshots": {
+    "Konnaxion(20260929-115210).zip": "cc654e6b58e4710cd4480cd5ac8820a6ffe737eb5fdb18cb9052ae938e00ec32",
+    "Konnaxion_Worlds(20260929-115210).zip": "81287158dd19f777a527bb407d5d062b4edaea2cefd4fc2b927f7808a637185d"
+  },
+  "pre_patch_files": {
+    "Konnaxion/backend/config/world_adapters.py": "e4b8513135d878c17e0ca56f6af751cb73570121a1e00aa9b33012cef515f2a9",
+    "Konnaxion_Worlds/backend/konnaxion/worlds/services/seed_packs.py": "ae7289e75be98ee21c053c4473f6ccd4226b382a9a67a5434f725541dddc5289"
+  },
+  "post_patch_files": {
+    "Konnaxion/backend/config/world_adapters.py": "aedd5c8be9c498fda7cb92a04ab069aea2f31589240bf663062c0674b27d7147",
+    "Konnaxion_Worlds/backend/konnaxion/worlds/services/universe_packs.py": "0f10e5bae2116ed3b7976f54829d5e606659349d35898090605400a0bb484a1b"
+  }
+}

@@ -1,0 +1,281 @@
+{
+  "pack_contract": "konnaxion-all-universe-seeds-import-pack/v1",
+  "pack_version": "1.0.0",
+  "target": "Konnaxion repository root overlay",
+  "platform_contracts": [
+    "kx-universe-pack/v1",
+    "kx-world-pack/v1",
+    "kx-world-personas/v1"
+  ],
+  "universes": [
+    {
+      "key": "cuba-2026",
+      "title": "Cuba 2026 — Simulation civique",
+      "pack_version": "0.2.0",
+      "visibility": "private",
+      "default_world": "cuba-koali-offline",
+      "world_count": 1,
+      "worlds": [
+        {
+          "world_key": "cuba-koali-offline",
+          "seed_pack_key": "cuba-koali-offline",
+          "seed_version": "0.2.0"
+        }
+      ],
+      "relations": 0,
+      "subscriptions": 0,
+      "path": "backend/seed-data/universes/cuba-2026/universe.yaml"
+    },
+    {
+      "key": "kristal-farms",
+      "title": "Kristal Farms",
+      "pack_version": "0.4.0",
+      "visibility": "public",
+      "default_world": null,
+      "world_count": 11,
+      "worlds": [
+        {
+          "world_key": "kf-fr-ovhcloud",
+          "seed_pack_key": "kf-fr-ovhcloud",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "kf-nl-nebius",
+          "seed_pack_key": "kf-nl-nebius",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "kf-uk-nscale",
+          "seed_pack_key": "kf-uk-nscale",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "kf-kr-sk-telecom",
+          "seed_pack_key": "kf-kr-sk-telecom",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "kf-kr-naver-cloud",
+          "seed_pack_key": "kf-kr-naver-cloud",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "kf-jp-sakura-internet",
+          "seed_pack_key": "kf-jp-sakura-internet",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "kf-jp-kddi",
+          "seed_pack_key": "kf-jp-kddi",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "kf-de-t-systems",
+          "seed_pack_key": "kf-de-t-systems",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "kf-fr-scaleway",
+          "seed_pack_key": "kf-fr-scaleway",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "kf-ch-infomaniak",
+          "seed_pack_key": "kf-ch-infomaniak",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "kf-ch-exoscale",
+          "seed_pack_key": "kf-ch-exoscale",
+          "seed_version": "0.4.0"
+        }
+      ],
+      "relations": 0,
+      "subscriptions": 0,
+      "path": "backend/seed-data/universes/kristal-farms/universe.yaml"
+    },
+    {
+      "key": "levis",
+      "title": "Ville de Lévis",
+      "pack_version": "0.4.0",
+      "visibility": "public",
+      "default_world": "levis-direction-generale",
+      "world_count": 17,
+      "worlds": [
+        {
+          "world_key": "levis-direction-generale",
+          "seed_pack_key": "levis-direction-generale",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "levis-capital-humain",
+          "seed_pack_key": "levis-capital-humain",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "levis-finances",
+          "seed_pack_key": "levis-finances",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "levis-developpement-economique",
+          "seed_pack_key": "levis-developpement-economique",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "levis-environnement",
+          "seed_pack_key": "levis-environnement",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "levis-genie",
+          "seed_pack_key": "levis-genie",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "levis-urbanisme",
+          "seed_pack_key": "levis-urbanisme",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "levis-mobilite",
+          "seed_pack_key": "levis-mobilite",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "levis-securite-civile",
+          "seed_pack_key": "levis-securite-civile",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "levis-police",
+          "seed_pack_key": "levis-police",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "levis-incendie",
+          "seed_pack_key": "levis-incendie",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "levis-approvisionnement-immobilier",
+          "seed_pack_key": "levis-approvisionnement-immobilier",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "levis-affaires-juridiques-greffe",
+          "seed_pack_key": "levis-affaires-juridiques-greffe",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "levis-entretien-infrastructures",
+          "seed_pack_key": "levis-entretien-infrastructures",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "levis-vie-communautaire",
+          "seed_pack_key": "levis-vie-communautaire",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "levis-communications-citoyens",
+          "seed_pack_key": "levis-communications-citoyens",
+          "seed_version": "0.4.0"
+        },
+        {
+          "world_key": "levis-ti-transformation",
+          "seed_pack_key": "levis-ti-transformation",
+          "seed_version": "0.4.0"
+        }
+      ],
+      "relations": 16,
+      "subscriptions": 0,
+      "path": "backend/seed-data/universes/levis/universe.yaml"
+    },
+    {
+      "key": "unesco",
+      "title": "UNESCO",
+      "pack_version": "1.4.0",
+      "visibility": "public",
+      "default_world": "unesco-commons",
+      "world_count": 7,
+      "worlds": [
+        {
+          "world_key": "unesco-commons",
+          "seed_pack_key": "unesco-commons",
+          "seed_version": "1.4.0"
+        },
+        {
+          "world_key": "unesco-education",
+          "seed_pack_key": "unesco-education",
+          "seed_version": "1.4.0"
+        },
+        {
+          "world_key": "unesco-science-planet",
+          "seed_pack_key": "unesco-science-planet",
+          "seed_version": "1.4.0"
+        },
+        {
+          "world_key": "unesco-ocean",
+          "seed_pack_key": "unesco-ocean",
+          "seed_version": "1.4.0"
+        },
+        {
+          "world_key": "unesco-culture-heritage",
+          "seed_pack_key": "unesco-culture-heritage",
+          "seed_version": "1.4.0"
+        },
+        {
+          "world_key": "unesco-humanity-society",
+          "seed_pack_key": "unesco-humanity-society",
+          "seed_version": "1.4.0"
+        },
+        {
+          "world_key": "unesco-information-digital",
+          "seed_pack_key": "unesco-information-digital",
+          "seed_version": "1.4.0"
+        }
+      ],
+      "relations": 30,
+      "subscriptions": 0,
+      "path": "backend/seed-data/universes/unesco/universe.yaml"
+    }
+  ],
+  "counts": {
+    "universes": 4,
+    "worlds": 36,
+    "scenarios": 36,
+    "persona_scenarios": 36,
+    "strict_identity_binding_scenarios": 17
+  },
+  "source_packages": [
+    {
+      "universe_key": "unesco",
+      "name": "UNESCO",
+      "version": "1.4.0",
+      "source_zip": "unesco-konnaxion-seed-v1.4.0.zip",
+      "source_root": "unesco-konnaxion-seed-v1.4.0"
+    },
+    {
+      "universe_key": "cuba-2026",
+      "name": "Cuba Koali",
+      "version": "0.2.0",
+      "source_zip": "cuba-koali-universe-seed-v0.2.0.zip",
+      "source_root": "cuba-koali-universe-seed-v0.2.0"
+    },
+    {
+      "universe_key": "kristal-farms",
+      "name": "Kristal Farms",
+      "version": "0.4.0",
+      "source_zip": "kristal-farms-seed-v0.4.0.zip",
+      "source_root": "kristal-farms-seed-v0.4.0"
+    },
+    {
+      "universe_key": "levis",
+      "name": "Ville de Lévis",
+      "version": "0.4.0",
+      "source_zip": "levis-konnaxion-universe-seed-v0.4.0.zip",
+      "source_root": "levis-konnaxion-universe-seed-v0.4.0"
+    }
+  ]
+}

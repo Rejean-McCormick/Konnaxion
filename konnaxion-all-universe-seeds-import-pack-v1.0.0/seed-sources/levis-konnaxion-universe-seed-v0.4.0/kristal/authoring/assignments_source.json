@@ -1,0 +1,3469 @@
+{
+  "schema": "levis-kristal-authoring-assignments/v1",
+  "seed_version": "0.3.0",
+  "baseline_date": "2026-09-29",
+  "universe_key": "levis",
+  "assignments": [
+    {
+      "world_key": "levis-affaires-juridiques-greffe",
+      "actor_key": "affaires-juridiques-greffe",
+      "canonical_actor_key": "levis:organization:affaires-juridiques-greffe",
+      "display_name": "Direction des affaires juridiques et du greffe",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Direction des affaires juridiques et du greffe",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "droit municipal",
+        "litiges",
+        "cour municipale",
+        "greffe",
+        "accès aux documents",
+        "gestion documentaire"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-affaires-juridiques-greffe",
+      "actor_key": "lysandre-arseneau",
+      "canonical_actor_key": "levis:person:lysandre-arseneau",
+      "display_name": "Lysandre Arseneau",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Chef de service — cour municipale et greffes",
+        "verification_status": "last_verified_2025_2026_document",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "droit",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "0421",
+          "provenance": [
+            {
+              "source_id": "city_accessibility_2025_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": null
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "cour municipale",
+        "greffes"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_accessibility_2025_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": null
+        }
+      ],
+      "role_status": "last_verified",
+      "panel_eligibility": "source_date_sensitive"
+    },
+    {
+      "world_key": "levis-affaires-juridiques-greffe",
+      "actor_key": "marlyne-turgeon",
+      "canonical_actor_key": "levis:person:marlyne-turgeon",
+      "display_name": "Marlyne Turgeon",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Greffière et responsable de l’accès aux documents et de la protection des renseignements personnels",
+        "verification_status": "current_official_webpage",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "droit",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "0421",
+          "provenance": [
+            {
+              "source_id": "city_orgchart_2025_07",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-07"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "greffe",
+        "processus décisionnel",
+        "accès aux documents",
+        "protection des renseignements personnels",
+        "réglementation municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_access_documents_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/acces-aux-documents",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_budget_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-11-26",
+          "retrieved_at": null
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-affaires-juridiques-greffe",
+      "actor_key": "simon-roberge-vallieres",
+      "canonical_actor_key": "levis:person:simon-roberge-vallieres",
+      "display_name": "Simon Roberge-Vallières",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directeur des affaires juridiques et du greffe",
+        "verification_status": "current_official_webpage",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "droit",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "0421",
+          "provenance": [
+            {
+              "source_id": "city_orgchart_2025_07",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-07"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "droit municipal",
+        "affaires juridiques",
+        "litiges",
+        "cour municipale",
+        "greffe",
+        "documents légaux"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-approvisionnement-immobilier",
+      "actor_key": "approvisionnement-immobilier",
+      "canonical_actor_key": "levis:organization:approvisionnement-immobilier",
+      "display_name": "Direction de l’approvisionnement et de la gestion immobilière",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Direction de l’approvisionnement et de la gestion immobilière",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-approvisionnement-immobilier",
+      "actor_key": "vincent-vu",
+      "canonical_actor_key": "levis:person:vincent-vu",
+      "display_name": "Vincent Vu",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directeur de l’approvisionnement et de la gestion immobilière",
+        "verification_status": "current_official_webpage",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "gestion et administration",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "0413",
+          "provenance": [
+            {
+              "source_id": "city_orgchart_2025_07",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-07"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "approvisionnement",
+        "contrats",
+        "gestion immobilière"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-capital-humain",
+      "actor_key": "gestion-capital-humain",
+      "canonical_actor_key": "levis:organization:gestion-capital-humain",
+      "display_name": "Direction de la gestion du capital humain",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Direction de la gestion du capital humain",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-capital-humain",
+      "actor_key": "manon-gauvreau",
+      "canonical_actor_key": "levis:person:manon-gauvreau",
+      "display_name": "Manon Gauvreau",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directrice de la gestion du capital humain",
+        "verification_status": "current_official_webpage",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "gestion et administration",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "0413",
+          "provenance": [
+            {
+              "source_id": "city_orgchart_2025_07",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-07"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "capital humain",
+        "gestion des talents",
+        "relations de travail"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-communications-citoyens",
+      "actor_key": "communications-interaction-citoyenne",
+      "canonical_actor_key": "levis:organization:communications-interaction-citoyenne",
+      "display_name": "Direction des communications et de l’interaction citoyenne",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Direction des communications et de l’interaction citoyenne",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        },
+        {
+          "source_id": "city_accessibility_2025_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": null
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-communications-citoyens",
+      "actor_key": "noemie-goulet",
+      "canonical_actor_key": "levis:person:noemie-goulet",
+      "display_name": "Noémie Goulet",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseillère en gestion des communications et de la relation citoyenne",
+        "verification_status": "verified_2025_2026_document",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "journalisme et information",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "032",
+          "provenance": [
+            {
+              "source_id": "city_accessibility_2025_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": null
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "communications",
+        "relation citoyenne"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_accessibility_2025_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": null
+        }
+      ],
+      "role_status": "last_verified",
+      "panel_eligibility": "source_date_sensitive"
+    },
+    {
+      "world_key": "levis-communications-citoyens",
+      "actor_key": "olivier-laviolette",
+      "canonical_actor_key": "levis:person:olivier-laviolette",
+      "display_name": "Olivier Laviolette",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Chef de service — interaction citoyenne",
+        "verification_status": "verified_2025_2026_document",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "interaction citoyenne"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_accessibility_2025_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": null
+        }
+      ],
+      "role_status": "last_verified",
+      "panel_eligibility": "source_date_sensitive"
+    },
+    {
+      "world_key": "levis-communications-citoyens",
+      "actor_key": "suzanne-breton",
+      "canonical_actor_key": "levis:person:suzanne-breton",
+      "display_name": "Suzanne Breton",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directrice des communications et de l’interaction citoyenne",
+        "verification_status": "current_official_webpage",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "journalisme et information",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "032",
+          "provenance": [
+            {
+              "source_id": "city_orgchart_2025_07",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-07"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "communications",
+        "interaction citoyenne"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-developpement-economique",
+      "actor_key": "developpement-economique-promotion",
+      "canonical_actor_key": "levis:organization:developpement-economique-promotion",
+      "display_name": "Direction du développement économique et de la promotion",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Direction du développement économique et de la promotion",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-developpement-economique",
+      "actor_key": "josee-bilodeau",
+      "canonical_actor_key": "levis:person:josee-bilodeau",
+      "display_name": "Josée Bilodeau",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Technicienne en tourisme",
+        "verification_status": "verified_2025_2026_document",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "tourisme"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_accessibility_2025_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": null
+        }
+      ],
+      "role_status": "last_verified",
+      "panel_eligibility": "source_date_sensitive"
+    },
+    {
+      "world_key": "levis-developpement-economique",
+      "actor_key": "etienne-talbot",
+      "canonical_actor_key": "levis:person:etienne-talbot",
+      "display_name": "Étienne Talbot",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directeur du développement économique et de la promotion",
+        "verification_status": "current_official_webpage",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "économie",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "0311",
+          "provenance": [
+            {
+              "source_id": "city_orgchart_2025_07",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-07"
+            }
+          ]
+        },
+        {
+          "label": "gestion et administration",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "0413",
+          "provenance": [
+            {
+              "source_id": "city_orgchart_2025_07",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-07"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "développement économique",
+        "promotion",
+        "tourisme"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "direction-generale",
+      "canonical_actor_key": "levis:organization:direction-generale",
+      "display_name": "Direction générale",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Direction générale",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "gouvernance municipale",
+        "coordination interdirections"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        },
+        {
+          "source_id": "city_budget_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-11-26"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "alain-quirion",
+      "canonical_actor_key": "levis:person:alain-quirion",
+      "display_name": "Alain Quirion",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseiller municipal",
+        "verification_status": "current_council_term_2025_2029",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "représentation politique municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_council_2025_2029",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-12"
+        }
+      ],
+      "representation_scope": {
+        "district": "District 7 — Saint-Jean"
+      },
+      "office_term": "2025-2029",
+      "role_status": "last_verified",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "anick-tremblay",
+      "canonical_actor_key": "levis:person:anick-tremblay",
+      "display_name": "Anick Tremblay",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseillère municipale",
+        "verification_status": "current_council_term_2025_2029",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "représentation politique municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_council_2025_2029",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-12"
+        }
+      ],
+      "representation_scope": {
+        "district": "District 9 — Saint-Romuald"
+      },
+      "office_term": "2025-2029",
+      "role_status": "last_verified",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "anne-marie-tremblay",
+      "canonical_actor_key": "levis:person:anne-marie-tremblay",
+      "display_name": "Anne-Marie Tremblay",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseillère municipale",
+        "verification_status": "current_council_term_2025_2029",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "représentation politique municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_council_2025_2029",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-12"
+        }
+      ],
+      "representation_scope": {
+        "district": "District 10 — Notre-Dame"
+      },
+      "office_term": "2025-2029",
+      "role_status": "last_verified",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "annie-gaudreault",
+      "canonical_actor_key": "levis:person:annie-gaudreault",
+      "display_name": "Annie Gaudreault",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directrice générale adjointe — Services à la communauté et intelligence d’affaires",
+        "verification_status": "current_official",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "gestion et administration",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "0413",
+          "provenance": [
+            {
+              "source_id": "city_structure_admin_current_2026_09",
+              "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+              "source_type": "official_municipal_webpage",
+              "source_date": null,
+              "retrieved_at": "2026-09-29"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "services à la communauté",
+        "intelligence d’affaires",
+        "performance organisationnelle",
+        "coordination entretien",
+        "coordination vie communautaire",
+        "coordination communications",
+        "coordination TI"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "anthony-dufour",
+      "canonical_actor_key": "levis:person:anthony-dufour",
+      "display_name": "Anthony Dufour",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseiller municipal",
+        "verification_status": "current_council_term_2025_2029",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "représentation politique municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_council_2025_2029",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-12"
+        }
+      ],
+      "representation_scope": {
+        "district": "District 1 — Saint-Étienne"
+      },
+      "office_term": "2025-2029",
+      "role_status": "last_verified",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "audrey-bedard",
+      "canonical_actor_key": "levis:person:audrey-bedard",
+      "display_name": "Audrey Bédard",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseillère municipale",
+        "verification_status": "current_council_term_2025_2029",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "représentation politique municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_council_2025_2029",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-12"
+        }
+      ],
+      "representation_scope": {
+        "district": "District 3 — Villieu"
+      },
+      "office_term": "2025-2029",
+      "role_status": "last_verified",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "benoit-forget-chiasson",
+      "canonical_actor_key": "levis:person:benoit-forget-chiasson",
+      "display_name": "Benoit Forget-Chiasson",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseiller municipal",
+        "verification_status": "current_council_term_2025_2029",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "représentation politique municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_council_2025_2029",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-12"
+        }
+      ],
+      "representation_scope": {
+        "district": "District 4 — Saint-Rédempteur"
+      },
+      "office_term": "2025-2029",
+      "role_status": "last_verified",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "daniel-saindon",
+      "canonical_actor_key": "levis:person:daniel-saindon",
+      "display_name": "Daniel Saindon",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseiller municipal",
+        "verification_status": "current_council_term_2025_2029",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "représentation politique municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_council_2025_2029",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-12"
+        }
+      ],
+      "representation_scope": {
+        "district": "District 5 — Charny"
+      },
+      "office_term": "2025-2029",
+      "role_status": "last_verified",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "david-boudreault",
+      "canonical_actor_key": "levis:person:david-boudreault",
+      "display_name": "David Boudreault",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directeur général adjoint — Planification intégrée du territoire",
+        "verification_status": "current_official",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "gestion et administration",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "0413",
+          "provenance": [
+            {
+              "source_id": "city_structure_admin_current_2026_09",
+              "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+              "source_type": "official_municipal_webpage",
+              "source_date": null,
+              "retrieved_at": "2026-09-29"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "planification intégrée du territoire",
+        "coordination développement économique",
+        "coordination environnement",
+        "coordination génie",
+        "coordination urbanisme",
+        "coordination mobilité"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "dominic-deslauriers",
+      "canonical_actor_key": "levis:person:dominic-deslauriers",
+      "display_name": "Dominic Deslauriers",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directeur général",
+        "verification_status": "current_official_webpage",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "administration municipale",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "0413",
+          "provenance": [
+            {
+              "source_id": "city_budget_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-11-26"
+            }
+          ]
+        },
+        {
+          "label": "coordination organisationnelle",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "0413",
+          "provenance": [
+            {
+              "source_id": "city_budget_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-11-26"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "direction générale",
+        "coordination interdirections"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        },
+        {
+          "source_id": "city_budget_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-11-26"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible",
+      "additional_roles": [
+        {
+          "title": "Directeur général adjoint par intérim — Sécurité publique et affaires corporatives",
+          "status": "current_interim",
+          "provenance": [
+            {
+              "source_id": "city_structure_admin_current_2026_09",
+              "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+              "source_type": "official_municipal_webpage",
+              "source_date": null,
+              "retrieved_at": "2026-09-29"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "erik-bilodeau",
+      "canonical_actor_key": "levis:person:erik-bilodeau",
+      "display_name": "Erik Bilodeau",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseiller municipal",
+        "verification_status": "current_council_term_2025_2029",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "représentation politique municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_council_2025_2029",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-12"
+        }
+      ],
+      "representation_scope": {
+        "district": "District 8 — Taniata"
+      },
+      "office_term": "2025-2029",
+      "role_status": "last_verified",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "isabelle-lefebvre",
+      "canonical_actor_key": "levis:person:isabelle-lefebvre",
+      "display_name": "Isabelle Lefebvre",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseillère municipale",
+        "verification_status": "current_council_term_2025_2029",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "représentation politique municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_council_2025_2029",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-12"
+        }
+      ],
+      "representation_scope": {
+        "district": "District 2 — Saint-Nicolas"
+      },
+      "office_term": "2025-2029",
+      "role_status": "last_verified",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "jean-demers",
+      "canonical_actor_key": "levis:person:jean-demers",
+      "display_name": "Jean Demers",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseiller municipal",
+        "verification_status": "current_council_term_2025_2029",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "représentation politique municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_council_2025_2029",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-12"
+        }
+      ],
+      "representation_scope": {
+        "district": "District 11 — Saint-David"
+      },
+      "office_term": "2025-2029",
+      "role_status": "last_verified",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "jean-leblond",
+      "canonical_actor_key": "levis:person:jean-leblond",
+      "display_name": "Jean Leblond",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseiller municipal",
+        "verification_status": "current_council_term_2025_2029",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "représentation politique municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_council_2025_2029",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-12"
+        }
+      ],
+      "representation_scope": {
+        "district": "District 12 — Christ-Roi"
+      },
+      "office_term": "2025-2029",
+      "role_status": "last_verified",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "karine-lavertu",
+      "canonical_actor_key": "levis:person:karine-lavertu",
+      "display_name": "Karine Lavertu",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseillère municipale",
+        "verification_status": "current_council_term_2025_2029",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "représentation politique municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_council_2025_2029",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-12"
+        }
+      ],
+      "representation_scope": {
+        "district": "District 6 — Breakeyville"
+      },
+      "office_term": "2025-2029",
+      "role_status": "last_verified",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "melanie-sicotte",
+      "canonical_actor_key": "levis:person:melanie-sicotte",
+      "display_name": "Mélanie Sicotte",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseillère municipale",
+        "verification_status": "current_council_term_2025_2029",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "représentation politique municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_council_2025_2029",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-12"
+        }
+      ],
+      "representation_scope": {
+        "district": "District 14 — Lauzon"
+      },
+      "office_term": "2025-2029",
+      "role_status": "last_verified",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "olivier-biron",
+      "canonical_actor_key": "levis:person:olivier-biron",
+      "display_name": "Olivier Biron",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseiller municipal",
+        "verification_status": "current_council_term_2025_2029",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "représentation politique municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_council_2025_2029",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-12"
+        }
+      ],
+      "representation_scope": {
+        "district": "District 13 — Bienville"
+      },
+      "office_term": "2025-2029",
+      "role_status": "last_verified",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "steven-blaney",
+      "canonical_actor_key": "levis:person:steven-blaney",
+      "display_name": "Steven Blaney",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Maire de Lévis",
+        "verification_status": "current_council_term_2025_2029",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "représentation politique municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_council_2025_2029",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-12"
+        }
+      ],
+      "representation_scope": {
+        "citywide": true
+      },
+      "office_term": "2025-2029",
+      "role_status": "last_verified",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-direction-generale",
+      "actor_key": "eric-nadeau",
+      "canonical_actor_key": "levis:person:eric-nadeau",
+      "display_name": "Éric Nadeau",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseiller municipal",
+        "verification_status": "current_council_term_2025_2029",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "représentation politique municipale"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_council_2025_2029",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/journal-levisinforme/JM_DECEMBRE2025_web.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-12"
+        }
+      ],
+      "representation_scope": {
+        "district": "District 15 — Pintendre"
+      },
+      "office_term": "2025-2029",
+      "role_status": "last_verified",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-entretien-infrastructures",
+      "actor_key": "entretien-infrastructures",
+      "canonical_actor_key": "levis:organization:entretien-infrastructures",
+      "display_name": "Direction de l’entretien des infrastructures",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Direction de l’entretien des infrastructures",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-entretien-infrastructures",
+      "actor_key": "annie-gaudreault",
+      "canonical_actor_key": "levis:person:annie-gaudreault",
+      "display_name": "Annie Gaudreault",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directrice par intérim de l’entretien des infrastructures",
+        "verification_status": "current_interim_official",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "gestion et administration",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "0413",
+          "provenance": [
+            {
+              "source_id": "city_structure_admin_current_2026_09",
+              "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+              "source_type": "official_municipal_webpage",
+              "source_date": null,
+              "retrieved_at": "2026-09-29"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "entretien des infrastructures",
+        "voirie",
+        "réseaux municipaux",
+        "équipements municipaux",
+        "parcs",
+        "traitement des eaux"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-entretien-infrastructures",
+      "actor_key": "simon-gauthier",
+      "canonical_actor_key": "levis:person:simon-gauthier",
+      "display_name": "Simon Gauthier",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Coordonnateur aux biens immobiliers",
+        "verification_status": "verified_2025_2026_document",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "biens immobiliers"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_accessibility_2025_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": null
+        }
+      ],
+      "role_status": "last_verified",
+      "panel_eligibility": "source_date_sensitive"
+    },
+    {
+      "world_key": "levis-environnement",
+      "actor_key": "environnement",
+      "canonical_actor_key": "levis:organization:environnement",
+      "display_name": "Direction de l’environnement",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Direction de l’environnement",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        },
+        {
+          "source_id": "city_budget_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-11-26"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-environnement",
+      "actor_key": "genevieve-coude-levesque",
+      "canonical_actor_key": "levis:person:genevieve-coude-levesque",
+      "display_name": "Geneviève Coudé-Lévesque",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directrice de l’environnement",
+        "verification_status": "current_official_webpage",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "sciences environnementales",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "0521",
+          "provenance": [
+            {
+              "source_id": "city_budget_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-11-26"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "environnement",
+        "écosystèmes",
+        "matières résiduelles",
+        "transition climatique"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        },
+        {
+          "source_id": "city_budget_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-11-26"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-finances",
+      "actor_key": "finances-tresorerie",
+      "canonical_actor_key": "levis:organization:finances-tresorerie",
+      "display_name": "Direction des finances et trésorerie",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Direction des finances et trésorerie",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        },
+        {
+          "source_id": "city_budget_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-11-26"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-finances",
+      "actor_key": "frederic-moisan",
+      "canonical_actor_key": "levis:person:frederic-moisan",
+      "display_name": "Frédéric Moisan",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directeur des finances et trésorier",
+        "verification_status": "current_official_webpage",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "administration financière",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "041",
+          "provenance": [
+            {
+              "source_id": "city_budget_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-11-26"
+            }
+          ]
+        },
+        {
+          "label": "gestion et administration",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "0413",
+          "provenance": [
+            {
+              "source_id": "city_budget_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-11-26"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "budget",
+        "trésorerie",
+        "planification financière"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        },
+        {
+          "source_id": "city_budget_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-11-26"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-genie",
+      "actor_key": "genie",
+      "canonical_actor_key": "levis:organization:genie",
+      "display_name": "Direction du génie",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Direction du génie",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "infrastructures municipales",
+        "gestion des actifs"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        },
+        {
+          "source_id": "city_budget_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-11-26"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-genie",
+      "actor_key": "charles-lemoyne",
+      "canonical_actor_key": "levis:person:charles-lemoyne",
+      "display_name": "Charles Lemoyne",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Chargé de projets, ingénieur",
+        "verification_status": "verified_in_public_source",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "génie civil et infrastructures",
+          "claim_type": "public_professional_source",
+          "isced_f_code": "071",
+          "provenance": [
+            {
+              "source_id": "city_etienne_dallaire_2025",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/ville/Seance_d_information_du_20_mai_2025_Prolongement_Etienne-Dallaire.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-05-20"
+            }
+          ]
+        },
+        {
+          "label": "gestion de projets",
+          "claim_type": "public_professional_source",
+          "isced_f_code": "0413",
+          "provenance": [
+            {
+              "source_id": "city_etienne_dallaire_2025",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/ville/Seance_d_information_du_20_mai_2025_Prolongement_Etienne-Dallaire.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-05-20"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [
+        {
+          "designation": "ingénieur",
+          "verification": "official_municipal_document",
+          "provenance": [
+            {
+              "source_id": "city_etienne_dallaire_2025",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/ville/Seance_d_information_du_20_mai_2025_Prolongement_Etienne-Dallaire.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-05-20"
+            }
+          ]
+        }
+      ],
+      "institutional_scope": [
+        "projets d’infrastructures",
+        "chantier municipal"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_etienne_dallaire_2025",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/ville/Seance_d_information_du_20_mai_2025_Prolongement_Etienne-Dallaire.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-05-20"
+        }
+      ],
+      "role_status": "last_verified",
+      "panel_eligibility": "source_date_sensitive"
+    },
+    {
+      "world_key": "levis-genie",
+      "actor_key": "dany-lachance",
+      "canonical_actor_key": "levis:person:dany-lachance",
+      "display_name": "Dany Lachance",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directeur adjoint aux projets majeurs — actifs de l’eau",
+        "verification_status": "verified_2026_professional_source",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "génie municipal",
+          "claim_type": "public_professional_source",
+          "isced_f_code": "071",
+          "provenance": [
+            {
+              "source_id": "aimq_dany_lachance_2026",
+              "url": "https://www.aimq.net/genial-les-conferences-implantation-dun-cadre-de-gestion-de-projets-uniformises-a-la-ville-de-levis/",
+              "source_type": "professional_association",
+              "source_date": "2026-04-14"
+            }
+          ]
+        },
+        {
+          "label": "eau potable et eaux usées",
+          "claim_type": "public_professional_source",
+          "isced_f_code": "071",
+          "provenance": [
+            {
+              "source_id": "aimq_dany_lachance_2026",
+              "url": "https://www.aimq.net/genial-les-conferences-implantation-dun-cadre-de-gestion-de-projets-uniformises-a-la-ville-de-levis/",
+              "source_type": "professional_association",
+              "source_date": "2026-04-14"
+            }
+          ]
+        },
+        {
+          "label": "gestion de projets majeurs",
+          "claim_type": "public_professional_source",
+          "isced_f_code": "0413",
+          "provenance": [
+            {
+              "source_id": "aimq_dany_lachance_2026",
+              "url": "https://www.aimq.net/genial-les-conferences-implantation-dun-cadre-de-gestion-de-projets-uniformises-a-la-ville-de-levis/",
+              "source_type": "professional_association",
+              "source_date": "2026-04-14"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [
+        {
+          "designation": "ing.",
+          "verification": "public_professional_source",
+          "provenance": [
+            {
+              "source_id": "aimq_dany_lachance_2026",
+              "url": "https://www.aimq.net/genial-les-conferences-implantation-dun-cadre-de-gestion-de-projets-uniformises-a-la-ville-de-levis/",
+              "source_type": "professional_association",
+              "source_date": "2026-04-14"
+            }
+          ]
+        }
+      ],
+      "institutional_scope": [
+        "actifs de l’eau",
+        "projets majeurs"
+      ],
+      "provenance": [
+        {
+          "source_id": "aimq_dany_lachance_2026",
+          "url": "https://www.aimq.net/genial-les-conferences-implantation-dun-cadre-de-gestion-de-projets-uniformises-a-la-ville-de-levis/",
+          "source_type": "professional_association",
+          "source_date": "2026-04-14"
+        }
+      ],
+      "role_status": "last_verified",
+      "panel_eligibility": "source_date_sensitive"
+    },
+    {
+      "world_key": "levis-genie",
+      "actor_key": "dominique-marceau",
+      "canonical_actor_key": "levis:person:dominique-marceau",
+      "display_name": "Dominique Marceau",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Chef de service — réalisation de projets de bâtiments et d’aménagements",
+        "verification_status": "verified_2025_2026_document",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "architecture et construction",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "073",
+          "provenance": [
+            {
+              "source_id": "city_accessibility_2025_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": null
+            }
+          ]
+        },
+        {
+          "label": "gestion de projets",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "0413",
+          "provenance": [
+            {
+              "source_id": "city_accessibility_2025_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": null
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "bâtiments municipaux",
+        "aménagements",
+        "réalisation de projets"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_accessibility_2025_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": null
+        }
+      ],
+      "role_status": "last_verified",
+      "panel_eligibility": "source_date_sensitive"
+    },
+    {
+      "world_key": "levis-genie",
+      "actor_key": "jean-francois-gagnon",
+      "canonical_actor_key": "levis:person:jean-francois-gagnon",
+      "display_name": "Jean-François Gagnon",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseiller en gestion de projets",
+        "verification_status": "verified_in_public_source",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "infrastructures municipales",
+          "claim_type": "public_professional_source",
+          "isced_f_code": "071",
+          "provenance": [
+            {
+              "source_id": "city_development_infra_2025",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/developpement/Contribution_au_developpement/Projet_de_reglement_contribution_au_developpement_Saint-Nicolas.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025"
+            }
+          ]
+        },
+        {
+          "label": "gestion de projets",
+          "claim_type": "public_professional_source",
+          "isced_f_code": "0413",
+          "provenance": [
+            {
+              "source_id": "city_development_infra_2025",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/developpement/Contribution_au_developpement/Projet_de_reglement_contribution_au_developpement_Saint-Nicolas.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "infrastructures",
+        "investissements municipaux",
+        "planification de projets"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_development_infra_2025",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/developpement/Contribution_au_developpement/Projet_de_reglement_contribution_au_developpement_Saint-Nicolas.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025"
+        }
+      ],
+      "role_status": "last_verified",
+      "panel_eligibility": "source_date_sensitive"
+    },
+    {
+      "world_key": "levis-genie",
+      "actor_key": "jean-sebastien-roy",
+      "canonical_actor_key": "levis:person:jean-sebastien-roy",
+      "display_name": "Jean-Sébastien Roy",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Technicien en génie civil et agent de liaison",
+        "verification_status": "verified_in_public_source",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "génie civil et infrastructures",
+          "claim_type": "public_professional_source",
+          "isced_f_code": "071",
+          "provenance": [
+            {
+              "source_id": "city_etienne_dallaire_2025",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/ville/Seance_d_information_du_20_mai_2025_Prolongement_Etienne-Dallaire.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-05-20"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "génie civil",
+        "liaison de chantier"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_etienne_dallaire_2025",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/ville/Seance_d_information_du_20_mai_2025_Prolongement_Etienne-Dallaire.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-05-20"
+        }
+      ],
+      "role_status": "last_verified",
+      "panel_eligibility": "source_date_sensitive"
+    },
+    {
+      "world_key": "levis-genie",
+      "actor_key": "pierre-lefevre",
+      "canonical_actor_key": "levis:person:pierre-lefevre",
+      "display_name": "Pierre Lefèvre",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directeur du génie",
+        "verification_status": "current_official_webpage",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "génie et techniques apparentées",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "071",
+          "provenance": [
+            {
+              "source_id": "city_budget_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-11-26"
+            }
+          ]
+        },
+        {
+          "label": "infrastructures municipales",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "071",
+          "provenance": [
+            {
+              "source_id": "city_budget_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-11-26"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "génie",
+        "infrastructures",
+        "gestion des actifs"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        },
+        {
+          "source_id": "city_budget_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-11-26"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-incendie",
+      "actor_key": "securite-incendie",
+      "canonical_actor_key": "levis:organization:securite-incendie",
+      "display_name": "Direction du service de la sécurité incendie",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Direction du service de la sécurité incendie",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-incendie",
+      "actor_key": "rejean-perusse",
+      "canonical_actor_key": "levis:person:rejean-perusse",
+      "display_name": "Réjean Pérusse",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directeur du service de la sécurité incendie",
+        "verification_status": "current_official_webpage",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "protection des personnes et des biens",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "1032",
+          "provenance": [
+            {
+              "source_id": "city_orgchart_2025_07",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-07"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "sécurité incendie",
+        "gestion des secours"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-incendie",
+      "actor_key": "steve-larose",
+      "canonical_actor_key": "levis:person:steve-larose",
+      "display_name": "Steve Larose",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Chef de division — prévention",
+        "verification_status": "verified_2025_2026_document",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "protection des personnes et des biens",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "1032",
+          "provenance": [
+            {
+              "source_id": "city_accessibility_2025_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": null
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "prévention incendie"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_accessibility_2025_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": null
+        }
+      ],
+      "role_status": "last_verified",
+      "panel_eligibility": "source_date_sensitive"
+    },
+    {
+      "world_key": "levis-mobilite",
+      "actor_key": "transports-mobilite",
+      "canonical_actor_key": "levis:organization:transports-mobilite",
+      "display_name": "Direction des transports et de la mobilité durable",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Direction des transports et de la mobilité durable",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        },
+        {
+          "source_id": "city_budget_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-11-26"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-mobilite",
+      "actor_key": "francis-joud",
+      "canonical_actor_key": "levis:person:francis-joud",
+      "display_name": "Francis Joud",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseiller en transport et circulation",
+        "verification_status": "verified_2025_2026_document",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "transport et circulation",
+          "claim_type": "public_professional_source",
+          "isced_f_code": "071",
+          "provenance": [
+            {
+              "source_id": "city_accessibility_2025_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": null
+            },
+            {
+              "source_id": "city_road_safety_strategy",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/Images/actualites/transport-infrastructure/Strategie-securite-routiere.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2024"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "circulation",
+        "sécurité routière",
+        "mobilité durable"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_accessibility_2025_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": null
+        },
+        {
+          "source_id": "city_road_safety_strategy",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/Images/actualites/transport-infrastructure/Strategie-securite-routiere.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2024"
+        }
+      ],
+      "role_status": "last_verified",
+      "panel_eligibility": "source_date_sensitive"
+    },
+    {
+      "world_key": "levis-mobilite",
+      "actor_key": "houda-slaoui",
+      "canonical_actor_key": "levis:person:houda-slaoui",
+      "display_name": "Houda Slaoui",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directrice des transports et de la mobilité durable",
+        "verification_status": "current_official_webpage",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "ingénierie et planification des transports",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "071",
+          "provenance": [
+            {
+              "source_id": "city_budget_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-11-26"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "transport",
+        "mobilité durable",
+        "sécurité des usagers",
+        "planification des réseaux"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        },
+        {
+          "source_id": "city_budget_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-11-26"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-police",
+      "actor_key": "service-police",
+      "canonical_actor_key": "levis:organization:service-police",
+      "display_name": "Direction du service de police",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Direction du service de police",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-police",
+      "actor_key": "francois-dube",
+      "canonical_actor_key": "levis:person:francois-dube",
+      "display_name": "François Dubé",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directeur du service de police",
+        "verification_status": "current_official_webpage",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "protection des personnes et des biens",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "1032",
+          "provenance": [
+            {
+              "source_id": "city_orgchart_2025_07",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-07"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "sécurité publique",
+        "police"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-police",
+      "actor_key": "marie-noelle-caron",
+      "canonical_actor_key": "levis:person:marie-noelle-caron",
+      "display_name": "Marie-Noëlle Caron",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Agente d’administration — Service de police",
+        "verification_status": "verified_2025_2026_document",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "administration policière"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_accessibility_2025_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": null
+        }
+      ],
+      "role_status": "last_verified",
+      "panel_eligibility": "source_date_sensitive"
+    },
+    {
+      "world_key": "levis-securite-civile",
+      "actor_key": "securite-civile",
+      "canonical_actor_key": "levis:organization:securite-civile",
+      "display_name": "Bureau de la sécurité civile",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Bureau de la sécurité civile",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-securite-civile",
+      "actor_key": "rejean-perusse",
+      "canonical_actor_key": "levis:person:rejean-perusse",
+      "display_name": "Réjean Pérusse",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directeur par intérim du Bureau de la sécurité civile",
+        "verification_status": "current_interim_budget_2026",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "sécurité et services d’urgence",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "1032",
+          "provenance": [
+            {
+              "source_id": "city_budget_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-11-26",
+              "retrieved_at": null
+            },
+            {
+              "source_id": "city_security_civil_current_2026_09",
+              "url": "https://levis.ca/fr/services/securite-publique/securite-civile",
+              "source_type": "official_municipal_webpage",
+              "source_date": null,
+              "retrieved_at": "2026-09-29"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "sécurité civile",
+        "planification d’urgence",
+        "coordination des ressources",
+        "préparation aux sinistres",
+        "résilience"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_budget_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-11-26",
+          "retrieved_at": null
+        },
+        {
+          "source_id": "city_security_civil_current_2026_09",
+          "url": "https://levis.ca/fr/services/securite-publique/securite-civile",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-ti-transformation",
+      "actor_key": "ti-transformation",
+      "canonical_actor_key": "levis:organization:ti-transformation",
+      "display_name": "Direction des technologies de l’information et transformation numérique",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Direction des technologies de l’information et transformation numérique",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-ti-transformation",
+      "actor_key": "denis-deschenes",
+      "canonical_actor_key": "levis:person:denis-deschenes",
+      "display_name": "Denis Deschênes",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directeur des technologies de l’information et de la transformation numérique",
+        "verification_status": "current_official",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "technologies de l’information et de la communication",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "061",
+          "provenance": [
+            {
+              "source_id": "city_structure_admin_current_2026_09",
+              "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+              "source_type": "official_municipal_webpage",
+              "source_date": null,
+              "retrieved_at": "2026-09-29"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "infrastructure TI",
+        "cybersécurité",
+        "données",
+        "développement numérique",
+        "transformation numérique"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-urbanisme",
+      "actor_key": "urbanisme",
+      "canonical_actor_key": "levis:organization:urbanisme",
+      "display_name": "Direction de l’urbanisme",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Direction de l’urbanisme",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "aménagement du territoire",
+        "cadre bâti"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        },
+        {
+          "source_id": "city_budget_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-11-26"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-urbanisme",
+      "actor_key": "annie-bergeron",
+      "canonical_actor_key": "levis:person:annie-bergeron",
+      "display_name": "Annie Bergeron",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseillère en aménagement du territoire",
+        "verification_status": "verified_2025_2026_document",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "architecture et aménagement urbain",
+          "claim_type": "public_professional_source",
+          "isced_f_code": "0731",
+          "provenance": [
+            {
+              "source_id": "city_accessibility_2025_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": null
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "aménagement du territoire"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_accessibility_2025_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/user_upload/DVC-DSC-2025-024_-_Plan_d_action_2025-2026_a_l_egard_des_personnes_handicapees_-_Annexe_1.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": null
+        }
+      ],
+      "role_status": "last_verified",
+      "panel_eligibility": "source_date_sensitive"
+    },
+    {
+      "world_key": "levis-urbanisme",
+      "actor_key": "marie-jeanne-gagnon-beaulieu",
+      "canonical_actor_key": "levis:person:marie-jeanne-gagnon-beaulieu",
+      "display_name": "Marie-Jeanne Gagnon-Beaulieu",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Conseillère en urbanisme",
+        "verification_status": "verified_in_public_source",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "architecture et aménagement urbain",
+          "claim_type": "public_professional_source",
+          "isced_f_code": "0731",
+          "provenance": [
+            {
+              "source_id": "city_urbanisme_fpd_2025_092",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/fpd/2025/URBA-SAT-2025-092.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "urbanisme",
+        "réglementation",
+        "aménagement du territoire"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_urbanisme_fpd_2025_092",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/fpd/2025/URBA-SAT-2025-092.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025"
+        }
+      ],
+      "role_status": "last_verified",
+      "panel_eligibility": "source_date_sensitive"
+    },
+    {
+      "world_key": "levis-urbanisme",
+      "actor_key": "patrick-hamelin",
+      "canonical_actor_key": "levis:person:patrick-hamelin",
+      "display_name": "Patrick Hamelin",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directeur de l’urbanisme",
+        "verification_status": "current_official_webpage",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [
+        {
+          "label": "architecture et aménagement urbain",
+          "claim_type": "institutional_role_derived",
+          "isced_f_code": "0731",
+          "provenance": [
+            {
+              "source_id": "city_budget_2026",
+              "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+              "source_type": "official_municipal_document",
+              "source_date": "2025-11-26"
+            }
+          ]
+        }
+      ],
+      "credential_claims": [],
+      "institutional_scope": [
+        "urbanisme",
+        "aménagement du territoire",
+        "cadre bâti"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        },
+        {
+          "source_id": "city_budget_2026",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/finances/2025-11-26_PM_Budget_2026.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-11-26"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-vie-communautaire",
+      "actor_key": "vie-communautaire",
+      "canonical_actor_key": "levis:organization:vie-communautaire",
+      "display_name": "Direction de la vie communautaire",
+      "persona_type": "organization",
+      "bridge_account_type": "service",
+      "representation": {
+        "real_person": false,
+        "simulated_voice": false,
+        "attribution_mode": "institutional_role",
+        "must_label_simulated": false,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Direction de la vie communautaire",
+        "verification_status": "official_organization_current",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [],
+      "provenance": [
+        {
+          "source_id": "city_orgchart_2026_02",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville_de_Levis_2602.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2026-02-18",
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    },
+    {
+      "world_key": "levis-vie-communautaire",
+      "actor_key": "sylvie-bernatchez",
+      "canonical_actor_key": "levis:person:sylvie-bernatchez",
+      "display_name": "Sylvie Bernatchez",
+      "persona_type": "simulated_person",
+      "bridge_account_type": "human",
+      "representation": {
+        "real_person": true,
+        "simulated_voice": true,
+        "attribution_mode": "role_simulation",
+        "must_label_simulated": true,
+        "no_personal_opinion_inference": true,
+        "source_bound": true
+      },
+      "institutional_role": {
+        "title": "Directrice de la vie communautaire",
+        "verification_status": "current_official_webpage",
+        "last_reviewed_at": "2026-09-29"
+      },
+      "expertise_claims": [],
+      "credential_claims": [],
+      "institutional_scope": [
+        "vie communautaire",
+        "culture",
+        "loisirs",
+        "sports",
+        "bibliothèques"
+      ],
+      "provenance": [
+        {
+          "source_id": "city_structure_admin_current_2026_09",
+          "url": "https://levis.ca/fr/ville/organisation-municipale/structure-administrative",
+          "source_type": "official_municipal_webpage",
+          "source_date": null,
+          "retrieved_at": "2026-09-29"
+        },
+        {
+          "source_id": "city_orgchart_2025_07",
+          "url": "https://www.ville.levis.qc.ca/fileadmin/documents/pdf/la-ville/Organigramme_Ville-de-Levis-2025-07.pdf",
+          "source_type": "official_municipal_document",
+          "source_date": "2025-07"
+        }
+      ],
+      "role_status": "current",
+      "panel_eligibility": "eligible"
+    }
+  ]
+}
