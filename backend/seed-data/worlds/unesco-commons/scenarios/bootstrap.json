@@ -6,7 +6,7 @@
   "metadata": {
     "universe": "unesco",
     "world_key": "unesco-commons",
-    "seed_version": "1.4.0",
+    "seed_version": "1.5.0",
     "simulation_mode": "dynamic_deliberation",
     "position_seed_policy": "none",
     "vote_seed_policy": "none",
@@ -8894,7 +8894,56 @@
         "representation_type": "institutional",
         "simulation_eligible": true,
         "ethikos_write": false
+      },
+      "unesco_commons__sim_expert_1": {
+        "persona_type": "simulated_person",
+        "entity_type": "synthetic_fictional_persona",
+        "role": "simulation_subject_matter_expert",
+        "account_type": "human",
+        "is_klone": true,
+        "simulation_eligible": true,
+        "ethikos_write": true,
+        "representation_type": "synthetic_fictional_persona",
+        "source_basis": [
+          "simulation_fixture"
+        ],
+        "speaking_policy": "explicit_simulation_only"
+      },
+      "unesco_commons__sim_expert_2": {
+        "persona_type": "simulated_person",
+        "entity_type": "synthetic_fictional_persona",
+        "role": "simulation_subject_matter_expert",
+        "account_type": "human",
+        "is_klone": true,
+        "simulation_eligible": true,
+        "ethikos_write": true,
+        "representation_type": "synthetic_fictional_persona",
+        "source_basis": [
+          "simulation_fixture"
+        ],
+        "speaking_policy": "explicit_simulation_only"
+      },
+      "unesco_commons__sim_expert_3": {
+        "persona_type": "simulated_person",
+        "entity_type": "synthetic_fictional_persona",
+        "role": "simulation_subject_matter_expert",
+        "account_type": "human",
+        "is_klone": true,
+        "simulation_eligible": true,
+        "ethikos_write": true,
+        "representation_type": "synthetic_fictional_persona",
+        "source_basis": [
+          "simulation_fixture"
+        ],
+        "speaking_policy": "explicit_simulation_only"
       }
+    },
+    "mega_update": {
+      "version": "1.0.0",
+      "date": "2026-09-30",
+      "purpose": "simulation_deliberation_plus_contextual_ekoh_readings",
+      "real_person_ekoh_scores_generated": false,
+      "baseline_always_visible": true
     }
   },
   "actors": [
@@ -11657,18 +11706,555 @@
       "username": "demo_world_bank",
       "display_name": "World Bank",
       "is_ethikos_elite": false
+    },
+    {
+      "key": "unesco_commons__sim_expert_1",
+      "username": "demo_unesco_commons_sim_expert_1",
+      "display_name": "[SIMULATION] Systems expert — UNESCO Commons",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "unesco_commons__sim_expert_2",
+      "username": "demo_unesco_commons_sim_expert_2",
+      "display_name": "[SIMULATION] Governance expert — UNESCO Commons",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "unesco_commons__sim_expert_3",
+      "username": "demo_unesco_commons_sim_expert_3",
+      "display_name": "[SIMULATION] Evidence & community expert — UNESCO Commons",
+      "is_ethikos_elite": true
     }
   ],
-  "categories": [],
-  "topics": [],
-  "stances": [],
-  "arguments": [],
-  "argument_sources": [],
+  "categories": [
+    {
+      "key": "coordination",
+      "name": "Cross-sector coordination"
+    },
+    {
+      "key": "evidence",
+      "name": "Evidence and review"
+    },
+    {
+      "key": "participation",
+      "name": "Participation and inclusion"
+    },
+    {
+      "key": "digital",
+      "name": "Shared digital infrastructure"
+    }
+  ],
+  "topics": [
+    {
+      "key": "cross_sector_priorities",
+      "title": "[DEMO] Should cross-sector initiatives use a common prioritization framework before resources are committed?",
+      "description": "Cross-sector priorities. Synthetic cross-sector demo question for the UNESCO Commons World.",
+      "status": "open",
+      "category": "coordination",
+      "start_date": "2026-09-30",
+      "end_date": "2026-12-31"
+    },
+    {
+      "key": "evidence_governance",
+      "title": "[DEMO] Should every cross-sector programme publish its evidence assumptions, uncertainty and review triggers?",
+      "description": "Evidence governance. Synthetic cross-sector demo question for the UNESCO Commons World.",
+      "status": "open",
+      "category": "evidence",
+      "start_date": "2026-09-30",
+      "end_date": "2026-12-31"
+    },
+    {
+      "key": "inclusive_participation",
+      "title": "[DEMO] Should cross-sector programme design include a documented participation and accessibility plan?",
+      "description": "Inclusive participation. Synthetic cross-sector demo question for the UNESCO Commons World.",
+      "status": "open",
+      "category": "participation",
+      "start_date": "2026-09-30",
+      "end_date": "2026-12-31"
+    },
+    {
+      "key": "digital_public_infrastructure",
+      "title": "[DEMO] Should shared digital infrastructure be governed through common interoperability, security and accountability requirements?",
+      "description": "Digital public infrastructure. Synthetic cross-sector demo question for the UNESCO Commons World.",
+      "status": "open",
+      "category": "digital",
+      "start_date": "2026-09-30",
+      "end_date": "2026-12-31"
+    }
+  ],
+  "stances": [
+    {
+      "topic": "cross_sector_priorities",
+      "actor": "unesco_commons__sim_expert_1",
+      "value": 2
+    },
+    {
+      "topic": "cross_sector_priorities",
+      "actor": "unesco_commons__sim_expert_2",
+      "value": -1
+    },
+    {
+      "topic": "cross_sector_priorities",
+      "actor": "unesco_commons__sim_expert_3",
+      "value": 0
+    },
+    {
+      "topic": "evidence_governance",
+      "actor": "unesco_commons__sim_expert_3",
+      "value": -2
+    },
+    {
+      "topic": "evidence_governance",
+      "actor": "unesco_commons__sim_expert_1",
+      "value": 1
+    },
+    {
+      "topic": "evidence_governance",
+      "actor": "unesco_commons__sim_expert_2",
+      "value": 0
+    },
+    {
+      "topic": "inclusive_participation",
+      "actor": "unesco_commons__sim_expert_1",
+      "value": 2
+    },
+    {
+      "topic": "inclusive_participation",
+      "actor": "unesco_commons__sim_expert_2",
+      "value": -1
+    },
+    {
+      "topic": "inclusive_participation",
+      "actor": "unesco_commons__sim_expert_3",
+      "value": 0
+    },
+    {
+      "topic": "digital_public_infrastructure",
+      "actor": "unesco_commons__sim_expert_1",
+      "value": -2
+    },
+    {
+      "topic": "digital_public_infrastructure",
+      "actor": "unesco_commons__sim_expert_3",
+      "value": 1
+    },
+    {
+      "topic": "digital_public_infrastructure",
+      "actor": "unesco_commons__sim_expert_2",
+      "value": 0
+    }
+  ],
+  "arguments": [
+    {
+      "key": "mega_cross_sector_priorities_1",
+      "topic": "cross_sector_priorities",
+      "actor": "unesco_commons__sim_expert_1",
+      "side": "pro",
+      "content": "[SIMULATION] This position favours the option stated in the question so its expected benefits can be tested with monitoring criteria, stop conditions and review."
+    },
+    {
+      "key": "mega_cross_sector_priorities_2",
+      "topic": "cross_sector_priorities",
+      "actor": "unesco_commons__sim_expert_2",
+      "side": "con",
+      "content": "[SIMULATION] This position does not favour the stated option until costs, risks, alternatives and reversibility conditions have been compared."
+    },
+    {
+      "key": "mega_evidence_governance_1",
+      "topic": "evidence_governance",
+      "actor": "unesco_commons__sim_expert_3",
+      "side": "con",
+      "content": "[SIMULATION] This position does not favour the stated option until costs, risks, alternatives and reversibility conditions have been compared."
+    },
+    {
+      "key": "mega_evidence_governance_2",
+      "topic": "evidence_governance",
+      "actor": "unesco_commons__sim_expert_1",
+      "side": "pro",
+      "content": "[SIMULATION] This position favours the option stated in the question so its expected benefits can be tested with monitoring criteria, stop conditions and review."
+    },
+    {
+      "key": "mega_inclusive_participation_1",
+      "topic": "inclusive_participation",
+      "actor": "unesco_commons__sim_expert_1",
+      "side": "pro",
+      "content": "[SIMULATION] This position favours the option stated in the question so its expected benefits can be tested with monitoring criteria, stop conditions and review."
+    },
+    {
+      "key": "mega_inclusive_participation_2",
+      "topic": "inclusive_participation",
+      "actor": "unesco_commons__sim_expert_2",
+      "side": "con",
+      "content": "[SIMULATION] This position does not favour the stated option until costs, risks, alternatives and reversibility conditions have been compared."
+    },
+    {
+      "key": "mega_digital_public_infrastructure_1",
+      "topic": "digital_public_infrastructure",
+      "actor": "unesco_commons__sim_expert_1",
+      "side": "con",
+      "content": "[SIMULATION] This position does not favour the stated option until costs, risks, alternatives and reversibility conditions have been compared."
+    },
+    {
+      "key": "mega_digital_public_infrastructure_2",
+      "topic": "digital_public_infrastructure",
+      "actor": "unesco_commons__sim_expert_3",
+      "side": "pro",
+      "content": "[SIMULATION] This position favours the option stated in the question so its expected benefits can be tested with monitoring criteria, stop conditions and review."
+    }
+  ],
+  "argument_sources": [
+    {
+      "key": "mega_cross_sector_priorities_1_source",
+      "argument": "mega_cross_sector_priorities_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "SIMULATION FIXTURE — generated only to exercise deliberation and EkoH Smart Vote. It is not a factual claim, endorsement or real-person position."
+    },
+    {
+      "key": "mega_cross_sector_priorities_2_source",
+      "argument": "mega_cross_sector_priorities_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "SIMULATION FIXTURE — generated only to exercise deliberation and EkoH Smart Vote. It is not a factual claim, endorsement or real-person position."
+    },
+    {
+      "key": "mega_evidence_governance_1_source",
+      "argument": "mega_evidence_governance_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "SIMULATION FIXTURE — generated only to exercise deliberation and EkoH Smart Vote. It is not a factual claim, endorsement or real-person position."
+    },
+    {
+      "key": "mega_evidence_governance_2_source",
+      "argument": "mega_evidence_governance_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "SIMULATION FIXTURE — generated only to exercise deliberation and EkoH Smart Vote. It is not a factual claim, endorsement or real-person position."
+    },
+    {
+      "key": "mega_inclusive_participation_1_source",
+      "argument": "mega_inclusive_participation_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "SIMULATION FIXTURE — generated only to exercise deliberation and EkoH Smart Vote. It is not a factual claim, endorsement or real-person position."
+    },
+    {
+      "key": "mega_inclusive_participation_2_source",
+      "argument": "mega_inclusive_participation_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "SIMULATION FIXTURE — generated only to exercise deliberation and EkoH Smart Vote. It is not a factual claim, endorsement or real-person position."
+    },
+    {
+      "key": "mega_digital_public_infrastructure_1_source",
+      "argument": "mega_digital_public_infrastructure_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "SIMULATION FIXTURE — generated only to exercise deliberation and EkoH Smart Vote. It is not a factual claim, endorsement or real-person position."
+    },
+    {
+      "key": "mega_digital_public_infrastructure_2_source",
+      "argument": "mega_digital_public_infrastructure_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "SIMULATION FIXTURE — generated only to exercise deliberation and EkoH Smart Vote. It is not a factual claim, endorsement or real-person position."
+    }
+  ],
   "consultations": [],
   "consultation_votes": [],
   "impact_items": [],
-  "ekoh_profiles": [],
+  "ekoh_profiles": [
+    {
+      "actor": "unesco_commons__sim_expert_1",
+      "rating_visibility": "public",
+      "publication_basis": "SYNTHETIC FICTIONAL PERSONA — demo seed only",
+      "ethics_score": 1.0,
+      "expertise": [
+        {
+          "domain_code": "0413",
+          "raw_score": 0.95,
+          "weighted_score": 0.95
+        },
+        {
+          "domain_code": "0312",
+          "raw_score": 0.82,
+          "weighted_score": 0.82
+        },
+        {
+          "domain_code": "0542",
+          "raw_score": 0.68,
+          "weighted_score": 0.68
+        },
+        {
+          "domain_code": "0223",
+          "raw_score": 0.54,
+          "weighted_score": 0.54
+        },
+        {
+          "domain_code": "0314",
+          "raw_score": 0.42,
+          "weighted_score": 0.42
+        },
+        {
+          "domain_code": "0612",
+          "raw_score": 0.32,
+          "weighted_score": 0.32
+        },
+        {
+          "domain_code": "0321",
+          "raw_score": 0.24,
+          "weighted_score": 0.24
+        },
+        {
+          "domain_code": "0613",
+          "raw_score": 0.18,
+          "weighted_score": 0.18
+        }
+      ]
+    },
+    {
+      "actor": "unesco_commons__sim_expert_2",
+      "rating_visibility": "public",
+      "publication_basis": "SYNTHETIC FICTIONAL PERSONA — demo seed only",
+      "ethics_score": 1.0,
+      "expertise": [
+        {
+          "domain_code": "0312",
+          "raw_score": 0.95,
+          "weighted_score": 0.95
+        },
+        {
+          "domain_code": "0542",
+          "raw_score": 0.82,
+          "weighted_score": 0.82
+        },
+        {
+          "domain_code": "0223",
+          "raw_score": 0.68,
+          "weighted_score": 0.68
+        },
+        {
+          "domain_code": "0314",
+          "raw_score": 0.54,
+          "weighted_score": 0.54
+        },
+        {
+          "domain_code": "0612",
+          "raw_score": 0.42,
+          "weighted_score": 0.42
+        },
+        {
+          "domain_code": "0321",
+          "raw_score": 0.32,
+          "weighted_score": 0.32
+        },
+        {
+          "domain_code": "0613",
+          "raw_score": 0.24,
+          "weighted_score": 0.24
+        },
+        {
+          "domain_code": "0421",
+          "raw_score": 0.18,
+          "weighted_score": 0.18
+        }
+      ]
+    },
+    {
+      "actor": "unesco_commons__sim_expert_3",
+      "rating_visibility": "public",
+      "publication_basis": "SYNTHETIC FICTIONAL PERSONA — demo seed only",
+      "ethics_score": 1.0,
+      "expertise": [
+        {
+          "domain_code": "0542",
+          "raw_score": 0.95,
+          "weighted_score": 0.95
+        },
+        {
+          "domain_code": "0223",
+          "raw_score": 0.82,
+          "weighted_score": 0.82
+        },
+        {
+          "domain_code": "0314",
+          "raw_score": 0.68,
+          "weighted_score": 0.68
+        },
+        {
+          "domain_code": "0612",
+          "raw_score": 0.54,
+          "weighted_score": 0.54
+        },
+        {
+          "domain_code": "0321",
+          "raw_score": 0.42,
+          "weighted_score": 0.42
+        },
+        {
+          "domain_code": "0613",
+          "raw_score": 0.32,
+          "weighted_score": 0.32
+        },
+        {
+          "domain_code": "0421",
+          "raw_score": 0.24,
+          "weighted_score": 0.24
+        },
+        {
+          "domain_code": "0922",
+          "raw_score": 0.18,
+          "weighted_score": 0.18
+        }
+      ]
+    }
+  ],
   "consultation_relevance": [],
-  "topic_relevance": [],
+  "topic_relevance": [
+    {
+      "topic": "cross_sector_priorities",
+      "domain_code": "0413",
+      "weight": 0.35,
+      "criteria": {
+        "basis": "simulation_fixture_domain_mapping",
+        "semantic": "context relevance only; not truth, endorsement or ranking"
+      }
+    },
+    {
+      "topic": "cross_sector_priorities",
+      "domain_code": "0312",
+      "weight": 0.25,
+      "criteria": {
+        "basis": "simulation_fixture_domain_mapping",
+        "semantic": "context relevance only; not truth, endorsement or ranking"
+      }
+    },
+    {
+      "topic": "cross_sector_priorities",
+      "domain_code": "0542",
+      "weight": 0.2,
+      "criteria": {
+        "basis": "simulation_fixture_domain_mapping",
+        "semantic": "context relevance only; not truth, endorsement or ranking"
+      }
+    },
+    {
+      "topic": "cross_sector_priorities",
+      "domain_code": "0223",
+      "weight": 0.2,
+      "criteria": {
+        "basis": "simulation_fixture_domain_mapping",
+        "semantic": "context relevance only; not truth, endorsement or ranking"
+      }
+    },
+    {
+      "topic": "evidence_governance",
+      "domain_code": "0542",
+      "weight": 0.3,
+      "criteria": {
+        "basis": "simulation_fixture_domain_mapping",
+        "semantic": "context relevance only; not truth, endorsement or ranking"
+      }
+    },
+    {
+      "topic": "evidence_governance",
+      "domain_code": "0223",
+      "weight": 0.25,
+      "criteria": {
+        "basis": "simulation_fixture_domain_mapping",
+        "semantic": "context relevance only; not truth, endorsement or ranking"
+      }
+    },
+    {
+      "topic": "evidence_governance",
+      "domain_code": "0321",
+      "weight": 0.25,
+      "criteria": {
+        "basis": "simulation_fixture_domain_mapping",
+        "semantic": "context relevance only; not truth, endorsement or ranking"
+      }
+    },
+    {
+      "topic": "evidence_governance",
+      "domain_code": "0413",
+      "weight": 0.2,
+      "criteria": {
+        "basis": "simulation_fixture_domain_mapping",
+        "semantic": "context relevance only; not truth, endorsement or ranking"
+      }
+    },
+    {
+      "topic": "inclusive_participation",
+      "domain_code": "0314",
+      "weight": 0.35,
+      "criteria": {
+        "basis": "simulation_fixture_domain_mapping",
+        "semantic": "context relevance only; not truth, endorsement or ranking"
+      }
+    },
+    {
+      "topic": "inclusive_participation",
+      "domain_code": "0312",
+      "weight": 0.25,
+      "criteria": {
+        "basis": "simulation_fixture_domain_mapping",
+        "semantic": "context relevance only; not truth, endorsement or ranking"
+      }
+    },
+    {
+      "topic": "inclusive_participation",
+      "domain_code": "0922",
+      "weight": 0.2,
+      "criteria": {
+        "basis": "simulation_fixture_domain_mapping",
+        "semantic": "context relevance only; not truth, endorsement or ranking"
+      }
+    },
+    {
+      "topic": "inclusive_participation",
+      "domain_code": "0413",
+      "weight": 0.2,
+      "criteria": {
+        "basis": "simulation_fixture_domain_mapping",
+        "semantic": "context relevance only; not truth, endorsement or ranking"
+      }
+    },
+    {
+      "topic": "digital_public_infrastructure",
+      "domain_code": "0612",
+      "weight": 0.3,
+      "criteria": {
+        "basis": "simulation_fixture_domain_mapping",
+        "semantic": "context relevance only; not truth, endorsement or ranking"
+      }
+    },
+    {
+      "topic": "digital_public_infrastructure",
+      "domain_code": "0613",
+      "weight": 0.25,
+      "criteria": {
+        "basis": "simulation_fixture_domain_mapping",
+        "semantic": "context relevance only; not truth, endorsement or ranking"
+      }
+    },
+    {
+      "topic": "digital_public_infrastructure",
+      "domain_code": "0421",
+      "weight": 0.25,
+      "criteria": {
+        "basis": "simulation_fixture_domain_mapping",
+        "semantic": "context relevance only; not truth, endorsement or ranking"
+      }
+    },
+    {
+      "topic": "digital_public_infrastructure",
+      "domain_code": "0413",
+      "weight": 0.2,
+      "criteria": {
+        "basis": "simulation_fixture_domain_mapping",
+        "semantic": "context relevance only; not truth, endorsement or ranking"
+      }
+    }
+  ],
   "reading_exclusions": []
 }

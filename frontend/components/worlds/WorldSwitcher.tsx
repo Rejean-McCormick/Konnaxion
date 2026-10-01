@@ -8,6 +8,19 @@ import styled from 'styled-components';
 import { useLanguage } from '@/context/LanguageContext';
 import { useWorld } from '@/context/WorldContext';
 
+function getWorldDisplayTitle(world: { title: string; universe_title: string }) {
+  const title = world.title.trim();
+  const universeTitle = world.universe_title.trim();
+
+  if (!universeTitle || !title.toLocaleLowerCase().startsWith(universeTitle.toLocaleLowerCase())) {
+    return title;
+  }
+
+  const remainder = title.slice(universeTitle.length);
+  const withoutRepeatedUniverse = remainder.replace(/^[\s:—–-]+/, '').trim();
+  return withoutRepeatedUniverse || title;
+}
+
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
@@ -85,21 +98,25 @@ export default function WorldSwitcher() {
           if (rightRank === undefined) return -1;
           return leftRank - rightRank;
         }
-        return left.title.localeCompare(right.title);
+        return getWorldDisplayTitle(left).localeCompare(getWorldDisplayTitle(right));
       });
   }, [recentWorldKeys, universeKey, worlds]);
 
   const worldOptions = useMemo(
     () =>
-      orderedWorlds.map((world) => ({
-        value: world.key,
-        label: world.title,
-        searchText: `${world.title} ${world.key}`.toLowerCase(),
-        disabled:
-          !world.current_release ||
-          world.current_release.status !== 'current' ||
-          (world.status !== 'active' && !world.can_manage),
-      })),
+      orderedWorlds.map((world) => {
+        const displayTitle = getWorldDisplayTitle(world);
+        return {
+          value: world.key,
+          label: displayTitle,
+          title: world.title,
+          searchText: `${displayTitle} ${world.title} ${world.key}`.toLowerCase(),
+          disabled:
+            !world.current_release ||
+            world.current_release.status !== 'current' ||
+            (world.status !== 'active' && !world.can_manage),
+        };
+      }),
     [orderedWorlds],
   );
 
@@ -153,6 +170,7 @@ export default function WorldSwitcher() {
         onChange={switchWorld}
         status={runtimeError ? 'error' : undefined}
         filterOption={filter}
+        popupMatchSelectWidth={false}
         options={worldOptions}
         notFoundContent={
           catalogError ? t('worlds.catalogUnavailable') : t('worlds.none')

@@ -12,6 +12,8 @@ import React, {
 
 import api from '@/api';
 import {
+  buildUniverseHostUrl,
+  getUniverseKeyFromBrowserHostname,
   getUniverseKeyFromPathname,
   getWorldKeyFromPathname,
   stripWorldPrefix,
@@ -83,6 +85,7 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
   const worldKey = getWorldKeyFromPathname(pathname);
   const appPath = stripWorldPrefix(pathname);
 
+  const [hostUniverseKey, setHostUniverseKey] = useState<string | null>(null);
   const [runtime, setRuntime] = useState<WorldRuntime | null>(null);
   const [universes, setUniverses] = useState<UniverseSummary[]>([]);
   const [worlds, setWorlds] = useState<WorldSummary[]>([]);
@@ -92,9 +95,11 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
   const [catalogError, setCatalogError] = useState(false);
   const [runtimeError, setRuntimeError] = useState(false);
 
-  const universeKey = routeUniverseKey ?? runtime?.universe.key ?? null;
+  const universeKey =
+    routeUniverseKey ?? hostUniverseKey ?? runtime?.universe.key ?? null;
 
   useEffect(() => {
+    setHostUniverseKey(getUniverseKeyFromBrowserHostname());
     setRecentWorldKeys(readRecentWorlds());
   }, []);
 
@@ -133,7 +138,11 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
       setRuntime(null);
       setRuntimeError(false);
       setLoadingRuntime(false);
-      delete document.documentElement.dataset.kxUniverse;
+      if (universeKey) {
+        document.documentElement.dataset.kxUniverse = universeKey;
+      } else {
+        delete document.documentElement.dataset.kxUniverse;
+      }
       delete document.documentElement.dataset.kxWorld;
       delete document.documentElement.dataset.kxWorldReleaseId;
       return;
@@ -142,9 +151,9 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false;
     setLoadingRuntime(true);
     setRuntimeError(false);
-    if (routeUniverseKey) {
+    if (universeKey) {
       setRecentWorldKeys((current) =>
-        rememberWorld(routeUniverseKey, worldKey, current),
+        rememberWorld(universeKey, worldKey, current),
       );
     }
 
@@ -164,8 +173,8 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
         if (cancelled) return;
         setRuntime(null);
         setRuntimeError(true);
-        if (routeUniverseKey) {
-          document.documentElement.dataset.kxUniverse = routeUniverseKey;
+        if (universeKey) {
+          document.documentElement.dataset.kxUniverse = universeKey;
         } else {
           delete document.documentElement.dataset.kxUniverse;
         }
@@ -179,7 +188,7 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [routeUniverseKey, worldKey]);
+  }, [universeKey, worldKey]);
 
   useEffect(() => {
     let reloading = false;
@@ -195,8 +204,13 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const href = useCallback(
-    (path: string) => withWorldPath(path, worldKey, universeKey),
-    [universeKey, worldKey],
+    (path: string) =>
+      withWorldPath(
+        path,
+        worldKey,
+        hostUniverseKey && hostUniverseKey === universeKey ? null : universeKey,
+      ),
+    [hostUniverseKey, universeKey, worldKey],
   );
 
   const navigate = useCallback((target: string) => {
@@ -217,16 +231,17 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
       setRecentWorldKeys((current) =>
         rememberWorld(targetWorld.universe_key, key, current),
       );
-      navigate(
-        switchWorldPath(
-          pathname,
-          key,
-          '/ethikos/insights',
-          targetWorld.universe_key,
-        ),
+      const targetPath = switchWorldPath(
+        pathname,
+        key,
+        '/ethikos/insights',
+        hostUniverseKey && targetWorld.universe_key === hostUniverseKey
+          ? null
+          : targetWorld.universe_key,
       );
+      navigate(targetPath);
     },
-    [navigate, pathname, universeKey, worldKey, worlds],
+    [hostUniverseKey, navigate, pathname, universeKey, worldKey, worlds],
   );
 
   const switchUniverse = useCallback(
@@ -247,13 +262,22 @@ export function WorldProvider({ children }: { children: React.ReactNode }) {
       setRecentWorldKeys((current) =>
         rememberWorld(key, targetWorld.key, current),
       );
+      const hostPath = switchWorldPath(
+        pathname,
+        targetWorld.key,
+        '/ethikos/insights',
+        null,
+      );
+      const hostTarget = buildUniverseHostUrl(key, hostPath);
       navigate(
-        switchWorldPath(
-          pathname,
-          targetWorld.key,
-          '/ethikos/insights',
-          key,
-        ),
+        hostTarget === hostPath
+          ? switchWorldPath(
+              pathname,
+              targetWorld.key,
+              '/ethikos/insights',
+              key,
+            )
+          : hostTarget,
       );
     },
     [navigate, pathname, universeKey, universes, worlds],

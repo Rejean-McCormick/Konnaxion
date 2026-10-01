@@ -7,7 +7,12 @@ import {
   LANGUAGE_COOKIE_KEY,
   LANGUAGE_COOKIE_MAX_AGE,
 } from './i18n/config';
-import { isGlobalApiPath, parseWorldPath, withWorldPath } from './lib/worlds';
+import {
+  getUniverseKeyFromHostname,
+  isGlobalApiPath,
+  parseWorldPath,
+  withWorldPath,
+} from './lib/worlds';
 
 const STATIC_FILE_RE = /\.[a-z0-9]{2,10}$/i;
 const GLOBAL_UI_PREFIXES = [
@@ -43,16 +48,25 @@ function withDetectedLanguageCookie(
   return response;
 }
 
-function parseSourcePath(pathname: string): SourceContext {
+function parseSourcePath(
+  pathname: string,
+  hostname?: string | null,
+): SourceContext {
   const parsed = parseWorldPath(pathname);
-  return parsed ? { universeKey: parsed.universeKey, worldKey: parsed.key } : null;
+  if (!parsed) return null;
+  return {
+    universeKey:
+      parsed.universeKey ?? getUniverseKeyFromHostname(hostname ?? null),
+    worldKey: parsed.key,
+  };
 }
 
 function sourceContext(request: NextRequest): SourceContext {
   const referer = request.headers.get('referer');
   if (referer) {
     try {
-      const context = parseSourcePath(new URL(referer).pathname);
+      const sourceUrl = new URL(referer);
+      const context = parseSourcePath(sourceUrl.pathname, sourceUrl.hostname);
       if (context) return context;
     } catch {
       // Ignore malformed/untrusted Referer and try Next's navigation header.
@@ -62,7 +76,8 @@ function sourceContext(request: NextRequest): SourceContext {
   const nextUrl = request.headers.get('next-url');
   if (nextUrl) {
     try {
-      const context = parseSourcePath(new URL(nextUrl, request.nextUrl.origin).pathname);
+      const sourceUrl = new URL(nextUrl, request.nextUrl.origin);
+      const context = parseSourcePath(sourceUrl.pathname, sourceUrl.hostname);
       if (context) return context;
     } catch {
       // No usable navigation context.
@@ -86,6 +101,17 @@ function isUiCarryoverCandidate(pathname: string): boolean {
  */
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  const hostUniverseKey = getUniverseKeyFromHostname(request.nextUrl.hostname);
+  const pathContext = parseWorldPath(pathname);
+
+  if (
+    hostUniverseKey &&
+    pathContext?.universeKey &&
+    hostUniverseKey !== pathContext.universeKey
+  ) {
+    return new NextResponse('UNIVERSE_HOST_PATH_CONFLICT', { status: 400 });
+  }
+
   const context = sourceContext(request);
 
   if (pathname.startsWith('/api/')) {

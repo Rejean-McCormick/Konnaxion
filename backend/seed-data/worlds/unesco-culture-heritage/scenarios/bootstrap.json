@@ -6,7 +6,7 @@
   "metadata": {
     "universe": "unesco",
     "world_key": "unesco-culture-heritage",
-    "seed_version": "1.4.0",
+    "seed_version": "1.5.0",
     "simulation_mode": "dynamic_deliberation",
     "position_seed_policy": "none",
     "vote_seed_policy": "none",
@@ -499,7 +499,56 @@
         "representation_type": "institutional",
         "simulation_eligible": true,
         "ethikos_write": true
+      },
+      "unesco_culture_heritage__sim_expert_1": {
+        "persona_type": "simulated_person",
+        "entity_type": "synthetic_fictional_persona",
+        "role": "simulation_subject_matter_expert",
+        "account_type": "human",
+        "is_klone": true,
+        "simulation_eligible": true,
+        "ethikos_write": true,
+        "representation_type": "synthetic_fictional_persona",
+        "source_basis": [
+          "simulation_fixture"
+        ],
+        "speaking_policy": "explicit_simulation_only"
+      },
+      "unesco_culture_heritage__sim_expert_2": {
+        "persona_type": "simulated_person",
+        "entity_type": "synthetic_fictional_persona",
+        "role": "simulation_subject_matter_expert",
+        "account_type": "human",
+        "is_klone": true,
+        "simulation_eligible": true,
+        "ethikos_write": true,
+        "representation_type": "synthetic_fictional_persona",
+        "source_basis": [
+          "simulation_fixture"
+        ],
+        "speaking_policy": "explicit_simulation_only"
+      },
+      "unesco_culture_heritage__sim_expert_3": {
+        "persona_type": "simulated_person",
+        "entity_type": "synthetic_fictional_persona",
+        "role": "simulation_subject_matter_expert",
+        "account_type": "human",
+        "is_klone": true,
+        "simulation_eligible": true,
+        "ethikos_write": true,
+        "representation_type": "synthetic_fictional_persona",
+        "source_basis": [
+          "simulation_fixture"
+        ],
+        "speaking_policy": "explicit_simulation_only"
       }
+    },
+    "mega_update": {
+      "version": "1.0.0",
+      "date": "2026-09-30",
+      "purpose": "simulation_deliberation_plus_contextual_ekoh_readings",
+      "real_person_ekoh_scores_generated": false,
+      "baseline_always_visible": true
     }
   },
   "actors": [
@@ -616,6 +665,24 @@
       "username": "demo_wikimedia_foundation",
       "display_name": "Wikimedia Foundation",
       "is_ethikos_elite": true
+    },
+    {
+      "key": "unesco_culture_heritage__sim_expert_1",
+      "username": "demo_unesco_culture_heritage_sim_expert_1",
+      "display_name": "[SIMULATION] Systems expert — UNESCO — Culture & Heritage",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "unesco_culture_heritage__sim_expert_2",
+      "username": "demo_unesco_culture_heritage_sim_expert_2",
+      "display_name": "[SIMULATION] Governance expert — UNESCO — Culture & Heritage",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "unesco_culture_heritage__sim_expert_3",
+      "username": "demo_unesco_culture_heritage_sim_expert_3",
+      "display_name": "[SIMULATION] Evidence & community expert — UNESCO — Culture & Heritage",
+      "is_ethikos_elite": true
     }
   ],
   "categories": [
@@ -666,13 +733,333 @@
       "category": "digital-heritage"
     }
   ],
-  "stances": [],
-  "arguments": [],
-  "argument_sources": [],
+  "stances": [
+    {
+      "topic": "heritage_reconstruction",
+      "actor": "unesco_culture_heritage__sim_expert_1",
+      "value": 2
+    },
+    {
+      "topic": "heritage_reconstruction",
+      "actor": "unesco_culture_heritage__sim_expert_2",
+      "value": -1
+    },
+    {
+      "topic": "heritage_reconstruction",
+      "actor": "unesco_culture_heritage__sim_expert_3",
+      "value": 0
+    },
+    {
+      "topic": "living_heritage_safeguarding",
+      "actor": "unesco_culture_heritage__sim_expert_1",
+      "value": -2
+    },
+    {
+      "topic": "living_heritage_safeguarding",
+      "actor": "unesco_culture_heritage__sim_expert_2",
+      "value": 1
+    },
+    {
+      "topic": "living_heritage_safeguarding",
+      "actor": "unesco_culture_heritage__sim_expert_3",
+      "value": 0
+    },
+    {
+      "topic": "heritage_tourism_capacity",
+      "actor": "unesco_culture_heritage__sim_expert_1",
+      "value": 2
+    },
+    {
+      "topic": "heritage_tourism_capacity",
+      "actor": "unesco_culture_heritage__sim_expert_3",
+      "value": -1
+    },
+    {
+      "topic": "heritage_tourism_capacity",
+      "actor": "unesco_culture_heritage__sim_expert_2",
+      "value": 0
+    },
+    {
+      "topic": "digital_cultural_collections",
+      "actor": "unesco_culture_heritage__sim_expert_1",
+      "value": -2
+    },
+    {
+      "topic": "digital_cultural_collections",
+      "actor": "unesco_culture_heritage__sim_expert_2",
+      "value": 1
+    },
+    {
+      "topic": "digital_cultural_collections",
+      "actor": "unesco_culture_heritage__sim_expert_3",
+      "value": 0
+    }
+  ],
+  "arguments": [
+    {
+      "key": "mega_heritage_reconstruction_1",
+      "topic": "heritage_reconstruction",
+      "actor": "unesco_culture_heritage__sim_expert_1",
+      "side": "pro",
+      "content": "[SIMULATION] This position favours the option stated in the question so its expected benefits can be tested with monitoring criteria, stop conditions and review."
+    },
+    {
+      "key": "mega_heritage_reconstruction_2",
+      "topic": "heritage_reconstruction",
+      "actor": "unesco_culture_heritage__sim_expert_2",
+      "side": "con",
+      "content": "[SIMULATION] This position does not favour the stated option until costs, risks, alternatives and reversibility conditions have been compared."
+    },
+    {
+      "key": "mega_living_heritage_safeguarding_1",
+      "topic": "living_heritage_safeguarding",
+      "actor": "unesco_culture_heritage__sim_expert_1",
+      "side": "con",
+      "content": "[SIMULATION] This position does not favour the stated option until costs, risks, alternatives and reversibility conditions have been compared."
+    },
+    {
+      "key": "mega_living_heritage_safeguarding_2",
+      "topic": "living_heritage_safeguarding",
+      "actor": "unesco_culture_heritage__sim_expert_2",
+      "side": "pro",
+      "content": "[SIMULATION] This position favours the option stated in the question so its expected benefits can be tested with monitoring criteria, stop conditions and review."
+    },
+    {
+      "key": "mega_heritage_tourism_capacity_1",
+      "topic": "heritage_tourism_capacity",
+      "actor": "unesco_culture_heritage__sim_expert_1",
+      "side": "pro",
+      "content": "[SIMULATION] This position favours the option stated in the question so its expected benefits can be tested with monitoring criteria, stop conditions and review."
+    },
+    {
+      "key": "mega_heritage_tourism_capacity_2",
+      "topic": "heritage_tourism_capacity",
+      "actor": "unesco_culture_heritage__sim_expert_3",
+      "side": "con",
+      "content": "[SIMULATION] This position does not favour the stated option until costs, risks, alternatives and reversibility conditions have been compared."
+    },
+    {
+      "key": "mega_digital_cultural_collections_1",
+      "topic": "digital_cultural_collections",
+      "actor": "unesco_culture_heritage__sim_expert_1",
+      "side": "con",
+      "content": "[SIMULATION] This position does not favour the stated option until costs, risks, alternatives and reversibility conditions have been compared."
+    },
+    {
+      "key": "mega_digital_cultural_collections_2",
+      "topic": "digital_cultural_collections",
+      "actor": "unesco_culture_heritage__sim_expert_2",
+      "side": "pro",
+      "content": "[SIMULATION] This position favours the option stated in the question so its expected benefits can be tested with monitoring criteria, stop conditions and review."
+    }
+  ],
+  "argument_sources": [
+    {
+      "key": "mega_heritage_reconstruction_1_source",
+      "argument": "mega_heritage_reconstruction_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "SIMULATION FIXTURE — generated only to exercise deliberation and EkoH Smart Vote. It is not a factual claim, endorsement or real-person position."
+    },
+    {
+      "key": "mega_heritage_reconstruction_2_source",
+      "argument": "mega_heritage_reconstruction_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "SIMULATION FIXTURE — generated only to exercise deliberation and EkoH Smart Vote. It is not a factual claim, endorsement or real-person position."
+    },
+    {
+      "key": "mega_living_heritage_safeguarding_1_source",
+      "argument": "mega_living_heritage_safeguarding_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "SIMULATION FIXTURE — generated only to exercise deliberation and EkoH Smart Vote. It is not a factual claim, endorsement or real-person position."
+    },
+    {
+      "key": "mega_living_heritage_safeguarding_2_source",
+      "argument": "mega_living_heritage_safeguarding_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "SIMULATION FIXTURE — generated only to exercise deliberation and EkoH Smart Vote. It is not a factual claim, endorsement or real-person position."
+    },
+    {
+      "key": "mega_heritage_tourism_capacity_1_source",
+      "argument": "mega_heritage_tourism_capacity_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "SIMULATION FIXTURE — generated only to exercise deliberation and EkoH Smart Vote. It is not a factual claim, endorsement or real-person position."
+    },
+    {
+      "key": "mega_heritage_tourism_capacity_2_source",
+      "argument": "mega_heritage_tourism_capacity_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "SIMULATION FIXTURE — generated only to exercise deliberation and EkoH Smart Vote. It is not a factual claim, endorsement or real-person position."
+    },
+    {
+      "key": "mega_digital_cultural_collections_1_source",
+      "argument": "mega_digital_cultural_collections_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "SIMULATION FIXTURE — generated only to exercise deliberation and EkoH Smart Vote. It is not a factual claim, endorsement or real-person position."
+    },
+    {
+      "key": "mega_digital_cultural_collections_2_source",
+      "argument": "mega_digital_cultural_collections_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "SIMULATION FIXTURE — generated only to exercise deliberation and EkoH Smart Vote. It is not a factual claim, endorsement or real-person position."
+    }
+  ],
   "consultations": [],
   "consultation_votes": [],
   "impact_items": [],
-  "ekoh_profiles": [],
+  "ekoh_profiles": [
+    {
+      "actor": "unesco_culture_heritage__sim_expert_1",
+      "rating_visibility": "public",
+      "publication_basis": "SYNTHETIC FICTIONAL PERSONA — demo seed only",
+      "ethics_score": 1.0,
+      "expertise": [
+        {
+          "domain_code": "0314",
+          "raw_score": 0.95,
+          "weighted_score": 0.95
+        },
+        {
+          "domain_code": "0223",
+          "raw_score": 0.82,
+          "weighted_score": 0.82
+        },
+        {
+          "domain_code": "0421",
+          "raw_score": 0.68,
+          "weighted_score": 0.68
+        },
+        {
+          "domain_code": "0731",
+          "raw_score": 0.54,
+          "weighted_score": 0.54
+        },
+        {
+          "domain_code": "0413",
+          "raw_score": 0.42,
+          "weighted_score": 0.42
+        },
+        {
+          "domain_code": "0311",
+          "raw_score": 0.32,
+          "weighted_score": 0.32
+        },
+        {
+          "domain_code": "0612",
+          "raw_score": 0.24,
+          "weighted_score": 0.24
+        },
+        {
+          "domain_code": "0613",
+          "raw_score": 0.18,
+          "weighted_score": 0.18
+        }
+      ]
+    },
+    {
+      "actor": "unesco_culture_heritage__sim_expert_2",
+      "rating_visibility": "public",
+      "publication_basis": "SYNTHETIC FICTIONAL PERSONA — demo seed only",
+      "ethics_score": 1.0,
+      "expertise": [
+        {
+          "domain_code": "0223",
+          "raw_score": 0.95,
+          "weighted_score": 0.95
+        },
+        {
+          "domain_code": "0421",
+          "raw_score": 0.82,
+          "weighted_score": 0.82
+        },
+        {
+          "domain_code": "0731",
+          "raw_score": 0.68,
+          "weighted_score": 0.68
+        },
+        {
+          "domain_code": "0413",
+          "raw_score": 0.54,
+          "weighted_score": 0.54
+        },
+        {
+          "domain_code": "0311",
+          "raw_score": 0.42,
+          "weighted_score": 0.42
+        },
+        {
+          "domain_code": "0612",
+          "raw_score": 0.32,
+          "weighted_score": 0.32
+        },
+        {
+          "domain_code": "0613",
+          "raw_score": 0.24,
+          "weighted_score": 0.24
+        },
+        {
+          "domain_code": "0312",
+          "raw_score": 0.18,
+          "weighted_score": 0.18
+        }
+      ]
+    },
+    {
+      "actor": "unesco_culture_heritage__sim_expert_3",
+      "rating_visibility": "public",
+      "publication_basis": "SYNTHETIC FICTIONAL PERSONA — demo seed only",
+      "ethics_score": 1.0,
+      "expertise": [
+        {
+          "domain_code": "0421",
+          "raw_score": 0.95,
+          "weighted_score": 0.95
+        },
+        {
+          "domain_code": "0731",
+          "raw_score": 0.82,
+          "weighted_score": 0.82
+        },
+        {
+          "domain_code": "0413",
+          "raw_score": 0.68,
+          "weighted_score": 0.68
+        },
+        {
+          "domain_code": "0311",
+          "raw_score": 0.54,
+          "weighted_score": 0.54
+        },
+        {
+          "domain_code": "0612",
+          "raw_score": 0.42,
+          "weighted_score": 0.42
+        },
+        {
+          "domain_code": "0613",
+          "raw_score": 0.32,
+          "weighted_score": 0.32
+        },
+        {
+          "domain_code": "0312",
+          "raw_score": 0.24,
+          "weighted_score": 0.24
+        },
+        {
+          "domain_code": "0521",
+          "raw_score": 0.18,
+          "weighted_score": 0.18
+        }
+      ]
+    }
+  ],
   "consultation_relevance": [],
   "topic_relevance": [
     {

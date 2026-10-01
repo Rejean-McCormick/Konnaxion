@@ -1,6 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/context/LanguageContext';
+import { useWorld } from '@/context/WorldContext'
 import 'dayjs/locale/en'
 import {
   BranchesOutlined,
@@ -34,8 +35,17 @@ dayjs.extend(relativeTime)
 
 const { Text } = Typography
 
+type HttpError = Error & {
+  response?: { status?: number }
+}
+
+function getHttpStatus(error?: Error): number | undefined {
+  return (error as HttpError | undefined)?.response?.status
+}
+
 export default function TopicThreadPage(): JSX.Element {
   const { t: i18nT } = useLanguage();
+  const { href } = useWorld()
   const controller = useTopicThreadController()
   const [participantContext, setParticipantContext] =
     useState<ParticipantContextTarget | null>(null)
@@ -57,10 +67,26 @@ export default function TopicThreadPage(): JSX.Element {
   }
 
   if (!controller.loading && !controller.pageData) {
+    const topicNotFoundInWorld = getHttpStatus(controller.pageError) === 404
+
     return (
       <EthikosPageShell title={i18nT("ui.ethikos.deliberate.topic.deliberateTopic")} sectionLabel={i18nT("ui.ethikos.deliberate.topic.deliberate")}>
         <TopicErrorState
-          description={controller.pageError?.message ?? i18nT("ui.ethikos.deliberate.topic.topicNotFound")}
+          description={
+            topicNotFoundInWorld
+              ? i18nT("ui.ethikos.deliberate.topic.topicUnavailableInActiveWorld")
+              : controller.pageError?.message ?? i18nT("ui.ethikos.deliberate.topic.topicNotFound")
+          }
+          actionHref={
+            topicNotFoundInWorld
+              ? href('/ethikos/deliberate/elite?sidebar=ethikos')
+              : undefined
+          }
+          actionLabel={
+            topicNotFoundInWorld
+              ? i18nT("ui.ethikos.deliberate.elite.expertDeliberation")
+              : undefined
+          }
         />
       </EthikosPageShell>
     )

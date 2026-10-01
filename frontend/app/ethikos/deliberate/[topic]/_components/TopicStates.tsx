@@ -2,7 +2,8 @@
 
 import { useLanguage } from '@/context/LanguageContext';
 import { PageContainer } from '@ant-design/pro-components'
-import { Card, Empty, Space, Spin, Typography } from 'antd'
+import { Button, Card, Empty, Space, Spin, Typography } from 'antd'
+import Link from 'next/link'
 
 const { Text } = Typography
 
@@ -22,12 +23,22 @@ export function TopicLoadingState(): JSX.Element {
 
 export function TopicErrorState({
   description,
+  actionHref,
+  actionLabel,
 }: {
   description: string
+  actionHref?: string
+  actionLabel?: string
 }): JSX.Element {
   return (
     <PageContainer ghost>
-      <Empty description={description} />
+      <Empty description={description}>
+        {actionHref && actionLabel ? (
+          <Link href={actionHref} prefetch={false}>
+            <Button type="primary">{actionLabel}</Button>
+          </Link>
+        ) : null}
+      </Empty>
     </PageContainer>
   )
 }

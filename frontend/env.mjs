@@ -30,10 +30,16 @@ export const env = createEnv({
     // Exposed to the browser.
     // Must not default to localhost in production.
     NEXT_PUBLIC_API_BASE: apiBaseSchema,
+    NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN: z
+      .string()
+      .optional()
+      .default("konnaxion.com"),
   },
 
   runtimeEnv: {
     ANALYZE: process.env.ANALYZE,
     NEXT_PUBLIC_API_BASE: process.env.NEXT_PUBLIC_API_BASE,
+    NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN:
+      process.env.NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN,
   },
 });

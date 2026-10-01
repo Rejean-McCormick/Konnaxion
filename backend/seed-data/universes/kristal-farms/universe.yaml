@@ -2,9 +2,9 @@ universe_contract: kx-universe-pack/v1
 universe_key: kristal-farms
 title: Kristal Farms
 description: Universe dynamique de projets de simulation et de délibération sur le portefeuille international Kristal Farms.
-pack_version: 0.4.0
+pack_version: 0.5.0
 visibility: public
-default_world: null
+default_world: kf-fr-ovhcloud
 requires:
   world_contract: kx-world-pack/v1
   host_contracts:
@@ -12,10 +12,9 @@ requires:
 worlds:
 - world_key: kf-fr-ovhcloud
   seed_pack_key: kf-fr-ovhcloud
-  seed_version: 0.4.0
+  seed_version: 0.5.0
   title: Kristal Farms — Étude internationale 01 — OVHcloud
-  description: Projet de simulation et de délibération Kristal Farms, slot 01, étudiant OVHcloud dans l’interface France–Québec/Canada;
-    aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
+  description: Projet de simulation et de délibération Kristal Farms, slot 01, étudiant OVHcloud dans l’interface France–Québec/Canada; aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
   visibility: public
   metadata:
     portfolio_slot: 1
@@ -23,10 +22,9 @@ worlds:
     status: research_target
 - world_key: kf-nl-nebius
   seed_pack_key: kf-nl-nebius
-  seed_version: 0.4.0
+  seed_version: 0.5.0
   title: Kristal Farms — Étude internationale 02 — Nebius
-  description: Projet de simulation et de délibération Kristal Farms, slot 02, étudiant Nebius dans l’interface Pays-Bas–Québec/Canada;
-    aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
+  description: Projet de simulation et de délibération Kristal Farms, slot 02, étudiant Nebius dans l’interface Pays-Bas–Québec/Canada; aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
   visibility: public
   metadata:
     portfolio_slot: 2
@@ -34,10 +32,9 @@ worlds:
     status: research_target
 - world_key: kf-uk-nscale
   seed_pack_key: kf-uk-nscale
-  seed_version: 0.4.0
+  seed_version: 0.5.0
   title: Kristal Farms — Étude internationale 03 — Nscale
-  description: Projet de simulation et de délibération Kristal Farms, slot 03, étudiant Nscale dans l’interface Royaume-Uni–Québec/Canada;
-    aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
+  description: Projet de simulation et de délibération Kristal Farms, slot 03, étudiant Nscale dans l’interface Royaume-Uni–Québec/Canada; aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
   visibility: public
   metadata:
     portfolio_slot: 3
@@ -45,10 +42,9 @@ worlds:
     status: research_target
 - world_key: kf-kr-sk-telecom
   seed_pack_key: kf-kr-sk-telecom
-  seed_version: 0.4.0
+  seed_version: 0.5.0
   title: Kristal Farms — Étude internationale 04 — SK Telecom
-  description: Projet de simulation et de délibération Kristal Farms, slot 04, étudiant SK Telecom dans l’interface Corée
-    du Sud–Québec/Canada; aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
+  description: Projet de simulation et de délibération Kristal Farms, slot 04, étudiant SK Telecom dans l’interface Corée du Sud–Québec/Canada; aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
   visibility: public
   metadata:
     portfolio_slot: 4
@@ -56,10 +52,9 @@ worlds:
     status: research_target
 - world_key: kf-kr-naver-cloud
   seed_pack_key: kf-kr-naver-cloud
-  seed_version: 0.4.0
+  seed_version: 0.5.0
   title: Kristal Farms — Étude internationale 05 — NAVER Cloud
-  description: Projet de simulation et de délibération Kristal Farms, slot 05, étudiant NAVER Cloud dans l’interface Corée
-    du Sud–Québec/Canada; aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
+  description: Projet de simulation et de délibération Kristal Farms, slot 05, étudiant NAVER Cloud dans l’interface Corée du Sud–Québec/Canada; aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
   visibility: public
   metadata:
     portfolio_slot: 5
@@ -67,10 +62,9 @@ worlds:
     status: research_target
 - world_key: kf-jp-sakura-internet
   seed_pack_key: kf-jp-sakura-internet
-  seed_version: 0.4.0
+  seed_version: 0.5.0
   title: Kristal Farms — Étude internationale 06 — Sakura Internet
-  description: Projet de simulation et de délibération Kristal Farms, slot 06, étudiant Sakura Internet dans l’interface Japon–Québec/Canada;
-    aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
+  description: Projet de simulation et de délibération Kristal Farms, slot 06, étudiant Sakura Internet dans l’interface Japon–Québec/Canada; aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
   visibility: public
   metadata:
     portfolio_slot: 6
@@ -78,10 +72,9 @@ worlds:
     status: research_target
 - world_key: kf-jp-kddi
   seed_pack_key: kf-jp-kddi
-  seed_version: 0.4.0
+  seed_version: 0.5.0
   title: Kristal Farms — Étude internationale 07 — KDDI
-  description: Projet de simulation et de délibération Kristal Farms, slot 07, étudiant KDDI dans l’interface Japon–Québec/Canada;
-    aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
+  description: Projet de simulation et de délibération Kristal Farms, slot 07, étudiant KDDI dans l’interface Japon–Québec/Canada; aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
   visibility: public
   metadata:
     portfolio_slot: 7
@@ -89,10 +82,9 @@ worlds:
     status: research_target
 - world_key: kf-de-t-systems
   seed_pack_key: kf-de-t-systems
-  seed_version: 0.4.0
+  seed_version: 0.5.0
   title: Kristal Farms — Étude internationale 08 — Deutsche Telekom / T-Systems
-  description: Projet de simulation et de délibération Kristal Farms, slot 08, étudiant Deutsche Telekom / T-Systems dans
-    l’interface Allemagne–Québec/Canada; aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
+  description: Projet de simulation et de délibération Kristal Farms, slot 08, étudiant Deutsche Telekom / T-Systems dans l’interface Allemagne–Québec/Canada; aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
   visibility: public
   metadata:
     portfolio_slot: 8
@@ -100,10 +92,9 @@ worlds:
     status: research_target
 - world_key: kf-fr-scaleway
   seed_pack_key: kf-fr-scaleway
-  seed_version: 0.4.0
+  seed_version: 0.5.0
   title: Kristal Farms — Étude internationale 09 — Scaleway / iliad
-  description: Projet de simulation et de délibération Kristal Farms, slot 09, étudiant Scaleway / iliad dans l’interface
-    France–Québec/Canada; aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
+  description: Projet de simulation et de délibération Kristal Farms, slot 09, étudiant Scaleway / iliad dans l’interface France–Québec/Canada; aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
   visibility: public
   metadata:
     portfolio_slot: 9
@@ -111,10 +102,9 @@ worlds:
     status: research_target
 - world_key: kf-ch-infomaniak
   seed_pack_key: kf-ch-infomaniak
-  seed_version: 0.4.0
+  seed_version: 0.5.0
   title: Kristal Farms — Étude internationale 10 — Infomaniak
-  description: Projet de simulation et de délibération Kristal Farms, slot 10, étudiant Infomaniak dans l’interface Suisse–Québec/Canada;
-    aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
+  description: Projet de simulation et de délibération Kristal Farms, slot 10, étudiant Infomaniak dans l’interface Suisse–Québec/Canada; aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
   visibility: public
   metadata:
     portfolio_slot: 10
@@ -122,10 +112,9 @@ worlds:
     status: research_target
 - world_key: kf-ch-exoscale
   seed_pack_key: kf-ch-exoscale
-  seed_version: 0.4.0
+  seed_version: 0.5.0
   title: Kristal Farms — Étude internationale 11 — Exoscale
-  description: Projet de simulation et de délibération Kristal Farms, slot 11, étudiant Exoscale dans l’interface Suisse–Québec/Canada;
-    aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
+  description: Projet de simulation et de délibération Kristal Farms, slot 11, étudiant Exoscale dans l’interface Suisse–Québec/Canada; aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.
   visibility: public
   metadata:
     portfolio_slot: 11
@@ -143,6 +132,9 @@ metadata:
     keenkonnect: post-decision execution handoff
     konnected: knowledge/community handoff
     kreative: excluded from Kristal Farms flow
-  seed_version: 0.4.0
+  seed_version: 0.5.0
   identity_model: project-centric; target organization is an actor/research target
   persona_model: office/institution simulated; real incumbents source-only; release-local auth bridges
+  mega_update_version: 1.0.0
+  mega_update_date: '2026-09-30'
+  demo_smart_vote_enabled: true

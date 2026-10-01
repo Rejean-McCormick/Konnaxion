@@ -84,6 +84,34 @@ and discard stale responses whose `X-Konnaxion-Universe`, `X-Konnaxion-World` or
 Changing Universe/World is navigation only. Konnaxion host UI MUST NOT trigger seed import,
 build, migration, reset, release promotion or schema provisioning as a side effect of switching.
 
+### Universe subdomain adapter
+
+Production may expose an Universe through an explicit hostname while retaining
+the canonical path/API contracts:
+
+```text
+unesco.konnaxion.com/w/unesco-ocean/
+levis.konnaxion.com/w/levis-finances/
+```
+
+The adapter is generic:
+
+```text
+<subdomain>.konnaxion.com -> Universe.key == <subdomain>
+```
+
+The browser shell derives the Universe from the configured base domain, while
+World identity remains in the path. API requests continue to use the canonical
+`/api/u/{universe_key}/w/{world_key}/...` contract internally.
+
+If a hostname-selected Universe and an explicit `/u/{universe_key}/...` path
+disagree, the request fails closed. No Universe-specific code, database,
+container, or reverse-proxy instance is created.
+
+For the current production setup, DNS records are explicit rather than
+wildcard: each public Universe hostname aliases `konnaxion.com`, and Traefik
+receives the same explicit host list for routing and ordinary ACME certificates.
+
 ## Change rule
 
 If a requested change alters any of these concepts, implement/specify it first in `Konnaxion_Worlds`:

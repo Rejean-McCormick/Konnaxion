@@ -37,7 +37,8 @@ uv.lock
 ##############################################################################
 # 3) Versioned data / inventories not needed for source review
 ##############################################################################
-seed-data/
+# Keep backend/seed-data/ in SmartSnap: Universe/World packs are executable
+# runtime source and are required to diagnose composition/content behavior.
 EndPoints-Graphs/
 
 backend/routes.json

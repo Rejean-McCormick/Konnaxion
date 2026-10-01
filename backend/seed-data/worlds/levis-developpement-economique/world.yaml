@@ -2,7 +2,7 @@ world_contract: kx-world-pack/v1
 world_key: levis-developpement-economique
 title: Ville de Lévis — Développement économique et promotion
 description: Développement économique, entreprises, tourisme et promotion du territoire.
-pack_version: 0.4.0
+pack_version: 0.5.0
 requires:
   ethikos_scenario_schema: ethikos-demo-scenario/v3
   fixtures:
@@ -23,6 +23,10 @@ metadata:
   registry_fingerprint: 68b77f1c607a4195ddc4da46b0429f2fe8308e2c259af670ecd6e7b2b19d75a9
   knowledge_authority: kristal_v5_runtime_pack
   generated_statements: false
-  seed_version: 0.4.0
+  seed_version: 0.5.0
   persona_projection_mode: identity_binding_only
   kristal_authoring_bundle_version: 0.3.0
+  mega_update_version: 1.0.0
+  mega_update_date: '2026-09-30'
+  demo_smart_vote_enabled: true
+  demo_deliberation_overlay: true

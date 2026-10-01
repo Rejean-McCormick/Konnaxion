@@ -1271,7 +1271,7 @@
     "noConsultationsMatchYourSearchOrFilters": "Aucune consultation ne correspond à votre recherche ou à vos filtres.",
     "noDecisionsMatchTheCurrentFilters": "Aucune décision ne correspond aux filtres actuels",
     "noDeclaredReading": "Aucune lecture déclarée",
-    "noDeliberationTopicsAvailableYet": "Aucun sujet de délibération disponible pour l’instant",
+    "noDeliberationTopicsAvailableYet": "Aucun sujet de délibération n’est disponible dans ce World pour le moment",
     "noDomainRelevanceVectorIsAttachedToThis": "Aucun vecteur de pertinence de domaine n’est associé à cette question.",
     "noEarnedBadgesMatchTheCurrentFilters": "Aucun badge obtenu ne correspond aux filtres actuels.",
     "noEkohProfileAvailable": "Aucun profil EkoH disponible",
@@ -5122,7 +5122,7 @@
           "needsFirstStance": "Needs Premier stance",
           "newTopic": "Nouveau sujet",
           "newTopic_8358da": "Nouveau Sujet",
-          "noDeliberationTopicsAvailableYet": "Aucun sujet de délibération disponible pour le moment",
+          "noDeliberationTopicsAvailableYet": "Aucun sujet de délibération n’est disponible dans ce World pour le moment",
           "noPreviewDataAvailable": "Aucun aperçu données disponible.",
           "noStatementsYetOpenTheThreadTo": "Aucune déclaration pour le moment. Ouvrez le fil pour lancer la discussion.",
           "open": "Ouvrir",
@@ -5399,7 +5399,8 @@
           "text": "{category} · {value1}",
           "topic": "Sujet",
           "topicDataUnavailable": "Sujet données unavailable",
-          "topicNotFound": "Sujet Introuvable",
+          "topicNotFound": "Sujet introuvable",
+          "topicUnavailableInActiveWorld": "Ce sujet n’est pas disponible dans le World actif.",
           "topicstates": {
             "loadingDeliberationThread": "Chargement deliberation thread…"
           },

@@ -1,0 +1,1612 @@
+**********************
+Début de la transcription PowerShell
+Heure de début : 20260930075511
+Nom d’utilisateur : SAILINGWIND\rejea
+Utilisateur RunAs : SAILINGWIND\rejea
+Nom de la configuration : 
+Ordinateur : SAILINGWIND (Microsoft Windows NT 10.0.26200.0)
+Application hôte : C:\Program Files\PowerShell\7\pwsh.dll
+ID de processus : 9096
+PSVersion: 7.6.6
+PSEdition: Core
+GitCommitId: 7.6.6
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+La transcription a démarré, le fichier de sortie est C:\mycode\Konnaxion\Konnaxion\KONNAXION_LOCAL_DIAG_20260930-075510.txt
+PS C:\mycode\Konnaxion\Konnaxion> function Section([string]$Title) {
+    Write-Host ""
+    Write-Host ("=" * 100)
+    Write-Host "=== $Title"
+    Write-Host ("=" * 100)
+}
+PS C:\mycode\Konnaxion\Konnaxion> function Show-RelevantEnvFile([string]$Path) {
+    if (-not (Test-Path $Path)) {
+        Write-Host "$Path : <ABSENT>"
+        return
+    }
+
+    Write-Host ""
+    Write-Host "--- $Path ---"
+
+    Get-Content $Path |
+        Where-Object {
+            $_ -match '^\s*(NEXT_PUBLIC_API_BASE|NEXT_PUBLIC_BACKEND_BASE|API_PROXY_BASE|INTERNAL_API_BASE|NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN|KONNAXION_UNIVERSE_HOST_ROUTING_ENABLED|KONNAXION_UNIVERSE_BASE_DOMAINS|KONNAXION_WORLDS_DATA_PLANE_ENABLED|FRONTEND_BASE_URL|DJANGO_ALLOWED_HOSTS|DJANGO_CSRF_TRUSTED_ORIGINS|CORS_ALLOWED_ORIGINS)\s*='
+        } |
+        ForEach-Object { Write-Host $_ }
+}
+PS C:\mycode\Konnaxion\Konnaxion> function Curl-Probe([string]$Url) {
+    $Headers = Join-Path $env:TEMP ("kx-headers-" + [guid]::NewGuid().ToString() + ".txt")
+    $Body    = Join-Path $env:TEMP ("kx-body-"    + [guid]::NewGuid().ToString() + ".txt")
+
+    try {
+        $Result = & curl.exe -sS --connect-timeout 3 --max-time 10 --max-redirs 0 `
+            -D $Headers -o $Body `
+            -w "HTTP=%{http_code} EFFECTIVE=%{url_effective}" `
+            $Url 2>&1
+
+        Write-Host "URL: $Url"
+        Write-Host $Result
+
+        if (Test-Path $Headers) {
+            $InterestingHeaders = Get-Content $Headers |
+                Where-Object {
+                    $_ -match '^(HTTP/|Location:|Server:|Content-Type:|X-Konnaxion-|X-Powered-By:)'
+                }
+
+            foreach ($Line in $InterestingHeaders) {
+                Write-Host "  $Line"
+            }
+        }
+
+        if (Test-Path $Body) {
+            $Raw = Get-Content $Body -Raw -ErrorAction SilentlyContinue
+            if ($Raw) {
+                if ($Raw.Length -gt 800) {
+                    $Raw = $Raw.Substring(0,800)
+                }
+                $Raw = $Raw -replace '\s+', ' '
+                Write-Host "  BODY-FIRST: $Raw"
+            }
+        }
+    }
+    finally {
+        Remove-Item $Headers,$Body -Force -ErrorAction SilentlyContinue
+    }
+
+    Write-Host ""
+}
+PS C:\mycode\Konnaxion\Konnaxion> Section "0. DATE / ROOT / POWERSHELL"
+
+====================================================================================================
+=== 0. DATE / ROOT / POWERSHELL
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> Write-Host "Date       :" (Get-Date -Format o)
+Date       : 2026-09-30T07:55:12.3597887-04:00
+PS C:\mycode\Konnaxion\Konnaxion> Write-Host "PowerShell :" $PSVersionTable.PSVersion
+PowerShell : 7.6.6
+PS C:\mycode\Konnaxion\Konnaxion> Write-Host "Root       :" $Root
+Root       : C:\mycode\Konnaxion\Konnaxion
+PS C:\mycode\Konnaxion\Konnaxion> Write-Host "PWD        :" (Get-Location)
+PWD        : C:\mycode\Konnaxion\Konnaxion
+PS C:\mycode\Konnaxion\Konnaxion> Section "1. FICHIERS ENV NEXT — ORDRE LOCAL POSSIBLE"
+
+====================================================================================================
+=== 1. FICHIERS ENV NEXT — ORDRE LOCAL POSSIBLE
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> @(
+    (Join-Path $Frontend ".env.local"),
+    (Join-Path $Frontend ".env.development.local"),
+    (Join-Path $Frontend ".env.development"),
+    (Join-Path $Frontend ".env"),
+    (Join-Path $Frontend "env.local.example"),
+    (Join-Path $Backend ".env")
+) | ForEach-Object {
+    Show-RelevantEnvFile $_
+}
+
+--- C:\mycode\Konnaxion\Konnaxion\frontend\.env.local ---
+NEXT_PUBLIC_API_BASE=/api
+API_PROXY_BASE=http://localhost:8000/api
+C:\mycode\Konnaxion\Konnaxion\frontend\.env.development.local : <ABSENT>
+C:\mycode\Konnaxion\Konnaxion\frontend\.env.development : <ABSENT>
+C:\mycode\Konnaxion\Konnaxion\frontend\.env : <ABSENT>
+
+--- C:\mycode\Konnaxion\Konnaxion\frontend\env.local.example ---
+NEXT_PUBLIC_API_BASE=http://localhost:8000/api
+NEXT_PUBLIC_BACKEND_BASE=http://localhost:8000
+
+--- C:\mycode\Konnaxion\Konnaxion\backend\.env ---
+KONNAXION_WORLDS_DATA_PLANE_ENABLED=true
+PS C:\mycode\Konnaxion\Konnaxion> Section "2. VARIABLES D'ENVIRONNEMENT WINDOWS — PROCESS / USER / MACHINE"
+
+====================================================================================================
+=== 2. VARIABLES D'ENVIRONNEMENT WINDOWS — PROCESS / USER / MACHINE
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> $Keys = @(
+    "NEXT_PUBLIC_API_BASE",
+    "NEXT_PUBLIC_BACKEND_BASE",
+    "API_PROXY_BASE",
+    "INTERNAL_API_BASE",
+    "NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN",
+    "KONNAXION_UNIVERSE_HOST_ROUTING_ENABLED",
+    "KONNAXION_UNIVERSE_BASE_DOMAINS",
+    "KONNAXION_WORLDS_DATA_PLANE_ENABLED",
+    "FRONTEND_BASE_URL"
+)
+PS C:\mycode\Konnaxion\Konnaxion> foreach ($Key in $Keys) {
+    Write-Host ""
+    Write-Host "$Key"
+    Write-Host "  Process =" ([Environment]::GetEnvironmentVariable($Key, "Process"))
+    Write-Host "  User    =" ([Environment]::GetEnvironmentVariable($Key, "User"))
+    Write-Host "  Machine =" ([Environment]::GetEnvironmentVariable($Key, "Machine"))
+}
+
+NEXT_PUBLIC_API_BASE
+  Process =
+  User    =
+  Machine =
+
+NEXT_PUBLIC_BACKEND_BASE
+  Process =
+  User    =
+  Machine =
+
+API_PROXY_BASE
+  Process =
+  User    =
+  Machine =
+
+INTERNAL_API_BASE
+  Process =
+  User    =
+  Machine =
+
+NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN
+  Process =
+  User    =
+  Machine =
+
+KONNAXION_UNIVERSE_HOST_ROUTING_ENABLED
+  Process =
+  User    =
+  Machine =
+
+KONNAXION_UNIVERSE_BASE_DOMAINS
+  Process =
+  User    =
+  Machine =
+
+KONNAXION_WORLDS_DATA_PLANE_ENABLED
+  Process =
+  User    =
+  Machine =
+
+FRONTEND_BASE_URL
+  Process =
+  User    =
+  Machine =
+PS C:\mycode\Konnaxion\Konnaxion> Section "3. RUN_frontend_local.bat EXACT"
+
+====================================================================================================
+=== 3. RUN_frontend_local.bat EXACT
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> if (Test-Path ".\RUN_frontend_local.bat") {
+    Get-Content ".\RUN_frontend_local.bat"
+}
+@echo off
+setlocal EnableExtensions
+
+rem Konnaxion local frontend launcher.
+rem - Keeps existing services (for example Orgo) untouched.
+rem - Uses port 3000 when free.
+rem - Otherwise selects the first free port from 3001..3099.
+rem - Pass an explicit port as the first argument to require that port.
+
+set "KX_FRONTEND_PORT="
+set "KX_FRONTEND_PORT_EXPLICIT=0"
+
+if not "%~1"=="" (
+  set "KX_FRONTEND_PORT=%~1"
+  set "KX_FRONTEND_PORT_EXPLICIT=1"
+)
+
+if "%KX_FRONTEND_PORT_EXPLICIT%"=="1" (
+  powershell -NoProfile -Command "$p=%KX_FRONTEND_PORT%; if (Get-NetTCPConnection -State Listen -LocalPort $p -ErrorAction SilentlyContinue) { exit 1 }"
+  if errorlevel 1 (
+    echo [ERROR] Port %KX_FRONTEND_PORT% is already in use.
+    echo [ERROR] Konnaxion will not stop or replace the service that owns it.
+    exit /b 1
+  )
+) else (
+  for /f %%P in ('powershell -NoProfile -Command "$p=3000; while ($p -le 3099 -and (Get-NetTCPConnection -State Listen -LocalPort $p -ErrorAction SilentlyContinue)) { $p++ }; if ($p -gt 3099) { exit 1 }; $p"') do set "KX_FRONTEND_PORT=%%P"
+  if not defined KX_FRONTEND_PORT (
+    echo [ERROR] No free frontend port found in range 3000-3099.
+    exit /b 1
+  )
+)
+
+if not "%KX_FRONTEND_PORT%"=="3000" (
+  echo [INFO] Port 3000 is already in use. Existing service left untouched.
+)
+
+echo [INFO] Konnaxion frontend: http://localhost:%KX_FRONTEND_PORT%
+echo [INFO] Universe hosts:     http://^<universe^>.localhost:%KX_FRONTEND_PORT%
+
+pushd "%~dp0frontend"
+
+where pnpm >nul 2>nul
+if errorlevel 1 (
+  call corepack enable
+  if errorlevel 1 (
+    popd
+    exit /b 1
+  )
+)
+
+if not exist "node_modules" (
+  call pnpm install
+  if errorlevel 1 (
+    popd
+    exit /b 1
+  )
+)
+
+call pnpm exec cross-env FORCE_COLOR=1 next dev --turbo -p %KX_FRONTEND_PORT%
+set "KX_EXIT_CODE=%ERRORLEVEL%"
+
+popd
+endlocal & exit /b %KX_EXIT_CODE%
+PS C:\mycode\Konnaxion\Konnaxion> else {
+    Write-Host "<ABSENT>"
+}
+else: Le terme « else » n’est pas reconnu comme nom d’applet de commande, d’une fonction, d’un fichier de script ou d’un programme exécutable.
+Vérifiez l’orthographe du nom ou, si un chemin d’accès a été inclus, vérifiez que le chemin d’accès est correct et réessayez.
+else: Le terme « else » n’est pas reconnu comme nom d’applet de commande, d’une fonction, d’un fichier de script ou d’un programme exécutable.
+Vérifiez l’orthographe du nom ou, si un chemin d’accès a été inclus, vérifiez que le chemin d’accès est correct et réessayez.
+PS C:\mycode\Konnaxion\Konnaxion> CommandInvocation(Get-Command): "Get-Command"
+>> ParameterBinding(Get-Command): name="UseFuzzyMatching"; value="True"
+>> ParameterBinding(Get-Command): name="FuzzyMinimumDistance"; value="1"
+>> ParameterBinding(Get-Command): name="Name"; value="else"
+>> CommandInvocation(Select-Object): "Select-Object"
+>> ParameterBinding(Select-Object): name="First"; value="5"
+>> ParameterBinding(Select-Object): name="Unique"; value="True"
+>> ParameterBinding(Select-Object): name="ExpandProperty"; value="Name"
+PS C:\mycode\Konnaxion\Konnaxion> Section "4. REFERENCES ROUTING / KONNAXION.COM DANS LE SOURCE FRONTEND"
+
+====================================================================================================
+=== 4. REFERENCES ROUTING / KONNAXION.COM DANS LE SOURCE FRONTEND
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> $Patterns = @(
+    'NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN',
+    'KONNAXION_UNIVERSE_BASE_DOMAINS',
+    'KONNAXION_UNIVERSE_HOST_ROUTING_ENABLED',
+    'konnaxion\.com',
+    'window\.location\.assign',
+    'window\.location\.host',
+    'window\.location\.hostname',
+    'location\.assign',
+    'switchUniverse',
+    'switchWorld',
+    'baseDomain',
+    'base_domain',
+    'subdomain'
+)
+PS C:\mycode\Konnaxion\Konnaxion> $SourceFiles = Get-ChildItem $Frontend -Recurse -File -ErrorAction SilentlyContinue |
+    Where-Object {
+        $_.FullName -notmatch '\\node_modules\\' -and
+        $_.FullName -notmatch '\\\.next\\' -and
+        $_.Extension -in @(".ts",".tsx",".js",".mjs",".cjs",".json")
+    }
+PS C:\mycode\Konnaxion\Konnaxion> foreach ($Pattern in $Patterns) {
+    Write-Host ""
+    Write-Host "--- PATTERN: $Pattern ---"
+
+    $Matches = $SourceFiles |
+        Select-String -Pattern $Pattern -ErrorAction SilentlyContinue |
+        Select-Object -First 80
+
+    if (-not $Matches) {
+        Write-Host "<NO MATCH>"
+        continue
+    }
+
+    foreach ($M in $Matches) {
+        $Rel = $M.Path.Replace($Root + "\", "")
+        $Text = ($M.Line -replace '\s+', ' ').Trim()
+        if ($Text.Length -gt 500) {
+            $Text = $Text.Substring(0,500) + "..."
+        }
+
+        Write-Host ("{0}:{1}: {2}" -f $Rel,$M.LineNumber,$Text)
+    }
+}
+
+--- PATTERN: NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN ---
+frontend\env.mjs:33: NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN: z
+frontend\env.mjs:42: NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN:
+frontend\env.mjs:43: process.env.NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN,
+frontend\lib\worlds.ts:94: process.env.NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN ?? 'konnaxion.com'
+
+--- PATTERN: KONNAXION_UNIVERSE_BASE_DOMAINS ---
+<NO MATCH>
+
+--- PATTERN: KONNAXION_UNIVERSE_HOST_ROUTING_ENABLED ---
+<NO MATCH>
+
+--- PATTERN: konnaxion\.com ---
+frontend\env.mjs:36: .default("konnaxion.com"),
+frontend\next.config.ts:9: ? 'https://konnaxion.com/api'
+frontend\lib\worlds.ts:94: process.env.NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN ?? 'konnaxion.com'
+frontend\lib\__tests__\worlds.test.ts:88: expect(getUniverseKeyFromHostname('unesco.konnaxion.com', 'konnaxion.com')).toBe(
+frontend\lib\__tests__\worlds.test.ts:92: getUniverseKeyFromHostname('kristal-farms.konnaxion.com', 'konnaxion.com'),
+frontend\lib\__tests__\worlds.test.ts:97: expect(getUniverseKeyFromHostname('konnaxion.com', 'konnaxion.com')).toBeNull();
+frontend\lib\__tests__\worlds.test.ts:98: expect(getUniverseKeyFromHostname('www.konnaxion.com', 'konnaxion.com')).toBeNull();
+frontend\lib\__tests__\worlds.test.ts:99: expect(getUniverseKeyFromHostname('x.y.konnaxion.com', 'konnaxion.com')).toBeNull();
+frontend\lib\__tests__\worlds.test.ts:100: expect(getUniverseKeyFromHostname('other.example', 'konnaxion.com')).toBeNull();
+
+--- PATTERN: window\.location\.assign ---
+frontend\context\WorldContext.tsx:219: window.location.assign(`${target}${search}${hash}`);
+frontend\modules\ethikos\deliberate\elite\page.tsx:225: onClick={() => window.location.assign(`/ethikos/deliberate/${preview.id}`)}
+
+--- PATTERN: window\.location\.host ---
+frontend\lib\worlds.ts:130: return getUniverseKeyFromHostname(window.location.hostname);
+frontend\lib\worlds.ts:425: return `${protocol}//${window.location.host}${scopedPath}`;
+
+--- PATTERN: window\.location\.hostname ---
+frontend\lib\worlds.ts:130: return getUniverseKeyFromHostname(window.location.hostname);
+
+--- PATTERN: location\.assign ---
+frontend\context\WorldContext.tsx:219: window.location.assign(`${target}${search}${hash}`);
+frontend\modules\ethikos\deliberate\elite\page.tsx:225: onClick={() => window.location.assign(`/ethikos/deliberate/${preview.id}`)}
+
+--- PATTERN: switchUniverse ---
+frontend\components\worlds\WorldSwitcher.tsx:72: switchUniverse,
+frontend\components\worlds\WorldSwitcher.tsx:154: onChange={switchUniverse}
+frontend\context\WorldContext.tsx:44: switchUniverse: (key: string) => void;
+frontend\context\WorldContext.tsx:247: const switchUniverse = useCallback(
+frontend\context\WorldContext.tsx:301: switchUniverse,
+frontend\context\WorldContext.tsx:318: switchUniverse,
+
+--- PATTERN: switchWorld ---
+frontend\components\worlds\WorldSwitcher.tsx:73: switchWorld,
+frontend\components\worlds\WorldSwitcher.tsx:170: onChange={switchWorld}
+frontend\context\WorldContext.tsx:20: switchWorldPath,
+frontend\context\WorldContext.tsx:45: switchWorld: (key: string) => void;
+frontend\context\WorldContext.tsx:222: const switchWorld = useCallback(
+frontend\context\WorldContext.tsx:234: const targetPath = switchWorldPath(
+frontend\context\WorldContext.tsx:265: const hostPath = switchWorldPath(
+frontend\context\WorldContext.tsx:274: ? switchWorldPath(
+frontend\context\WorldContext.tsx:302: switchWorld,
+frontend\context\WorldContext.tsx:319: switchWorld,
+frontend\lib\worlds.ts:218: export function switchWorldPath(
+frontend\lib\__tests__\worlds.test.ts:11: switchWorldPath,
+frontend\lib\__tests__\worlds.test.ts:42: expect(switchWorldPath('/u/mine-x/w/engineering/konsensus', 'finance')).toBe(
+frontend\lib\__tests__\worlds.test.ts:45: expect(switchWorldPath('/', 'b')).toBe('/w/b/ethikos/insights');
+
+--- PATTERN: baseDomain ---
+frontend\lib\worlds.ts:92: function configuredUniverseBaseDomain(): string | null {
+frontend\lib\worlds.ts:114: baseDomain: string | null = configuredUniverseBaseDomain(),
+frontend\lib\worlds.ts:117: const base = normalizeHostname(baseDomain ?? '');
+frontend\lib\worlds.ts:145: const base = configuredUniverseBaseDomain();
+
+--- PATTERN: base_domain ---
+frontend\env.mjs:33: NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN: z
+frontend\env.mjs:42: NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN:
+frontend\env.mjs:43: process.env.NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN,
+frontend\lib\worlds.ts:94: process.env.NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN ?? 'konnaxion.com'
+
+--- PATTERN: subdomain ---
+frontend\artifacts\i18n-extraction\ui-translation-occurrences.json:71418: "text": "The UNESCO taxonomy organizes knowledge domains into a consistent hierarchy. By selecting favourite nodes, you decide which domains and subdomains will appear when creating problem templates in Team Builder.",
+frontend\artifacts\i18n-extraction\ui-translation-occurrences.json:71598: "text": "An alternative way to pick a small number of domains or subdomains.",
+frontend\artifacts\i18n-extraction\ui-translation-occurrences.json:71610: "snippet": "An alternative way to pick a small number of domains or subdomains."
+frontend\artifacts\i18n-extraction\ui-translation-unique.json:35609: "text": "An alternative way to pick a small number of domains or subdomains.",
+frontend\artifacts\i18n-extraction\ui-translation-unique.json:104441: "text": "The UNESCO taxonomy organizes knowledge domains into a consistent hierarchy. By selecting favourite nodes, you decide which domains and subdomains will appear when creating problem templates in Team Builder.",
+frontend\i18n\locales\en.json:3918: "anAlternativeWayToPickASmallNumber": "An alternative way to pick a small number of domains or subdomains.",
+frontend\i18n\locales\en.json:4306: "theUnescoTaxonomyOrganizesKnowledgeDomainsIntoA": "The UNESCO taxonomy organizes knowledge domains into a consistent hierarchy. By selecting favourite nodes, you decide which domains and subdomains will appear when creating problem templates in Team Builder.",
+frontend\i18n\locales\en.json:10014: "anAlternativeWayToPickASmall": "An alternative way to pick a small number of domains or subdomains.",
+frontend\i18n\locales\en.json:10034: "theUnescoTaxonomyOrganizesKnowledgeDomainsInto": "The UNESCO taxonomy organizes knowledge domains into a consistent hierarchy. By selecting favourite nodes, you decide which domains and subdomains will appear when creating problem templates in Team Builder.",
+frontend\lib\worlds.ts:110: * subdomains are deliberately ignored: Worlds remain path-scoped.
+frontend\lib\worlds.ts:123: const subdomain = host.slice(0, -suffix.length);
+frontend\lib\worlds.ts:124: if (subdomain.includes('.') || !isUniverseKey(subdomain)) return null;
+frontend\lib\worlds.ts:125: return subdomain.toLowerCase();
+frontend\lib\worlds.ts:133: /** Build an absolute browser URL on the selected Universe subdomain. */
+frontend\lib\__tests__\worlds.test.ts:87: test('derives a generic Universe key from one explicit subdomain label', () => {
+PS C:\mycode\Konnaxion\Konnaxion> Section "5. WORLD CONTEXT / WORLDS.TS — ZONE DE NAVIGATION"
+
+====================================================================================================
+=== 5. WORLD CONTEXT / WORLDS.TS — ZONE DE NAVIGATION
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> $ImportantFiles = @(
+    ".\frontend\context\WorldContext.tsx",
+    ".\frontend\lib\worlds.ts",
+    ".\frontend\components\worlds\WorldSwitcher.tsx",
+    ".\frontend\next.config.ts",
+    ".\frontend\env.mjs",
+    ".\frontend\middleware.ts"
+)
+PS C:\mycode\Konnaxion\Konnaxion> foreach ($File in $ImportantFiles) {
+    Write-Host ""
+    Write-Host "--- $File ---"
+
+    if (-not (Test-Path $File)) {
+        Write-Host "<ABSENT>"
+        continue
+    }
+
+    Select-String -Path $File `
+        -Pattern 'switchUniverse|switchWorld|location\.assign|KONNAXION|konnaxion\.com|hostname|host|BASE_DOMAIN|API_PROXY|NEXT_PUBLIC_API_BASE|control/universes|control/worlds' `
+        -Context 3,3 |
+        Select-Object -First 120 |
+        ForEach-Object {
+            Write-Host $_.ToString()
+        }
+}
+
+--- .\frontend\context\WorldContext.tsx ---
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:12:
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:13:import api from '@/api';
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:14:import {
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:15:  buildUniverseHostUrl,
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:16:  getUniverseKeyFromBrowserHostname,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:17:  getUniverseKeyFromPathname,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:18:  getWorldKeyFromPathname,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:19:  stripWorldPrefix,
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:20:  switchWorldPath,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:21:  type UniverseSummary,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:22:  type WorldRuntime,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:23:  type WorldSummary,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:24:  withWorldPath,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:25:} from '@/lib/worlds';
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:26:
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:27:const RECENT_WORLDS_KEY = 'konnaxion:recent-worlds';
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:28:const MAX_RECENT_WORLDS = 8;
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:29:
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:30:type WorldContextValue = {
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:41:  catalogError: boolean;
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:42:  runtimeError: boolean;
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:43:  href: (path: string) => string;
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:44:  switchUniverse: (key: string) => void;
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:45:  switchWorld: (key: string) => void;
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:46:};
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:47:
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:48:const WorldContext = createContext<WorldContextValue | null>(null);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:85:  const worldKey = getWorldKeyFromPathname(pathname);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:86:  const appPath = stripWorldPrefix(pathname);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:87:
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:88:  const [hostUniverseKey, setHostUniverseKey] = useState<string | null>(null);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:89:  const [runtime, setRuntime] = useState<WorldRuntime | null>(null);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:90:  const [universes, setUniverses] = useState<UniverseSummary[]>([]);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:91:  const [worlds, setWorlds] = useState<WorldSummary[]>([]);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:96:  const [runtimeError, setRuntimeError] = useState(false);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:97:
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:98:  const universeKey =
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:99:    routeUniverseKey ?? hostUniverseKey ?? runtime?.universe.key ?? null;
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:100:
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:101:  useEffect(() => {
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:102:    setHostUniverseKey(getUniverseKeyFromBrowserHostname());
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:103:    setRecentWorldKeys(readRecentWorlds());
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:104:  }, []);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:105:
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:109:    setCatalogError(false);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:110:
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:111:    void Promise.all([
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:112:      api.get<UniverseSummary[]>('control/universes/'),
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:113:      api.get<WorldSummary[]>('control/worlds/'),
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:114:    ])
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:115:      .then(([universeRows, worldRows]) => {
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:116:        if (cancelled) return;
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:197:      reloading = true;
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:198:      window.location.reload();
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:199:    };
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:200:    window.addEventListener('konnaxion:world-release-changed', onReleaseChanged);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:201:    return () => {
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:202:      window.removeEventListener('konnaxion:world-release-changed', onReleaseChanged);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:203:    };
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:204:  }, []);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:205:
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:208:      withWorldPath(
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:209:        path,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:210:        worldKey,
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:211:        hostUniverseKey && hostUniverseKey === universeKey ? null : universeKey,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:212:      ),
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:213:    [hostUniverseKey, universeKey, worldKey],
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:214:  );
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:215:
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:216:  const navigate = useCallback((target: string) => {
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:217:    const search = typeof window !== 'undefined' ? window.location.search : '';
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:218:    const hash = typeof window !== 'undefined' ? window.location.hash : '';
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:219:    window.location.assign(`${target}${search}${hash}`);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:220:  }, []);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:221:
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:222:  const switchWorld = useCallback(
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:223:    (key: string) => {
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:224:      if (key === worldKey) return;
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:225:      const targetWorld = worlds.find(
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:231:      setRecentWorldKeys((current) =>
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:232:        rememberWorld(targetWorld.universe_key, key, current),
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:233:      );
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:234:      const targetPath = switchWorldPath(
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:235:        pathname,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:236:        key,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:237:        '/ethikos/insights',
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:238:        hostUniverseKey && targetWorld.universe_key === hostUniverseKey
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:239:          ? null
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:240:          : targetWorld.universe_key,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:241:      );
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:242:      navigate(targetPath);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:243:    },
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:244:    [hostUniverseKey, navigate, pathname, universeKey, worldKey, worlds],
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:245:  );
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:246:
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:247:  const switchUniverse = useCallback(
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:248:    (key: string) => {
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:249:      if (key === universeKey) return;
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:250:      const universe = universes.find((item) => item.key === key);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:262:      setRecentWorldKeys((current) =>
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:263:        rememberWorld(key, targetWorld.key, current),
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:264:      );
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:265:      const hostPath = switchWorldPath(
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:266:        pathname,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:267:        targetWorld.key,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:268:        '/ethikos/insights',
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:269:        null,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:270:      );
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:271:      const hostTarget = buildUniverseHostUrl(key, hostPath);
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:272:      navigate(
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:273:        hostTarget === hostPath
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:274:          ? switchWorldPath(
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:275:              pathname,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:276:              targetWorld.key,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:277:              '/ethikos/insights',
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:278:              key,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:279:            )
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:280:          : hostTarget,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:281:      );
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:282:    },
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:283:    [navigate, pathname, universeKey, universes, worlds],
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:298:      catalogError,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:299:      runtimeError,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:300:      href,
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:301:      switchUniverse,
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:302:      switchWorld,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:303:    }),
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:304:    [
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:305:      pathname,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:315:      catalogError,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:316:      runtimeError,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:317:      href,
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:318:      switchUniverse,
+> C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:319:      switchWorld,
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:320:    ],
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:321:  );
+  C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx:322:
+
+--- .\frontend\lib\worlds.ts ---
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:91:
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:92:function configuredUniverseBaseDomain(): string | null {
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:93:  const raw = (
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:94:    process.env.NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN ?? 'konnaxion.com'
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:95:  )
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:96:    .trim()
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:97:    .toLowerCase()
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:99:  return raw || null;
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:100:}
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:101:
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:102:function normalizeHostname(value: string): string {
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:103:  return value.trim().toLowerCase().replace(/\.$/, '');
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:104:}
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:105:
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:106:/**
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:107: * Resolve a one-label Universe key from <universe>.<base-domain>.
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:108: *
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:109: * The apex and www are product/infrastructure hosts, not Universes. Nested
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:110: * subdomains are deliberately ignored: Worlds remain path-scoped.
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:111: */
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:112:export function getUniverseKeyFromHostname(
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:113:  hostname: string | null | undefined,
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:114:  baseDomain: string | null = configuredUniverseBaseDomain(),
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:115:): string | null {
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:116:  const host = normalizeHostname(hostname ?? '');
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:117:  const base = normalizeHostname(baseDomain ?? '');
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:118:  if (!host || !base || host === base || host === `www.${base}`) return null;
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:119:
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:120:  const suffix = `.${base}`;
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:121:  if (!host.endsWith(suffix)) return null;
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:122:
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:123:  const subdomain = host.slice(0, -suffix.length);
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:124:  if (subdomain.includes('.') || !isUniverseKey(subdomain)) return null;
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:125:  return subdomain.toLowerCase();
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:126:}
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:127:
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:128:export function getUniverseKeyFromBrowserHostname(): string | null {
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:129:  if (typeof window === 'undefined') return null;
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:130:  return getUniverseKeyFromHostname(window.location.hostname);
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:131:}
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:132:
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:133:/** Build an absolute browser URL on the selected Universe subdomain. */
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:134:export function buildUniverseHostUrl(
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:135:  universeKey: string,
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:136:  path: string,
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:137:): string {
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:147:
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:148:  try {
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:149:    const url = new URL(path || '/', window.location.origin);
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:150:    url.hostname = `${universeKey.toLowerCase()}.${base}`;
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:151:    // Production Universe hosts use the normal scheme port. Keep explicit local
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:152:    // ports only when the configured base itself is localhost-like.
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:153:    if (!base.includes('localhost')) url.port = '';
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:154:    return url.toString();
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:155:  } catch {
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:156:    return path;
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:215:  return `${prefix}${appPath === '/' ? '' : appPath}${suffix}`;
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:216:}
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:217:
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:218:export function switchWorldPath(
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:219:  currentPath: string,
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:220:  targetWorldKey: string,
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:221:  fallbackPath = '/ethikos/insights',
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:267:  if (typeof window === 'undefined') return path;
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:268:  const route = parseWorldPath(window.location.pathname);
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:269:  const universeKey =
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:270:    route?.universeKey ?? getUniverseKeyFromBrowserHostname();
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:271:  return scopeApiPath(path, route?.key, universeKey);
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:272:}
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:273:
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:323:  const activeWorld = route?.key ?? null;
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:324:  const activeUniverse =
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:325:    route?.universeKey ??
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:326:    getUniverseKeyFromBrowserHostname() ??
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:327:    document.documentElement.dataset.kxUniverse ??
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:328:    null;
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:329:
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:348:  ) {
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:349:    const actual = String(responseReleaseId);
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:350:    window.dispatchEvent(
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:351:      new CustomEvent('konnaxion:world-release-changed', {
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:352:        detail: {
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:353:          universe: activeUniverse,
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:354:          world: activeWorld,
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:415:
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:416:  const route = parseWorldPath(window.location.pathname);
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:417:  const universeKey =
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:418:    route?.universeKey ?? getUniverseKeyFromBrowserHostname();
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:419:  const scopedPath = scopeWorldWebSocketPath(path, route?.key, universeKey);
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:420:  if (!scopedPath) return null;
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:421:
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:422:  const rawBase = base?.trim();
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:423:  if (!rawBase) {
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:424:    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:425:    return `${protocol}//${window.location.host}${scopedPath}`;
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:426:  }
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:427:
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:428:  try {
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:442:      : url.pathname === '/'
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:443:        ? ''
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:444:        : url.pathname.replace(/\/+$/, '');
+> C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:445:    return `${url.protocol}//${url.host}${basePath}${scopedPath}`;
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:446:  } catch {
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:447:    return null;
+  C:\mycode\Konnaxion\Konnaxion\frontend\lib\worlds.ts:448:  }
+
+--- .\frontend\components\worlds\WorldSwitcher.tsx ---
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:69:    loadingRuntime,
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:70:    catalogError,
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:71:    runtimeError,
+> C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:72:    switchUniverse,
+> C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:73:    switchWorld,
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:74:  } = useWorld();
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:75:
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:76:  const universeOptions = useMemo(
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:151:        placeholder={t('worlds.selectUniverse')}
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:152:        showSearch
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:153:        allowClear={false}
+> C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:154:        onChange={switchUniverse}
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:155:        status={catalogError ? 'error' : undefined}
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:156:        filterOption={filter}
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:157:        options={universeOptions}
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:167:        placeholder={t('worlds.select')}
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:168:        showSearch
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:169:        allowClear={false}
+> C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:170:        onChange={switchWorld}
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:171:        status={runtimeError ? 'error' : undefined}
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:172:        filterOption={filter}
+  C:\mycode\Konnaxion\Konnaxion\frontend\components\worlds\WorldSwitcher.tsx:173:        popupMatchSelectWidth={false}
+
+--- .\frontend\next.config.ts ---
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:4:
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:5:import { env } from './env.mjs';
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:6:
+> C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:7:const DEFAULT_API_PROXY_BASE =
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:8:  process.env.NODE_ENV === 'production'
+> C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:9:    ? 'https://konnaxion.com/api'
+> C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:10:    : 'http://localhost:8000/api';
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:11:
+> C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:12:const API_PROXY_BASE = (
+> C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:13:  process.env.API_PROXY_BASE ??
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:14:  process.env.INTERNAL_API_BASE ??
+> C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:15:  DEFAULT_API_PROXY_BASE
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:16:).replace(/\/+$/, '');
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:17:
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:18:const baseConfig: NextConfig = {
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:42:      // Next rewrites /api/* to the server-only backend proxy base.
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:43:      //
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:44:      // Local:
+> C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:45:      //   API_PROXY_BASE=http://localhost:8000/api
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:46:      //
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:47:      // Capsule/runtime:
+> C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:48:      //   API_PROXY_BASE=http://django-api:8000/api
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:49:      //
+> C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:50:      // Keep NEXT_PUBLIC_API_BASE for browser code only.
+> C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:51:      { source: '/api/:path*', destination: `${API_PROXY_BASE}/:path*/` },
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:52:    ];
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:53:  },
+  C:\mycode\Konnaxion\Konnaxion\frontend\next.config.ts:54:};
+
+--- .\frontend\env.mjs ---
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:10:      value.startsWith("/") ||
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:11:      value.startsWith("http://") ||
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:12:      value.startsWith("https://"),
+> C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:13:    "NEXT_PUBLIC_API_BASE must be a relative path or HTTP(S) URL",
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:14:  );
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:15:
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:16:export const env = createEnv({
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:23:
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:24:    // Public API base used by browser/client code.
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:25:    // Use "/api" for same-origin routing through Next/Traefik.
+> C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:26:    NEXT_PUBLIC_API_BASE: apiBaseSchema,
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:27:  },
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:28:
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:29:  client: {
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:30:    // Exposed to the browser.
+> C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:31:    // Must not default to localhost in production.
+> C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:32:    NEXT_PUBLIC_API_BASE: apiBaseSchema,
+> C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:33:    NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN: z
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:34:      .string()
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:35:      .optional()
+> C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:36:      .default("konnaxion.com"),
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:37:  },
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:38:
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:39:  runtimeEnv: {
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:40:    ANALYZE: process.env.ANALYZE,
+> C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:41:    NEXT_PUBLIC_API_BASE: process.env.NEXT_PUBLIC_API_BASE,
+> C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:42:    NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN:
+> C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:43:      process.env.NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN,
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:44:  },
+  C:\mycode\Konnaxion\Konnaxion\frontend\env.mjs:45:});
+
+--- .\frontend\middleware.ts ---
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:8:  LANGUAGE_COOKIE_MAX_AGE,
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:9:} from './i18n/config';
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:10:import {
+> C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:11:  getUniverseKeyFromHostname,
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:12:  isGlobalApiPath,
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:13:  parseWorldPath,
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:14:  withWorldPath,
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:50:
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:51:function parseSourcePath(
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:52:  pathname: string,
+> C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:53:  hostname?: string | null,
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:54:): SourceContext {
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:55:  const parsed = parseWorldPath(pathname);
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:56:  if (!parsed) return null;
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:57:  return {
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:58:    universeKey:
+> C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:59:      parsed.universeKey ?? getUniverseKeyFromHostname(hostname ?? null),
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:60:    worldKey: parsed.key,
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:61:  };
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:62:}
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:66:  if (referer) {
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:67:    try {
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:68:      const sourceUrl = new URL(referer);
+> C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:69:      const context = parseSourcePath(sourceUrl.pathname, sourceUrl.hostname);
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:70:      if (context) return context;
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:71:    } catch {
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:72:      // Ignore malformed/untrusted Referer and try Next's navigation header.
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:77:  if (nextUrl) {
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:78:    try {
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:79:      const sourceUrl = new URL(nextUrl, request.nextUrl.origin);
+> C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:80:      const context = parseSourcePath(sourceUrl.pathname, sourceUrl.hostname);
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:81:      if (context) return context;
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:82:    } catch {
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:83:      // No usable navigation context.
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:101: */
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:102:export function middleware(request: NextRequest) {
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:103:  const pathname = request.nextUrl.pathname;
+> C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:104:  const hostUniverseKey = getUniverseKeyFromHostname(request.nextUrl.hostname);
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:105:  const pathContext = parseWorldPath(pathname);
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:106:
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:107:  if (
+> C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:108:    hostUniverseKey &&
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:109:    pathContext?.universeKey &&
+> C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:110:    hostUniverseKey !== pathContext.universeKey
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:111:  ) {
+> C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:112:    return new NextResponse('UNIVERSE_HOST_PATH_CONFLICT', { status: 400 });
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:113:  }
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:114:
+  C:\mycode\Konnaxion\Konnaxion\frontend\middleware.ts:115:  const context = sourceContext(request);
+PS C:\mycode\Konnaxion\Konnaxion> Section "6. BUNDLE NEXT ACTUEL — VALEURS POTENTIELLEMENT COMPILEES"
+
+====================================================================================================
+=== 6. BUNDLE NEXT ACTUEL — VALEURS POTENTIELLEMENT COMPILEES
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> $NextDir = Join-Path $Frontend ".next"
+PS C:\mycode\Konnaxion\Konnaxion> if (-not (Test-Path $NextDir)) {
+    Write-Host ".next absent"
+}
+PS C:\mycode\Konnaxion\Konnaxion> else {
+    Write-Host ".next existe:" $NextDir
+
+    $CompiledFiles = Get-ChildItem $NextDir -Recurse -File -ErrorAction SilentlyContinue |
+        Where-Object {
+            $_.Extension -in @(".js",".json",".html")
+        }
+
+    foreach ($Pattern in @(
+        'konnaxion\.com',
+        'NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN',
+        'cuba-2026',
+        'unesco\.localhost',
+        'localhost'
+    )) {
+        Write-Host ""
+        Write-Host "--- BUNDLE PATTERN: $Pattern ---"
+
+        $BundleMatches = $CompiledFiles |
+            Select-String -Pattern $Pattern -ErrorAction SilentlyContinue |
+            Select-Object -First 30
+
+        if (-not $BundleMatches) {
+            Write-Host "<NO MATCH>"
+            continue
+        }
+
+        foreach ($M in $BundleMatches) {
+            $Rel = $M.Path.Replace($Frontend + "\", "")
+            $Text = ($M.Line -replace '\s+', ' ').Trim()
+            if ($Text.Length -gt 350) {
+                $Text = $Text.Substring(0,350) + "..."
+            }
+
+            Write-Host ("{0}:{1}: {2}" -f $Rel,$M.LineNumber,$Text)
+        }
+    }
+}
+else: Le terme « else » n’est pas reconnu comme nom d’applet de commande, d’une fonction, d’un fichier de script ou d’un programme exécutable.
+Vérifiez l’orthographe du nom ou, si un chemin d’accès a été inclus, vérifiez que le chemin d’accès est correct et réessayez.
+else: Le terme « else » n’est pas reconnu comme nom d’applet de commande, d’une fonction, d’un fichier de script ou d’un programme exécutable.
+Vérifiez l’orthographe du nom ou, si un chemin d’accès a été inclus, vérifiez que le chemin d’accès est correct et réessayez.
+PS C:\mycode\Konnaxion\Konnaxion> CommandInvocation(Get-Command): "Get-Command"
+>> ParameterBinding(Get-Command): name="UseFuzzyMatching"; value="True"
+>> ParameterBinding(Get-Command): name="FuzzyMinimumDistance"; value="1"
+>> ParameterBinding(Get-Command): name="Name"; value="else"
+>> CommandInvocation(Select-Object): "Select-Object"
+>> ParameterBinding(Select-Object): name="First"; value="5"
+>> ParameterBinding(Select-Object): name="Unique"; value="True"
+>> ParameterBinding(Select-Object): name="ExpandProperty"; value="Name"
+PS C:\mycode\Konnaxion\Konnaxion> Section "7. PORTS 3000-3099 + PROCESSUS QUI LES POSSEDENT"
+
+====================================================================================================
+=== 7. PORTS 3000-3099 + PROCESSUS QUI LES POSSEDENT
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> $Listeners = Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
+    Where-Object {
+        $_.LocalPort -ge 3000 -and $_.LocalPort -le 3099
+    } |
+    Sort-Object LocalPort,LocalAddress
+PS C:\mycode\Konnaxion\Konnaxion> if (-not $Listeners) {
+    Write-Host "<AUCUN LISTENER 3000-3099>"
+}
+PS C:\mycode\Konnaxion\Konnaxion> else {
+    $Listeners |
+        Select-Object LocalAddress,LocalPort,OwningProcess |
+        Format-Table -AutoSize
+
+    foreach ($PIDValue in ($Listeners.OwningProcess | Sort-Object -Unique)) {
+        Write-Host ""
+        Write-Host "--- PID $PIDValue ---"
+
+        $P = Get-CimInstance Win32_Process -Filter "ProcessId=$PIDValue" -ErrorAction SilentlyContinue
+
+        if ($P) {
+            Write-Host "Name        :" $P.Name
+            Write-Host "Executable  :" $P.ExecutablePath
+            Write-Host "CommandLine :" $P.CommandLine
+            Write-Host "Parent PID  :" $P.ParentProcessId
+        }
+    }
+}
+else: Le terme « else » n’est pas reconnu comme nom d’applet de commande, d’une fonction, d’un fichier de script ou d’un programme exécutable.
+Vérifiez l’orthographe du nom ou, si un chemin d’accès a été inclus, vérifiez que le chemin d’accès est correct et réessayez.
+else: Le terme « else » n’est pas reconnu comme nom d’applet de commande, d’une fonction, d’un fichier de script ou d’un programme exécutable.
+Vérifiez l’orthographe du nom ou, si un chemin d’accès a été inclus, vérifiez que le chemin d’accès est correct et réessayez.
+PS C:\mycode\Konnaxion\Konnaxion> CommandInvocation(Get-Command): "Get-Command"
+>> ParameterBinding(Get-Command): name="UseFuzzyMatching"; value="True"
+>> ParameterBinding(Get-Command): name="FuzzyMinimumDistance"; value="1"
+>> ParameterBinding(Get-Command): name="Name"; value="else"
+>> CommandInvocation(Select-Object): "Select-Object"
+>> ParameterBinding(Select-Object): name="First"; value="5"
+>> ParameterBinding(Select-Object): name="Unique"; value="True"
+>> ParameterBinding(Select-Object): name="ExpandProperty"; value="Name"
+PS C:\mycode\Konnaxion\Konnaxion> Section "8. PROCESSUS NODE / PNPM / NEXT / KONNAXION / ORGO"
+
+====================================================================================================
+=== 8. PROCESSUS NODE / PNPM / NEXT / KONNAXION / ORGO
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
+    Where-Object {
+        $_.Name -match 'node|pnpm|cmd|pwsh' -and
+        (
+            $_.CommandLine -match 'Konnaxion' -or
+            $_.CommandLine -match 'Orgo' -or
+            $_.CommandLine -match 'next dev' -or
+            $_.CommandLine -match 'next-server'
+        )
+    } |
+    Select-Object ProcessId,ParentProcessId,Name,ExecutablePath,CommandLine |
+    Format-List
+
+ProcessId       : 18280
+ParentProcessId : 5328
+Name            : cmd.exe
+ExecutablePath  : C:\Windows\system32\cmd.exe
+CommandLine     : C:\Windows\system32\cmd.exe /c ""C:\mycode\Konnaxion\Konnaxion\RUN_frontend_local.bat" "
+
+ProcessId       : 12392
+ParentProcessId : 18280
+Name            : pnpm.exe
+ExecutablePath  : C:\Program Files\Volta\pnpm.exe
+CommandLine     : pnpm  exec cross-env FORCE_COLOR=1 next dev --turbo -p 3001
+
+ProcessId       : 21036
+ParentProcessId : 12392
+Name            : cmd.exe
+ExecutablePath  : C:\Windows\system32\cmd.exe
+CommandLine     : "cmd.exe" /C pnpm exec cross-env FORCE_COLOR=1 next dev --turbo -p 3001
+
+ProcessId       : 18380
+ParentProcessId : 21036
+Name            : node.exe
+ExecutablePath  : C:\Users\rejea\AppData\Local\Volta\tools\image\node\22.11.0\node.exe
+CommandLine     : node  "C:\Users\rejea\AppData\Local\Volta\tools\image\pnpm\10.30.3\bin\\pnpm.cjs" exec cross-env
+                  FORCE_COLOR=1 next dev --turbo -p 3001
+
+ProcessId       : 37256
+ParentProcessId : 23628
+Name            : node.exe
+ExecutablePath  : C:\Users\rejea\AppData\Local\Volta\tools\image\node\22.11.0\node.exe
+CommandLine     : node   "C:\mycode\Konnaxion\Konnaxion\frontend\node_modules\.bin\\..\cross-env\src\bin\cross-env.js"
+                  "FORCE_COLOR=1" "next" "dev" "--turbo" "-p" "3001"
+
+ProcessId       : 14788
+ParentProcessId : 14968
+Name            : node.exe
+ExecutablePath  : C:\Users\rejea\AppData\Local\Volta\tools\image\node\22.11.0\node.exe
+CommandLine     : node   "C:\mycode\Konnaxion\Konnaxion\frontend\node_modules\.bin\\..\next\dist\bin\next" "dev"
+                  "--turbo" "-p" "3001"
+
+ProcessId       : 36228
+ParentProcessId : 14788
+Name            : node.exe
+ExecutablePath  : C:\Users\rejea\AppData\Local\Volta\tools\image\node\22.11.0\node.exe
+CommandLine     : C:\Users\rejea\AppData\Local\Volta\tools\image\node\22.11.0\node.exe C:\mycode\Konnaxion\Konnaxion\fr
+                  ontend\node_modules\.pnpm\next@15.3.1_@babel+core@7.2_33d04ac6b32ce151a44f8e16cf21584a\node_modules\n
+                  ext\dist\server\lib\start-server.js
+
+ProcessId       : 21384
+ParentProcessId : 5328
+Name            : cmd.exe
+ExecutablePath  : C:\Windows\system32\cmd.exe
+CommandLine     : C:\Windows\system32\cmd.exe /c ""C:\mycode\Konnaxion\Konnaxion\RUN_backend_local.bat" "
+
+ProcessId       : 31100
+ParentProcessId : 36228
+Name            : node.exe
+ExecutablePath  : C:\Users\rejea\AppData\Local\Volta\tools\image\node\22.11.0\node.exe
+CommandLine     : "node" C:\mycode\Konnaxion\Konnaxion\frontend\.next\transform.js 65436
+
+PS C:\mycode\Konnaxion\Konnaxion> Section "9. DOCKER LOCAL — AUCUNE MODIFICATION"
+
+====================================================================================================
+=== 9. DOCKER LOCAL — AUCUNE MODIFICATION
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Ports}}" 2>&1
+PS C:\mycode\Konnaxion\Konnaxion> Section "10. RESOLUTION DES HOSTS LOCAUX"
+
+====================================================================================================
+=== 10. RESOLUTION DES HOSTS LOCAUX
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> foreach ($HostName in @(
+    "localhost",
+    "unesco.localhost",
+    "kristal-farms.localhost",
+    "levis.localhost",
+    "cuba-2026.localhost",
+    "konnaxion.com"
+)) {
+    Write-Host ""
+    Write-Host "--- $HostName ---"
+    try {
+        [System.Net.Dns]::GetHostAddresses($HostName) |
+            ForEach-Object { Write-Host $_.IPAddressToString }
+    }
+    catch {
+        Write-Host "DNS ERROR:" $_.Exception.Message
+    }
+}
+
+--- localhost ---
+::1
+127.0.0.1
+
+--- unesco.localhost ---
+DNS ERROR: Exception lors de l’appel de « GetHostAddresses » avec « 1 » argument(s) : « Hôte inconnu. »
+
+--- kristal-farms.localhost ---
+DNS ERROR: Exception lors de l’appel de « GetHostAddresses » avec « 1 » argument(s) : « Hôte inconnu. »
+
+--- levis.localhost ---
+DNS ERROR: Exception lors de l’appel de « GetHostAddresses » avec « 1 » argument(s) : « Hôte inconnu. »
+
+--- cuba-2026.localhost ---
+DNS ERROR: Exception lors de l’appel de « GetHostAddresses » avec « 1 » argument(s) : « Hôte inconnu. »
+
+--- konnaxion.com ---
+2.56.97.41
+PS C:\mycode\Konnaxion\Konnaxion> Section "11. WINDOWS HOSTS FILE — LIGNES PERTINENTES"
+
+====================================================================================================
+=== 11. WINDOWS HOSTS FILE — LIGNES PERTINENTES
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> $HostsFile = "$env:SystemRoot\System32\drivers\etc\hosts"
+PS C:\mycode\Konnaxion\Konnaxion> if (Test-Path $HostsFile) {
+    Get-Content $HostsFile |
+        Where-Object {
+            $_ -match 'localhost|konnaxion|unesco|levis|cuba|kristal'
+        }
+}
+# localhost name resolution is handled within DNS itself.
+#	127.0.0.1       localhost
+#	::1             localhost
+# 159.198.41.96 konnaxion.local
+PS C:\mycode\Konnaxion\Konnaxion> Section "12. DJANGO — SETTINGS REELS"
+
+====================================================================================================
+=== 12. DJANGO — SETTINGS REELS
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> $Py = ".\backend\.venv\Scripts\python.exe"
+PS C:\mycode\Konnaxion\Konnaxion> if (-not (Test-Path $Py)) {
+    Write-Host "Python local absent: $Py"
+}
+PS C:\mycode\Konnaxion\Konnaxion> else {
+    $SettingsDiag = @'
+from django.conf import settings
+from django.db import connection
+
+keys = [
+    "KONNAXION_UNIVERSE_HOST_ROUTING_ENABLED",
+    "KONNAXION_UNIVERSE_BASE_DOMAINS",
+    "KONNAXION_WORLDS_DATA_PLANE_ENABLED",
+    "KONNAXION_UNIVERSE_SEED_ROOT",
+    "KONNAXION_WORLD_SEED_ROOT",
+    "FRONTEND_BASE_URL",
+    "ALLOWED_HOSTS",
+    "CSRF_TRUSTED_ORIGINS",
+    "CORS_ALLOWED_ORIGINS",
+]
+
+for key in keys:
+    print(f"{key} = {getattr(settings, key, '<UNDEFINED>')!r}")
+
+print("DATABASE ENGINE =", connection.settings_dict.get("ENGINE"))
+print("DATABASE NAME   =", connection.settings_dict.get("NAME"))
+print("DATABASE HOST   =", connection.settings_dict.get("HOST"))
+'@
+
+    & $Py ".\backend\manage.py" shell -c $SettingsDiag 2>&1
+}
+else: Le terme « else » n’est pas reconnu comme nom d’applet de commande, d’une fonction, d’un fichier de script ou d’un programme exécutable.
+Vérifiez l’orthographe du nom ou, si un chemin d’accès a été inclus, vérifiez que le chemin d’accès est correct et réessayez.
+else: Le terme « else » n’est pas reconnu comme nom d’applet de commande, d’une fonction, d’un fichier de script ou d’un programme exécutable.
+Vérifiez l’orthographe du nom ou, si un chemin d’accès a été inclus, vérifiez que le chemin d’accès est correct et réessayez.
+PS C:\mycode\Konnaxion\Konnaxion> CommandInvocation(Get-Command): "Get-Command"
+>> ParameterBinding(Get-Command): name="UseFuzzyMatching"; value="True"
+>> ParameterBinding(Get-Command): name="FuzzyMinimumDistance"; value="1"
+>> ParameterBinding(Get-Command): name="Name"; value="else"
+>> CommandInvocation(Select-Object): "Select-Object"
+>> ParameterBinding(Select-Object): name="First"; value="5"
+>> ParameterBinding(Select-Object): name="Unique"; value="True"
+>> ParameterBinding(Select-Object): name="ExpandProperty"; value="Name"
+PS C:\mycode\Konnaxion\Konnaxion> Section "13. DJANGO — TOUS LES UNIVERSES EN DB, MEME PRIVES/ARCHIVES"
+
+====================================================================================================
+=== 13. DJANGO — TOUS LES UNIVERSES EN DB, MEME PRIVES/ARCHIVES
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> if (Test-Path $Py) {
+    $DbDiag = @'
+from konnaxion.worlds.models import Universe, World
+
+print("UNIVERSES_RAW:")
+for u in Universe.objects.order_by("key"):
+    print(
+        "UNIVERSE",
+        u.id,
+        u.key,
+        "| title=", repr(u.title),
+        "| status=", u.status,
+        "| visibility=", u.visibility,
+        "| default=", getattr(u.default_world, "key", None),
+        "| worlds=", u.worlds.count(),
+    )
+
+print()
+print("CUBA_RAW:")
+try:
+    u = Universe.objects.get(key="cuba-2026")
+except Universe.DoesNotExist:
+    print("cuba-2026 = <ABSENT FROM DATABASE>")
+else:
+    print(
+        "cuba-2026",
+        "| id=", u.id,
+        "| status=", u.status,
+        "| visibility=", u.visibility,
+        "| default=", getattr(u.default_world, "key", None),
+        "| metadata=", u.metadata_json,
+    )
+
+    for w in u.worlds.select_related("current_release").order_by("key"):
+        print(
+            "WORLD",
+            w.id,
+            w.key,
+            "| title=", repr(w.title),
+            "| status=", w.status,
+            "| visibility=", w.visibility,
+            "| current_release_id=", w.current_release_id,
+            "| release_status=", getattr(w.current_release, "status", None),
+            "| seed_version=", getattr(w.current_release, "seed_version", None),
+        )
+'@
+
+    & $Py ".\backend\manage.py" shell -c $DbDiag 2>&1
+}
+PS C:\mycode\Konnaxion\Konnaxion> Section "14. CUBA — PACK CANONIQUE REEL CHARGE PAR LE CODE"
+
+====================================================================================================
+=== 14. CUBA — PACK CANONIQUE REEL CHARGE PAR LE CODE
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> if (Test-Path $Py) {
+    $PackDiag = @'
+from konnaxion.worlds.services.universe_packs import (
+    universe_seed_root,
+    discover_universe_packs,
+    get_universe_pack,
+)
+
+print("UNIVERSE_SEED_ROOT =", universe_seed_root())
+
+print()
+print("DISCOVERED_PACKS:")
+for p in discover_universe_packs():
+    print(
+        p.universe_key,
+        p.version,
+        "| visibility=", p.visibility,
+        "| default_world=", p.default_world,
+        "| manifest=", p.manifest_path,
+    )
+
+print()
+print("CUBA PACK 0.2.0:")
+try:
+    p = get_universe_pack("cuba-2026", "0.2.0")
+except Exception as exc:
+    print("ERROR:", type(exc).__name__, str(exc))
+else:
+    print("key          =", p.universe_key)
+    print("version      =", p.version)
+    print("visibility   =", p.visibility)
+    print("default_world=", p.default_world)
+    print("manifest     =", p.manifest_path)
+    print("checksum     =", p.checksum)
+
+    for row in p.worlds:
+        print(
+            "WORLD DECLARATION",
+            row["world_key"],
+            "| visibility=", row["visibility"],
+            "| title=", repr(row["title"]),
+            "| seed_version=", row["seed_version"],
+        )
+'@
+
+    & $Py ".\backend\manage.py" shell -c $PackDiag 2>&1
+}
+PS C:\mycode\Konnaxion\Konnaxion> Section "15. MIGRATIONS WORLDS"
+
+====================================================================================================
+=== 15. MIGRATIONS WORLDS
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> if (Test-Path $Py) {
+    & $Py ".\backend\manage.py" showmigrations worlds 2>&1
+}
+PS C:\mycode\Konnaxion\Konnaxion> Section "16. BACKEND DIRECT :8000 — HEALTH + CATALOGUES"
+
+====================================================================================================
+=== 16. BACKEND DIRECT :8000 — HEALTH + CATALOGUES
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> Curl-Probe "http://127.0.0.1:8000/api/control/universes/"
+URL: http://127.0.0.1:8000/api/control/universes/
+HTTP=200 EFFECTIVE=http://127.0.0.1:8000/api/control/universes/
+  HTTP/1.1 200 OK
+  server: uvicorn
+  content-type: application/json
+  BODY-FIRST: [{"id":2,"key":"unesco","title":"UNESCO","description":"Dynamic simulation and deliberation universe aligned to UNESCO mission domains.","status":"active","visibility":"public","default_world_key":"unesco-commons","world_count":7,"can_manage":false,"metadata_json":{"experience":"dynamic_simulation","seed_version":"1.3.0","_kx_universe_pack":{"checksum":"814632124a08d03804d301c0e291b32edc70314473af8986570d77ced9adc615","contract":"kx-universe-pack/v1","pack_version":"1.4.0","universe_key":"unesco"},"architecture_lock":"KX-UNIVERSES-1","natural_extensions":["keenkonnect","konnected"],"primary_deliberation":"ethikos/korum","excluded_from_workflow_seed":["kreative"]},"created_at":"2026-09-29T18:15:19.663103Z","updated_at":"2026-09-29T18:30:10.046617Z","archived_at":null},{"id":4,"key":"kristal
+
+PS C:\mycode\Konnaxion\Konnaxion> Curl-Probe "http://127.0.0.1:8000/api/control/worlds/"
+URL: http://127.0.0.1:8000/api/control/worlds/
+HTTP=200 EFFECTIVE=http://127.0.0.1:8000/api/control/worlds/
+  HTTP/1.1 200 OK
+  server: uvicorn
+  content-type: application/json
+  BODY-FIRST: [{"id":17,"universe_id":4,"universe_key":"kristal-farms","universe_title":"Kristal Farms","key":"kf-fr-ovhcloud","title":"Kristal Farms — Étude internationale 01 — OVHcloud","description":"Projet de simulation et de délibération Kristal Farms, slot 01, étudiant OVHcloud dans l’interface France–Québec/Canada; aucune manifestation d’intérêt, sélection de site ou relation commerciale n’est présumée.","status":"active","visibility":"public","current_release":{"id":33,"release_number":1,"status":"current","seed_pack_key":"kf-fr-ovhcloud","seed_version":"0.4.0","is_dirty":false,"dirty_since":null,"promoted_at":"2026-09-29T18:47:26.053594Z","created_at":"2026-09-29T18:33:39.283653Z"},"parent_world_id":null,"can_manage":false,"created_at":"2026-09-29T18:33:30.204519Z","updated_at":"2026-09-29T18:4
+
+PS C:\mycode\Konnaxion\Konnaxion> Curl-Probe "http://127.0.0.1:8000/api/control/universes/cuba-2026/"
+URL: http://127.0.0.1:8000/api/control/universes/cuba-2026/
+HTTP=404 EFFECTIVE=http://127.0.0.1:8000/api/control/universes/cuba-2026/
+  HTTP/1.1 404 Not Found
+  server: uvicorn
+  content-type: application/json
+  BODY-FIRST: {"error":"UNIVERSE_NOT_FOUND"}
+
+PS C:\mycode\Konnaxion\Konnaxion> Section "17. BACKEND DIRECT — CATALOGUE PARSE"
+
+====================================================================================================
+=== 17. BACKEND DIRECT — CATALOGUE PARSE
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> try {
+    $U = Invoke-RestMethod `
+        -Uri "http://127.0.0.1:8000/api/control/universes/" `
+        -TimeoutSec 5
+
+    Write-Host "UNIVERSES VIA BACKEND DIRECT:"
+
+    $U |
+        Select-Object id,key,title,status,visibility,default_world_key,world_count |
+        Format-Table -AutoSize
+}
+catch {
+    Write-Host "Backend universes ERROR:" $_.Exception.Message
+}
+UNIVERSES VIA BACKEND DIRECT:
+
+id key           title          status visibility default_world_key        world_count
+-- ---           -----          ------ ---------- -----------------        -----------
+ 2 unesco        UNESCO         active public     unesco-commons                     7
+ 4 kristal-farms Kristal Farms  active public                                       11
+ 5 levis         Ville de Lévis active public     levis-direction-generale          17
+
+PS C:\mycode\Konnaxion\Konnaxion> try {
+    $W = Invoke-RestMethod `
+        -Uri "http://127.0.0.1:8000/api/control/worlds/" `
+        -TimeoutSec 5
+
+    Write-Host ""
+    Write-Host "WORLD COUNT PAR UNIVERSE VIA BACKEND DIRECT:"
+
+    $W |
+        Group-Object universe_key |
+        Sort-Object Name |
+        Select-Object Name,Count |
+        Format-Table -AutoSize
+
+    Write-Host ""
+    Write-Host "CUBA WORLDS VIA BACKEND DIRECT:"
+
+    $W |
+        Where-Object universe_key -eq "cuba-2026" |
+        Select-Object key,title,status,visibility,@{
+            Name="release_status"
+            Expression={$_.current_release.status}
+        } |
+        Format-Table -AutoSize
+}
+catch {
+    Write-Host "Backend worlds ERROR:" $_.Exception.Message
+}
+
+WORLD COUNT PAR UNIVERSE VIA BACKEND DIRECT:
+
+Name          Count
+----          -----
+kristal-farms    11
+levis            17
+unesco            7
+
+
+CUBA WORLDS VIA BACKEND DIRECT:
+PS C:\mycode\Konnaxion\Konnaxion> Section "18. PROBE DE TOUS LES FRONTENDS 3000-3099"
+
+====================================================================================================
+=== 18. PROBE DE TOUS LES FRONTENDS 3000-3099
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> $Ports = @()
+PS C:\mycode\Konnaxion\Konnaxion> if ($Listeners) {
+    $Ports = $Listeners.LocalPort | Sort-Object -Unique
+}
+PS C:\mycode\Konnaxion\Konnaxion> foreach ($Port in $Ports) {
+    Write-Host ""
+    Write-Host ("#" * 100)
+    Write-Host "### PORT $Port"
+    Write-Host ("#" * 100)
+
+    Curl-Probe "http://localhost:$Port/"
+    Curl-Probe "http://unesco.localhost:$Port/"
+    Curl-Probe "http://cuba-2026.localhost:$Port/"
+
+    Curl-Probe "http://localhost:$Port/api/control/universes/"
+    Curl-Probe "http://cuba-2026.localhost:$Port/api/control/universes/"
+
+    Curl-Probe "http://localhost:$Port/u/unesco/w/unesco-culture-heritage/ethikos/insights"
+    Curl-Probe "http://localhost:$Port/u/cuba-2026/w/cuba-koali-offline/ethikos/insights"
+
+    Curl-Probe "http://unesco.localhost:$Port/w/unesco-culture-heritage/ethikos/insights"
+    Curl-Probe "http://cuba-2026.localhost:$Port/w/cuba-koali-offline/ethikos/insights"
+}
+
+####################################################################################################
+### PORT 3000
+####################################################################################################
+URL: http://localhost:3000/
+HTTP=200 EFFECTIVE=http://localhost:3000/
+  HTTP/1.1 200 OK
+  X-Powered-By: Next.js
+  Content-Type: text/html; charset=utf-8
+  BODY-FIRST: <!DOCTYPE html><html><head><meta charSet="utf-8" data-next-head=""/><meta name="viewport" content="width=device-width" data-next-head=""/><title data-next-head="">Orgo · Organize and Go</title><link rel="icon" href="/logo_k.svg" type="image/svg+xml" data-next-head=""/><meta name="description" content="Organize signals into Workrooms, decisions, plans, Actions, evidence, and verified outcomes." data-next-head=""/><link rel="preload" href="/_next/static/css/a55524c97d72be83.css" as="style"/><link rel="stylesheet" href="/_next/static/css/a55524c97d72be83.css" data-n-g=""/><noscript data-n-css=""></noscript><script defer="" noModule="" src="/_next/static/chunks/polyfills-42372ed130431b0a.js"></script><script src="/_next/static/chunks/webpack-8497fbbedd21184c.js" defer=""></script><script src="
+
+URL: http://unesco.localhost:3000/
+HTTP=200 EFFECTIVE=http://unesco.localhost:3000/
+  HTTP/1.1 200 OK
+  X-Powered-By: Next.js
+  Content-Type: text/html; charset=utf-8
+  BODY-FIRST: <!DOCTYPE html><html><head><meta charSet="utf-8" data-next-head=""/><meta name="viewport" content="width=device-width" data-next-head=""/><title data-next-head="">Orgo · Organize and Go</title><link rel="icon" href="/logo_k.svg" type="image/svg+xml" data-next-head=""/><meta name="description" content="Organize signals into Workrooms, decisions, plans, Actions, evidence, and verified outcomes." data-next-head=""/><link rel="preload" href="/_next/static/css/a55524c97d72be83.css" as="style"/><link rel="stylesheet" href="/_next/static/css/a55524c97d72be83.css" data-n-g=""/><noscript data-n-css=""></noscript><script defer="" noModule="" src="/_next/static/chunks/polyfills-42372ed130431b0a.js"></script><script src="/_next/static/chunks/webpack-8497fbbedd21184c.js" defer=""></script><script src="
+
+URL: http://cuba-2026.localhost:3000/
+HTTP=200 EFFECTIVE=http://cuba-2026.localhost:3000/
+  HTTP/1.1 200 OK
+  X-Powered-By: Next.js
+  Content-Type: text/html; charset=utf-8
+  BODY-FIRST: <!DOCTYPE html><html><head><meta charSet="utf-8" data-next-head=""/><meta name="viewport" content="width=device-width" data-next-head=""/><title data-next-head="">Orgo · Organize and Go</title><link rel="icon" href="/logo_k.svg" type="image/svg+xml" data-next-head=""/><meta name="description" content="Organize signals into Workrooms, decisions, plans, Actions, evidence, and verified outcomes." data-next-head=""/><link rel="preload" href="/_next/static/css/a55524c97d72be83.css" as="style"/><link rel="stylesheet" href="/_next/static/css/a55524c97d72be83.css" data-n-g=""/><noscript data-n-css=""></noscript><script defer="" noModule="" src="/_next/static/chunks/polyfills-42372ed130431b0a.js"></script><script src="/_next/static/chunks/webpack-8497fbbedd21184c.js" defer=""></script><script src="
+
+URL: http://localhost:3000/api/control/universes/
+HTTP=308 EFFECTIVE=http://localhost:3000/api/control/universes/
+  HTTP/1.1 308 Permanent Redirect
+  location: /api/control/universes
+  BODY-FIRST: /api/control/universes
+
+URL: http://cuba-2026.localhost:3000/api/control/universes/
+HTTP=308 EFFECTIVE=http://cuba-2026.localhost:3000/api/control/universes/
+  HTTP/1.1 308 Permanent Redirect
+  location: /api/control/universes
+  BODY-FIRST: /api/control/universes
+
+URL: http://localhost:3000/u/unesco/w/unesco-culture-heritage/ethikos/insights
+HTTP=200 EFFECTIVE=http://localhost:3000/u/unesco/w/unesco-culture-heritage/ethikos/insights
+  HTTP/1.1 200 OK
+  X-Powered-By: Next.js
+  Content-Type: text/html; charset=utf-8
+  BODY-FIRST: <!DOCTYPE html><html><head><meta charSet="utf-8" data-next-head=""/><meta name="viewport" content="width=device-width" data-next-head=""/><title data-next-head="">Orgo · Organize and Go</title><link rel="icon" href="/logo_k.svg" type="image/svg+xml" data-next-head=""/><meta name="description" content="Organize signals into Workrooms, decisions, plans, Actions, evidence, and verified outcomes." data-next-head=""/><link rel="preload" href="/_next/static/css/a55524c97d72be83.css" as="style"/><link rel="stylesheet" href="/_next/static/css/a55524c97d72be83.css" data-n-g=""/><noscript data-n-css=""></noscript><script defer="" noModule="" src="/_next/static/chunks/polyfills-42372ed130431b0a.js"></script><script src="/_next/static/chunks/webpack-8497fbbedd21184c.js" defer=""></script><script src="
+
+URL: http://localhost:3000/u/cuba-2026/w/cuba-koali-offline/ethikos/insights
+HTTP=200 EFFECTIVE=http://localhost:3000/u/cuba-2026/w/cuba-koali-offline/ethikos/insights
+  HTTP/1.1 200 OK
+  X-Powered-By: Next.js
+  Content-Type: text/html; charset=utf-8
+  BODY-FIRST: <!DOCTYPE html><html><head><meta charSet="utf-8" data-next-head=""/><meta name="viewport" content="width=device-width" data-next-head=""/><title data-next-head="">Orgo · Organize and Go</title><link rel="icon" href="/logo_k.svg" type="image/svg+xml" data-next-head=""/><meta name="description" content="Organize signals into Workrooms, decisions, plans, Actions, evidence, and verified outcomes." data-next-head=""/><link rel="preload" href="/_next/static/css/a55524c97d72be83.css" as="style"/><link rel="stylesheet" href="/_next/static/css/a55524c97d72be83.css" data-n-g=""/><noscript data-n-css=""></noscript><script defer="" noModule="" src="/_next/static/chunks/polyfills-42372ed130431b0a.js"></script><script src="/_next/static/chunks/webpack-8497fbbedd21184c.js" defer=""></script><script src="
+
+URL: http://unesco.localhost:3000/w/unesco-culture-heritage/ethikos/insights
+HTTP=200 EFFECTIVE=http://unesco.localhost:3000/w/unesco-culture-heritage/ethikos/insights
+  HTTP/1.1 200 OK
+  X-Powered-By: Next.js
+  Content-Type: text/html; charset=utf-8
+  BODY-FIRST: <!DOCTYPE html><html><head><meta charSet="utf-8" data-next-head=""/><meta name="viewport" content="width=device-width" data-next-head=""/><title data-next-head="">Orgo · Organize and Go</title><link rel="icon" href="/logo_k.svg" type="image/svg+xml" data-next-head=""/><meta name="description" content="Organize signals into Workrooms, decisions, plans, Actions, evidence, and verified outcomes." data-next-head=""/><link rel="preload" href="/_next/static/css/a55524c97d72be83.css" as="style"/><link rel="stylesheet" href="/_next/static/css/a55524c97d72be83.css" data-n-g=""/><noscript data-n-css=""></noscript><script defer="" noModule="" src="/_next/static/chunks/polyfills-42372ed130431b0a.js"></script><script src="/_next/static/chunks/webpack-8497fbbedd21184c.js" defer=""></script><script src="
+
+URL: http://cuba-2026.localhost:3000/w/cuba-koali-offline/ethikos/insights
+HTTP=200 EFFECTIVE=http://cuba-2026.localhost:3000/w/cuba-koali-offline/ethikos/insights
+  HTTP/1.1 200 OK
+  X-Powered-By: Next.js
+  Content-Type: text/html; charset=utf-8
+  BODY-FIRST: <!DOCTYPE html><html><head><meta charSet="utf-8" data-next-head=""/><meta name="viewport" content="width=device-width" data-next-head=""/><title data-next-head="">Orgo · Organize and Go</title><link rel="icon" href="/logo_k.svg" type="image/svg+xml" data-next-head=""/><meta name="description" content="Organize signals into Workrooms, decisions, plans, Actions, evidence, and verified outcomes." data-next-head=""/><link rel="preload" href="/_next/static/css/a55524c97d72be83.css" as="style"/><link rel="stylesheet" href="/_next/static/css/a55524c97d72be83.css" data-n-g=""/><noscript data-n-css=""></noscript><script defer="" noModule="" src="/_next/static/chunks/polyfills-42372ed130431b0a.js"></script><script src="/_next/static/chunks/webpack-8497fbbedd21184c.js" defer=""></script><script src="
+
+
+####################################################################################################
+### PORT 3001
+####################################################################################################
+URL: http://localhost:3001/
+HTTP=200 EFFECTIVE=http://localhost:3001/
+  HTTP/1.1 200 OK
+  X-Powered-By: Next.js
+  Content-Type: text/html; charset=utf-8
+  BODY-FIRST: <!DOCTYPE html><html lang="fr-CA"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="image" href="/LogoK.svg"/><link rel="stylesheet" href="/_next/static/chunks/styles_tailwind_a431aba9.css" data-precedence="next_static/chunks/styles_tailwind_a431aba9.css"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_8873a9ea._.js"/><script src="/_next/static/chunks/af7d4_next_dist_compiled_dcfe9415._.js" async=""></script><script src="/_next/static/chunks/af7d4_next_dist_client_0191978f._.js" async=""></script><script src="/_next/static/chunks/af7d4_next_dist_42a6a07f._.js" async=""></script><script src="/_next/static/chunks/61dca_%40swc_helpers_cjs
+
+URL: http://unesco.localhost:3001/
+HTTP=200 EFFECTIVE=http://unesco.localhost:3001/
+  HTTP/1.1 200 OK
+  X-Powered-By: Next.js
+  Content-Type: text/html; charset=utf-8
+  BODY-FIRST: <!DOCTYPE html><html lang="fr-CA"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="image" href="/LogoK.svg"/><link rel="stylesheet" href="/_next/static/chunks/styles_tailwind_a431aba9.css" data-precedence="next_static/chunks/styles_tailwind_a431aba9.css"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_8873a9ea._.js"/><script src="/_next/static/chunks/af7d4_next_dist_compiled_dcfe9415._.js" async=""></script><script src="/_next/static/chunks/af7d4_next_dist_client_0191978f._.js" async=""></script><script src="/_next/static/chunks/af7d4_next_dist_42a6a07f._.js" async=""></script><script src="/_next/static/chunks/61dca_%40swc_helpers_cjs
+
+URL: http://cuba-2026.localhost:3001/
+HTTP=200 EFFECTIVE=http://cuba-2026.localhost:3001/
+  HTTP/1.1 200 OK
+  X-Powered-By: Next.js
+  Content-Type: text/html; charset=utf-8
+  BODY-FIRST: <!DOCTYPE html><html lang="fr-CA"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="image" href="/LogoK.svg"/><link rel="stylesheet" href="/_next/static/chunks/styles_tailwind_a431aba9.css" data-precedence="next_static/chunks/styles_tailwind_a431aba9.css"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_8873a9ea._.js"/><script src="/_next/static/chunks/af7d4_next_dist_compiled_dcfe9415._.js" async=""></script><script src="/_next/static/chunks/af7d4_next_dist_client_0191978f._.js" async=""></script><script src="/_next/static/chunks/af7d4_next_dist_42a6a07f._.js" async=""></script><script src="/_next/static/chunks/61dca_%40swc_helpers_cjs
+
+URL: http://localhost:3001/api/control/universes/
+HTTP=308 EFFECTIVE=http://localhost:3001/api/control/universes/
+  HTTP/1.1 308 Permanent Redirect
+  location: /api/control/universes
+  BODY-FIRST: /api/control/universes
+
+URL: http://cuba-2026.localhost:3001/api/control/universes/
+HTTP=308 EFFECTIVE=http://cuba-2026.localhost:3001/api/control/universes/
+  HTTP/1.1 308 Permanent Redirect
+  location: /api/control/universes
+  BODY-FIRST: /api/control/universes
+
+URL: http://localhost:3001/u/unesco/w/unesco-culture-heritage/ethikos/insights
+HTTP=200 EFFECTIVE=http://localhost:3001/u/unesco/w/unesco-culture-heritage/ethikos/insights
+  HTTP/1.1 200 OK
+  X-Powered-By: Next.js
+  Content-Type: text/html; charset=utf-8
+  BODY-FIRST: <!DOCTYPE html><html lang="fr-CA"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="image" href="/LogoK.svg"/><link rel="stylesheet" href="/_next/static/chunks/styles_tailwind_a431aba9.css" data-precedence="next_static/chunks/styles_tailwind_a431aba9.css"/><link rel="stylesheet" href="/_next/static/chunks/components_layout-components_Menu_2dd0c29b.css" data-precedence="next_static/chunks/components_layout-components_Menu_2dd0c29b.css"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_8873a9ea._.js"/><script src="/_next/static/chunks/af7d4_next_dist_compiled_dcfe9415._.js" async=""></script><script src="/_next/static/chunks/af7d4_next_dis
+
+URL: http://localhost:3001/u/cuba-2026/w/cuba-koali-offline/ethikos/insights
+HTTP=200 EFFECTIVE=http://localhost:3001/u/cuba-2026/w/cuba-koali-offline/ethikos/insights
+  HTTP/1.1 200 OK
+  X-Powered-By: Next.js
+  Content-Type: text/html; charset=utf-8
+  BODY-FIRST: <!DOCTYPE html><html lang="fr-CA"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="image" href="/LogoK.svg"/><link rel="stylesheet" href="/_next/static/chunks/styles_tailwind_a431aba9.css" data-precedence="next_static/chunks/styles_tailwind_a431aba9.css"/><link rel="stylesheet" href="/_next/static/chunks/components_layout-components_Menu_2dd0c29b.css" data-precedence="next_static/chunks/components_layout-components_Menu_2dd0c29b.css"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_8873a9ea._.js"/><script src="/_next/static/chunks/af7d4_next_dist_compiled_dcfe9415._.js" async=""></script><script src="/_next/static/chunks/af7d4_next_dis
+
+URL: http://unesco.localhost:3001/w/unesco-culture-heritage/ethikos/insights
+HTTP=200 EFFECTIVE=http://unesco.localhost:3001/w/unesco-culture-heritage/ethikos/insights
+  HTTP/1.1 200 OK
+  X-Powered-By: Next.js
+  Content-Type: text/html; charset=utf-8
+  BODY-FIRST: <!DOCTYPE html><html lang="fr-CA"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="image" href="/LogoK.svg"/><link rel="stylesheet" href="/_next/static/chunks/styles_tailwind_a431aba9.css" data-precedence="next_static/chunks/styles_tailwind_a431aba9.css"/><link rel="stylesheet" href="/_next/static/chunks/components_layout-components_Menu_2dd0c29b.css" data-precedence="next_static/chunks/components_layout-components_Menu_2dd0c29b.css"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_8873a9ea._.js"/><script src="/_next/static/chunks/af7d4_next_dist_compiled_dcfe9415._.js" async=""></script><script src="/_next/static/chunks/af7d4_next_dis
+
+URL: http://cuba-2026.localhost:3001/w/cuba-koali-offline/ethikos/insights
+HTTP=200 EFFECTIVE=http://cuba-2026.localhost:3001/w/cuba-koali-offline/ethikos/insights
+  HTTP/1.1 200 OK
+  X-Powered-By: Next.js
+  Content-Type: text/html; charset=utf-8
+  BODY-FIRST: <!DOCTYPE html><html lang="fr-CA"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="image" href="/LogoK.svg"/><link rel="stylesheet" href="/_next/static/chunks/styles_tailwind_a431aba9.css" data-precedence="next_static/chunks/styles_tailwind_a431aba9.css"/><link rel="stylesheet" href="/_next/static/chunks/components_layout-components_Menu_2dd0c29b.css" data-precedence="next_static/chunks/components_layout-components_Menu_2dd0c29b.css"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_8873a9ea._.js"/><script src="/_next/static/chunks/af7d4_next_dist_compiled_dcfe9415._.js" async=""></script><script src="/_next/static/chunks/af7d4_next_dis
+
+PS C:\mycode\Konnaxion\Konnaxion> Section "19. FRONTEND PROXY — PARSE DES UNIVERSES POUR CHAQUE PORT"
+
+====================================================================================================
+=== 19. FRONTEND PROXY — PARSE DES UNIVERSES POUR CHAQUE PORT
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> foreach ($Port in $Ports) {
+    Write-Host ""
+    Write-Host "--- PORT $Port / localhost ---"
+
+    try {
+        $Rows = Invoke-RestMethod `
+            -Uri "http://localhost:$Port/api/control/universes/" `
+            -TimeoutSec 5
+
+        $Rows |
+            Select-Object id,key,title,status,visibility,default_world_key,world_count |
+            Format-Table -AutoSize
+    }
+    catch {
+        Write-Host "ERROR:" $_.Exception.Message
+    }
+
+    Write-Host ""
+    Write-Host "--- PORT $Port / cuba-2026.localhost ---"
+
+    try {
+        $Rows = Invoke-RestMethod `
+            -Uri "http://cuba-2026.localhost:$Port/api/control/universes/" `
+            -TimeoutSec 5
+
+        $Rows |
+            Select-Object id,key,title,status,visibility,default_world_key,world_count |
+            Format-Table -AutoSize
+    }
+    catch {
+        Write-Host "ERROR:" $_.Exception.Message
+    }
+}
+
+--- PORT 3000 / localhost ---
+PS C:\mycode\Konnaxion\Konnaxion> TerminatingError(Invoke-RestMethod): "
+
+
+
+Error
+
+
+Cannot GET /api/control/universes
+
+
+"
+ERROR: Le code d’état de réponse n’a pas abouti : 404 (Not Found).
+
+--- PORT 3000 / cuba-2026.localhost ---
+PS C:\mycode\Konnaxion\Konnaxion> TerminatingError(Invoke-RestMethod): "Hôte inconnu."
+ERROR: Hôte inconnu. (cuba-2026.localhost:3000)
+
+--- PORT 3001 / localhost ---
+
+id key           title          status visibility default_world_key        world_count
+-- ---           -----          ------ ---------- -----------------        -----------
+ 2 unesco        UNESCO         active public     unesco-commons                     7
+ 4 kristal-farms Kristal Farms  active public                                       11
+ 5 levis         Ville de Lévis active public     levis-direction-generale          17
+
+
+--- PORT 3001 / cuba-2026.localhost ---
+PS C:\mycode\Konnaxion\Konnaxion> TerminatingError(Invoke-RestMethod): "Hôte inconnu."
+ERROR: Hôte inconnu. (cuba-2026.localhost:3001)
+PS C:\mycode\Konnaxion\Konnaxion> Section "20. TEST CUBA RUNTIME DIRECT BACKEND"
+
+====================================================================================================
+=== 20. TEST CUBA RUNTIME DIRECT BACKEND
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> Curl-Probe "http://127.0.0.1:8000/api/u/cuba-2026/w/cuba-koali-offline/runtime/"
+URL: http://127.0.0.1:8000/api/u/cuba-2026/w/cuba-koali-offline/runtime/
+HTTP=403 EFFECTIVE=http://127.0.0.1:8000/api/u/cuba-2026/w/cuba-koali-offline/runtime/
+  HTTP/1.1 403 Forbidden
+  server: uvicorn
+  content-type: application/json
+  BODY-FIRST: {"error": "WORLD_ACCESS_DENIED", "detail": "You do not have access to this World."}
+
+PS C:\mycode\Konnaxion\Konnaxion> Section "21. TEST UNESCO RUNTIME DIRECT BACKEND"
+
+====================================================================================================
+=== 21. TEST UNESCO RUNTIME DIRECT BACKEND
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> Curl-Probe "http://127.0.0.1:8000/api/u/unesco/w/unesco-culture-heritage/runtime/"
+URL: http://127.0.0.1:8000/api/u/unesco/w/unesco-culture-heritage/runtime/
+HTTP=200 EFFECTIVE=http://127.0.0.1:8000/api/u/unesco/w/unesco-culture-heritage/runtime/
+  HTTP/1.1 200 OK
+  server: uvicorn
+  content-type: application/json
+  x-konnaxion-universe: unesco
+  x-konnaxion-world: unesco-culture-heritage
+  x-konnaxion-world-release: 1
+  x-konnaxion-world-release-id: 29
+  x-konnaxion-world-dirty: false
+  BODY-FIRST: {"architecture_lock":"KX-UNIVERSES-1","universe":{"id":2,"key":"unesco","title":"UNESCO"},"world":{"id":13,"key":"unesco-culture-heritage","title":"UNESCO — Culture & Heritage"},"release":{"id":29,"number":1,"dirty":false},"view_as":null,"capabilities":{"data_plane_enabled":true,"scoped_api_enforced":true}}
+
+PS C:\mycode\Konnaxion\Konnaxion> Section "22. RESUME MACHINE LISIBLE"
+
+====================================================================================================
+=== 22. RESUME MACHINE LISIBLE
+====================================================================================================
+PS C:\mycode\Konnaxion\Konnaxion> Write-Host "Diagnostic terminé."
+Diagnostic terminé.
+PS C:\mycode\Konnaxion\Konnaxion> Write-Host "Fichier:" $Diag
+Fichier: C:\mycode\Konnaxion\Konnaxion\KONNAXION_LOCAL_DIAG_20260930-075510.txt
+PS C:\mycode\Konnaxion\Konnaxion> Write-Host ""
+
+PS C:\mycode\Konnaxion\Konnaxion> Write-Host "Aucune configuration n'a été modifiée."
+Aucune configuration n'a été modifiée.
+PS C:\mycode\Konnaxion\Konnaxion> Write-Host "Aucun container/processus n'a été arrêté."
+Aucun container/processus n'a été arrêté.
+PS C:\mycode\Konnaxion\Konnaxion> Write-Host "Aucune migration/import/promotion n'a été exécuté."
+Aucune migration/import/promotion n'a été exécuté.
+PS C:\mycode\Konnaxion\Konnaxion> Stop-Transcript
+**********************
+Fin de la transcription PowerShell
+Heure de fin : 20260930075553
+**********************

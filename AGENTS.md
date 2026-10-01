@@ -42,6 +42,8 @@ Use active source instead.
 
 `.smartignore` identifies additional content that is normally irrelevant to AI/code-navigation work.
 
+Active `backend/seed-data/` Universe/World packs are executable runtime inputs, not generated inventory. Inspect them when diagnosing seeded World content, release composition, or runtime-data gaps.
+
 Do not modify an archive, dump, generated inventory, or diagnostic artifact to change current application behavior.
 
 ## 3. Universe / World engine ownership is external to this repository

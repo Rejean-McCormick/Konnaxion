@@ -1,4 +1,5 @@
 import {
+  getUniverseKeyFromHostname,
   getUniverseKeyFromPathname,
   getWorldKeyFromPathname,
   isGlobalApiPath,
@@ -37,11 +38,29 @@ describe('Universe/World URL helpers', () => {
     );
   });
 
-  test('switches World while retaining current Universe and app path', () => {
+  test('switches World while retaining portable app paths', () => {
     expect(switchWorldPath('/u/mine-x/w/engineering/konsensus', 'finance')).toBe(
       '/u/mine-x/w/finance/konsensus',
     );
     expect(switchWorldPath('/', 'b')).toBe('/w/b/ethikos/insights');
+  });
+
+  test('does not carry release-local ethiKos topic ids across World switches', () => {
+    expect(
+      switchWorldPath(
+        '/u/levis/w/levis-approvisionnement-immobilier/ethikos/deliberate/4',
+        'levis-affaires-juridiques-greffe',
+      ),
+    ).toBe(
+      '/u/levis/w/levis-affaires-juridiques-greffe/ethikos/deliberate/elite',
+    );
+
+    expect(
+      switchWorldPath(
+        '/w/levis-approvisionnement-immobilier/ethikos/deliberate/elite',
+        'levis-affaires-juridiques-greffe',
+      ),
+    ).toBe('/w/levis-affaires-juridiques-greffe/ethikos/deliberate/elite');
   });
 });
 
@@ -81,3 +100,22 @@ describe('Universe/World WebSocket scoping', () => {
     );
   });
 });
+
+describe('Universe hostname routing', () => {
+  test('derives a generic Universe key from one explicit subdomain label', () => {
+    expect(getUniverseKeyFromHostname('unesco.konnaxion.com', 'konnaxion.com')).toBe(
+      'unesco',
+    );
+    expect(
+      getUniverseKeyFromHostname('kristal-farms.konnaxion.com', 'konnaxion.com'),
+    ).toBe('kristal-farms');
+  });
+
+  test('does not reinterpret infrastructure or nested hosts as Universes', () => {
+    expect(getUniverseKeyFromHostname('konnaxion.com', 'konnaxion.com')).toBeNull();
+    expect(getUniverseKeyFromHostname('www.konnaxion.com', 'konnaxion.com')).toBeNull();
+    expect(getUniverseKeyFromHostname('x.y.konnaxion.com', 'konnaxion.com')).toBeNull();
+    expect(getUniverseKeyFromHostname('other.example', 'konnaxion.com')).toBeNull();
+  });
+});
+

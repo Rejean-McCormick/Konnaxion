@@ -1,7 +1,7 @@
 world_contract: kx-world-pack/v1
 world_key: cuba-koali-offline
 title: Cuba 2026 — Koali Offline
-pack_version: 0.2.0
+pack_version: 0.3.0
 requires:
   ethikos_scenario_schema: ethikos-demo-scenario/v3
   fixtures:
@@ -28,7 +28,11 @@ metadata:
   - leo_romantique
   - arkady_courtisan
   - dd44_colosse
-  seed_version: 0.2.0
+  seed_version: 0.3.0
   political_reality_boundary: fictional simulation; no real political organization or operational activity is asserted
   universe_standard: kx-universe-pack/v1
   persona_contract: kx-world-personas/v1
+  mega_update_version: 1.0.0
+  mega_update_date: '2026-09-30'
+  demo_smart_vote_enabled: true
+  demo_visibility: public

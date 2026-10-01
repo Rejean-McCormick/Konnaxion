@@ -1271,7 +1271,7 @@
     "noConsultationsMatchYourSearchOrFilters": "No consultations match your search or filters.",
     "noDecisionsMatchTheCurrentFilters": "No decisions match the current filters",
     "noDeclaredReading": "No declared reading",
-    "noDeliberationTopicsAvailableYet": "No deliberation topics available yet",
+    "noDeliberationTopicsAvailableYet": "No deliberation topics are available in this World yet",
     "noDomainRelevanceVectorIsAttachedToThis": "No domain relevance vector is attached to this question.",
     "noEarnedBadgesMatchTheCurrentFilters": "No earned badges match the current filters.",
     "noEkohProfileAvailable": "No EkoH profile available",
@@ -5122,7 +5122,7 @@
           "needsFirstStance": "Needs first stance",
           "newTopic": "New topic",
           "newTopic_8358da": "New Topic",
-          "noDeliberationTopicsAvailableYet": "No deliberation topics available yet",
+          "noDeliberationTopicsAvailableYet": "No deliberation topics are available in this World yet",
           "noPreviewDataAvailable": "No preview data available.",
           "noStatementsYetOpenTheThreadTo": "No statements yet. Open the thread to start the discussion.",
           "open": "Open",
@@ -5400,6 +5400,7 @@
           "topic": "Topic",
           "topicDataUnavailable": "Topic data unavailable",
           "topicNotFound": "Topic not found",
+          "topicUnavailableInActiveWorld": "This topic is not available in the active World.",
           "topicstates": {
             "loadingDeliberationThread": "Loading deliberation thread…"
           },

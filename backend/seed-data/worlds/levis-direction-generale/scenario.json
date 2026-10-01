@@ -6,8 +6,8 @@
   "metadata": {
     "seed_kind": "municipal_persona_projection_baseline",
     "baseline_date": "2026-09-29",
-    "seed_version": "0.4.0",
-    "generated_statements": false,
+    "seed_version": "0.5.0",
+    "generated_statements": true,
     "registry_fingerprint": "68b77f1c607a4195ddc4da46b0429f2fe8308e2c259af670ecd6e7b2b19d75a9",
     "generated_from_registry": true,
     "knowledge_authority": "kristal_v5_runtime_pack",
@@ -521,7 +521,91 @@
           "binding": "referent_ref",
           "runtime_pack_required_for_epistemic_claims": true
         }
+      },
+      "levis_direction_generale__sim_expert_1": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "is_klone": true,
+        "simulation_eligible": true,
+        "ethikos_elite": true,
+        "entity_type": "synthetic_fictional_persona",
+        "representation_type": "synthetic_fictional_persona",
+        "representation": {
+          "real_person": false,
+          "simulated_voice": true,
+          "attribution_mode": "synthetic_fixture",
+          "must_label_simulated": true,
+          "source_bound": false
+        },
+        "global_entity_key": "levis:simulation:levis-direction-generale:expert-1",
+        "external_referents": {
+          "konnaxion_demo": "levis:simulation:levis-direction-generale:expert-1"
+        },
+        "knowledge_projection": {
+          "authority": "konnaxion_demo_seed",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "levis_direction_generale__sim_expert_2": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "is_klone": true,
+        "simulation_eligible": true,
+        "ethikos_elite": true,
+        "entity_type": "synthetic_fictional_persona",
+        "representation_type": "synthetic_fictional_persona",
+        "representation": {
+          "real_person": false,
+          "simulated_voice": true,
+          "attribution_mode": "synthetic_fixture",
+          "must_label_simulated": true,
+          "source_bound": false
+        },
+        "global_entity_key": "levis:simulation:levis-direction-generale:expert-2",
+        "external_referents": {
+          "konnaxion_demo": "levis:simulation:levis-direction-generale:expert-2"
+        },
+        "knowledge_projection": {
+          "authority": "konnaxion_demo_seed",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
+      },
+      "levis_direction_generale__sim_expert_3": {
+        "persona_type": "simulated_person",
+        "account_type": "human",
+        "is_klone": true,
+        "simulation_eligible": true,
+        "ethikos_elite": true,
+        "entity_type": "synthetic_fictional_persona",
+        "representation_type": "synthetic_fictional_persona",
+        "representation": {
+          "real_person": false,
+          "simulated_voice": true,
+          "attribution_mode": "synthetic_fixture",
+          "must_label_simulated": true,
+          "source_bound": false
+        },
+        "global_entity_key": "levis:simulation:levis-direction-generale:expert-3",
+        "external_referents": {
+          "konnaxion_demo": "levis:simulation:levis-direction-generale:expert-3"
+        },
+        "knowledge_projection": {
+          "authority": "konnaxion_demo_seed",
+          "binding": "referent_ref",
+          "runtime_pack_required_for_epistemic_claims": true
+        }
       }
+    },
+    "mega_update": {
+      "version": "1.0.0",
+      "date": "2026-09-30",
+      "purpose": "synthetic_world_scoped_deliberation_plus_contextual_ekoh_readings",
+      "real_person_ekoh_scores_generated": false,
+      "real_person_stances_generated": false,
+      "baseline_always_visible": true,
+      "note": "All new stances, arguments and EkoH scores belong only to explicitly synthetic fictional expert personas."
     }
   },
   "actors": [
@@ -644,18 +728,487 @@
       "username": "eric-nadeau",
       "display_name": "Éric Nadeau",
       "is_ethikos_elite": false
+    },
+    {
+      "key": "levis_direction_generale__sim_expert_1",
+      "username": "demo_levis_direction_generale_sim_expert_1",
+      "display_name": "[SIMULATION] Expert·e opérations — Ville de Lévis — Direction générale",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "levis_direction_generale__sim_expert_2",
+      "username": "demo_levis_direction_generale_sim_expert_2",
+      "display_name": "[SIMULATION] Expert·e gouvernance — Ville de Lévis — Direction générale",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "levis_direction_generale__sim_expert_3",
+      "username": "demo_levis_direction_generale_sim_expert_3",
+      "display_name": "[SIMULATION] Expert·e données et impacts — Ville de Lévis — Direction générale",
+      "is_ethikos_elite": true
     }
   ],
-  "categories": [],
-  "topics": [],
-  "stances": [],
-  "arguments": [],
-  "argument_sources": [],
+  "categories": [
+    {
+      "key": "governance",
+      "name": "[DEMO] Governance"
+    },
+    {
+      "key": "operations",
+      "name": "[DEMO] Operations"
+    }
+  ],
+  "topics": [
+    {
+      "key": "priorites_interdirections",
+      "title": "[DEMO] Lévis — Faut-il utiliser un portefeuille municipal unique pour arbitrer les priorités entre directions??",
+      "description": "Faut-il utiliser un portefeuille municipal unique pour arbitrer les priorités entre directions? Question synthétique destinée à exercer la délibération, les profils EkoH et la lecture Smart Vote dans ce World.",
+      "status": "open",
+      "category": "governance",
+      "start_date": "2026-09-30",
+      "end_date": "2026-12-31"
+    },
+    {
+      "key": "suivi_engagements",
+      "title": "[DEMO] Lévis — Faut-il publier un tableau de suivi commun des engagements transversaux avec responsables, échéances et indicateurs??",
+      "description": "Faut-il publier un tableau de suivi commun des engagements transversaux avec responsables, échéances et indicateurs? Question synthétique destinée à exercer la délibération, les profils EkoH et la lecture Smart Vote dans ce World.",
+      "status": "open",
+      "category": "governance",
+      "start_date": "2026-09-30",
+      "end_date": "2026-12-31"
+    },
+    {
+      "key": "capacite_execution",
+      "title": "[DEMO] Lévis — Faut-il conditionner le démarrage des nouveaux projets transversaux à une vérification explicite de la capacité opérationnelle??",
+      "description": "Faut-il conditionner le démarrage des nouveaux projets transversaux à une vérification explicite de la capacité opérationnelle? Question synthétique destinée à exercer la délibération, les profils EkoH et la lecture Smart Vote dans ce World.",
+      "status": "open",
+      "category": "operations",
+      "start_date": "2026-09-30",
+      "end_date": "2026-12-31"
+    },
+    {
+      "key": "revue_services",
+      "title": "[DEMO] Lévis — Faut-il instaurer une revue périodique des services municipaux fondée sur coût, qualité, accessibilité et risques??",
+      "description": "Faut-il instaurer une revue périodique des services municipaux fondée sur coût, qualité, accessibilité et risques? Question synthétique destinée à exercer la délibération, les profils EkoH et la lecture Smart Vote dans ce World.",
+      "status": "open",
+      "category": "operations",
+      "start_date": "2026-09-30",
+      "end_date": "2026-12-31"
+    }
+  ],
+  "stances": [
+    {
+      "topic": "priorites_interdirections",
+      "actor": "levis_direction_generale__sim_expert_1",
+      "value": 2
+    },
+    {
+      "topic": "priorites_interdirections",
+      "actor": "levis_direction_generale__sim_expert_3",
+      "value": -1
+    },
+    {
+      "topic": "priorites_interdirections",
+      "actor": "levis_direction_generale__sim_expert_2",
+      "value": 0
+    },
+    {
+      "topic": "suivi_engagements",
+      "actor": "levis_direction_generale__sim_expert_1",
+      "value": -2
+    },
+    {
+      "topic": "suivi_engagements",
+      "actor": "levis_direction_generale__sim_expert_3",
+      "value": 1
+    },
+    {
+      "topic": "suivi_engagements",
+      "actor": "levis_direction_generale__sim_expert_2",
+      "value": 0
+    },
+    {
+      "topic": "capacite_execution",
+      "actor": "levis_direction_generale__sim_expert_1",
+      "value": 2
+    },
+    {
+      "topic": "capacite_execution",
+      "actor": "levis_direction_generale__sim_expert_3",
+      "value": -1
+    },
+    {
+      "topic": "capacite_execution",
+      "actor": "levis_direction_generale__sim_expert_2",
+      "value": 0
+    },
+    {
+      "topic": "revue_services",
+      "actor": "levis_direction_generale__sim_expert_1",
+      "value": -2
+    },
+    {
+      "topic": "revue_services",
+      "actor": "levis_direction_generale__sim_expert_3",
+      "value": 1
+    },
+    {
+      "topic": "revue_services",
+      "actor": "levis_direction_generale__sim_expert_2",
+      "value": 0
+    }
+  ],
+  "arguments": [
+    {
+      "key": "mega_priorites_interdirections_1",
+      "topic": "priorites_interdirections",
+      "actor": "levis_direction_generale__sim_expert_1",
+      "side": "pro",
+      "content": "[SIMULATION] Cette position privilégie l’option formulée dans la question afin d’en tester les bénéfices attendus, avec critères de suivi, seuils d’arrêt et réévaluation."
+    },
+    {
+      "key": "mega_priorites_interdirections_2",
+      "topic": "priorites_interdirections",
+      "actor": "levis_direction_generale__sim_expert_3",
+      "side": "con",
+      "content": "[SIMULATION] Cette position demande de ne pas privilégier l’option formulée avant d’avoir comparé les coûts, les risques, les alternatives et les conditions de réversibilité."
+    },
+    {
+      "key": "mega_suivi_engagements_1",
+      "topic": "suivi_engagements",
+      "actor": "levis_direction_generale__sim_expert_1",
+      "side": "con",
+      "content": "[SIMULATION] Cette position demande de ne pas privilégier l’option formulée avant d’avoir comparé les coûts, les risques, les alternatives et les conditions de réversibilité."
+    },
+    {
+      "key": "mega_suivi_engagements_2",
+      "topic": "suivi_engagements",
+      "actor": "levis_direction_generale__sim_expert_3",
+      "side": "pro",
+      "content": "[SIMULATION] Cette position privilégie l’option formulée dans la question afin d’en tester les bénéfices attendus, avec critères de suivi, seuils d’arrêt et réévaluation."
+    },
+    {
+      "key": "mega_capacite_execution_1",
+      "topic": "capacite_execution",
+      "actor": "levis_direction_generale__sim_expert_1",
+      "side": "pro",
+      "content": "[SIMULATION] Cette position privilégie l’option formulée dans la question afin d’en tester les bénéfices attendus, avec critères de suivi, seuils d’arrêt et réévaluation."
+    },
+    {
+      "key": "mega_capacite_execution_2",
+      "topic": "capacite_execution",
+      "actor": "levis_direction_generale__sim_expert_3",
+      "side": "con",
+      "content": "[SIMULATION] Cette position demande de ne pas privilégier l’option formulée avant d’avoir comparé les coûts, les risques, les alternatives et les conditions de réversibilité."
+    },
+    {
+      "key": "mega_revue_services_1",
+      "topic": "revue_services",
+      "actor": "levis_direction_generale__sim_expert_1",
+      "side": "con",
+      "content": "[SIMULATION] Cette position demande de ne pas privilégier l’option formulée avant d’avoir comparé les coûts, les risques, les alternatives et les conditions de réversibilité."
+    },
+    {
+      "key": "mega_revue_services_2",
+      "topic": "revue_services",
+      "actor": "levis_direction_generale__sim_expert_3",
+      "side": "pro",
+      "content": "[SIMULATION] Cette position privilégie l’option formulée dans la question afin d’en tester les bénéfices attendus, avec critères de suivi, seuils d’arrêt et réévaluation."
+    }
+  ],
+  "argument_sources": [
+    {
+      "key": "mega_priorites_interdirections_1_source",
+      "argument": "mega_priorites_interdirections_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_priorites_interdirections_2_source",
+      "argument": "mega_priorites_interdirections_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_suivi_engagements_1_source",
+      "argument": "mega_suivi_engagements_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_suivi_engagements_2_source",
+      "argument": "mega_suivi_engagements_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_capacite_execution_1_source",
+      "argument": "mega_capacite_execution_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_capacite_execution_2_source",
+      "argument": "mega_capacite_execution_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_revue_services_1_source",
+      "argument": "mega_revue_services_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_revue_services_2_source",
+      "argument": "mega_revue_services_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    }
+  ],
   "consultations": [],
   "consultation_votes": [],
   "impact_items": [],
-  "ekoh_profiles": [],
+  "ekoh_profiles": [
+    {
+      "actor": "levis_direction_generale__sim_expert_1",
+      "rating_visibility": "public",
+      "publication_basis": "SYNTHETIC FICTIONAL PERSONA — Lévis demo seed only",
+      "ethics_score": 1.0,
+      "expertise": [
+        {
+          "domain_code": "0413",
+          "raw_score": 0.95,
+          "weighted_score": 0.95
+        },
+        {
+          "domain_code": "0312",
+          "raw_score": 0.8,
+          "weighted_score": 0.8
+        },
+        {
+          "domain_code": "0311",
+          "raw_score": 0.62,
+          "weighted_score": 0.62
+        },
+        {
+          "domain_code": "0421",
+          "raw_score": 0.45,
+          "weighted_score": 0.45
+        }
+      ]
+    },
+    {
+      "actor": "levis_direction_generale__sim_expert_2",
+      "rating_visibility": "public",
+      "publication_basis": "SYNTHETIC FICTIONAL PERSONA — Lévis demo seed only",
+      "ethics_score": 1.0,
+      "expertise": [
+        {
+          "domain_code": "0312",
+          "raw_score": 0.95,
+          "weighted_score": 0.95
+        },
+        {
+          "domain_code": "0311",
+          "raw_score": 0.8,
+          "weighted_score": 0.8
+        },
+        {
+          "domain_code": "0421",
+          "raw_score": 0.62,
+          "weighted_score": 0.62
+        },
+        {
+          "domain_code": "0413",
+          "raw_score": 0.45,
+          "weighted_score": 0.45
+        }
+      ]
+    },
+    {
+      "actor": "levis_direction_generale__sim_expert_3",
+      "rating_visibility": "public",
+      "publication_basis": "SYNTHETIC FICTIONAL PERSONA — Lévis demo seed only",
+      "ethics_score": 1.0,
+      "expertise": [
+        {
+          "domain_code": "0311",
+          "raw_score": 0.95,
+          "weighted_score": 0.95
+        },
+        {
+          "domain_code": "0421",
+          "raw_score": 0.8,
+          "weighted_score": 0.8
+        },
+        {
+          "domain_code": "0413",
+          "raw_score": 0.62,
+          "weighted_score": 0.62
+        },
+        {
+          "domain_code": "0312",
+          "raw_score": 0.45,
+          "weighted_score": 0.45
+        }
+      ]
+    }
+  ],
   "consultation_relevance": [],
-  "topic_relevance": [],
+  "topic_relevance": [
+    {
+      "topic": "priorites_interdirections",
+      "domain_code": "0413",
+      "weight": 0.35,
+      "criteria": {
+        "basis": "world_scope_to_isced_f_demo_mapping",
+        "semantic": "context relevance only; not truth, endorsement, competence assessment or political recommendation"
+      }
+    },
+    {
+      "topic": "priorites_interdirections",
+      "domain_code": "0312",
+      "weight": 0.25,
+      "criteria": {
+        "basis": "world_scope_to_isced_f_demo_mapping",
+        "semantic": "context relevance only; not truth, endorsement, competence assessment or political recommendation"
+      }
+    },
+    {
+      "topic": "priorites_interdirections",
+      "domain_code": "0311",
+      "weight": 0.2,
+      "criteria": {
+        "basis": "world_scope_to_isced_f_demo_mapping",
+        "semantic": "context relevance only; not truth, endorsement, competence assessment or political recommendation"
+      }
+    },
+    {
+      "topic": "priorites_interdirections",
+      "domain_code": "0421",
+      "weight": 0.2,
+      "criteria": {
+        "basis": "world_scope_to_isced_f_demo_mapping",
+        "semantic": "context relevance only; not truth, endorsement, competence assessment or political recommendation"
+      }
+    },
+    {
+      "topic": "suivi_engagements",
+      "domain_code": "0413",
+      "weight": 0.35,
+      "criteria": {
+        "basis": "world_scope_to_isced_f_demo_mapping",
+        "semantic": "context relevance only; not truth, endorsement, competence assessment or political recommendation"
+      }
+    },
+    {
+      "topic": "suivi_engagements",
+      "domain_code": "0312",
+      "weight": 0.25,
+      "criteria": {
+        "basis": "world_scope_to_isced_f_demo_mapping",
+        "semantic": "context relevance only; not truth, endorsement, competence assessment or political recommendation"
+      }
+    },
+    {
+      "topic": "suivi_engagements",
+      "domain_code": "0311",
+      "weight": 0.2,
+      "criteria": {
+        "basis": "world_scope_to_isced_f_demo_mapping",
+        "semantic": "context relevance only; not truth, endorsement, competence assessment or political recommendation"
+      }
+    },
+    {
+      "topic": "suivi_engagements",
+      "domain_code": "0421",
+      "weight": 0.2,
+      "criteria": {
+        "basis": "world_scope_to_isced_f_demo_mapping",
+        "semantic": "context relevance only; not truth, endorsement, competence assessment or political recommendation"
+      }
+    },
+    {
+      "topic": "capacite_execution",
+      "domain_code": "0413",
+      "weight": 0.35,
+      "criteria": {
+        "basis": "world_scope_to_isced_f_demo_mapping",
+        "semantic": "context relevance only; not truth, endorsement, competence assessment or political recommendation"
+      }
+    },
+    {
+      "topic": "capacite_execution",
+      "domain_code": "0312",
+      "weight": 0.25,
+      "criteria": {
+        "basis": "world_scope_to_isced_f_demo_mapping",
+        "semantic": "context relevance only; not truth, endorsement, competence assessment or political recommendation"
+      }
+    },
+    {
+      "topic": "capacite_execution",
+      "domain_code": "0311",
+      "weight": 0.2,
+      "criteria": {
+        "basis": "world_scope_to_isced_f_demo_mapping",
+        "semantic": "context relevance only; not truth, endorsement, competence assessment or political recommendation"
+      }
+    },
+    {
+      "topic": "capacite_execution",
+      "domain_code": "0421",
+      "weight": 0.2,
+      "criteria": {
+        "basis": "world_scope_to_isced_f_demo_mapping",
+        "semantic": "context relevance only; not truth, endorsement, competence assessment or political recommendation"
+      }
+    },
+    {
+      "topic": "revue_services",
+      "domain_code": "0413",
+      "weight": 0.35,
+      "criteria": {
+        "basis": "world_scope_to_isced_f_demo_mapping",
+        "semantic": "context relevance only; not truth, endorsement, competence assessment or political recommendation"
+      }
+    },
+    {
+      "topic": "revue_services",
+      "domain_code": "0312",
+      "weight": 0.25,
+      "criteria": {
+        "basis": "world_scope_to_isced_f_demo_mapping",
+        "semantic": "context relevance only; not truth, endorsement, competence assessment or political recommendation"
+      }
+    },
+    {
+      "topic": "revue_services",
+      "domain_code": "0311",
+      "weight": 0.2,
+      "criteria": {
+        "basis": "world_scope_to_isced_f_demo_mapping",
+        "semantic": "context relevance only; not truth, endorsement, competence assessment or political recommendation"
+      }
+    },
+    {
+      "topic": "revue_services",
+      "domain_code": "0421",
+      "weight": 0.2,
+      "criteria": {
+        "basis": "world_scope_to_isced_f_demo_mapping",
+        "semantic": "context relevance only; not truth, endorsement, competence assessment or political recommendation"
+      }
+    }
+  ],
   "reading_exclusions": []
 }

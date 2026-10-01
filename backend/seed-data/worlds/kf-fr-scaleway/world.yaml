@@ -1,7 +1,7 @@
 world_contract: kx-world-pack/v1
 world_key: kf-fr-scaleway
 title: Kristal Farms — Étude internationale 09 — Scaleway / iliad
-pack_version: 0.4.0
+pack_version: 0.5.0
 requires:
   ethikos_scenario_schema: ethikos-demo-scenario/v3
   fixtures:
@@ -30,7 +30,10 @@ metadata:
   target_organization_global_entity_key: org:iliad:scaleway
   persona_bridge_contract: kf-release-persona-bridge/v1
   promotion_policy: build_all_ready_then_atomic_portfolio_promotion
-  seed_version: 0.4.0
+  seed_version: 0.5.0
   evidence_profile: world_specific_2026q3
   universe_standard: kx-universe-pack/v1
   persona_contract: kx-world-personas/v1
+  mega_update_version: 1.0.0
+  mega_update_date: '2026-09-30'
+  demo_smart_vote_enabled: true

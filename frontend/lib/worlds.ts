@@ -50,6 +50,7 @@ const UNIVERSE_WORLD_PATH_RE = new RegExp(
   'i',
 );
 const LEGACY_WORLD_PATH_RE = new RegExp(`^/w/(${KEY_PATTERN})(/.*)?$`, 'i');
+const ETHIKOS_TOPIC_DETAIL_PATH_RE = /^\/ethikos\/deliberate\/(?!elite(?:\/|$)|guidelines(?:\/|$))[^/]+(?:\/.*)?$/i;
 
 /** APIs that remain owned by the global/control plane even inside a World URL. */
 const GLOBAL_API_PREFIXES = [
@@ -86,7 +87,76 @@ export function isWorldKey(value: string | null | undefined): value is string {
   return new RegExp(`^${KEY_PATTERN}$`, 'i').test(value);
 }
 
+
 export const isUniverseKey = isWorldKey;
+
+function configuredUniverseBaseDomain(): string | null {
+  const raw = (
+    process.env.NEXT_PUBLIC_KONNAXION_UNIVERSE_BASE_DOMAIN ?? 'konnaxion.com'
+  )
+    .trim()
+    .toLowerCase()
+    .replace(/\.$/, '');
+  return raw || null;
+}
+
+function normalizeHostname(value: string): string {
+  return value.trim().toLowerCase().replace(/\.$/, '');
+}
+
+/**
+ * Resolve a one-label Universe key from <universe>.<base-domain>.
+ *
+ * The apex and www are product/infrastructure hosts, not Universes. Nested
+ * subdomains are deliberately ignored: Worlds remain path-scoped.
+ */
+export function getUniverseKeyFromHostname(
+  hostname: string | null | undefined,
+  baseDomain: string | null = configuredUniverseBaseDomain(),
+): string | null {
+  const host = normalizeHostname(hostname ?? '');
+  const base = normalizeHostname(baseDomain ?? '');
+  if (!host || !base || host === base || host === `www.${base}`) return null;
+
+  const suffix = `.${base}`;
+  if (!host.endsWith(suffix)) return null;
+
+  const subdomain = host.slice(0, -suffix.length);
+  if (subdomain.includes('.') || !isUniverseKey(subdomain)) return null;
+  return subdomain.toLowerCase();
+}
+
+export function getUniverseKeyFromBrowserHostname(): string | null {
+  if (typeof window === 'undefined') return null;
+  return getUniverseKeyFromHostname(window.location.hostname);
+}
+
+/** Build an absolute browser URL on the selected Universe subdomain. */
+export function buildUniverseHostUrl(
+  universeKey: string,
+  path: string,
+): string {
+  if (
+    typeof window === 'undefined' ||
+    !isUniverseKey(universeKey)
+  ) {
+    return path;
+  }
+
+  const base = configuredUniverseBaseDomain();
+  if (!base) return path;
+
+  try {
+    const url = new URL(path || '/', window.location.origin);
+    url.hostname = `${universeKey.toLowerCase()}.${base}`;
+    // Production Universe hosts use the normal scheme port. Keep explicit local
+    // ports only when the configured base itself is localhost-like.
+    if (!base.includes('localhost')) url.port = '';
+    return url.toString();
+  } catch {
+    return path;
+  }
+}
 
 export function parseWorldPath(
   pathname: string | null | undefined,
@@ -146,6 +216,23 @@ export function withWorldPath(
   return `${prefix}${appPath === '/' ? '' : appPath}${suffix}`;
 }
 
+function appPathForWorldSwitch(
+  appPath: string,
+  fallbackPath: string,
+): string {
+  if (appPath === '/') return fallbackPath;
+
+  // Topic ids are release-local data-plane resources. Carrying /deliberate/:id
+  // into another World can resolve a different topic or produce a misleading 404.
+  // Keep portable collection/configuration routes, but land topic detail switches
+  // on the canonical Expert deliberation collection for the target World.
+  if (ETHIKOS_TOPIC_DETAIL_PATH_RE.test(appPath)) {
+    return '/ethikos/deliberate/elite';
+  }
+
+  return appPath;
+}
+
 export function switchWorldPath(
   currentPath: string,
   targetWorldKey: string,
@@ -154,7 +241,7 @@ export function switchWorldPath(
 ): string {
   const parsed = parseWorldPath(currentPath);
   const appPath = parsed?.appPath ?? currentPath;
-  const usefulPath = appPath === '/' ? fallbackPath : appPath;
+  const usefulPath = appPathForWorldSwitch(appPath, fallbackPath);
   const universeKey = targetUniverseKey === undefined
     ? parsed?.universeKey
     : targetUniverseKey;
@@ -197,7 +284,9 @@ export function scopeApiPath(
 export function scopeApiPathForBrowser(path: string): string {
   if (typeof window === 'undefined') return path;
   const route = parseWorldPath(window.location.pathname);
-  return scopeApiPath(path, route?.key, route?.universeKey);
+  const universeKey =
+    route?.universeKey ?? getUniverseKeyFromBrowserHostname();
+  return scopeApiPath(path, route?.key, universeKey);
 }
 
 export class StaleWorldReleaseError extends Error {
@@ -251,7 +340,10 @@ export function assertCurrentWorldResponse(
   const route = parseWorldPath(window.location.pathname);
   const activeWorld = route?.key ?? null;
   const activeUniverse =
-    route?.universeKey ?? document.documentElement.dataset.kxUniverse ?? null;
+    route?.universeKey ??
+    getUniverseKeyFromBrowserHostname() ??
+    document.documentElement.dataset.kxUniverse ??
+    null;
 
   if (
     activeUniverse &&
@@ -340,7 +432,9 @@ export function resolveWorldWebSocketUrl(
   if (typeof window === 'undefined') return null;
 
   const route = parseWorldPath(window.location.pathname);
-  const scopedPath = scopeWorldWebSocketPath(path, route?.key, route?.universeKey);
+  const universeKey =
+    route?.universeKey ?? getUniverseKeyFromBrowserHostname();
+  const scopedPath = scopeWorldWebSocketPath(path, route?.key, universeKey);
   if (!scopedPath) return null;
 
   const rawBase = base?.trim();

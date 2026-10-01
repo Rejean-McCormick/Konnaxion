@@ -6,7 +6,7 @@
   "metadata": {
     "universe_key": "cuba-2026",
     "world_key": "cuba-koali-offline",
-    "seed_version": "0.2.0",
+    "seed_version": "0.3.0",
     "simulation": true,
     "fiction_boundary": "All named accounts in this World are synthetic fictional personas using pseudonyms. No real Cuban official, activist, party or institution is represented as a participant.",
     "persona_policy": "The Great fictional-character archetypes supply personality/expertise only; original social rank and historical identity are not imported into the World.",
@@ -271,7 +271,14 @@
       "koali_spaces": "presentation/composition only; not political or epistemic authority",
       "kreative": "not required for this World seed"
     },
-    "persona_contract": "kx-world-personas/v1"
+    "persona_contract": "kx-world-personas/v1",
+    "mega_update": {
+      "version": "1.0.0",
+      "date": "2026-09-30",
+      "purpose": "activate_seeded_fictional_personas_in_contextual_ekoh_readings",
+      "real_person_ekoh_scores_generated": false,
+      "baseline_always_visible": true
+    }
   },
   "actors": [
     {
@@ -461,7 +468,158 @@
       "category": "transition_legitimacy"
     }
   ],
-  "stances": [],
+  "stances": [
+    {
+      "topic": "provisional_mandate",
+      "actor": "orlo_reformateur",
+      "value": 2
+    },
+    {
+      "topic": "provisional_mandate",
+      "actor": "catherine_idealiste",
+      "value": -1
+    },
+    {
+      "topic": "provisional_mandate",
+      "actor": "elizabeth_folle",
+      "value": 0
+    },
+    {
+      "topic": "constitution_process",
+      "actor": "orlo_reformateur",
+      "value": -2
+    },
+    {
+      "topic": "constitution_process",
+      "actor": "catherine_idealiste",
+      "value": 1
+    },
+    {
+      "topic": "constitution_process",
+      "actor": "elizabeth_folle",
+      "value": 0
+    },
+    {
+      "topic": "citizen_assembly",
+      "actor": "dd44_colosse",
+      "value": 2
+    },
+    {
+      "topic": "citizen_assembly",
+      "actor": "arkady_courtisan",
+      "value": -1
+    },
+    {
+      "topic": "citizen_assembly",
+      "actor": "orlo_reformateur",
+      "value": 0
+    },
+    {
+      "topic": "essential_services_first",
+      "actor": "catherine_idealiste",
+      "value": -2
+    },
+    {
+      "topic": "essential_services_first",
+      "actor": "dd44_colosse",
+      "value": 1
+    },
+    {
+      "topic": "essential_services_first",
+      "actor": "orlo_reformateur",
+      "value": 0
+    },
+    {
+      "topic": "economic_rules",
+      "actor": "orlo_reformateur",
+      "value": 2
+    },
+    {
+      "topic": "economic_rules",
+      "actor": "georgina_intrigante",
+      "value": -1
+    },
+    {
+      "topic": "economic_rules",
+      "actor": "catherine_idealiste",
+      "value": 0
+    },
+    {
+      "topic": "rights_and_pluralism",
+      "actor": "orlo_reformateur",
+      "value": -2
+    },
+    {
+      "topic": "rights_and_pluralism",
+      "actor": "catherine_idealiste",
+      "value": 1
+    },
+    {
+      "topic": "rights_and_pluralism",
+      "actor": "archie_archeveque",
+      "value": 0
+    },
+    {
+      "topic": "information_provenance",
+      "actor": "dd44_colosse",
+      "value": 2
+    },
+    {
+      "topic": "information_provenance",
+      "actor": "archie_archeveque",
+      "value": -1
+    },
+    {
+      "topic": "information_provenance",
+      "actor": "arkady_courtisan",
+      "value": 0
+    },
+    {
+      "topic": "offline_continuity",
+      "actor": "dd44_colosse",
+      "value": -2
+    },
+    {
+      "topic": "offline_continuity",
+      "actor": "orlo_reformateur",
+      "value": 1
+    },
+    {
+      "topic": "offline_continuity",
+      "actor": "catherine_idealiste",
+      "value": 0
+    },
+    {
+      "topic": "foreign_humanitarian",
+      "actor": "catherine_idealiste",
+      "value": 2
+    },
+    {
+      "topic": "foreign_humanitarian",
+      "actor": "orlo_reformateur",
+      "value": -1
+    },
+    {
+      "topic": "foreign_humanitarian",
+      "actor": "elizabeth_folle",
+      "value": 0
+    },
+    {
+      "topic": "transition_exit",
+      "actor": "orlo_reformateur",
+      "value": -2
+    },
+    {
+      "topic": "transition_exit",
+      "actor": "catherine_idealiste",
+      "value": 1
+    },
+    {
+      "topic": "transition_exit",
+      "actor": "elizabeth_folle",
+      "value": 0
+    }
+  ],
   "arguments": [
     {
       "key": "a_cath_mandate",
@@ -588,6 +746,146 @@
       "actor": "peter_tyran",
       "side": "con",
       "content": "Une organisation peut se perdre dans la vérification au point de ne plus savoir parler clairement. Il faut distinguer ce qui mérite enquête de ce qui exige une décision immédiate."
+    },
+    {
+      "key": "mega_provisional_mandate_1",
+      "topic": "provisional_mandate",
+      "actor": "orlo_reformateur",
+      "side": "pro",
+      "content": "[SIMULATION] Cette position privilégie l’option formulée dans la question afin d’en tester les bénéfices attendus, avec critères de suivi, seuils d’arrêt et réévaluation."
+    },
+    {
+      "key": "mega_provisional_mandate_2",
+      "topic": "provisional_mandate",
+      "actor": "catherine_idealiste",
+      "side": "con",
+      "content": "[SIMULATION] Cette position demande de ne pas privilégier l’option formulée avant d’avoir comparé les coûts, les risques, les alternatives et les conditions de réversibilité."
+    },
+    {
+      "key": "mega_constitution_process_1",
+      "topic": "constitution_process",
+      "actor": "orlo_reformateur",
+      "side": "con",
+      "content": "[SIMULATION] Cette position demande de ne pas privilégier l’option formulée avant d’avoir comparé les coûts, les risques, les alternatives et les conditions de réversibilité."
+    },
+    {
+      "key": "mega_constitution_process_2",
+      "topic": "constitution_process",
+      "actor": "catherine_idealiste",
+      "side": "pro",
+      "content": "[SIMULATION] Cette position privilégie l’option formulée dans la question afin d’en tester les bénéfices attendus, avec critères de suivi, seuils d’arrêt et réévaluation."
+    },
+    {
+      "key": "mega_citizen_assembly_1",
+      "topic": "citizen_assembly",
+      "actor": "dd44_colosse",
+      "side": "pro",
+      "content": "[SIMULATION] Cette position privilégie l’option formulée dans la question afin d’en tester les bénéfices attendus, avec critères de suivi, seuils d’arrêt et réévaluation."
+    },
+    {
+      "key": "mega_citizen_assembly_2",
+      "topic": "citizen_assembly",
+      "actor": "arkady_courtisan",
+      "side": "con",
+      "content": "[SIMULATION] Cette position demande de ne pas privilégier l’option formulée avant d’avoir comparé les coûts, les risques, les alternatives et les conditions de réversibilité."
+    },
+    {
+      "key": "mega_essential_services_first_1",
+      "topic": "essential_services_first",
+      "actor": "catherine_idealiste",
+      "side": "con",
+      "content": "[SIMULATION] Cette position demande de ne pas privilégier l’option formulée avant d’avoir comparé les coûts, les risques, les alternatives et les conditions de réversibilité."
+    },
+    {
+      "key": "mega_essential_services_first_2",
+      "topic": "essential_services_first",
+      "actor": "dd44_colosse",
+      "side": "pro",
+      "content": "[SIMULATION] Cette position privilégie l’option formulée dans la question afin d’en tester les bénéfices attendus, avec critères de suivi, seuils d’arrêt et réévaluation."
+    },
+    {
+      "key": "mega_economic_rules_1",
+      "topic": "economic_rules",
+      "actor": "orlo_reformateur",
+      "side": "pro",
+      "content": "[SIMULATION] Cette position privilégie l’option formulée dans la question afin d’en tester les bénéfices attendus, avec critères de suivi, seuils d’arrêt et réévaluation."
+    },
+    {
+      "key": "mega_economic_rules_2",
+      "topic": "economic_rules",
+      "actor": "georgina_intrigante",
+      "side": "con",
+      "content": "[SIMULATION] Cette position demande de ne pas privilégier l’option formulée avant d’avoir comparé les coûts, les risques, les alternatives et les conditions de réversibilité."
+    },
+    {
+      "key": "mega_rights_and_pluralism_1",
+      "topic": "rights_and_pluralism",
+      "actor": "orlo_reformateur",
+      "side": "con",
+      "content": "[SIMULATION] Cette position demande de ne pas privilégier l’option formulée avant d’avoir comparé les coûts, les risques, les alternatives et les conditions de réversibilité."
+    },
+    {
+      "key": "mega_rights_and_pluralism_2",
+      "topic": "rights_and_pluralism",
+      "actor": "catherine_idealiste",
+      "side": "pro",
+      "content": "[SIMULATION] Cette position privilégie l’option formulée dans la question afin d’en tester les bénéfices attendus, avec critères de suivi, seuils d’arrêt et réévaluation."
+    },
+    {
+      "key": "mega_information_provenance_1",
+      "topic": "information_provenance",
+      "actor": "dd44_colosse",
+      "side": "pro",
+      "content": "[SIMULATION] Cette position privilégie l’option formulée dans la question afin d’en tester les bénéfices attendus, avec critères de suivi, seuils d’arrêt et réévaluation."
+    },
+    {
+      "key": "mega_information_provenance_2",
+      "topic": "information_provenance",
+      "actor": "archie_archeveque",
+      "side": "con",
+      "content": "[SIMULATION] Cette position demande de ne pas privilégier l’option formulée avant d’avoir comparé les coûts, les risques, les alternatives et les conditions de réversibilité."
+    },
+    {
+      "key": "mega_offline_continuity_1",
+      "topic": "offline_continuity",
+      "actor": "dd44_colosse",
+      "side": "con",
+      "content": "[SIMULATION] Cette position demande de ne pas privilégier l’option formulée avant d’avoir comparé les coûts, les risques, les alternatives et les conditions de réversibilité."
+    },
+    {
+      "key": "mega_offline_continuity_2",
+      "topic": "offline_continuity",
+      "actor": "orlo_reformateur",
+      "side": "pro",
+      "content": "[SIMULATION] Cette position privilégie l’option formulée dans la question afin d’en tester les bénéfices attendus, avec critères de suivi, seuils d’arrêt et réévaluation."
+    },
+    {
+      "key": "mega_foreign_humanitarian_1",
+      "topic": "foreign_humanitarian",
+      "actor": "catherine_idealiste",
+      "side": "pro",
+      "content": "[SIMULATION] Cette position privilégie l’option formulée dans la question afin d’en tester les bénéfices attendus, avec critères de suivi, seuils d’arrêt et réévaluation."
+    },
+    {
+      "key": "mega_foreign_humanitarian_2",
+      "topic": "foreign_humanitarian",
+      "actor": "orlo_reformateur",
+      "side": "con",
+      "content": "[SIMULATION] Cette position demande de ne pas privilégier l’option formulée avant d’avoir comparé les coûts, les risques, les alternatives et les conditions de réversibilité."
+    },
+    {
+      "key": "mega_transition_exit_1",
+      "topic": "transition_exit",
+      "actor": "orlo_reformateur",
+      "side": "con",
+      "content": "[SIMULATION] Cette position demande de ne pas privilégier l’option formulée avant d’avoir comparé les coûts, les risques, les alternatives et les conditions de réversibilité."
+    },
+    {
+      "key": "mega_transition_exit_2",
+      "topic": "transition_exit",
+      "actor": "catherine_idealiste",
+      "side": "pro",
+      "content": "[SIMULATION] Cette position privilégie l’option formulée dans la question afin d’en tester les bénéfices attendus, avec critères de suivi, seuils d’arrêt et réévaluation."
     }
   ],
   "argument_sources": [
@@ -734,6 +1032,146 @@
       "source_type": "simulation_persona_archetype",
       "citation_text": "Position synthétique générée pour la simulation à partir du profil fictif fourni par l’auteur du seed.",
       "note": "Ce texte n’est attribué à aucune personne réelle et ne constitue pas une recommandation politique du système."
+    },
+    {
+      "key": "mega_provisional_mandate_1_source",
+      "argument": "mega_provisional_mandate_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_provisional_mandate_2_source",
+      "argument": "mega_provisional_mandate_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_constitution_process_1_source",
+      "argument": "mega_constitution_process_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_constitution_process_2_source",
+      "argument": "mega_constitution_process_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_citizen_assembly_1_source",
+      "argument": "mega_citizen_assembly_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_citizen_assembly_2_source",
+      "argument": "mega_citizen_assembly_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_essential_services_first_1_source",
+      "argument": "mega_essential_services_first_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_essential_services_first_2_source",
+      "argument": "mega_essential_services_first_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_economic_rules_1_source",
+      "argument": "mega_economic_rules_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_economic_rules_2_source",
+      "argument": "mega_economic_rules_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_rights_and_pluralism_1_source",
+      "argument": "mega_rights_and_pluralism_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_rights_and_pluralism_2_source",
+      "argument": "mega_rights_and_pluralism_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_information_provenance_1_source",
+      "argument": "mega_information_provenance_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_information_provenance_2_source",
+      "argument": "mega_information_provenance_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_offline_continuity_1_source",
+      "argument": "mega_offline_continuity_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_offline_continuity_2_source",
+      "argument": "mega_offline_continuity_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_foreign_humanitarian_1_source",
+      "argument": "mega_foreign_humanitarian_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_foreign_humanitarian_2_source",
+      "argument": "mega_foreign_humanitarian_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_transition_exit_1_source",
+      "argument": "mega_transition_exit_1",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
+    },
+    {
+      "key": "mega_transition_exit_2_source",
+      "argument": "mega_transition_exit_2",
+      "source_type": "simulation_fixture",
+      "citation_text": "Konnaxion mega demo seed 2026-09-30",
+      "note": "FIXTURE DE SIMULATION — générée uniquement pour exercer la délibération et EkoH Smart Vote. Ce n’est ni un fait, ni un endossement, ni la position d’une personne réelle."
     }
   ],
   "consultations": [],
@@ -742,7 +1180,7 @@
   "ekoh_profiles": [
     {
       "actor": "catherine_idealiste",
-      "rating_visibility": "scoped",
+      "rating_visibility": "public",
       "publication_basis": "SYNTHETIC FICTIONAL PERSONA — seed simulation only",
       "expertise": [
         {
@@ -769,12 +1207,18 @@
           "domain_code": "0613",
           "raw_score": 0.45,
           "weighted_score": 0.45
+        },
+        {
+          "domain_code": "0923",
+          "raw_score": 0.85,
+          "weighted_score": 0.85
         }
-      ]
+      ],
+      "ethics_score": 1.0
     },
     {
       "actor": "peter_tyran",
-      "rating_visibility": "scoped",
+      "rating_visibility": "public",
       "publication_basis": "SYNTHETIC FICTIONAL PERSONA — seed simulation only",
       "expertise": [
         {
@@ -792,11 +1236,12 @@
           "raw_score": 0.45,
           "weighted_score": 0.45
         }
-      ]
+      ],
+      "ethics_score": 1.0
     },
     {
       "actor": "marial_rusee",
-      "rating_visibility": "scoped",
+      "rating_visibility": "public",
       "publication_basis": "SYNTHETIC FICTIONAL PERSONA — seed simulation only",
       "expertise": [
         {
@@ -814,11 +1259,12 @@
           "raw_score": 0.6,
           "weighted_score": 0.6
         }
-      ]
+      ],
+      "ethics_score": 1.0
     },
     {
       "actor": "orlo_reformateur",
-      "rating_visibility": "scoped",
+      "rating_visibility": "public",
       "publication_basis": "SYNTHETIC FICTIONAL PERSONA — seed simulation only",
       "expertise": [
         {
@@ -841,11 +1287,12 @@
           "raw_score": 0.65,
           "weighted_score": 0.65
         }
-      ]
+      ],
+      "ethics_score": 1.0
     },
     {
       "actor": "elizabeth_folle",
-      "rating_visibility": "scoped",
+      "rating_visibility": "public",
       "publication_basis": "SYNTHETIC FICTIONAL PERSONA — seed simulation only",
       "expertise": [
         {
@@ -868,11 +1315,12 @@
           "raw_score": 0.6,
           "weighted_score": 0.6
         }
-      ]
+      ],
+      "ethics_score": 1.0
     },
     {
       "actor": "archie_archeveque",
-      "rating_visibility": "scoped",
+      "rating_visibility": "public",
       "publication_basis": "SYNTHETIC FICTIONAL PERSONA — seed simulation only",
       "expertise": [
         {
@@ -895,11 +1343,12 @@
           "raw_score": 0.65,
           "weighted_score": 0.65
         }
-      ]
+      ],
+      "ethics_score": 1.0
     },
     {
       "actor": "velementov_ivrogne",
-      "rating_visibility": "scoped",
+      "rating_visibility": "public",
       "publication_basis": "SYNTHETIC FICTIONAL PERSONA — seed simulation only",
       "expertise": [
         {
@@ -917,11 +1366,12 @@
           "raw_score": 0.5,
           "weighted_score": 0.5
         }
-      ]
+      ],
+      "ethics_score": 1.0
     },
     {
       "actor": "grigor_loyal",
-      "rating_visibility": "scoped",
+      "rating_visibility": "public",
       "publication_basis": "SYNTHETIC FICTIONAL PERSONA — seed simulation only",
       "expertise": [
         {
@@ -939,11 +1389,12 @@
           "raw_score": 0.55,
           "weighted_score": 0.55
         }
-      ]
+      ],
+      "ethics_score": 1.0
     },
     {
       "actor": "georgina_intrigante",
-      "rating_visibility": "scoped",
+      "rating_visibility": "public",
       "publication_basis": "SYNTHETIC FICTIONAL PERSONA — seed simulation only",
       "expertise": [
         {
@@ -966,11 +1417,12 @@
           "raw_score": 0.7,
           "weighted_score": 0.7
         }
-      ]
+      ],
+      "ethics_score": 1.0
     },
     {
       "actor": "leo_romantique",
-      "rating_visibility": "scoped",
+      "rating_visibility": "public",
       "publication_basis": "SYNTHETIC FICTIONAL PERSONA — seed simulation only",
       "expertise": [
         {
@@ -988,11 +1440,12 @@
           "raw_score": 0.65,
           "weighted_score": 0.65
         }
-      ]
+      ],
+      "ethics_score": 1.0
     },
     {
       "actor": "arkady_courtisan",
-      "rating_visibility": "scoped",
+      "rating_visibility": "public",
       "publication_basis": "SYNTHETIC FICTIONAL PERSONA — seed simulation only",
       "expertise": [
         {
@@ -1015,11 +1468,12 @@
           "raw_score": 0.5,
           "weighted_score": 0.5
         }
-      ]
+      ],
+      "ethics_score": 1.0
     },
     {
       "actor": "dd44_colosse",
-      "rating_visibility": "scoped",
+      "rating_visibility": "public",
       "publication_basis": "SYNTHETIC FICTIONAL PERSONA — seed simulation only",
       "expertise": [
         {
@@ -1041,8 +1495,14 @@
           "domain_code": "0413",
           "raw_score": 0.6,
           "weighted_score": 0.6
+        },
+        {
+          "domain_code": "0612",
+          "raw_score": 0.85,
+          "weighted_score": 0.85
         }
-      ]
+      ],
+      "ethics_score": 1.0
     }
   ],
   "consultation_relevance": [],
