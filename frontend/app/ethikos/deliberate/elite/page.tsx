@@ -14,7 +14,6 @@ import {
 } from '@ant-design/icons'
 import {
   ModalForm,
-  PageContainer,
   ProCard,
   type ProColumns,
   ProFormSelect,
@@ -29,6 +28,8 @@ import {
   Button,
   Drawer,
   Empty,
+  Input,
+  Select,
   Space,
   Tag,
   Tooltip,
@@ -41,6 +42,7 @@ import { useRouter } from 'next/navigation'
 import React from 'react'
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell'
+import styles from './page.module.css'
 import {
   createEliteTopic,
   fetchEliteTopics,
@@ -62,6 +64,7 @@ dayjs.extend(relativeTime)
 const { Paragraph, Text } = Typography
 
 type TopicStatus = 'open' | 'closed' | 'archived'
+type TableMode = 'wide' | 'compact' | 'mobile'
 
 type CategoryLike =
   | string
@@ -267,6 +270,39 @@ export default function EliteAgora(): JSX.Element {
   const [previewOpen, setPreviewOpen] = React.useState(false)
   const [previewState, setPreviewState] =
     React.useState<PreviewState | null>(null)
+  const [query, setQuery] = React.useState('')
+  const [categoryFilter, setCategoryFilter] = React.useState<string>()
+  const [statusFilter, setStatusFilter] = React.useState<TopicStatus>()
+  const tableRegionRef = React.useRef<HTMLDivElement>(null)
+  const [tableWidth, setTableWidth] = React.useState(0)
+
+  React.useEffect(() => {
+    const element = tableRegionRef.current
+
+    if (!element) {
+      return
+    }
+
+    const updateWidth = () => {
+      setTableWidth(element.getBoundingClientRect().width)
+    }
+
+    updateWidth()
+
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', updateWidth)
+      return () => window.removeEventListener('resize', updateWidth)
+    }
+
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) {
+        setTableWidth(entry.contentRect.width)
+      }
+    })
+
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
 
   const {
     data: preview,
@@ -305,6 +341,47 @@ export default function EliteAgora(): JSX.Element {
     () => rows.filter((topic) => topic.status === 'open'),
     [rows],
   )
+
+  const tableMode = React.useMemo<TableMode>(() => {
+    if (tableWidth === 0) {
+      return 'compact'
+    }
+
+    if (tableWidth < 560) {
+      return 'mobile'
+    }
+
+    if (tableWidth < 980) {
+      return 'compact'
+    }
+
+    return 'wide'
+  }, [tableWidth])
+
+  const filteredRows = React.useMemo(() => {
+    const normalizedQuery = query.trim().toLocaleLowerCase()
+
+    return rows.filter((topic) => {
+      if (
+        normalizedQuery &&
+        !`${topic.title} ${topic.categoryLabel ?? ''}`
+          .toLocaleLowerCase()
+          .includes(normalizedQuery)
+      ) {
+        return false
+      }
+
+      if (categoryFilter && topic.categoryLabel !== categoryFilter) {
+        return false
+      }
+
+      if (statusFilter && topic.status !== statusFilter) {
+        return false
+      }
+
+      return true
+    })
+  }, [categoryFilter, query, rows, statusFilter])
 
   const headerStats = React.useMemo(
     () => [
@@ -348,72 +425,153 @@ export default function EliteAgora(): JSX.Element {
             .filter((label): label is string => Boolean(label)),
         ),
       ).map((label) => ({
-        text: label,
+        label,
         value: label,
       })),
     [rows],
   )
 
-  const columns = React.useMemo<ProColumns<TopicRow>[]>(
+  const statusOptions = React.useMemo(
     () => [
+      { label: i18nT("ui.ethikos.deliberate.elite.open"), value: 'open' },
+      { label: i18nT("ui.ethikos.deliberate.elite.closed"), value: 'closed' },
+      { label: i18nT("ui.ethikos.deliberate.elite.archived"), value: 'archived' },
+    ],
+    [i18nT],
+  )
+
+  const renderTopicCell = React.useCallback(
+    (row: TopicRow) => (
+      <div className={styles.topicCell}>
+        <Button
+          type="link"
+          onClick={() => openPreview(row)}
+          className={styles.topicButton}
+        >
+          {row.title}
+        </Button>
+
+        <Space size={6} wrap className={styles.topicSignals}>
+          {row.hot ? (
+            <Tooltip title={i18nT("ui.ethikos.deliberate.elite.recentActivity")}>
+              <Tag icon={<FireOutlined />} color="volcano">
+                {i18nT("ui.ethikos.deliberate.elite.active")}
+              </Tag>
+            </Tooltip>
+          ) : null}
+
+          {row.stanceCount === 0 && row.status === 'open' ? (
+            <Tag color="gold">
+              {i18nT("ui.ethikos.deliberate.elite.needsFirstStance")}
+            </Tag>
+          ) : null}
+        </Space>
+      </div>
+    ),
+    [i18nT, openPreview],
+  )
+
+  const renderMetadata = React.useCallback(
+    (row: TopicRow, mobile = false) => {
+      const lastActivity = dayjs(row.lastActivity)
+      const activityLabel = lastActivity.isValid()
+        ? lastActivity.fromNow()
+        : i18nT("ui.ethikos.deliberate.elite.unknown")
+
+      return (
+        <div
+          className={mobile ? styles.mobileMetadata : styles.metadataStack}
+        >
+          <div className={styles.metadataTags}>
+            {row.categoryLabel ? (
+              <Tag color="geekblue">{row.categoryLabel}</Tag>
+            ) : (
+              <Text type="secondary">
+                {i18nT("ui.ethikos.deliberate.elite.uncategorised")}
+              </Text>
+            )}
+            <Tag color={statusColor(row.status)}>{row.status}</Tag>
+          </div>
+
+          <div className={styles.metadataFacts}>
+            <Text>
+              <strong>{row.stanceCount}</strong>{' '}
+              {i18nT("ui.ethikos.deliberate.elite.stances")}
+            </Text>
+            <Text type="secondary">
+              {i18nT("ui.ethikos.deliberate.elite.lastActivity")}: {activityLabel}
+            </Text>
+          </div>
+
+          <Button
+            type="primary"
+            size="small"
+            className={styles.openThreadButton}
+            onClick={() => router.push(topicUrl(row.id))}
+          >
+            {i18nT("ui.ethikos.deliberate.elite.openThread")}
+          </Button>
+        </div>
+      )
+    },
+    [i18nT, router],
+  )
+
+  const columns = React.useMemo<ProColumns<TopicRow>[]>(() => {
+    if (tableMode === 'mobile') {
+      return [
+        {
+          title: i18nT("ui.ethikos.deliberate.elite.topic"),
+          dataIndex: 'title',
+          render: (_dom, row) => (
+            <div className={styles.mobileTopicRow}>
+              {renderTopicCell(row)}
+              {renderMetadata(row, true)}
+            </div>
+          ),
+        },
+      ]
+    }
+
+    if (tableMode === 'compact') {
+      return [
+        {
+          title: i18nT("ui.ethikos.deliberate.elite.topic"),
+          dataIndex: 'title',
+          render: (_dom, row) => renderTopicCell(row),
+        },
+        {
+          title: '',
+          key: 'metadata',
+          width: 220,
+          render: (_dom, row) => renderMetadata(row),
+        },
+      ]
+    }
+
+    return [
       {
         title: i18nT("ui.ethikos.deliberate.elite.topic"),
         dataIndex: 'title',
-        ellipsis: true,
-        render: (_dom, row) => (
-          <Space direction="vertical" size={2}>
-            <Button
-              type="link"
-              onClick={() => openPreview(row)}
-              style={{
-                padding: 0,
-                height: 'auto',
-                textAlign: 'left',
-                whiteSpace: 'normal',
-              }}
-            >
-              {row.title}
-            </Button>
-
-            <Space size={6} wrap>
-              {row.hot ? (
-                <Tooltip title={i18nT("ui.ethikos.deliberate.elite.recentActivity")}>
-                  <Tag icon={<FireOutlined />} color="volcano">
-                    {i18nT("ui.ethikos.deliberate.elite.active")}
-                  </Tag>
-                </Tooltip>
-              ) : null}
-
-              {row.stanceCount === 0 && row.status === 'open' ? (
-                <Tag color="gold">{i18nT("ui.ethikos.deliberate.elite.needsFirstStance")}</Tag>
-              ) : null}
-            </Space>
-          </Space>
-        ),
+        render: (_dom, row) => renderTopicCell(row),
       },
       {
         title: i18nT("ui.ethikos.deliberate.elite.theme"),
         dataIndex: 'categoryLabel',
-        filters: categoryFilters,
-        onFilter: (value, row) =>
-          String(row.categoryLabel ?? '') === String(value),
+        width: 150,
         render: (_dom, row) =>
           row.categoryLabel ? (
             <Tag color="geekblue">{row.categoryLabel}</Tag>
           ) : (
-            <Text type="secondary">{i18nT("ui.ethikos.deliberate.elite.uncategorised")}</Text>
+            <Text type="secondary">
+              {i18nT("ui.ethikos.deliberate.elite.uncategorised")}
+            </Text>
           ),
       },
       {
         title: i18nT("ui.ethikos.deliberate.elite.status"),
         dataIndex: 'status',
-        width: 120,
-        filters: [
-          { text: i18nT("ui.ethikos.deliberate.elite.open"), value: 'open' },
-          { text: i18nT("ui.ethikos.deliberate.elite.closed"), value: 'closed' },
-          { text: i18nT("ui.ethikos.deliberate.elite.archived"), value: 'archived' },
-        ],
-        onFilter: (value, row) => row.status === String(value),
+        width: 110,
         render: (_dom, row) => (
           <Tag color={statusColor(row.status)}>{row.status}</Tag>
         ),
@@ -423,27 +581,30 @@ export default function EliteAgora(): JSX.Element {
         dataIndex: 'stanceCount',
         sorter: (a, b) => a.stanceCount - b.stanceCount,
         align: 'right',
-        width: 110,
+        width: 90,
       },
       {
         title: i18nT("ui.ethikos.deliberate.elite.lastActivity"),
         dataIndex: 'lastActivity',
         sorter: (a, b) =>
           dayjs(a.lastActivity).valueOf() - dayjs(b.lastActivity).valueOf(),
-        width: 160,
+        width: 140,
         render: (_dom, row) => {
           const lastActivity = dayjs(row.lastActivity)
 
           return lastActivity.isValid() ? (
             lastActivity.fromNow()
           ) : (
-            <Text type="secondary">{i18nT("ui.ethikos.deliberate.elite.unknown")}</Text>
+            <Text type="secondary">
+              {i18nT("ui.ethikos.deliberate.elite.unknown")}
+            </Text>
           )
         },
       },
       {
         title: '',
-        width: 130,
+        key: 'action',
+        width: 125,
         render: (_dom, row) => (
           <Button
             type="primary"
@@ -454,9 +615,8 @@ export default function EliteAgora(): JSX.Element {
           </Button>
         ),
       },
-    ],
-    [categoryFilters, openPreview, router, i18nT],
-  )
+    ]
+  }, [i18nT, renderMetadata, renderTopicCell, router, tableMode])
 
   const openedAt = previewOpenedAt(preview)
   const resolvedPreviewId = previewId(preview, previewTopicId)
@@ -480,21 +640,7 @@ export default function EliteAgora(): JSX.Element {
         </Link>
       }
     >
-      <PageContainer
-        ghost
-        loading={loading}
-        extra={
-          <Space>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={() => refresh()}
-              type="text"
-              title={i18nT("ui.ethikos.deliberate.elite.refreshTopics")}
-            />
-            <NewTopicButton onCreated={refresh} />
-          </Space>
-        }
-      >
+      <div className={styles.pageContent}>
         <ProCard
           title={
             <Space>
@@ -569,32 +715,84 @@ export default function EliteAgora(): JSX.Element {
 
         <ProCard
           title={i18nT("ui.ethikos.deliberate.elite.topicsReadyForDeliberation")}
-          extra={
-            <Text type="secondary">
+        >
+          <div className={styles.topicToolbar}>
+            <Text type="secondary" className={styles.topicToolbarHint}>
               {i18nT("ui.ethikos.deliberate.elite.openAThreadToReadTheQuestion")}
             </Text>
-          }
-        >
-          <ProTable<TopicRow>
-            rowKey="id"
-            columns={columns}
-            dataSource={rows}
-            search={{ labelWidth: 90, filterType: 'light' }}
-            pagination={{ pageSize: 10 }}
-            options={false}
-            locale={{
-              emptyText: (
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description={i18nT("ui.ethikos.deliberate.elite.noDeliberationTopicsAvailableYet")}
-                />
-              ),
-            }}
-          />
+            <Space size={8}>
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={() => refresh()}
+                type="text"
+                title={i18nT("ui.ethikos.deliberate.elite.refreshTopics")}
+              />
+              <NewTopicButton onCreated={refresh} />
+            </Space>
+          </div>
+
+          <div ref={tableRegionRef} className={styles.tableRegion}>
+            <div className={styles.filters}>
+              <Input
+                allowClear
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={i18nT("ui.ethikos.deliberate.elite.topic")}
+                aria-label={i18nT("ui.ethikos.deliberate.elite.topic")}
+              />
+              <Select
+                allowClear
+                value={categoryFilter}
+                onChange={(value) => setCategoryFilter(value)}
+                placeholder={i18nT("ui.ethikos.deliberate.elite.theme")}
+                aria-label={i18nT("ui.ethikos.deliberate.elite.theme")}
+                options={categoryFilters}
+              />
+              <Select
+                allowClear
+                value={statusFilter}
+                onChange={(value) =>
+                  setStatusFilter(value as TopicStatus | undefined)
+                }
+                placeholder={i18nT("ui.ethikos.deliberate.elite.status")}
+                aria-label={i18nT("ui.ethikos.deliberate.elite.status")}
+                options={statusOptions}
+              />
+            </div>
+
+            <div
+              className={
+                tableMode === 'mobile'
+                  ? `${styles.tableShell} ${styles.mobileTable}`
+                  : styles.tableShell
+              }
+            >
+              <ProTable<TopicRow>
+                rowKey="id"
+                columns={columns}
+                dataSource={filteredRows}
+                loading={loading}
+                search={false}
+                pagination={{ pageSize: 10, showSizeChanger: false }}
+                options={false}
+                toolBarRender={false}
+                rowClassName={() => styles.topicRow}
+                scroll={tableMode === 'wide' ? { x: 980 } : undefined}
+                locale={{
+                  emptyText: (
+                    <Empty
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      description={i18nT("ui.ethikos.deliberate.elite.noDeliberationTopicsAvailableYet")}
+                    />
+                  ),
+                }}
+              />
+            </div>
+          </div>
         </ProCard>
 
         <Drawer
-          width={560}
+          width="min(560px, 100vw)"
           open={previewOpen}
           onClose={closePreview}
           title={i18nT("ui.ethikos.deliberate.elite.topicPreview")}
@@ -670,7 +868,7 @@ export default function EliteAgora(): JSX.Element {
             <Empty description={i18nT("ui.ethikos.deliberate.elite.noPreviewDataAvailable")} />
           )}
         </Drawer>
-      </PageContainer>
+      </div>
     </EthikosPageShell>
   )
 }

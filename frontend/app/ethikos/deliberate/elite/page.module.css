@@ -1,0 +1,168 @@
+.pageContent {
+  min-width: 0;
+}
+
+.topicToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.topicToolbarHint {
+  min-width: 0;
+}
+
+.tableRegion {
+  container-name: deliberation-table;
+  container-type: inline-size;
+  min-width: 0;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(150px, 220px) minmax(130px, 180px);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.tableShell {
+  min-width: 0;
+}
+
+.topicRow > td {
+  vertical-align: top;
+}
+
+.topicCell {
+  min-width: 0;
+  width: 100%;
+}
+
+.topicButton {
+  display: block !important;
+  width: 100%;
+  height: auto !important;
+  max-width: 100%;
+  padding: 0 !important;
+  line-height: 1.45 !important;
+  text-align: left !important;
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: break-word;
+}
+
+.topicSignals {
+  margin-top: 6px;
+}
+
+.metadataStack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  width: 100%;
+  padding-left: 8px;
+}
+
+.metadataTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.metadataTags :global(.ant-tag) {
+  margin-inline-end: 0;
+}
+
+.metadataFacts {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  line-height: 1.35;
+}
+
+.openThreadButton {
+  margin-top: 2px;
+}
+
+.mobileTopicRow {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-block: 4px;
+}
+
+.mobileMetadata {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'tags action'
+    'facts action';
+  gap: 8px 12px;
+  align-items: start;
+}
+
+.mobileMetadata .metadataTags {
+  grid-area: tags;
+}
+
+.mobileMetadata .metadataFacts {
+  grid-area: facts;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+
+.mobileMetadata .openThreadButton {
+  grid-area: action;
+  margin-top: 0;
+}
+
+.mobileTable :global(.ant-table-thead) {
+  display: none;
+}
+
+.mobileTable :global(.ant-table-tbody > tr > td) {
+  padding-inline: 4px !important;
+}
+
+@container deliberation-table (max-width: 760px) {
+  .filters {
+    grid-template-columns: minmax(0, 1fr) minmax(140px, 0.55fr);
+  }
+
+  .filters > :first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@container deliberation-table (max-width: 560px) {
+  .filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .filters > :first-child {
+    grid-column: auto;
+  }
+
+  .mobileMetadata {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'tags'
+      'facts'
+      'action';
+  }
+
+  .mobileMetadata .openThreadButton {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 720px) {
+  .topicToolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
