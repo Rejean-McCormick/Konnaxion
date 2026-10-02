@@ -23,22 +23,14 @@ from typing import Any
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
-# Group names are deliberately permissive during Wave 1 so existing deployments
-# can adopt either Django staff flags or explicit moderator groups.
 ETHIKOS_MODERATOR_GROUP_NAMES = {
-    "ethikos_moderator",
-    "ethikos_moderators",
-    "moderator",
-    "moderators",
-    "Moderators",
+    "konnaxion.ethikos.moderator",
+    "konnaxion.ethikos.moderators",
 }
 
 ETHIKOS_ADMIN_GROUP_NAMES = {
-    "ethikos_admin",
-    "ethikos_admins",
-    "admin",
-    "admins",
-    "Administrators",
+    "konnaxion.ethikos.admin",
+    "konnaxion.ethikos.admins",
 }
 
 

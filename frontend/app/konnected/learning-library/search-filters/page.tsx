@@ -26,6 +26,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
+import { openExternalUrlSafely } from '@/lib/security/navigation';
 
 const { RangePicker } = DatePicker;
 const { Text } = Typography;
@@ -241,7 +242,10 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
               {isClickable ? (
                 <a
                   href={href as string}
-                  target="_blank"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    openExternalUrlSafely(href as string);
+                  }}
                   rel="noopener noreferrer"
                 >
                   {value}
@@ -311,7 +315,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
                 type="link"
                 size="small"
                 onClick={() => {
-                  window.open(record.url as string, '_blank', 'noopener');
+                  openExternalUrlSafely(record.url as string);
                 }}
               >
                 {i18nT("ui.konnected.learningLibrary.searchFilters.open")}

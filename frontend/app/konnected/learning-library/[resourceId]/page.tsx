@@ -34,8 +34,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { apiFetch } from '@/api';
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
+import { openExternalUrlSafely } from '@/lib/security/navigation';
 
 const { Paragraph, Text, Title } = Typography;
+
 
 type KnowledgeLevel = 'beginner' | 'intermediate' | 'advanced';
 
@@ -161,31 +163,15 @@ function formatResourceType(i18nT: TranslateFunction, resource: KnowledgeResourc
   return i18nT("ui.konnected.learningLibrary.resourceid.resource");
 }
 
-/** Pick the best available content field for inline preview. */
-function pickContentHtml(resource: KnowledgeResourceDetail | null): string | null {
+/** Pick plain text only; HTML from API responses is never injected into the DOM. */
+function pickContentText(resource: KnowledgeResourceDetail | null): string | null {
   if (!resource) return null;
-  if (typeof resource.body_html === 'string' && resource.body_html.trim().length) {
-    return resource.body_html;
-  }
-  if (typeof resource.content_html === 'string' && resource.content_html.trim().length) {
-    return resource.content_html;
-  }
-  // Fallback: plain text -> wrapped in <p>
   const plain =
     (typeof resource.body === 'string' && resource.body) ||
     (typeof resource.content === 'string' && resource.content) ||
     '';
-  if (plain.trim().length) {
-    const safe = plain.replace(/\n{2,}/g, '\n\n');
-    const paragraphs = safe
-      .split(/\n{2,}/)
-      .map((block) => block.trim())
-      .filter(Boolean)
-      .map((block) => `<p>${block}</p>`)
-      .join('\n');
-    return paragraphs || null;
-  }
-  return null;
+  const trimmed = plain.trim();
+  return trimmed.length ? trimmed : null;
 }
 
 /** Simple helper to normalise progress into a 0–100 range. */
@@ -258,7 +244,7 @@ export default function LearningResourceViewerPage() {
 
   const progressPercent = useMemo(() => normalizeProgress(resource), [resource]);
 
-  const inlineHtml = useMemo(() => pickContentHtml(resource), [resource]);
+  const inlineText = useMemo(() => pickContentText(resource), [resource]);
 
   const shellTitle = resource?.title ?? i18nT("ui.konnected.learningLibrary.resourceid.learningResource");
   const shellDescription =
@@ -278,7 +264,7 @@ export default function LearningResourceViewerPage() {
 
   const handleOpenResource = () => {
     if (resource?.url && typeof window !== 'undefined') {
-      window.open(resource.url, '_blank', 'noopener,noreferrer');
+      openExternalUrlSafely(resource.url);
     }
   };
 
@@ -365,13 +351,13 @@ export default function LearningResourceViewerPage() {
                       label: i18nT("ui.konnected.learningLibrary.resourceid.overview"),
                       children: (
                         <>
-                          {inlineHtml ? (
-                            <div
+                          {inlineText ? (
+                            <Paragraph
                               className="konnected-resource-body"
-                              style={{ lineHeight: 1.7 }}
-                              // Content comes from the trusted backend (CMS)
-                              dangerouslySetInnerHTML={{ __html: inlineHtml }}
-                            />
+                              style={{ whiteSpace: 'pre-wrap', lineHeight: 1.7 }}
+                            >
+                              {inlineText}
+                            </Paragraph>
                           ) : (
                             <Paragraph type="secondary">
                               {i18nT("ui.konnected.learningLibrary.resourceid.detailedContentForThisResourceWillAppear")}

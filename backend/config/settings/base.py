@@ -404,8 +404,23 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_THROTTLE_CLASSES": (
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ),
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": env("KONNAXION_API_ANON_RATE", default="120/min"),
+        "user": env("KONNAXION_API_USER_RATE", default="1200/min"),
+    },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+
+# Optional strict destination allowlist for user-visible external links. An empty
+# list still enforces HTTPS/no-credentials/no-private-host validation.
+KONNAXION_EXTERNAL_LINK_ALLOWED_HOSTS = env.list(
+    "KONNAXION_EXTERNAL_LINK_ALLOWED_HOSTS",
+    default=[],
+)
 
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
 CORS_URLS_REGEX = r"^/api/.*$"

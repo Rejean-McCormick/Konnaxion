@@ -56,7 +56,16 @@ const KNOWLEDGE_SEARCH_ENDPOINTS = [
   '/knowledge/resources/',
 ] as const
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_BASE ?? '').replace(/\/+$/, '')
+const DEFAULT_INTERNAL_API_BASE =
+  process.env.NODE_ENV === 'production'
+    ? 'http://django-api:5000/api'
+    : 'http://127.0.0.1:8000/api'
+
+const API_BASE = (
+  process.env.INTERNAL_API_BASE ??
+  process.env.API_PROXY_BASE ??
+  DEFAULT_INTERNAL_API_BASE
+).replace(/\/+$/, '')
 
 function toTitleCase(segment: string): string {
   return segment
@@ -73,16 +82,15 @@ function pathToTitle(p: string): string {
   return segments.map(toTitleCase).join(' · ')
 }
 
-function buildBackendUrl(endpoint: string, request: NextRequest): string {
+function buildBackendUrl(endpoint: string, _request: NextRequest): string {
   const trimmed = endpoint.trim()
-  if (!trimmed) return request.nextUrl.origin
-  if (/^https?:\/\//i.test(trimmed)) return trimmed
+  if (!trimmed) return API_BASE
+  if (/^https?:\/\//i.test(trimmed)) {
+    throw new Error('Absolute backend endpoint URLs are not allowed')
+  }
 
-  const base = API_BASE || `${request.nextUrl.origin}/api`
-  const normalizedBase = base.replace(/\/+$/, '')
   const normalizedEndpoint = trimmed.startsWith('/') ? trimmed : `/${trimmed}`
-
-  return `${normalizedBase}${normalizedEndpoint}`
+  return `${API_BASE}${normalizedEndpoint}`
 }
 
 function normalizeKnowledgeResults(

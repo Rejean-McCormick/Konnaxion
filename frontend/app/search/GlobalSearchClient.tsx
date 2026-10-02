@@ -19,6 +19,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useWorld } from '@/context/WorldContext';
+import { openExternalUrlSafely } from '@/lib/security/navigation';
 
 const { Title, Paragraph, Text } = Typography;
 const { Search } = Input;
@@ -126,7 +127,7 @@ export default function GlobalSearchClient() {
     if (!target) return;
 
     if (target.startsWith('http://') || target.startsWith('https://')) {
-      window.open(target, '_blank', 'noopener,noreferrer');
+      openExternalUrlSafely(target);
       return;
     }
 

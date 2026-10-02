@@ -1,5 +1,5 @@
 # backend/konnaxion/teambuilder/views.py
-from django.db.models import Count
+from django.db.models import Count, Q
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -18,6 +18,7 @@ from .serializers import (
     ProblemSessionSummarySerializer,
 )
 from .logic import generate_teams_for_session
+from konnaxion.security_controls import OwnerOrStaffWritePermission
 
 
 class BuilderSessionViewSet(viewsets.ModelViewSet):
@@ -32,7 +33,15 @@ class BuilderSessionViewSet(viewsets.ModelViewSet):
         .order_by("-created_at")
     )
     serializer_class = BuilderSessionSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, OwnerOrStaffWritePermission]
+    owner_fields = ("created_by",)
+
+    def get_queryset(self):
+        qs = self.queryset
+        user = self.request.user
+        if getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+            return qs
+        return qs.filter(created_by=user)
 
     def perform_create(self, serializer):
         # Automatically assign the logged-in user as the creator
@@ -66,6 +75,13 @@ class TeamViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filterset_fields = ["session"]
 
+    def get_queryset(self):
+        qs = self.queryset
+        user = self.request.user
+        if getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+            return qs
+        return qs.filter(session__created_by=user)
+
 
 class ProblemViewSet(viewsets.ModelViewSet):
     """
@@ -75,16 +91,17 @@ class ProblemViewSet(viewsets.ModelViewSet):
     """
 
     serializer_class = ProblemSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, OwnerOrStaffWritePermission]
+    owner_fields = ("created_by",)
 
     def get_queryset(self):
         # Annotate usage_count from linked sessions; average_outcome can be
         # added later via additional aggregates if you store outcome scores.
-        return (
-            Problem.objects.all()
-            .annotate(usage_count=Count("sessions"))
-            .order_by("-created_at")
-        )
+        qs = Problem.objects.all().annotate(usage_count=Count("sessions"))
+        user = self.request.user
+        if not (getattr(user, "is_staff", False) or getattr(user, "is_superuser", False)):
+            qs = qs.filter(Q(created_by=user) | Q(created_by__isnull=True))
+        return qs.order_by("-created_at")
 
     def perform_create(self, serializer):
         problem = serializer.save(created_by=self.request.user)

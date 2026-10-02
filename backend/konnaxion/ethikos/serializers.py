@@ -8,6 +8,8 @@ from typing import Any
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from konnaxion.security_controls import validate_safe_external_url
+
 from .constants import (
     ARGUMENT_IMPACT_VOTE_MAX,
     ARGUMENT_IMPACT_VOTE_MIN,
@@ -329,6 +331,11 @@ class ArgumentSourceSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+
+    def validate_url(self, value):
+        if not value:
+            return value
+        return validate_safe_external_url(value)
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         url = attrs.get("url")

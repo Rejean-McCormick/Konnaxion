@@ -7,7 +7,9 @@ import re
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from urllib.parse import urlsplit
 
 from konnaxion.worlds.resolver import WorldUnavailable
 from konnaxion.worlds.runtime import reset_world_runtime, set_world_runtime
@@ -21,6 +23,36 @@ REPORTS_WS_RE = re.compile(
 SUPPORTED_METRICS = {"smart-vote", "usage", "perf"}
 SUPPORTED_GROUP_BY = {"day", "week"}
 LOGGER = logging.getLogger(__name__)
+
+
+def _header_value(headers, name: bytes) -> str | None:
+    for key, value in headers or ():
+        if bytes(key).lower() == name:
+            try:
+                return bytes(value).decode("latin-1")
+            except Exception:
+                return None
+    return None
+
+
+def _websocket_origin_allowed(headers) -> bool:
+    origin = _header_value(headers, b"origin")
+    if not origin:
+        return False
+    try:
+        parsed = urlsplit(origin)
+    except ValueError:
+        return False
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+        return False
+    host = parsed.hostname.lower().rstrip(".")
+    allowed = {str(item).split(":", 1)[0].lower().rstrip(".") for item in getattr(settings, "ALLOWED_HOSTS", [])}
+    if "*" in allowed:
+        # Wildcard ALLOWED_HOSTS must never imply wildcard WebSocket origins.
+        allowed.remove("*")
+    if getattr(settings, "DEBUG", False):
+        allowed.update({"localhost", "127.0.0.1", "::1"})
+    return any(host == item or host.endswith(f".{item}") for item in allowed if item)
 
 
 def _iso_now() -> str:
@@ -165,6 +197,10 @@ def _build_summary(
 async def websocket_application(scope, receive, send):
     first_event = await receive()
     if first_event.get("type") != "websocket.connect":
+        return
+
+    if not _websocket_origin_allowed(scope.get("headers", ())):
+        await send({"type": "websocket.close", "code": 4403})
         return
 
     path = scope.get("path", "")

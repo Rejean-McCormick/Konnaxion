@@ -28,6 +28,50 @@ const GLOBAL_UI_PREFIXES = [
 
 type SourceContext = { universeKey: string | null; worldKey: string } | null;
 
+
+function buildContentSecurityPolicy(nonce: string): string {
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
+    "script-src-attr 'none'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' data: https:",
+    "connect-src 'self' https: wss:",
+    "media-src 'self' blob: https:",
+    "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+    "upgrade-insecure-requests",
+  ].join('; ');
+}
+
+function securityContext(request: NextRequest) {
+  const nonce = btoa(crypto.randomUUID());
+  const csp = buildContentSecurityPolicy(nonce);
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-nonce', nonce);
+  requestHeaders.set('Content-Security-Policy', csp);
+  return { csp, requestHeaders };
+}
+
+function finalizeResponse(
+  request: NextRequest,
+  response: NextResponse,
+  csp: string,
+): NextResponse {
+  response.headers.set('Content-Security-Policy', csp);
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+  response.headers.set('Cross-Origin-Resource-Policy', 'same-origin');
+  return withDetectedLanguageCookie(request, response);
+}
+
 function withDetectedLanguageCookie(
   request: NextRequest,
   response: NextResponse,
@@ -100,6 +144,7 @@ function isUiCarryoverCandidate(pathname: string): boolean {
  * Canonical helpers remain the primary path.
  */
 export function middleware(request: NextRequest) {
+  const { csp, requestHeaders } = securityContext(request);
   const pathname = request.nextUrl.pathname;
   const hostUniverseKey = getUniverseKeyFromHostname(request.nextUrl.hostname);
   const pathContext = parseWorldPath(pathname);
@@ -109,7 +154,7 @@ export function middleware(request: NextRequest) {
     pathContext?.universeKey &&
     hostUniverseKey !== pathContext.universeKey
   ) {
-    return new NextResponse('UNIVERSE_HOST_PATH_CONFLICT', { status: 400 });
+    return finalizeResponse(request, new NextResponse('UNIVERSE_HOST_PATH_CONFLICT', { status: 400 }), csp);
   }
 
   const context = sourceContext(request);
@@ -117,14 +162,14 @@ export function middleware(request: NextRequest) {
   if (pathname.startsWith('/api/')) {
     const apiPath = pathname.slice('/api/'.length);
     if (!context || isGlobalApiPath(apiPath)) {
-      return withDetectedLanguageCookie(request, NextResponse.next());
+      return finalizeResponse(request, NextResponse.next({ request: { headers: requestHeaders } }), csp);
     }
 
     const target = request.nextUrl.clone();
     target.pathname = context.universeKey
       ? `/api/u/${context.universeKey}/w/${context.worldKey}/${apiPath}`
       : `/api/w/${context.worldKey}/${apiPath}`;
-    return withDetectedLanguageCookie(request, NextResponse.rewrite(target));
+    return finalizeResponse(request, NextResponse.rewrite(target, { request: { headers: requestHeaders } }), csp);
   }
 
   if (
@@ -134,10 +179,10 @@ export function middleware(request: NextRequest) {
   ) {
     const target = request.nextUrl.clone();
     target.pathname = withWorldPath(pathname, context.worldKey, context.universeKey);
-    return withDetectedLanguageCookie(request, NextResponse.redirect(target));
+    return finalizeResponse(request, NextResponse.redirect(target), csp);
   }
 
-  return withDetectedLanguageCookie(request, NextResponse.next());
+  return finalizeResponse(request, NextResponse.next({ request: { headers: requestHeaders } }), csp);
 }
 
 export const config = {

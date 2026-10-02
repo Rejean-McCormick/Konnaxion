@@ -25,7 +25,11 @@ const USAGE_QUERY = '?range=30d&grouping=day';
 
 // Base URL for the backend (matches how the rest of the app calls it)
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000';
+  process.env.INTERNAL_API_BASE ??
+  process.env.API_PROXY_BASE ??
+  (process.env.NODE_ENV === 'production'
+    ? 'http://django-api:5000/api'
+    : 'http://127.0.0.1:8000/api');
 
 /**
  * Build the absolute URL for the usage report on the analytics backend.

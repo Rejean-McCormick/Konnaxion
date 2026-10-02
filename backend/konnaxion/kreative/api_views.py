@@ -1,7 +1,10 @@
 # FILE: backend/konnaxion/kreative/api_views.py
 # kreative/api_views.py
 
+from django.db.models import Q
 from rest_framework import filters, permissions, viewsets
+
+from konnaxion.security_controls import OwnerOrStaffWritePermission, StaffWritePublicReadPermission
 
 from .models import CollabSession, Gallery, KreativeArtwork, Tag, TraditionEntry
 from .serializers import (
@@ -27,7 +30,8 @@ class KreativeArtworkViewSet(viewsets.ModelViewSet):
         .all()
     )
     serializer_class = KreativeArtworkSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, OwnerOrStaffWritePermission]
+    owner_fields = ("artist",)
     filterset_fields = ["artist", "media_type", "year"]
 
     def perform_create(self, serializer):
@@ -46,7 +50,8 @@ class GalleryViewSet(viewsets.ModelViewSet):
         "artworks",
     )
     serializer_class = GallerySerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, OwnerOrStaffWritePermission]
+    owner_fields = ("created_by",)
     filterset_fields = ["created_by", "theme"]
 
     def perform_create(self, serializer):
@@ -66,7 +71,8 @@ class CollabSessionViewSet(viewsets.ModelViewSet):
         "final_artwork",
     ).all()
     serializer_class = CollabSessionSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, OwnerOrStaffWritePermission]
+    owner_fields = ("host",)
     filterset_fields = ["session_type", "host", "ended_at"]
 
     def perform_create(self, serializer):
@@ -86,11 +92,40 @@ class TraditionEntryViewSet(viewsets.ModelViewSet):
         "approved_by",
     ).all()
     serializer_class = TraditionEntrySerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, OwnerOrStaffWritePermission]
+    owner_fields = ("submitted_by",)
     filterset_fields = ["approved", "region", "submitted_by"]
+
+    def get_queryset(self):
+        qs = TraditionEntry.objects.select_related("submitted_by", "approved_by")
+        user = self.request.user
+        if getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+            return qs
+        if getattr(user, "is_authenticated", False):
+            return qs.filter(Q(approved=True) | Q(submitted_by=user))
+        return qs.filter(approved=True)
 
     def perform_create(self, serializer):
         serializer.save(submitted_by=self.request.user)
+
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        if instance.approved and not (
+            getattr(self.request.user, "is_staff", False)
+            or getattr(self.request.user, "is_superuser", False)
+        ):
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Approved tradition entries are immutable to submitters.")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if instance.approved and not (
+            getattr(self.request.user, "is_staff", False)
+            or getattr(self.request.user, "is_superuser", False)
+        ):
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Approved tradition entries can only be removed by staff.")
+        instance.delete()
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -103,7 +138,7 @@ class TagViewSet(viewsets.ModelViewSet):
 
     queryset = Tag.objects.all().order_by("name")
     serializer_class = TagSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [StaffWritePublicReadPermission]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ["name"]
     search_fields = ["name"]

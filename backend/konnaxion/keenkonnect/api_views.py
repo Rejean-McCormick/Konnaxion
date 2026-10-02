@@ -2,6 +2,16 @@
 from rest_framework import viewsets, permissions, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
+
+from konnaxion.security_controls import (
+    OwnerOrStaffWritePermission,
+    ProjectManagerWritePermission,
+    SelfOrStaffWritePermission,
+    StaffWritePublicReadPermission,
+    user_can_manage_project,
+    user_can_participate_project,
+)
 
 from .models import (
     Project,
@@ -35,7 +45,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
         .all()
     )
     serializer_class = ProjectSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, OwnerOrStaffWritePermission]
+    owner_fields = ("creator",)
     # Use the model field name "creator" (DjangoFilterBackend will filter by ID)
     filterset_fields = ["status", "category", "creator"]
 
@@ -55,11 +66,13 @@ class ProjectResourceViewSet(viewsets.ModelViewSet):
         .all()
     )
     serializer_class = ProjectResourceSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, ProjectManagerWritePermission]
     filterset_fields = ["project", "file_type"]
 
     def perform_create(self, serializer):
-        # Set uploader to current user
+        project = serializer.validated_data.get("project")
+        if not user_can_manage_project(self.request.user, project):
+            raise PermissionDenied("Project owner permission is required to add resources.")
         serializer.save(uploaded_by=self.request.user)
 
 
@@ -75,12 +88,13 @@ class ProjectTaskViewSet(viewsets.ModelViewSet):
         .all()
     )
     serializer_class = ProjectTaskSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, ProjectManagerWritePermission]
     filterset_fields = ["project", "status", "assignee"]
 
     def perform_create(self, serializer):
-        # On create, ensure task is associated with a project (project must be provided in request data).
-        # We do not set assignee automatically; if provided and valid, it will be used.
+        project = serializer.validated_data.get("project")
+        if not user_can_manage_project(self.request.user, project):
+            raise PermissionDenied("Project owner permission is required to add tasks.")
         serializer.save()
 
 
@@ -97,11 +111,15 @@ class ProjectMessageViewSet(viewsets.ModelViewSet):
     )
     serializer_class = ProjectMessageSerializer
     # If you want messages to be fully private, switch this to IsAuthenticated.
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, OwnerOrStaffWritePermission]
     filterset_fields = ["project", "author"]
 
+    owner_fields = ("author",)
+
     def perform_create(self, serializer):
-        # Set message author to current user
+        project = serializer.validated_data.get("project")
+        if not user_can_participate_project(self.request.user, project):
+            raise PermissionDenied("Project membership is required to post messages.")
         serializer.save(author=self.request.user)
 
 
@@ -117,7 +135,7 @@ class ProjectTeamViewSet(viewsets.ModelViewSet):
         .all()
     )
     serializer_class = ProjectTeamSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, ProjectManagerWritePermission]
     filterset_fields = ["project", "user", "role"]
 
     def perform_create(self, serializer):
@@ -214,7 +232,7 @@ class ProjectRatingViewSet(viewsets.ModelViewSet):
         .all()
     )
     serializer_class = ProjectRatingSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, SelfOrStaffWritePermission]
     filterset_fields = ["project", "user"]
 
     def perform_create(self, serializer):
@@ -230,7 +248,7 @@ class TagViewSet(viewsets.ModelViewSet):
     """
     queryset = Tag.objects.all().order_by("name")
     serializer_class = TagSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [StaffWritePublicReadPermission]
     filterset_fields = ["name"]
     # Allow searching/order tags by name
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]

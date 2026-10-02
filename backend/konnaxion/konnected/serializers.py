@@ -1,6 +1,8 @@
 # FILE: backend/konnaxion/konnected/serializers.py
 from rest_framework import serializers
 
+from konnaxion.security_controls import validate_safe_external_url
+
 from .models import (
     CertificationPath,
     Evaluation,
@@ -48,6 +50,10 @@ class KnowledgeResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = KnowledgeResource
         fields = "__all__"
+        read_only_fields = ("id", "author", "created_at", "updated_at")
+
+    def validate_url(self, value):
+        return validate_safe_external_url(value)
 
 
 class CertificationPathSerializer(serializers.ModelSerializer):
@@ -96,6 +102,13 @@ class PeerValidationSerializer(serializers.ModelSerializer):
         model = PeerValidation
         fields = "__all__"
         read_only_fields = ("id", "peer", "created_at", "updated_at")
+
+    def validate_evaluation(self, evaluation):
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if user and getattr(user, "is_authenticated", False) and evaluation.user_id == user.pk:
+            raise serializers.ValidationError("You cannot peer-validate your own evaluation.")
+        return evaluation
 
 
 class PortfolioSerializer(serializers.ModelSerializer):

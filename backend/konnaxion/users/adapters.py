@@ -17,7 +17,7 @@ if typing.TYPE_CHECKING:
 
 class AccountAdapter(DefaultAccountAdapter):
     def is_open_for_signup(self, request: HttpRequest) -> bool:
-        return getattr(settings, "ACCOUNT_ALLOW_REGISTRATION", True)
+        return getattr(settings, "ACCOUNT_ALLOW_REGISTRATION", False)
 
     def authenticate(self, request: HttpRequest, **credentials):
         user = super().authenticate(request, **credentials)
@@ -38,7 +38,7 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         request: HttpRequest,
         sociallogin: SocialLogin,
     ) -> bool:
-        return getattr(settings, "ACCOUNT_ALLOW_REGISTRATION", True)
+        return getattr(settings, "ACCOUNT_ALLOW_REGISTRATION", False)
 
     def populate_user(
         self,

@@ -7,6 +7,7 @@ from typing import Any, Optional
 from rest_framework import serializers
 
 from .models import Credential
+from konnaxion.security_controls import validate_safe_upload
 
 __all__ = ["CredentialSerializer"]
 
@@ -85,13 +86,20 @@ class CredentialSerializer(serializers.ModelSerializer):
     # ------------------------------------------------------------------
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
-        """
-        Enforce upload requirements on create while remaining permissive for updates.
-        """
-        if self.instance is None and not attrs.get("document"):
-            raise serializers.ValidationError(
-                {"file": ["This field is required."]}
-            )
+        """Require a credential file and enforce a narrow document/image policy."""
+        document = attrs.get("document")
+        if self.instance is None and not document:
+            raise serializers.ValidationError({"file": ["This field is required."]})
+        if document:
+            try:
+                validate_safe_upload(
+                    document,
+                    allowed_extensions={".pdf", ".jpg", ".jpeg", ".png"},
+                    allowed_mime_types={"application/pdf", "image/jpeg", "image/png"},
+                    max_bytes=15 * 1024 * 1024,
+                )
+            except serializers.ValidationError as exc:
+                raise serializers.ValidationError({"file": exc.detail}) from exc
         return attrs
 
     # ------------------------------------------------------------------

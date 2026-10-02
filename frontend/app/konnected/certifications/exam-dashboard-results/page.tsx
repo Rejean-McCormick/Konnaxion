@@ -40,6 +40,7 @@ import React, { useMemo, useState } from 'react'
 
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell'
 import api from '@/services/_request'
+import { openExternalUrlSafely } from '@/lib/security/navigation';
 
 const { Title, Text, Paragraph } = Typography
 
@@ -308,7 +309,7 @@ const ExamDashboardResultsPage: React.FC = () => {
 
   const handleOpenCertificate = (attempt: ExamAttempt) => {
     if (attempt.certificateUrl) {
-      window.open(attempt.certificateUrl, '_blank', 'noopener,noreferrer')
+      openExternalUrlSafely(attempt.certificateUrl)
     } else {
       message.info(i18nT("ui.konnected.certifications.examDashboardResults.certificateIsNotYetAvailableForThis"))
     }
@@ -316,7 +317,7 @@ const ExamDashboardResultsPage: React.FC = () => {
 
   const handleOpenPortfolio = (attempt: ExamAttempt) => {
     if (attempt.portfolioUrl) {
-      window.open(attempt.portfolioUrl, '_blank', 'noopener,noreferrer')
+      openExternalUrlSafely(attempt.portfolioUrl)
     } else {
       message.info(i18nT("ui.konnected.certifications.examDashboardResults.thisAttemptIsNotYetLinkedTo"))
     }

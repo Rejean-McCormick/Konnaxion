@@ -48,6 +48,7 @@ import Link from 'next/link';
 import { type ReactNode, useMemo, useState } from 'react';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import { openExternalUrlSafely } from '@/lib/security/navigation';
 import { type Credential, uploadCredential } from '@/services/trust';
 
 /* ---------------------------------------------
@@ -229,7 +230,14 @@ export default function Credentials() {
         <Space size={6}>
           <FileTextOutlined />
           {row.url ? (
-            <a href={row.url} target="_blank" rel="noreferrer">
+            <a
+              href={row.url}
+              onClick={(event) => {
+                event.preventDefault();
+                if (row.url) openExternalUrlSafely(row.url);
+              }}
+              rel="noreferrer"
+            >
               {row.title}
             </a>
           ) : (
@@ -274,7 +282,10 @@ export default function Credentials() {
             key="download"
             disabled={!canDownload}
             href={row.url}
-            target="_blank"
+            onClick={(event) => {
+              event.preventDefault();
+              if (row.url) openExternalUrlSafely(row.url);
+            }}
             rel="noreferrer"
           >
             {i18nT("ui.ethikos.trust.credentials.download")}
@@ -525,7 +536,14 @@ export default function Credentials() {
                       title: i18nT("ui.ethikos.trust.credentials.document"),
                       dataIndex: 'url',
                       render: (_: ReactNode, row: CredentialRow) => (
-                        <a href={row.url} target="_blank" rel="noreferrer">
+                        <a
+                          href={row.url}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            if (row.url) openExternalUrlSafely(row.url);
+                          }}
+                          rel="noreferrer"
+                        >
                           {i18nT("ui.ethikos.trust.credentials.openDocument")}
                         </a>
                       ),

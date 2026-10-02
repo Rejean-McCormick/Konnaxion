@@ -34,6 +34,13 @@ CSRF_TRUSTED_ORIGINS = env.list(
 FRONTEND_BASE_URL = env("FRONTEND_BASE_URL").rstrip("/")
 LOGIN_REDIRECT_URL = f"{FRONTEND_BASE_URL}/ekoh/dashboard"
 
+# Production registration is fail-closed. Opening public signup requires an
+# explicit deployment decision.
+ACCOUNT_ALLOW_REGISTRATION = env.bool(
+    "DJANGO_ACCOUNT_ALLOW_REGISTRATION",
+    default=False,
+)
+
 # DATABASES
 # ------------------------------------------------------------------------------
 DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)
@@ -69,10 +76,16 @@ CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = False
 # Keep one cookie name in local and production so every frontend client agrees.
 CSRF_COOKIE_NAME = "csrftoken"
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "Lax"
+# Browser/API topology is same-origin in production. Cross-origin credentials are
+# disabled unless a future deployment explicitly changes this reviewed policy.
+CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
+CORS_ALLOW_CREDENTIALS = False
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 # https://docs.djangoproject.com/en/dev/topics/security/#ssl-https
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-seconds
-# TODO: set this to 60 seconds first and then to 518400 once you prove the former works
-SECURE_HSTS_SECONDS = 60
+SECURE_HSTS_SECONDS = env.int("DJANGO_SECURE_HSTS_SECONDS", default=31536000)
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-include-subdomains
 SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool(
     "DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS",

@@ -3,6 +3,7 @@ from rest_framework import permissions, viewsets
 
 from .models import Vote, VoteResult
 from .serializers import VoteSerializer, VoteResultSerializer
+from konnaxion.security_controls import SelfOrStaffWritePermission
 
 
 __all__ = [
@@ -40,7 +41,7 @@ class VoteViewSet(viewsets.ModelViewSet):
     queryset = Vote.objects.select_related("user").all()
     serializer_class = VoteSerializer
     # Allow unauthenticated GET for analytics; keep auth for writes
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated, SelfOrStaffWritePermission]
 
     def get_queryset(self):
         """
@@ -53,6 +54,8 @@ class VoteViewSet(viewsets.ModelViewSet):
           - user (matches related User.username)
         """
         qs = self.queryset
+        if not (getattr(self.request.user, "is_staff", False) or getattr(self.request.user, "is_superuser", False)):
+            qs = qs.filter(user=self.request.user)
         params = self.request.query_params
 
         target_type = params.get("target_type")

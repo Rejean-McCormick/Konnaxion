@@ -36,6 +36,7 @@ import type {
   CreateArgumentSourcePayload,
   EthikosId,
 } from '@/services/ethikos'
+import { openExternalUrlSafely } from '@/lib/security/navigation';
 
 const { Paragraph, Text } = Typography
 const { TextArea } = Input
@@ -402,7 +403,14 @@ export default function ArgumentSourcesPanel({
                   avatar={<LinkOutlined />}
                   title={
                     url ? (
-                      <a href={url} target="_blank" rel="noreferrer">
+                      <a
+                        href={url}
+                        onClick={(event) => {
+                          event.preventDefault()
+                          openExternalUrlSafely(url)
+                        }}
+                        rel="noreferrer"
+                      >
                         {label}
                       </a>
                     ) : (

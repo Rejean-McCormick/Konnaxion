@@ -32,6 +32,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 import api from '@/services/_request';
+import { openExternalUrlSafely } from '@/lib/security/navigation';
 
 const { Text } = Typography;
 const { Search } = Input;
@@ -352,7 +353,7 @@ export default function BrowseResourcesPage(): JSX.Element {
     if (record.url) {
       const href = String(record.url);
       if (href.startsWith('http://') || href.startsWith('https://')) {
-        window.open(href, '_blank', 'noopener,noreferrer');
+        openExternalUrlSafely(href);
       } else {
         router.push(href);
       }

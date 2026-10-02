@@ -1,5 +1,5 @@
 // FILE: frontend/app/_api/admin/moderation/route.ts
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 type ReportType = 'Spam' | 'Harassment' | 'Misinformation'
 type ReportStatus = 'Pending' | 'Resolved'
@@ -24,27 +24,27 @@ function hasReportItems(value: unknown): value is { items: Report[] } {
   return Array.isArray((value as { items?: unknown }).items)
 }
 
-/**
- * Resolve the backend base URL in the same spirit as services/_request.ts.
- * In practice, NEXT_PUBLIC_API_BASE should be something like
- *   http://localhost:8000/api
- * or the public API root for your Django backend.
- */
+/** Resolve the backend through a server-only fixed internal origin. */
 function resolveApiBase(): string {
-  const raw = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000'
-  // Normalize to avoid trailing slash issues when concatenating paths
+  const fallback =
+    process.env.NODE_ENV === 'production'
+      ? 'http://django-api:5000/api'
+      : 'http://127.0.0.1:8000/api'
+  const raw = process.env.INTERNAL_API_BASE || process.env.API_PROXY_BASE || fallback
   return raw.replace(/\/+$/, '')
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const apiBase = resolveApiBase()
-  const url = `${apiBase}/admin/moderation`
+  const url = `${apiBase}/admin/moderation/`
 
   try {
     const res = await fetch(url, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
+        ...(request.headers.get('cookie') ? { Cookie: request.headers.get('cookie') as string } : {}),
+        ...(request.headers.get('authorization') ? { Authorization: request.headers.get('authorization') as string } : {}),
       },
       // Ensure we always hit the live queue, not a cached copy
       cache: 'no-store',
@@ -84,32 +84,9 @@ export async function GET() {
       },
     )
   } catch {
-    // Fallback: deterministic stub, matching ModerationPayload
-    const fallback: ModerationPayload = {
-      items: [
-        {
-          id: 'stub-1',
-          content: 'Example content flagged for potential harassment.',
-          reporter: 'alice@example.com',
-          type: 'Harassment',
-          status: 'Pending',
-        },
-        {
-          id: 'stub-2',
-          content: 'Example spam message that has already been resolved.',
-          reporter: 'moderation-bot',
-          type: 'Spam',
-          status: 'Resolved',
-        },
-      ],
-    }
-
-    return NextResponse.json<ModerationPayload>(fallback, {
-      status: 200,
-      headers: {
-        'Cache-Control': 'no-store',
-        'X-Konnaxion-Moderation-Mode': 'mock',
-      },
-    })
+    return NextResponse.json(
+      { error: 'Moderation backend is unavailable.' },
+      { status: 502, headers: { 'Cache-Control': 'no-store' } },
+    )
   }
 }

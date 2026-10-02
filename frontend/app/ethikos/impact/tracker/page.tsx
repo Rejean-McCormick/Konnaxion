@@ -46,6 +46,7 @@ import {
   patchImpactStatus,
   type TrackerItem,
 } from '@/services/impact';
+import { openExternalUrlSafely } from '@/lib/security/navigation';
 
 dayjs.extend(relativeTime);
 
@@ -384,8 +385,7 @@ export default function ImpactTracker(): JSX.Element {
               <Button
                 size="small"
                 icon={<LinkOutlined />}
-                href={evidenceUrl}
-                target="_blank"
+                onClick={() => openExternalUrlSafely(evidenceUrl)}
               >
                 {i18nT("ui.ethikos.impact.tracker.evidence")}
               </Button>

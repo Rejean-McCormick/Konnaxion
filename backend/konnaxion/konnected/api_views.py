@@ -7,6 +7,9 @@ from django.utils import timezone
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
+
+from konnaxion.security_controls import StaffWritePublicReadPermission
 
 from konnaxion.worlds.runtime import require_world_runtime
 
@@ -292,10 +295,10 @@ class KnowledgeResourceViewSet(viewsets.ModelViewSet):
 
     queryset = KnowledgeResource.objects.select_related("author")
     serializer_class = KnowledgeResourceSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [StaffWritePublicReadPermission]
 
     def perform_create(self, serializer):
-        # Record the authenticated user as the author
+        # Record the reviewed staff publisher as the author
         serializer.save(author=self.request.user)
 
 
@@ -399,7 +402,7 @@ class CertificationPathViewSet(viewsets.ModelViewSet):
 
     queryset = CertificationPath.objects.all().order_by("name")
     serializer_class = CertificationPathSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [StaffWritePublicReadPermission]
 
     @action(
         detail=True,
@@ -687,7 +690,21 @@ class PeerValidationViewSet(viewsets.ModelViewSet):
         )
 
     def perform_create(self, serializer):
-        serializer.save(peer=self.request.user)
+        user = self.request.user
+        is_staff = bool(getattr(user, "is_staff", False) or getattr(user, "is_superuser", False))
+        evaluation = serializer.validated_data["evaluation"]
+        mentor = MentorProfile.objects.filter(user=user, is_active=True).first()
+        if not is_staff:
+            if mentor is None:
+                raise PermissionDenied("Active mentor status is required for peer validation.")
+            assigned = MentorshipRequest.objects.filter(
+                mentor=mentor,
+                mentee_id=evaluation.user_id,
+                status=MentorshipRequest.Status.ACCEPTED,
+            ).exists()
+            if not assigned:
+                raise PermissionDenied("An accepted mentorship relationship is required for this evaluation.")
+        serializer.save(peer=user)
 
 
 class PortfolioViewSet(viewsets.ModelViewSet):

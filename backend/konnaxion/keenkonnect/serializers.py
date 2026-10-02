@@ -1,5 +1,7 @@
 # FILE: backend/konnaxion/keenkonnect/serializers.py
 from rest_framework import serializers
+
+from konnaxion.security_controls import validate_safe_external_url, validate_safe_upload
 from .models import Project, ProjectResource, ProjectTask, ProjectMessage, ProjectTeam, ProjectRating, Tag
 
 # Exported classes for import elsewhere
@@ -32,6 +34,30 @@ class ProjectResourceSerializer(serializers.ModelSerializer):
         model = ProjectResource
         fields = "__all__"
         read_only_fields = ("id", "uploaded_by", "uploaded_at", "version", "converted_path")
+
+    def validate_external_url(self, value):
+        return validate_safe_external_url(value) if value else value
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        upload = attrs.get("file")
+        file_type = attrs.get("file_type") or getattr(self.instance, "file_type", None)
+        if upload:
+            policies = {
+                "image": ({".jpg", ".jpeg", ".png", ".gif", ".webp"}, {"image/jpeg", "image/png", "image/gif", "image/webp"}, 15),
+                "document": ({".pdf", ".txt", ".csv", ".md"}, {"application/pdf", "text/plain", "text/csv", "text/markdown"}, 20),
+                "3d_model": ({".glb", ".gltf", ".obj"}, {"model/gltf-binary", "model/gltf+json", "text/plain", "application/octet-stream"}, 50),
+            }
+            if file_type not in policies:
+                raise serializers.ValidationError({"file": "File upload is not allowed for resource type 'other'."})
+            extensions, mime_types, max_mib = policies[file_type]
+            try:
+                validate_safe_upload(upload, allowed_extensions=extensions, allowed_mime_types=mime_types, max_bytes=max_mib * 1024 * 1024)
+            except serializers.ValidationError as exc:
+                raise serializers.ValidationError({"file": exc.detail}) from exc
+        if not upload and not attrs.get("external_url") and self.instance is None:
+            raise serializers.ValidationError("Provide either a validated file or an HTTPS external_url.")
+        return attrs
 
 class ProjectTaskSerializer(serializers.ModelSerializer):
     """Serializer for a ProjectTask (to-do or milestone in a project)."""
