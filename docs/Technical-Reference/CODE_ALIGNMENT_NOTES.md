@@ -29,6 +29,12 @@ ekoh.ExpertiseCategory
 
 The relation and its data migration should be moved to the EkoH-owned taxonomy. New code should not introduce another expertise taxonomy.
 
+### ISCED-F 2013 EkoH profile
+
+The canonical `ekoh.ExpertiseCategory` hierarchy is backed by `backend/konnaxion/ekoh/fixtures/isced_f_2013.json`. The default EkoH profile is **10 broad (`01`–`10`) / 26 substantive narrow / 77 substantive detailed = 113 categories**. It intentionally excludes generic field `00` and special catch-all/unknown coding categories from default expertise scoring.
+
+Do not reintroduce an ad-hoc “ISO-based” flat domain list. Official ISCED-F codes/labels are stable identifiers; EkoH scores and Smart Vote relevance remain separate semantics. See `EkoH Smart Vote/EkoH - Expertise Taxonomy (ISCED-F 2013).md`.
+
 ## 2. Remove active canonical dependence on `kollective_intelligence`
 
 ### `backend/config/settings/base.py`

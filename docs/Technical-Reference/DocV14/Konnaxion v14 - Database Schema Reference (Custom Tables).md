@@ -6,7 +6,7 @@
 
 ### **EkoH (Expertise & Reputation Domain)**
 
-* **Expertise Categories → ExpertiseCategory:** Catalog of knowledge domains used to classify expertise. **Key columns:** `id (PK)`, `name` (unique domain name).
+* **Expertise Categories → ExpertiseCategory:** Hierarchical UNESCO ISCED-F 2013 catalogue used by EkoH. **Key columns:** `id (PK)`, `code` (unique official field code), `name`, `parent` (self-FK), `depth`, `path` (PostgreSQL `ltree`). The default EkoH profile is 10 broad / 26 narrow / 77 detailed = 113 categories.
 
 * **User Expertise Scores → UserExpertiseScore:** Each user’s current expertise score per domain. **Key columns:** `id (PK)`, `user` (FK to User), `category` (FK to ExpertiseCategory), `raw_score`, `weighted_score`.
 

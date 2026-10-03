@@ -1,0 +1,9 @@
+{
+  "distribution": "konnaxion-worlds",
+  "version": "0.3.6",
+  "digest_algorithm": "sha256(sorted relative_path + NUL + sha256(file_bytes) + LF)",
+  "digest_scope": "backend/pyproject.toml + backend/konnaxion/worlds/** regular files; excludes __pycache__ and .pyc",
+  "tree_sha256": "eb3f1a29ccad7a7db85e5e99d6a8fe9c2df6ca4c5a8a75375303362255c445b4",
+  "architecture_lock": "KX-UNIVERSES-1",
+  "kristal_v7_boundary": "7.0.0-draft.3.1"
+}

@@ -1,3 +1,5 @@
+> **Implementation-alignment notice (2026-10-02):** the active EkoH owner is `backend/konnaxion/ekoh/`. The tree below preserves an older packaging sketch and is not authoritative for current paths. Current taxonomy loading uses `python manage.py load_isced`, not direct `loaddata`. See `EkoH - Expertise Taxonomy (ISCED-F 2013).md`.
+
 F**ile architecture for the EkoH module alone** (everything lives under `modules/ekoh-smartvote/ekoh/`):
 
 ekoh/                        \# Django app root  (namespace: konnaxion.ekoh)  
@@ -55,5 +57,5 @@ Key points:
 
 * **Pip-installable:** `pyproject.toml` at `modules/ekoh-smartvote/` exposes `konnaxion.ekoh` as a namespace package.
 
-* **Dev seed:** `manage.py loaddata fixtures/isced_f_2013.json` loads the domain taxonomy.
+* **Taxonomy synchronization:** `python manage.py load_isced` upserts the version-pinned ISCED-F 2013 EkoH profile and preserves existing expertise scores.
 

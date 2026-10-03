@@ -41,7 +41,7 @@ Canonical tables powering EkoH scoring, ethics, audit, and privacy.
 
 | Table / Model | Purpose | Key fields |
 | ----- | ----- | ----- |
-| `ExpertiseCategory` | Domain taxonomy for expertise classification. | `id`, `name` |
+| `ExpertiseCategory` | Hierarchical ISCED-F 2013 taxonomy for expertise classification. | `id`, `code`, `name`, `parent`, `depth`, `path` |
 | `UserExpertiseScore` | Per‑user per‑domain raw/weighted score. | `id`, `user`, `category`, `raw_score`, `weighted_score` |
 | `UserEthicsScore` | Per‑user ethical multiplier (applied to expertise). | `user` (PK), `ethical_score` |
 | `ScoreConfiguration` | Named weights/coefficients (global or per field). | `id`, `weight_name`, `weight_value`, `field` |
@@ -59,7 +59,7 @@ Finalized parameters for EkoH engine and domain taxonomy.
 
 * **Ethical multiplier bounds:** floor `0.20`, cap `1.50`.
 
-* **Expertise domains:** `EXPERTISE_DOMAIN_CHOICES` (26 ISO‑based domains; seeded fixtures).
+* **Expertise taxonomy:** UNESCO **ISCED-F 2013 / CITE-F 2013**, represented hierarchically as **10 broad / 26 substantive narrow / 77 substantive detailed = 113 EkoH categories**. The old phrase “26 ISO-based domains” is superseded; 26 refers only to the substantive narrow-field level in the EkoH profile.
 
 —
 

@@ -8,6 +8,8 @@
 > References to Kubernetes/Helm/Argo CD, Airflow, Dredd, k6, 90% coverage gates, team/SRE ownership structures, or other infrastructure/CI details are historical design assumptions unless independently present in current code and current qualification evidence.
 >
 > Do not use this file to claim present implementation, deployment topology, CI gates, test coverage, operational ownership, or release readiness.
+>
+> **Taxonomy note (2026-10-02):** current EkoH uses a hierarchical ISCED-F 2013 profile of **10 broad / 26 substantive narrow / 77 substantive detailed = 113 categories**. Any flat `enum[26]` description in this historical document refers at most to the narrow-field layer and is not the current taxonomy contract.
 
 ---
 
@@ -204,7 +206,7 @@ Thought for 28 seconds
 | `raw_weight_frequency` | `ScoreConfiguration` | `Decimal(4,3)` 0 – 5 | **0.750** | Dampening factor for contribution frequency (prevents spam inflation) |
 | `ethical_multiplier_floor` | `settings.EKOH` | `float` 0 – 1 | **0.20** | Lower bound applied to unethical users; anything below is auto-suspension |
 | `ethical_multiplier_cap` | `settings.EKOH` | `float` 1 – 2 | **1.50** | Upper bound for exemplary conduct; prevents runaway influence |
-| `EXPERTISE_DOMAIN_CHOICES` | `ExpertiseCategory` fixtures | `enum[26]` | UNESCO ISCED-F codes | Frozen list used by all domain tagging |
+| `EXPERTISE_DOMAIN_CHOICES` | `ExpertiseCategory` fixtures | historical `enum[26]` shortcut | UNESCO ISCED-F narrow-field layer | Superseded by the current hierarchical 10 / 26 / 77 EkoH profile |
 
 ---
 

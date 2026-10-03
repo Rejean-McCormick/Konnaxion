@@ -603,7 +603,10 @@ class InteractionEmission(models.Model):
 
     STATUS_QUEUED = "queued"
     STATUS_SENDING = "sending"
-    STATUS_DELIVERED = "delivered"
+    STATUS_DELIVERED = "delivered"  # transport-only legacy/awaiting canonical receipt
+    STATUS_ACCEPTED = "accepted"
+    STATUS_SUCCEEDED = "succeeded"
+    STATUS_FAILED = "failed"
     STATUS_RETRYING = "retrying"
     STATUS_DEAD = "dead"
     STATUS_CHOICES = tuple(
@@ -612,11 +615,17 @@ class InteractionEmission(models.Model):
             STATUS_QUEUED,
             STATUS_SENDING,
             STATUS_DELIVERED,
+            STATUS_ACCEPTED,
+            STATUS_SUCCEEDED,
+            STATUS_FAILED,
             STATUS_RETRYING,
             STATUS_DEAD,
         )
     )
-    TERMINAL_STATUSES = (STATUS_DELIVERED, STATUS_DEAD)
+    # Terminal here means "do not resend the original command automatically".
+    # ACCEPTED is transport-terminal but not business-terminal; a separate final
+    # receipt/outcome must advance it to SUCCEEDED or FAILED.
+    TERMINAL_STATUSES = (STATUS_DELIVERED, STATUS_ACCEPTED, STATUS_SUCCEEDED, STATUS_FAILED, STATUS_DEAD)
 
     interaction_id = models.UUIDField(unique=True)
     profile_id = models.CharField(max_length=160)
@@ -634,7 +643,10 @@ class InteractionEmission(models.Model):
     next_attempt_at = models.DateTimeField(null=True, blank=True)
     last_error_code = models.CharField(max_length=120, blank=True)
     last_error_detail = models.TextField(blank=True)
+    last_retryable = models.BooleanField(null=True, blank=True)
     receipt_json = models.JSONField(default=dict, blank=True)
+    acceptance_receipt_json = models.JSONField(default=dict, blank=True)
+    final_receipt_json = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     delivered_at = models.DateTimeField(null=True, blank=True)
@@ -665,7 +677,8 @@ class OrgoImpactPublication(models.Model):
     idempotency_key = models.CharField(max_length=200, unique=True)
     correlation_id = models.CharField(max_length=255)
     subject_type = models.CharField(max_length=80)
-    subject_id = models.UUIDField()
+    # IK envelope subject.id is a protocol string (1..500 chars), not necessarily a UUID.
+    subject_id = models.CharField(max_length=500)
     artifact_type = models.CharField(max_length=80, default="impact_update")
     external_reference = models.CharField(max_length=255, unique=True)
     checkpoint = models.CharField(max_length=80, blank=True)

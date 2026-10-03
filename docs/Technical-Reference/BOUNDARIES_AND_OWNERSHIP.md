@@ -185,7 +185,7 @@ The target boundary separates three classes of state:
 | Kristal Exchange / epistemic artifact | Kristal artifact authority | immutable/content-addressed knowledge representation |
 | Runtime Pack / query materialization | runtime/distribution surface | derived, read-oriented and rebuildable from authoritative Kristal inputs |
 
-When Konnaxion contributes knowledge to Kristal, it exports an immutable snapshot or artifact reference through IK to Da’at; it does not grant Da’at or Kristal direct write access to Konnaxion tables. When Konnaxion later receives `kristal.artifact.ready/1.0.0`, it may persist an `ArtifactRef`, digest, locator, correlation identifier or local application link, but the returned artifact does not replace the Konnaxion source rows that caused it to be built.
+When Konnaxion contributes knowledge to Kristal, it exports an immutable snapshot or artifact reference through IK to Da’at; it does not grant Da’at or Kristal direct write access to Konnaxion tables. When Konnaxion later receives `kristal.artifact.ready/2.0.0`, it may persist an `ArtifactRef`, digest, locator, correlation identifier or local application link, but the returned artifact does not replace the Konnaxion source rows that caused it to be built.
 
 If/when Konnaxion consumes a Kristal artifact:
 

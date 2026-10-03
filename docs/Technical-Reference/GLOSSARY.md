@@ -93,6 +93,10 @@ A content-identifiable set of EkoH contextual inputs used for a reading. If a re
 
 **EkoH** owns contextual expertise, ethics/reliability, confidentiality/rating visibility, evidence-derived score state and related access policy. It does not own civic ballots or final decision protocols.
 
+## ISCED-F 2013 / CITE-F 2013
+
+**ISCED-F 2013** is UNESCO's classification of fields of education and training. EkoH uses it as the external hierarchy for expertise-domain identifiers. The full classification contains 11 broad / 29 narrow / about 80 detailed fields; EkoH's default domain-bearing profile contains **10 / 26 / 77 = 113 categories**. An ISCED-F code is not itself an expertise claim or Smart Vote weight.
+
 ## Smart Vote
 
 **Smart Vote** owns declared derived readings, lens semantics and reading aggregation. It may consume EkoH context and source participation facts through explicit bindings. It must not silently rewrite those sources.

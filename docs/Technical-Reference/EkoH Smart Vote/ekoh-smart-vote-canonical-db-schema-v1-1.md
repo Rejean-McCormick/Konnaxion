@@ -1,3 +1,11 @@
+# HISTORICAL / SUPERSEDED — NON-CANONICAL
+
+> **Status (2026-10-02):** retained for historical/design reference. Current authority is `EkoH and Smart Vote - Technical Specification.md` plus `EkoH - Expertise Taxonomy (ISCED-F 2013).md`. Statements below that describe this file as the “single source of truth” are superseded.
+>
+> **Taxonomy correction:** the active EkoH profile is **10 broad / 26 substantive narrow / 77 substantive detailed = 113 categories**. The older “26 broad + 143 detailed” statement was incorrect. The complete ISCED-F 2013 standard itself contains 11 broad / 29 narrow / about 80 detailed fields.
+
+---
+
 title: 01-db\_schema  
 version: v1.1  
 updated: 2025-08-08  
@@ -25,7 +33,7 @@ This file is the single source of truth for \*\*all\*\* tables, keys, partitions
 
 | Table | Key columns | Notes |  
 |-------|-------------|-------|  
-| \*\*\`expertise\_category\`\*\* | \`code\` VARCHAR(16) UNIQUE, \`parent\_id\`, \`depth\`, \`path\` LTREE | Holds the full hierarchy (26 broad \+ 143 detailed ISCED-F codes). GIST index on \`path\`; BTREE on \`(depth, code)\`. |  
+| \*\*\`expertise\_category\`\*\* | \`code\` VARCHAR(16) UNIQUE, \`parent\_id\`, \`depth\`, \`path\` LTREE | Historical count corrected: current EkoH domain-bearing ISCED-F 2013 profile is 10 broad \+ 26 narrow \+ 77 detailed = 113 categories. GIST index on \`path\`; BTREE on \`(depth, code)\`. |  
 | \*\*\`user\_expertise\_score\`\*\* | \`user\_id\`, \`category\_id\`, \`weighted\_score\` | Composite \`UNIQUE\`; partial index for leaderboard: \`(category\_id, weighted\_score DESC) WHERE weighted\_score \> 0\`. |  
 | \*\*\`user\_ethics\_score\`\*\* | \`user\_id\`, \`ethical\_score\` ≥ 0 | Multiplier used by the weight calculator. |
 
@@ -398,7 +406,7 @@ END $$;
 psql \-f path/to/ddl.sql  
 psql \-c "\\copy ekoh\_smartvote.expertise\_category(code,name,parent\_id,depth,path) FROM 'isced\_f\_2013.csv' CSV HEADER"
 
-*Or via Django fixture (`manage.py loaddata fixtures/isced_f_2013.json`).*
+*Current implementation uses `python manage.py load_isced`; direct `loaddata` is historical.*
 
 ---
 

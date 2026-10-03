@@ -29,6 +29,12 @@ Canonical model families:
 - rating visibility/access scopes/grants;
 - contextual analysis log.
 
+## Expertise taxonomy
+
+The canonical EkoH domain hierarchy is version-pinned to **UNESCO ISCED-F 2013 / CITE-F 2013**. EkoH uses a domain-bearing profile of **10 broad / 26 narrow / 77 detailed fields (113 categories total)**, rather than a flat “26 ISO-based domains” list.
+
+The full ISCED-F classification itself contains 11 broad / 29 narrow / about 80 detailed fields; EkoH excludes generic/unknown/special coding buckets from default expertise scoring. See `EkoH - Expertise Taxonomy (ISCED-F 2013).md`.
+
 ## Expertise
 
 Expertise is domain-bounded. A score in one domain does not create universal authority in another.

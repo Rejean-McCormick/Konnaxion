@@ -19,17 +19,19 @@ In particular, `Technical-Reference/EkoH Smart Vote/ekoh-smart-vote-definitive-m
 ## Canonical reading order
 
 1. `Technical-Reference/QUALIFICATION_STATUS.md`
-2. `Technical-Reference/INTERACTION_KERNEL_INTEGRATION.md`
-3. `Technical-Reference/DocV14/Konnaxion v14 - Full-Stack Technical Specification.md`
-4. `Technical-Reference/GLOSSARY.md`
-5. `Technical-Reference/BOUNDARIES_AND_OWNERSHIP.md`
-6. `Technical-Reference/UNIVERSES_WORLDS_INTEGRATION.md`
-7. `Technical-Reference/CONTRACTS.txt`
-8. `Technical-Reference/EkoH Smart Vote/EkoH and Smart Vote - Technical Specification.md`
-9. `Technical-Reference/CODE_ALIGNMENT_NOTES.md`
-10. `Technical-Reference/NAVIGATION_AND_SHELL_CONTRACT.md`
-11. `Technical-Reference/DocV14/Konnaxion v14 - Site Navigation Map.md`
-12. `Konnaxion_User_Workflows.md`
+2. `Technical-Reference/ALIGNMENT_STATUS_2026-10-02.md`
+3. `Technical-Reference/INTERACTION_KERNEL_INTEGRATION.md`
+4. `Technical-Reference/DocV14/Konnaxion v14 - Full-Stack Technical Specification.md`
+5. `Technical-Reference/GLOSSARY.md`
+6. `Technical-Reference/BOUNDARIES_AND_OWNERSHIP.md`
+7. `Technical-Reference/UNIVERSES_WORLDS_INTEGRATION.md`
+8. `Technical-Reference/CONTRACTS.txt`
+9. `Technical-Reference/EkoH Smart Vote/EkoH and Smart Vote - Technical Specification.md`
+10. `Technical-Reference/CODE_ALIGNMENT_NOTES.md`
+11. `Technical-Reference/NAVIGATION_AND_SHELL_CONTRACT.md`
+12. `Technical-Reference/DocV14/Konnaxion v14 - Site Navigation Map.md`
+13. `Technical-Reference/KRISTAL_V7_INTEGRATION.md` for the current additive Kristal/Kristall boundary
+14. `Konnaxion_User_Workflows.md`
 
 ## Status and evidence rule
 

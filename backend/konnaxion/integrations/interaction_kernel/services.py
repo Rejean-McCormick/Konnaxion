@@ -124,11 +124,11 @@ def enqueue_decision_execution(*, decision_id: int, target_organization: str, ta
 
 
 def build_konnaxion_export(*, decision: DecisionRecord) -> dict[str, Any]:
-    require_world_runtime()
+    runtime = require_world_runtime()
     if decision.status != DecisionRecord.STATUS_PUBLISHED or not decision.artifact_digest:
         raise DecisionLifecycleError("Only a fully published decision can be exported.")
     source_world, source_release = _source_world_release()
-    scope = {}
+    scope = {"universe": runtime.universe_key}
     if source_world:
         scope["world"] = source_world
     if source_release:

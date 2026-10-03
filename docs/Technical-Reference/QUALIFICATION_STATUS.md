@@ -144,3 +144,10 @@ As of this documentation update, the Konnaxion-side IK implementation is present
 - Runtime Pack activation delegation when kOA-Linux is present.
 
 The recovered implementation provides executable product-side adapters (`DecisionRecord`, durable `InteractionEmission`, IK delivery, impact ingress and redrive) without a structural dependency on `Konnaxion_Worlds`. That is still not sufficient to mark Konnaxion↔Orgo IK-qualified: profile-level integration tests against the main Orgo runtime, including replay, conflict and redrive, are required.
+
+
+## 2026-10-02 Kristal v7 / ecosystem alignment patch
+
+A newer source-alignment patch is documented in `ALIGNMENT_STATUS_2026-10-02.md`. It updates the Kristal boundary to the supplied `7.0.0-draft.3.1` generation (while preserving v6 portable-state compatibility), pins Konnaxion_Worlds `0.3.6`, hardens several IK P0 product-side behaviors, and adds local static/contract checks.
+
+This patch does **not** replace the dated September diagnostic campaign with a new full LevelUpDiag/SecurityDiag result. It also does not claim full IK/Orgo conformance because canonical IK schema/TCK assets and several external repositories required by the handoff were not supplied to this patch environment. See the alignment-status document for exact PASS evidence and blockers.

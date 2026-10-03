@@ -103,12 +103,26 @@ def validate_impact_publish_envelope(envelope: Mapping[str, Any]) -> None:
         raise IKContractError("IK_UNAUTHORIZED", "profile requires source.system=orgo")
     if not isinstance(target, Mapping) or target.get("system") != "konnaxion":
         raise IKContractError("IK_TARGET_NOT_FOUND", "profile requires target.system=konnaxion")
-    if not isinstance(subject, Mapping) or not subject.get("type") or not subject.get("id"):
+    if not isinstance(subject, Mapping) or not subject.get("type"):
         raise IKContractError("IK_INVALID_ENVELOPE", "subject.type and subject.id are required")
+    subject_id = subject.get("id")
+    if not isinstance(subject_id, str) or not subject_id or len(subject_id) > 500:
+        raise IKContractError(
+            "IK_SCHEMA_VALIDATION_FAILED",
+            "subject.id must be a non-empty string of at most 500 characters",
+        )
     if not isinstance(data, Mapping):
         raise IKContractError("IK_SCHEMA_VALIDATION_FAILED", "data must be an object")
     if data.get("artifact_type") != "impact_update":
         raise IKContractError("IK_SCHEMA_VALIDATION_FAILED", "data.artifact_type must be impact_update")
+    external_reference = data.get("external_reference")
+    if not isinstance(external_reference, str) or not external_reference.strip():
+        raise IKContractError(
+            "IK_SCHEMA_VALIDATION_FAILED",
+            "data.external_reference is required and must be a non-empty string",
+        )
+    if not isinstance(data.get("summary"), Mapping):
+        raise IKContractError("IK_SCHEMA_VALIDATION_FAILED", "data.summary is required and must be an object")
     if not envelope.get("idempotency_key"):
         raise IKContractError("IK_INVALID_ENVELOPE", "idempotency_key is required")
     if not source.get("organization"):
@@ -120,7 +134,7 @@ def impact_publish_to_publication(envelope: Mapping[str, Any]) -> dict[str, Any]
     source = envelope["source"]
     subject = envelope["subject"]
     data = dict(envelope.get("data") or {})
-    external_reference = str(data.get("external_reference") or f"impact:{subject['type']}:{subject['id']}:{envelope['id']}")
+    external_reference = str(data["external_reference"]).strip()
     return {
         "operation_id": str(uuid5(NAMESPACE_URL, f"interaction-kernel:{envelope['id']}")),
         "organization_id": str(source["organization"]),
@@ -155,3 +169,19 @@ def error_receipt(envelope: Mapping[str, Any] | None, *, status: str, code: str,
         "target": source, "status": status, "code": code, "retryable": retryable, "external_reference": None,
         "data": {"detail": detail}, "correlation_id": (envelope or {}).get("correlation_id"),
     }
+
+
+def receipt_phase(receipt: Mapping[str, Any] | None) -> str:
+    """Classify the lifecycle phase of an IK receipt without claiming schema conformance.
+
+    Canonical JSON Schema validation remains a separate gate. This helper exists so
+    transport HTTP success is not conflated with final business success.
+    """
+    if not isinstance(receipt, Mapping):
+        return "transport_only"
+    status = str(receipt.get("status") or "").strip().lower()
+    if status == "accepted":
+        return "acceptance"
+    if status in {"succeeded", "failed", "rejected"}:
+        return "final"
+    return "transport_only"

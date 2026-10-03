@@ -38,8 +38,18 @@ class Command(BaseCommand):
                         raise CommandError(
                             f"InteractionEmission {emission_id} not found in {world_key} release {release_id}"
                         ) from exc
-                    if emission.status == InteractionEmission.STATUS_DELIVERED:
-                        raise CommandError("Delivered emissions cannot be redriven")
+                    redrivable = emission.status in {
+                        InteractionEmission.STATUS_DEAD,
+                        InteractionEmission.STATUS_RETRYING,
+                    } or (
+                        emission.status == InteractionEmission.STATUS_FAILED
+                        and emission.last_retryable is True
+                    )
+                    if not redrivable:
+                        raise CommandError(
+                            "Only dead/retrying or explicitly retryable failed emissions "
+                            f"can be redriven; current status={emission.status}"
+                        )
                     emission.status = InteractionEmission.STATUS_QUEUED
                     emission.next_attempt_at = None
                     emission.save(update_fields=["status", "next_attempt_at", "updated_at"])

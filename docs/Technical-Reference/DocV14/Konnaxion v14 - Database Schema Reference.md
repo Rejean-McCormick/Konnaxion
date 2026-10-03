@@ -48,7 +48,7 @@ Current model families:
 
 | Model | Role |
 |---|---|
-| `ExpertiseCategory` | hierarchical expertise taxonomy |
+| `ExpertiseCategory` | hierarchical UNESCO ISCED-F 2013 expertise taxonomy (`code`, `parent`, `depth`, `path`) |
 | `UserExpertiseScore` | user/domain expertise score |
 | `UserEthicsScore` | governed ethics/reliability context |
 | `ScoreConfiguration` | score configuration |
@@ -61,6 +61,8 @@ Current model families:
 | `ContextAnalysisLog` | non-authoritative contextual analysis record |
 
 The EkoH taxonomy and scores are the canonical source for EkoH/Smart Vote contextual expertise. New code must not use `kollective_intelligence` compatibility equivalents as source of truth.
+
+The default EkoH taxonomy profile is **10 broad (`01`–`10`) / 26 substantive narrow / 77 substantive detailed = 113 categories**. This is a deliberate subset of the full ISCED-F 2013 classification (11 / 29 / about 80), excluding generic and special catch-all coding categories from default expertise scoring. See `../EkoH Smart Vote/EkoH - Expertise Taxonomy (ISCED-F 2013).md`.
 
 ## 4. Smart Vote
 

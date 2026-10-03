@@ -1,0 +1,30 @@
+{
+  "manifest_id": "konnaxion.ecosystem-compatibility/2026-10-02-v7",
+  "generated_from_supplied_snapshots": true,
+  "konnaxion": {
+    "snapshot": "Code_snapshot_Konnaxion(20261002-231743).zip"
+  },
+  "konnaxion_worlds": {
+    "required_version": "0.3.6",
+    "architecture_lock": "KX-UNIVERSES-1",
+    "kristal_v7_boundary": "1.0.0"
+  },
+  "interaction_kernel": {
+    "reference_implementation": "2.0.0-dev.1",
+    "specversion": "ik/1.1",
+    "canonical_schema_assets": "not_supplied"
+  },
+  "kristal": {
+    "standard": "7.0.0-draft.3.1",
+    "portable_state_compatibility": "6.0.0",
+    "standard_archive_sha256": "sha256:a2c2a5cf845a94196f708943cfe7b55c26a29af5cf8162d39ca2a0b1723ff93b",
+    "standard_manifest_sha256": "sha256:a3885c1472a44e03c3ec1a7118b235c84e670928642832aa8ea4129e1aaa92aa"
+  },
+  "priority_rule": "Kristal v7 overrides alignment-handoff assumptions where they conflict; v6 remains the portable compatibility foundation required by v7.",
+  "known_blockers": [
+    "canonical Interaction Kernel envelope/artifact-ref/receipt/profile schema assets were not supplied",
+    "Interaction Kernel reference TCK vectors were not supplied",
+    "KonnaxionDiag and Capsule Manager source repositories were not supplied",
+    "Orgo runtime was not supplied"
+  ]
+}

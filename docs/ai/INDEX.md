@@ -21,6 +21,7 @@ Older documents that call themselves `canonical`, `definitive`, or `single sourc
 | What architecture and ownership must be preserved? | `docs/README.md` → canonical architecture documents |
 | Who owns Universe/World semantics? | `docs/Technical-Reference/UNIVERSES_WORLDS_INTEGRATION.md` → sibling `Konnaxion_Worlds` canonical spec |
 | What are the ecosystem interoperability rules? | `docs/Technical-Reference/INTERACTION_KERNEL_INTEGRATION.md` |
+| What is the current Kristal/Kristall boundary? | `docs/Technical-Reference/KRISTAL_V7_INTEGRATION.md` |
 | Where does code differ from the intended architecture? | `docs/Technical-Reference/CODE_ALIGNMENT_NOTES.md` |
 | What API/contract should exist? | `docs/Technical-Reference/CONTRACTS.txt` + actual router/service implementation |
 | Why was something designed historically? | Historical material only after current authority is established |

@@ -16,6 +16,22 @@ RatingAccessGrant
 ContextAnalysisLog
 ```
 
+## ExpertiseCategory taxonomy contract
+
+`ExpertiseCategory` is the hierarchical **ISCED-F 2013 / CITE-F 2013** domain catalogue used by EkoH. The active profile contains **113 categories: 10 broad (`01`–`10`), 26 substantive narrow and 77 substantive detailed fields**.
+
+Key taxonomy fields are:
+
+```text
+code    official ISCED-F code
+name    official label
+parent  parent category
+depth   0 / 1 / 2
+path    ltree hierarchy path
+```
+
+The full ISCED-F classification is broader (11 / 29 / about 80). EkoH intentionally excludes generic and special catch-all coding categories from default expertise scoring. See `EkoH - Expertise Taxonomy (ISCED-F 2013).md`.
+
 ## Canonical Smart Vote context models
 
 ```text

@@ -15,6 +15,7 @@ from konnaxion.worlds.runtime import (
 )
 from konnaxion.integrations.interaction_kernel.services import (
     IKIdempotencyConflict,
+    build_konnaxion_export,
     enqueue_decision_execution,
     publish_decision_record,
 )
@@ -50,6 +51,11 @@ class DecisionInteractionRuntimeTests(TestCase):
             self.assertEqual(published.status, DecisionRecord.STATUS_PUBLISHED)
             self.assertEqual(len(published.artifact_digest), 64)
             self.assertEqual(published.published_payload["decision"]["id"], str(decision.pk))
+            export = build_konnaxion_export(decision=published)
+            self.assertEqual(
+                export["provenance"],
+                {"universe": "ik-universe", "world": "ik-test", "release": "3"},
+            )
 
             target = str(uuid4())
             with self.captureOnCommitCallbacks(execute=True):
@@ -84,7 +90,7 @@ class ImpactIngressRuntimeTests(TestCase):
     def test_impact_ingress_replay_and_conflict(self):
         operation_id = str(uuid4())
         org_id = str(uuid4())
-        subject_id = str(uuid4())
+        subject_id = "orgo-case:external:alpha-42"
         key = f"impact:{operation_id}"
         envelope = {
             "specversion": "ik/1.1",
@@ -100,6 +106,8 @@ class ImpactIngressRuntimeTests(TestCase):
             "authority": {"kind": "operational-accountability"},
             "data": {
                 "artifact_type": "impact_update",
+                "external_reference": f"orgo-impact:{operation_id}",
+                "summary": {"kind": "operational_effect", "status": "recorded"},
                 "checkpoint": "decision_accepted",
                 "epistemic_status": "operational_effect_recorded",
             },
@@ -127,3 +135,59 @@ class ImpactIngressRuntimeTests(TestCase):
         self.assertEqual(conflict.status_code, 409, conflict.content)
         self.assertEqual(conflict.json()["code"], "IK_IDEMPOTENCY_CONFLICT")
         self.assertEqual(OrgoImpactPublication.objects.count(), 1)
+
+    @override_settings(IK_ORGO_INBOUND_TOKEN="orgo-impact-test-token")
+    def test_impact_ingress_rejects_missing_required_payload_fields(self):
+        org_id = str(uuid4())
+        subject_id = "case:non-uuid-subject"
+        base = {
+            "specversion": "ik/1.1",
+            "id": str(uuid4()),
+            "class": "command",
+            "time": timezone.now().isoformat().replace("+00:00", "Z"),
+            "profile": {"id": "accountability.impact.publish", "version": "1.0.0"},
+            "source": {"system": "orgo", "organization": org_id},
+            "target": {"system": "konnaxion"},
+            "subject": {"type": "case", "id": subject_id},
+            "correlation_id": f"case:{subject_id}",
+            "idempotency_key": "impact:missing-required",
+            "authority": {"kind": "operational-accountability"},
+            "data": {"artifact_type": "impact_update"},
+            "artifact_refs": [],
+            "response": {"acceptance_receipt": True, "final_receipt": True},
+        }
+        client = Client()
+        headers = {
+            "HTTP_AUTHORIZATION": "Bearer orgo-impact-test-token",
+            "HTTP_IDEMPOTENCY_KEY": base["idempotency_key"],
+        }
+        url = "/api/integrations/ik/konnaxion/interactions/"
+
+        missing_both = client.post(url, data=json.dumps(base), content_type="application/json", **headers)
+        self.assertEqual(missing_both.status_code, 400)
+        self.assertEqual(missing_both.json()["code"], "IK_SCHEMA_VALIDATION_FAILED")
+
+        missing_summary = json.loads(json.dumps(base))
+        missing_summary["data"]["external_reference"] = "impact:external"
+        missing_summary["id"] = str(uuid4())
+        missing_summary_response = client.post(
+            url,
+            data=json.dumps(missing_summary),
+            content_type="application/json",
+            **headers,
+        )
+        self.assertEqual(missing_summary_response.status_code, 400)
+        self.assertEqual(missing_summary_response.json()["code"], "IK_SCHEMA_VALIDATION_FAILED")
+        self.assertEqual(OrgoImpactPublication.objects.count(), 0)
+
+    @override_settings(IK_ORGO_INBOUND_TOKEN="orgo-impact-test-token")
+    def test_impact_ingress_uses_unauthenticated_for_invalid_token(self):
+        response = Client().post(
+            "/api/integrations/ik/konnaxion/interactions/",
+            data="{}",
+            content_type="application/json",
+            HTTP_AUTHORIZATION="Bearer wrong-token",
+        )
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json()["code"], "IK_UNAUTHENTICATED")
+

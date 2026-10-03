@@ -244,6 +244,12 @@ Expertise is a domain vector, not a single global rank.
 
 The current multidimensional scoring service normalizes evidence axes and persists a bounded `0..1` domain score. Lack of expertise does not create negative merit.
 
+### 7.1.1 Canonical taxonomy
+
+`ExpertiseCategory` uses **UNESCO ISCED-F 2013 / CITE-F 2013** as the external field classification. The complete ISCED-F framework has 11 broad, 29 narrow and about 80 detailed fields; EkoH intentionally uses a domain-bearing profile of **10 broad (`01`–`10`), 26 substantive narrow and 77 substantive detailed categories (113 total)** for default expertise scoring.
+
+This taxonomy is a domain identifier system, not evidence of competence. Official codes and labels remain unchanged, and any Konnaxion-specific finer-grained extensions must be separately namespaced or mapped. The profile is version-pinned and must be migrated explicitly if a successor to ISCED-F 2013 is adopted. See `../EkoH Smart Vote/EkoH - Expertise Taxonomy (ISCED-F 2013).md`.
+
 ### 7.2 AI/context analysis
 
 The current contextual-analysis service correctly records analysis as **non-authoritative**. It does not silently mutate `UserExpertiseScore`.

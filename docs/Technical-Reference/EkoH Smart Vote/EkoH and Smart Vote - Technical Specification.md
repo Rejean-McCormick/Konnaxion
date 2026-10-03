@@ -26,6 +26,14 @@ Important services:
 - `contextual_analysis.py` — non-authoritative analysis intake;
 - `rating_access.py` — disclosure policy authority.
 
+### 2.1 Canonical expertise taxonomy
+
+EkoH uses **UNESCO ISCED-F 2013 / CITE-F 2013** as its external expertise-domain backbone. The complete standard contains 11 broad / 29 narrow / about 80 detailed fields; the default EkoH domain-bearing profile intentionally uses **10 broad (`01`–`10`) / 26 substantive narrow / 77 substantive detailed = 113 categories**.
+
+`ExpertiseCategory` stores the official code/label hierarchy. ISCED-F identifiers classify domains; they do not themselves prove expertise or create Smart Vote influence. Konnaxion-specific finer-grained extensions must be explicitly separated from official ISCED-F codes.
+
+See **`EkoH - Expertise Taxonomy (ISCED-F 2013).md`** for the canonical profile, exclusions, loader contract and versioning rule.
+
 ## 3. Smart Vote code
 
 Primary packages:

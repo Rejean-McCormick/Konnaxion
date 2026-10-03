@@ -36,7 +36,7 @@ def _json(request: HttpRequest):
 def ik_interaction_ingress(request: HttpRequest) -> JsonResponse:
     envelope = None
     if not _authorized(request):
-        return JsonResponse(error_receipt(None, status="rejected", code="IK_UNAUTHORIZED", retryable=False, detail="invalid service token"), status=401)
+        return JsonResponse(error_receipt(None, status="rejected", code="IK_UNAUTHENTICATED", retryable=False, detail="invalid service token"), status=401)
     try:
         envelope = _json(request)
         if not isinstance(envelope, dict):

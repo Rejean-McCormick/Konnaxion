@@ -1,5 +1,5 @@
 # FILE: backend/konnaxion/ekoh/models/taxonomy.py
-"""Expertise hierarchy (UNESCO ISCED-F)."""
+"""Expertise hierarchy based on Konnaxion's UNESCO ISCED-F 2013 profile."""
 
 from django.contrib.postgres.indexes import GistIndex
 from django.db import models
@@ -16,7 +16,12 @@ class ExpertiseCategory(models.Model):
     Hierarchical expertise domain.
 
     * `code` – the official ISCED-F code (e.g. "0511").
-    * `path` – Postgres ltree (“01.04.11”) for fast descendant queries.
+    * `path` – Postgres ltree (for example, "01.011.0111") for fast descendant queries.
+
+    Konnaxion's bundled expertise profile intentionally uses the domain-bearing
+    ISCED-F 2013 fields (broad fields 01-10) and excludes generic, not-further-
+    defined, not-elsewhere-classified, and interdisciplinary placeholder codes
+    from the default EkoH expertise taxonomy.
     """
 
     code = models.CharField(max_length=16, unique=True)
@@ -40,4 +45,3 @@ class ExpertiseCategory(models.Model):
 
     def __str__(self) -> str:  # pragma: no cover
         return f"{self.code} • {self.name}"
-        

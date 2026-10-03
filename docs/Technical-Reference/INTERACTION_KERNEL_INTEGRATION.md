@@ -1,7 +1,7 @@
 # Konnaxion — Interaction Kernel Integration Baseline
 
 **Status:** product-side implementation restored in Konnaxion; cross-product qualification pending  
-**Updated:** 2026-09-16
+**Updated:** 2026-10-02
 
 ## Purpose
 
@@ -76,10 +76,10 @@ Konnaxion-owned operational state
 → local commit + durable outbox/export intent
 → immutable snapshot / ExportManifest / ArtifactRef inputs
 → Interaction Kernel
-→ kristal.build.request/1.0.0 or kristal.revision.request/1.0.0
+→ kristal.build.request/2.0.0 or kristal.revision.request/2.0.0
 → Da’at mapping/compilation boundary
 → Kristal-native artifact
-→ kristal.artifact.ready/1.0.0 + ArtifactRef/receipt
+→ kristal.artifact.ready/2.0.0 + ArtifactRef/receipt
 → Konnaxion stores only the reference/linkage needed by its own domain
 ```
 
@@ -94,6 +94,36 @@ Normative constraints:
 - No cross-system two-phase commit or other distributed transaction is required between Konnaxion, IK, Da’at and Kristal.
 
 The current Konnaxion snapshot does not prove this Kristal write path as implemented; these are target ecosystem contracts until executable adapter evidence exists.
+
+### Kristal v7 priority baseline
+
+The active Konnaxion lock now targets **Kristal Standard `7.0.0-draft.3.1`** as an additive meta-orchestration generation. The unchanged v6 `kristal_state` remains the portable wire-state compatibility foundation; v7 does not replace that wire schema. Existing v6 artifacts keep their identity and may be registered/orchestrated by Kristall without destructive conversion.
+
+Konnaxion therefore preserves the following v7 constraints at its boundary:
+
+- portable projections remain v6-compatible and may carry `extensions.kristal_v7`;
+- KQ/KP/KA/KS, Subjects, axes, Surfaces, Mesh and crystallization remain Kristal/Kristall-owned structures;
+- semantic resonance is only a candidate/similarity signal and cannot establish identity, equivalence, truth, causality or authority;
+- source assertion, derived assertion, structural relation, resonance signal, hypothesis and Mesh path remain distinct;
+- factorization/deduplication must retain source membership/provenance;
+- World-derived exports preserve stable Universe + World + exact Release provenance;
+- actionability/crystallization never bypass Konnaxion authorization/admission.
+
+See `KRISTAL_V7_INTEGRATION.md` and the pinned `interaction-kernel.lock.json`.
+
+The supplied handoff identifies IK `2.0.0-dev.1` and canonical v2 Kristal profiles, but its canonical IK schema/TCK asset repository was not included in this snapshot. Full envelope/ArtifactRef/receipt schema qualification remains explicitly blocked until those assets are supplied or vendored by digest; Konnaxion must not invent substitute schemas.
+
+### Receipt lifecycle in the product adapter
+
+Outbound IK emission state now distinguishes transport acceptance from final business outcome:
+
+```text
+queued → sending/retrying → accepted → succeeded | failed
+```
+
+A legacy `delivered` state is retained only for a 2xx transport response that does not carry a recognized canonical lifecycle status; it must not be interpreted as business success. Acceptance and final receipt payloads are stored separately, and redrive is limited to `dead`/`retrying` emissions or `failed` emissions explicitly marked retryable.
+
+This is **state-model alignment, not receipt-schema qualification**. Until the canonical IK receipt schema/TCK and callback routing contract are supplied, Konnaxion does not invent a new asynchronous final-receipt endpoint and does not claim full receipt conformance.
 
 ## Runtime Pack activation
 

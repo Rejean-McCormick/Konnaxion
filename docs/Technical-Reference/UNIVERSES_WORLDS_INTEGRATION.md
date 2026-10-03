@@ -2,7 +2,7 @@
 
 **Status:** canonical Konnaxion host-boundary document  
 **Engine/spec owner:** sibling repository/package `Konnaxion_Worlds`  
-**Current engine lock:** `KX-UNIVERSES-1` over `KX-WORLDS-1`
+**Current engine lock:** `KX-UNIVERSES-1` over `KX-WORLDS-1`; distribution `konnaxion-worlds==0.3.6` pinned by `WORLD_ENGINE.lock.json`
 
 ## Purpose
 
@@ -47,10 +47,9 @@ migrations, isolation, release management, permissions or canonical topology sem
 The main product's `konnaxion` package uses `pkgutil.extend_path` so a separately installed
 `konnaxion-worlds` distribution can provide `konnaxion.worlds` without vendoring it into this repo.
 
-Local development expects `Konnaxion_Worlds` beside `Konnaxion`; `RUN_backend_local.bat` installs
-its `backend` package in editable mode before running Konnaxion migrations/server startup.
-Production packaging must likewise install a deliberate/versioned `konnaxion-worlds` dependency;
-it must not restore a copied source directory.
+Local development expects `Konnaxion_Worlds` beside `Konnaxion`; `RUN_backend_local.bat` first verifies the sibling against `WORLD_ENGINE.lock.json` and then installs its `backend` package in editable mode before running Konnaxion migrations/server startup. The lock pins both package version and a deterministic content-tree digest over the canonical backend package.
+
+Production/capsule packaging must apply the same version/digest identity rather than accepting the first structurally valid sibling. The supplied Capsule Manager source was not part of this update, so its ReleaseSet binding remains a separate required handoff task; Konnaxion itself now exposes the exact expected identity in a machine-readable lock.
 
 ## Host-domain adapters
 

@@ -40,6 +40,14 @@ if not exist "%~dp0..\Konnaxion_Worlds\backend\pyproject.toml" (
   exit /b 1
 )
 
+echo [INFO] Verifying pinned Konnaxion_Worlds identity...
+".venv\Scripts\python.exe" "%~dp0scripts\check_worlds_dependency.py" "%~dp0..\Konnaxion_Worlds"
+if errorlevel 1 (
+  echo [ERROR] Konnaxion_Worlds version/digest does not match WORLD_ENGINE.lock.json.
+  pause
+  exit /b 1
+)
+
 echo [INFO] Installing canonical Konnaxion_Worlds engine...
 uv pip install --python ".venv\Scripts\python.exe" -e "%~dp0..\Konnaxion_Worlds\backend"
 if errorlevel 1 (

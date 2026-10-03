@@ -29,6 +29,41 @@ def _decode_json(raw: bytes) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
 
 
+def _receipt_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
+    data = payload.get("data")
+    if isinstance(data, dict) and (payload.get("ok") is True or payload.get("ok") is False):
+        return data
+    return dict(payload)
+
+
+def _error_semantics(status: int, payload: Mapping[str, Any]) -> tuple[bool, str, str, dict[str, Any]]:
+    """Preserve canonical remote IK receipt semantics before HTTP fallback mapping."""
+    receipt = _receipt_payload(payload)
+    remote_code = receipt.get("code")
+    remote_retryable = receipt.get("retryable")
+    if isinstance(remote_code, str) and remote_code.startswith("IK_"):
+        retryable = (
+            bool(remote_retryable)
+            if isinstance(remote_retryable, bool)
+            else status == 429 or status >= 500
+        )
+        remote_data = receipt.get("data")
+        data_detail = remote_data.get("detail") if isinstance(remote_data, Mapping) else None
+        detail = str(data_detail or receipt.get("detail") or "remote IK error")
+        return retryable, remote_code, detail, receipt
+    if status == 401:
+        return False, "IK_UNAUTHENTICATED", "remote endpoint rejected authentication", receipt
+    if status == 403:
+        return False, "IK_UNAUTHORIZED", "remote endpoint rejected authorization", receipt
+    if status == 404:
+        return False, "IK_TARGET_NOT_FOUND", "remote IK target was not found", receipt
+    if status == 429:
+        return True, "IK_RATE_LIMITED", "remote IK endpoint rate limited the request", receipt
+    if status >= 500:
+        return True, "IK_PROVIDER_UNAVAILABLE", f"remote IK endpoint returned HTTP {status}", receipt
+    return False, f"HTTP_{status}", "unexpected response", receipt
+
+
 def deliver_to_orgo(envelope: Mapping[str, Any]) -> DeliveryResult:
     """Deliver one IK envelope using the configured Orgo HTTP binding."""
 
@@ -60,12 +95,15 @@ def deliver_to_orgo(envelope: Mapping[str, Any]) -> DeliveryResult:
             payload = _decode_json(response.read())
             status = int(getattr(response, "status", 200) or 200)
             if 200 <= status < 300:
-                receipt = payload.get("data") if payload.get("ok") is True and isinstance(payload.get("data"), dict) else payload
+                receipt = _receipt_payload(payload)
                 return DeliveryResult(True, False, "", "", receipt)
-            return DeliveryResult(False, status >= 500 or status == 429, f"HTTP_{status}", "unexpected response", payload)
+            retryable, code, detail, receipt = _error_semantics(status, payload)
+            return DeliveryResult(False, retryable, code, detail, receipt)
     except HTTPError as exc:
         payload = _decode_json(exc.read())
-        retryable = exc.code == 429 or 500 <= exc.code <= 599
-        return DeliveryResult(False, retryable, f"HTTP_{exc.code}", str(payload or exc.reason), payload)
+        retryable, code, detail, receipt = _error_semantics(exc.code, payload)
+        if not payload and exc.reason:
+            detail = str(exc.reason)
+        return DeliveryResult(False, retryable, code, detail, receipt)
     except (URLError, TimeoutError, socket.timeout) as exc:
         return DeliveryResult(False, True, "IK_PROVIDER_UNAVAILABLE", str(exc), {})

@@ -48,10 +48,52 @@
     "depth": 1
   },
   {
+    "code": "0211",
+    "name": "Audio-visual techniques and media production",
+    "parent_code": "021",
+    "depth": 2
+  },
+  {
+    "code": "0212",
+    "name": "Fashion, interior and industrial design",
+    "parent_code": "021",
+    "depth": 2
+  },
+  {
+    "code": "0213",
+    "name": "Fine arts",
+    "parent_code": "021",
+    "depth": 2
+  },
+  {
+    "code": "0214",
+    "name": "Handicrafts",
+    "parent_code": "021",
+    "depth": 2
+  },
+  {
+    "code": "0215",
+    "name": "Music and performing arts",
+    "parent_code": "021",
+    "depth": 2
+  },
+  {
     "code": "022",
     "name": "Humanities (except languages)",
     "parent_code": "02",
     "depth": 1
+  },
+  {
+    "code": "0221",
+    "name": "Religion and theology",
+    "parent_code": "022",
+    "depth": 2
+  },
+  {
+    "code": "0222",
+    "name": "History and archaeology",
+    "parent_code": "022",
+    "depth": 2
   },
   {
     "code": "0223",
@@ -126,6 +168,12 @@
     "depth": 2
   },
   {
+    "code": "0322",
+    "name": "Library, information and archival studies",
+    "parent_code": "032",
+    "depth": 2
+  },
+  {
     "code": "04",
     "name": "Business, administration and law",
     "parent_code": null,
@@ -138,8 +186,44 @@
     "depth": 1
   },
   {
+    "code": "0411",
+    "name": "Accounting and taxation",
+    "parent_code": "041",
+    "depth": 2
+  },
+  {
+    "code": "0412",
+    "name": "Finance, banking and insurance",
+    "parent_code": "041",
+    "depth": 2
+  },
+  {
     "code": "0413",
     "name": "Management and administration",
+    "parent_code": "041",
+    "depth": 2
+  },
+  {
+    "code": "0414",
+    "name": "Marketing and advertising",
+    "parent_code": "041",
+    "depth": 2
+  },
+  {
+    "code": "0415",
+    "name": "Secretarial and office work",
+    "parent_code": "041",
+    "depth": 2
+  },
+  {
+    "code": "0416",
+    "name": "Wholesale and retail sales",
+    "parent_code": "041",
+    "depth": 2
+  },
+  {
+    "code": "0417",
+    "name": "Work skills",
     "parent_code": "041",
     "depth": 2
   },
@@ -162,6 +246,24 @@
     "depth": 0
   },
   {
+    "code": "051",
+    "name": "Biological and related sciences",
+    "parent_code": "05",
+    "depth": 1
+  },
+  {
+    "code": "0511",
+    "name": "Biology",
+    "parent_code": "051",
+    "depth": 2
+  },
+  {
+    "code": "0512",
+    "name": "Biochemistry",
+    "parent_code": "051",
+    "depth": 2
+  },
+  {
     "code": "052",
     "name": "Environment",
     "parent_code": "05",
@@ -174,10 +276,46 @@
     "depth": 2
   },
   {
+    "code": "0522",
+    "name": "Natural environments and wildlife",
+    "parent_code": "052",
+    "depth": 2
+  },
+  {
+    "code": "053",
+    "name": "Physical sciences",
+    "parent_code": "05",
+    "depth": 1
+  },
+  {
+    "code": "0531",
+    "name": "Chemistry",
+    "parent_code": "053",
+    "depth": 2
+  },
+  {
+    "code": "0532",
+    "name": "Earth sciences",
+    "parent_code": "053",
+    "depth": 2
+  },
+  {
+    "code": "0533",
+    "name": "Physics",
+    "parent_code": "053",
+    "depth": 2
+  },
+  {
     "code": "054",
     "name": "Mathematics and statistics",
     "parent_code": "05",
     "depth": 1
+  },
+  {
+    "code": "0541",
+    "name": "Mathematics",
+    "parent_code": "054",
+    "depth": 2
   },
   {
     "code": "0542",
@@ -196,6 +334,12 @@
     "name": "Information and Communication Technologies (ICTs)",
     "parent_code": "06",
     "depth": 1
+  },
+  {
+    "code": "0611",
+    "name": "Computer use",
+    "parent_code": "061",
+    "depth": 2
   },
   {
     "code": "0612",
@@ -222,8 +366,38 @@
     "depth": 1
   },
   {
+    "code": "0711",
+    "name": "Chemical engineering and processes",
+    "parent_code": "071",
+    "depth": 2
+  },
+  {
+    "code": "0712",
+    "name": "Environmental protection technology",
+    "parent_code": "071",
+    "depth": 2
+  },
+  {
     "code": "0713",
     "name": "Electricity and energy",
+    "parent_code": "071",
+    "depth": 2
+  },
+  {
+    "code": "0714",
+    "name": "Electronics and automation",
+    "parent_code": "071",
+    "depth": 2
+  },
+  {
+    "code": "0715",
+    "name": "Mechanics and metal trades",
+    "parent_code": "071",
+    "depth": 2
+  },
+  {
+    "code": "0716",
+    "name": "Motor vehicles, ships and aircraft",
     "parent_code": "071",
     "depth": 2
   },
@@ -234,8 +408,26 @@
     "depth": 1
   },
   {
+    "code": "0721",
+    "name": "Food processing",
+    "parent_code": "072",
+    "depth": 2
+  },
+  {
     "code": "0722",
     "name": "Materials (glass, paper, plastic and wood)",
+    "parent_code": "072",
+    "depth": 2
+  },
+  {
+    "code": "0723",
+    "name": "Textiles (clothes, footwear and leather)",
+    "parent_code": "072",
+    "depth": 2
+  },
+  {
+    "code": "0724",
+    "name": "Mining and extraction",
     "parent_code": "072",
     "depth": 2
   },
@@ -252,6 +444,12 @@
     "depth": 2
   },
   {
+    "code": "0732",
+    "name": "Building and civil engineering",
+    "parent_code": "073",
+    "depth": 2
+  },
+  {
     "code": "08",
     "name": "Agriculture, forestry, fisheries and veterinary",
     "parent_code": null,
@@ -264,10 +462,106 @@
     "depth": 1
   },
   {
+    "code": "0811",
+    "name": "Crop and livestock production",
+    "parent_code": "081",
+    "depth": 2
+  },
+  {
+    "code": "0812",
+    "name": "Horticulture",
+    "parent_code": "081",
+    "depth": 2
+  },
+  {
+    "code": "082",
+    "name": "Forestry",
+    "parent_code": "08",
+    "depth": 1
+  },
+  {
+    "code": "0821",
+    "name": "Forestry",
+    "parent_code": "082",
+    "depth": 2
+  },
+  {
+    "code": "083",
+    "name": "Fisheries",
+    "parent_code": "08",
+    "depth": 1
+  },
+  {
+    "code": "0831",
+    "name": "Fisheries",
+    "parent_code": "083",
+    "depth": 2
+  },
+  {
+    "code": "084",
+    "name": "Veterinary",
+    "parent_code": "08",
+    "depth": 1
+  },
+  {
+    "code": "0841",
+    "name": "Veterinary",
+    "parent_code": "084",
+    "depth": 2
+  },
+  {
     "code": "09",
     "name": "Health and welfare",
     "parent_code": null,
     "depth": 0
+  },
+  {
+    "code": "091",
+    "name": "Health",
+    "parent_code": "09",
+    "depth": 1
+  },
+  {
+    "code": "0911",
+    "name": "Dental studies",
+    "parent_code": "091",
+    "depth": 2
+  },
+  {
+    "code": "0912",
+    "name": "Medicine",
+    "parent_code": "091",
+    "depth": 2
+  },
+  {
+    "code": "0913",
+    "name": "Nursing and midwifery",
+    "parent_code": "091",
+    "depth": 2
+  },
+  {
+    "code": "0914",
+    "name": "Medical diagnostic and treatment technology",
+    "parent_code": "091",
+    "depth": 2
+  },
+  {
+    "code": "0915",
+    "name": "Therapy and rehabilitation",
+    "parent_code": "091",
+    "depth": 2
+  },
+  {
+    "code": "0916",
+    "name": "Pharmacy",
+    "parent_code": "091",
+    "depth": 2
+  },
+  {
+    "code": "0917",
+    "name": "Traditional and complementary medicine and therapy",
+    "parent_code": "091",
+    "depth": 2
   },
   {
     "code": "092",
@@ -300,15 +594,87 @@
     "depth": 0
   },
   {
+    "code": "101",
+    "name": "Personal services",
+    "parent_code": "10",
+    "depth": 1
+  },
+  {
+    "code": "1011",
+    "name": "Domestic services",
+    "parent_code": "101",
+    "depth": 2
+  },
+  {
+    "code": "1012",
+    "name": "Hair and beauty services",
+    "parent_code": "101",
+    "depth": 2
+  },
+  {
+    "code": "1013",
+    "name": "Hotel, restaurants and catering",
+    "parent_code": "101",
+    "depth": 2
+  },
+  {
+    "code": "1014",
+    "name": "Sports",
+    "parent_code": "101",
+    "depth": 2
+  },
+  {
+    "code": "1015",
+    "name": "Travel, tourism and leisure",
+    "parent_code": "101",
+    "depth": 2
+  },
+  {
+    "code": "102",
+    "name": "Hygiene and occupational health services",
+    "parent_code": "10",
+    "depth": 1
+  },
+  {
+    "code": "1021",
+    "name": "Community sanitation",
+    "parent_code": "102",
+    "depth": 2
+  },
+  {
+    "code": "1022",
+    "name": "Occupational health and safety",
+    "parent_code": "102",
+    "depth": 2
+  },
+  {
     "code": "103",
     "name": "Security services",
     "parent_code": "10",
     "depth": 1
   },
   {
+    "code": "1031",
+    "name": "Military and defence",
+    "parent_code": "103",
+    "depth": 2
+  },
+  {
     "code": "1032",
     "name": "Protection of persons and property",
     "parent_code": "103",
+    "depth": 2
+  },
+  {
+    "code": "104",
+    "name": "Transport services",
+    "parent_code": "10",
+    "depth": 1
+  },
+  {
+    "code": "1041",
+    "name": "Transport services",
+    "parent_code": "104",
     "depth": 2
   }
 ]

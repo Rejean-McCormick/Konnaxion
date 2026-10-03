@@ -52,7 +52,7 @@
 | `raw_weight_frequency` | `ScoreConfiguration` | `Decimal(4,3)` | **0.750** |
 | `ethical_multiplier_floor` | `settings.EKOH` | float 0‑1 | **0.20** |
 | `ethical_multiplier_cap` | `settings.EKOH` | float 1‑2 | **1.50** |
-| EkoH expertise taxonomy | `ExpertiseCategory` + `fixtures/isced_f_2013.json` | ISCED-F 2013 profile: 10 broad / 26 narrow / 77 detailed = 113 categories | synchronized by `python manage.py load_isced` |
+| `EXPERTISE_DOMAIN_CHOICES` | `ExpertiseCategory` | enum of 26 ISO‑based domains | frozen list in fixtures |
 
 These weights are the initial coefficients for the **multidimensional\_scoring** service and correspond 1‑for‑1 with “quality, frequency, relevance, expertise” axes defined in the functionality inventory .
 
@@ -119,43 +119,18 @@ All map directly to features in the technical spec and functionalities table .
 
 ## **6  Navigation & Route Invariants** {#6  navigation-&-route-invariants}
 
-Navigation ownership is defined by `../NAVIGATION_AND_SHELL_CONTRACT.md`. Route namespace, sidebar ownership and backend state ownership are distinct.
+The **24 routes** enumerated in the Navigation Map are locked; any new path must be added via RFC process. Route‑to‑app ownership table:
 
-### Suite registry
+| Route prefix | Owning Django app |
+| ----- | ----- |
+| `/konsensus`, `/ekoh` | `kollective_intelligence` |
+| `/debate`, `/consult`, `/ethikos` | `ethikos` |
+| `/projects`, `/impact` | `keenkonnect` |
+| `/learn`, `/course`, `/certs` | `konnected` |
+| `/kreative`, `/art`, `/archive`, `/connect`, `/profile` | `kreative` |
+| `/chat`, `/team`, `/admin` | core / `django.contrib.admin` |
 
-| Technical suite key | Visible label | Landing route | Switcher group |
-| --- | --- | --- | --- |
-| `ethikos` | **ethiKos** | `/ethikos/insights` | Core experiences |
-| `keenkonnect` | **keenKonnect** | `/keenkonnect/dashboard` | Core experiences |
-| `konnected` | **KonnectED** | `/konnected/dashboard` | Core experiences |
-| `kreative` | **Kreative** | `/kreative/dashboard` | Core experiences |
-| `ekoh` | **EkoH** | `/ekoh/dashboard` | Shared capabilities |
-| `teambuilder` | **Team Builder** | `/teambuilder` | Shared capabilities |
-| `reports` | **Insights** | `/reports` | Operations |
-| `kontrol` | **KonTrol** | `/kontrol/dashboard` | Operations |
-
-### Route-to-sidebar invariants
-
-| Route prefix | Default product sidebar | Notes |
-| --- | --- | --- |
-| `/ethikos/*` | ethiKos | canonical civic surface |
-| `/konsensus/*` | ethiKos | technical namespace is separate; product-owned by `ethiKos > Decide` |
-| `/ekoh/*` | EkoH | contextual expertise/reputation only; no Konsensus/Reports ownership |
-| `/keenkonnect/*` | keenKonnect | projects/workspaces/matching/knowledge/impact/reputation |
-| `/konnected/*` | KonnectED | learning/certification/discussion/collaboration |
-| `/kreative/*` | Kreative | creative hub/incubator/spaces/showcases |
-| `/teambuilder/*` | Team Builder | shared team-composition capability |
-| `/reports/*` | Insights | technical key is `reports`; visible label is Insights |
-| `/kontrol/*` | KonTrol | administration/governance; no Reports group |
-
-Additional invariants:
-
-- the canonical visible brand spelling is **ethiKos**; code identifiers remain `ethikos` / `Ethikos*` as applicable;
-- `/konsensus/admin` is compatibility debt and should resolve to `/kontrol/konsensus`;
-- `/konnected/teams-collaboration/team-builder` keeps its URL but is labeled **Create team** in KonnectED;
-- a valid explicit `?sidebar=<suite-key>` may preserve a selected suite for cross-mounted navigation;
-- suite keys, labels and landing routes should have one frontend source of truth rather than independent copies in MainLayout/switcher/breadcrumb code;
-- the exhaustive route inventory is maintained in `Konnaxion v14 - Site Navigation Map.md`; do not freeze a stale numeric route count here.
+No additional frontend pages may claim these prefixes without amending this reference .
 
 ---
 
