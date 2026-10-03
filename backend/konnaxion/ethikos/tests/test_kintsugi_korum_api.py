@@ -5,6 +5,7 @@ from http import HTTPStatus
 from typing import Any
 
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 from rest_framework.test import APITestCase
 
 from konnaxion.ethikos.constants import (
@@ -41,6 +42,7 @@ from konnaxion.ethikos.models import (
 User = get_user_model()
 
 
+@override_settings(KONNAXION_WORLDS_ENFORCE_SCOPED_API=False)
 class EthikosKintsugiKorumAPITests(APITestCase):
     """
     API tests for Kintsugi Wave 1 / Korum.

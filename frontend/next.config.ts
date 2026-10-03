@@ -18,7 +18,8 @@ const API_PROXY_BASE = (
 const baseConfig: NextConfig = {
   reactStrictMode: true,
   compiler: { styledComponents: true },
-  logging: { fetches: { fullUrl: true } },
+  // Avoid leaking sensitive query strings into server logs.
+  logging: { fetches: { fullUrl: false } },
 
   // TEMP : ne bloque pas la build sur les erreurs ESLint
   // (remets à false quand le lint sera corrigé)

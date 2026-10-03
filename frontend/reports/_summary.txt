@@ -1,2 +1,2 @@
-[TypeScript] exit=0
-[ESLint] exit=1
+[TypeScript/ESLint/Build/Jest/Playwright] SKIPPED (-DeepOnly; covered by LevelUpDiag N03/N05)
+[Pattern scan] exit=0

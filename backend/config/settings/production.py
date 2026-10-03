@@ -1,6 +1,9 @@
 # FILE: backend/config/settings/production.py
 # ruff: noqa: E501
 import logging
+from urllib.parse import urlsplit
+
+from django.core.exceptions import ImproperlyConfigured
 
 import sentry_sdk
 from sentry_sdk.integrations.celery import CeleryIntegration
@@ -17,10 +20,15 @@ from .base import env
 
 # GENERAL
 # ------------------------------------------------------------------------------
+# Production is fail-closed: an inherited DJANGO_DEBUG value must never expose
+# Django debug pages or exception details on an Internet-facing deployment.
+DEBUG = False
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
+if not ALLOWED_HOSTS or "*" in ALLOWED_HOSTS:
+    raise ImproperlyConfigured("Production DJANGO_ALLOWED_HOSTS must be explicit; '*' is forbidden.")
 # https://docs.djangoproject.com/en/dev/ref/settings/#csrf-trusted-origins
 # Prefer the canonical DJANGO_* key emitted by Capsule Manager, while keeping
 # compatibility with the older CSRF_TRUSTED_ORIGINS alias.
@@ -32,6 +40,9 @@ CSRF_TRUSTED_ORIGINS = env.list(
 # Public frontend origin used by post-login redirects.
 # Production must declare this explicitly; localhost is a development-only fallback.
 FRONTEND_BASE_URL = env("FRONTEND_BASE_URL").rstrip("/")
+_frontend_origin = urlsplit(FRONTEND_BASE_URL)
+if _frontend_origin.scheme != "https" or not _frontend_origin.hostname or _frontend_origin.username or _frontend_origin.password:
+    raise ImproperlyConfigured("Production FRONTEND_BASE_URL must be a credential-free HTTPS origin.")
 LOGIN_REDIRECT_URL = f"{FRONTEND_BASE_URL}/ekoh/dashboard"
 
 # Production registration is fail-closed. Opening public signup requires an
@@ -55,7 +66,9 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             # Mimicking memcache behavior.
             # https://github.com/jazzband/django-redis#memcached-exceptions-behavior
-            "IGNORE_EXCEPTIONS": True,
+            # Authentication/rate-limit state must fail closed. Silently
+            # ignoring Redis failures would disable allauth rate limiting.
+            "IGNORE_EXCEPTIONS": False,
         },
     },
 }
@@ -64,10 +77,14 @@ CACHES = {
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# Traefik is the single trusted ingress hop to Django in production. This lets
+# django-allauth derive the real client IP without trusting arbitrary XFF input.
+ALLAUTH_TRUSTED_PROXY_COUNT = 1
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-ssl-redirect
-SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
+SECURE_SSL_REDIRECT = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#session-cookie-secure
 SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#session-cookie-name
 SESSION_COOKIE_NAME = "__Secure-sessionid"
 # https://docs.djangoproject.com/en/dev/ref/settings/#csrf-cookie-secure
@@ -83,21 +100,16 @@ CSRF_COOKIE_SAMESITE = "Lax"
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 CORS_ALLOW_CREDENTIALS = False
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
 # https://docs.djangoproject.com/en/dev/topics/security/#ssl-https
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-seconds
-SECURE_HSTS_SECONDS = env.int("DJANGO_SECURE_HSTS_SECONDS", default=31536000)
+SECURE_HSTS_SECONDS = 31536000
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-include-subdomains
-SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool(
-    "DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS",
-    default=True,
-)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-preload
-SECURE_HSTS_PRELOAD = env.bool("DJANGO_SECURE_HSTS_PRELOAD", default=True)
+SECURE_HSTS_PRELOAD = True
 # https://docs.djangoproject.com/en/dev/ref/middleware/#x-content-type-options-nosniff
-SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
-    "DJANGO_SECURE_CONTENT_TYPE_NOSNIFF",
-    default=True,
-)
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
 
 # Authentication hardening: production admin uses the same allauth policy as users.

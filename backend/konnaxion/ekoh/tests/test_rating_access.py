@@ -56,7 +56,15 @@ def org_graph(db):
 
 
 @pytest.fixture
-def api_client():
+def api_client(settings):
+    """API client for profile-handler tests, isolated from Worlds route scoping.
+
+    WorldRouteMiddleware fail-closed behavior is qualified independently by the
+    dedicated Konnaxion_Worlds routing suite.  These tests exercise EkoH profile
+    disclosure semantics through the legacy handler path, so keep only this
+    fixture in compatibility mode. Production defaults remain strict.
+    """
+    settings.KONNAXION_WORLDS_ENFORCE_SCOPED_API = False
     return APIClient()
 
 

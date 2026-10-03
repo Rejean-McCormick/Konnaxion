@@ -11,6 +11,16 @@ IMPORT_URL = "/api/ethikos/demo-scenarios/import/"
 RESET_URL = "/api/ethikos/demo-scenarios/reset/"
 
 
+@pytest.fixture(autouse=True)
+def legacy_unscoped_world_api_for_handler_tests(settings):
+    """Keep these handler tests focused on importer API behavior.
+
+    World-route fail-closed behavior is qualified separately by the dedicated
+    Konnaxion_Worlds routing tests. Production defaults remain strict.
+    """
+    settings.KONNAXION_WORLDS_ENFORCE_SCOPED_API = False
+
+
 @pytest.fixture
 def api_client():
     return APIClient()

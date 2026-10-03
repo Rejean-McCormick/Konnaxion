@@ -3201,6 +3201,2702 @@
   },
   {
     "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/admin/konsensus-config/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_admin_konsensus_config_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/admin/konsensus-config/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_admin_konsensus_config_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/admin/konsensus-config/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_admin_konsensus_config_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/admin/konsensus-config/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_admin_konsensus_config_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/admin/konsensus-config/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_admin_konsensus_config_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/admin/konsensus-config/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_admin_konsensus_config_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/admin/moderation/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_admin_moderation_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/admin/moderation/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_admin_moderation_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/admin/moderation/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_admin_moderation_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/admin/moderation/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_admin_moderation_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/admin/moderation/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_admin_moderation_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/admin/moderation/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_admin_moderation_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/arguments/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_arguments_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/arguments/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_arguments_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/arguments/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_arguments_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/arguments/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_arguments_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/arguments/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_arguments_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/arguments/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_arguments_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/categories/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_categories_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/categories/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_categories_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/decision-protocols/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_decision_protocols_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/decision-protocols/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_decision_protocols_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/decision-protocols/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_decision_protocols_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/decision-protocols/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_decision_protocols_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/decision-protocols/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_decision_protocols_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/decision-protocols/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_decision_protocols_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/decision-records/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_decision_records_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/decision-records/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_decision_records_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/decision-records/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_decision_records_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/decision-records/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_decision_records_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/decision-records/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_decision_records_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/decision-records/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_decision_records_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/decision-records/{id}/execute/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_decision_records_execute_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/decision-records/{id}/export/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_decision_records_export_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/decision-records/{id}/publish/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_decision_records_publish_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/demo-scenarios/import",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_demo_scenarios_import_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/demo-scenarios/import/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_demo_scenarios_import_create_2",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/demo-scenarios/preview",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_demo_scenarios_preview_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/demo-scenarios/preview/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_demo_scenarios_preview_create_2",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/demo-scenarios/reset",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_demo_scenarios_reset_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/demo-scenarios/reset/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_demo_scenarios_reset_create_2",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/arguments/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_arguments_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/arguments/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_arguments_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/arguments/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_arguments_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/arguments/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_arguments_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/arguments/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_arguments_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/arguments/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_arguments_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/categories/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_categories_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/categories/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_categories_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/decision-protocols/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_decision_protocols_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/decision-protocols/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_decision_protocols_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/decision-protocols/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_decision_protocols_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/decision-protocols/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_decision_protocols_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/decision-protocols/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_decision_protocols_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/decision-protocols/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_decision_protocols_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/decision-records/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_decision_records_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/decision-records/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_decision_records_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/decision-records/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_decision_records_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/decision-records/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_decision_records_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/decision-records/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_decision_records_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/decision-records/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_decision_records_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/decision-records/{id}/execute/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_decision_records_execute_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/decision-records/{id}/export/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_decision_records_export_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/decision-records/{id}/publish/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_decision_records_publish_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/demo-scenarios/import",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_demo_scenarios_import_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/demo-scenarios/import/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_demo_scenarios_import_create_2",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/demo-scenarios/preview",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_demo_scenarios_preview_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/demo-scenarios/preview/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_demo_scenarios_preview_create_2",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/demo-scenarios/reset",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_demo_scenarios_reset_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/demo-scenarios/reset/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_demo_scenarios_reset_create_2",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/stances/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_stances_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/stances/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_stances_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/stances/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_stances_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/stances/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_stances_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/stances/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_stances_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/stances/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_stances_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/topics/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_topics_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/topics/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_topics_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/topics/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_topics_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/topics/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_topics_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/topics/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_topics_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/topics/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_topics_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/elite/topics/{id}/preview/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_elite_topics_preview_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/stances/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_stances_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/stances/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_stances_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/stances/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_stances_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/stances/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_stances_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/stances/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_stances_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/stances/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_stances_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/topics/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_topics_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/topics/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_topics_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/topics/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_topics_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/topics/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_topics_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/topics/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_topics_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/topics/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_topics_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/deliberate/topics/{id}/preview/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_deliberate_topics_preview_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-impact-votes/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_impact_votes_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-impact-votes/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_impact_votes_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-impact-votes/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_impact_votes_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-impact-votes/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_impact_votes_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-impact-votes/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_impact_votes_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-impact-votes/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_impact_votes_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-sources/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_sources_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-sources/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_sources_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-sources/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_sources_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-sources/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_sources_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-sources/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_sources_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-sources/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_sources_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-suggestions/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_suggestions_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-suggestions/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_suggestions_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-suggestions/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_suggestions_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-suggestions/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_suggestions_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-suggestions/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_suggestions_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-suggestions/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_suggestions_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-suggestions/{id}/accept/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_suggestions_accept_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-suggestions/{id}/reject/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_suggestions_reject_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/argument-suggestions/{id}/request-revision/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_argument_suggestions_request_revision_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/arguments/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_arguments_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/arguments/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_arguments_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/arguments/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_arguments_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/arguments/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_arguments_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/arguments/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_arguments_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/arguments/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_arguments_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/categories/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_categories_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/categories/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_categories_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/decision-protocols/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_decision_protocols_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/decision-protocols/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_decision_protocols_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/decision-protocols/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_decision_protocols_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/decision-protocols/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_decision_protocols_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/decision-protocols/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_decision_protocols_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/decision-protocols/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_decision_protocols_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/decision-records/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_decision_records_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/decision-records/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_decision_records_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/decision-records/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_decision_records_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/decision-records/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_decision_records_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/decision-records/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_decision_records_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/decision-records/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_decision_records_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/decision-records/{id}/execute/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_decision_records_execute_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/decision-records/{id}/export/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_decision_records_export_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/decision-records/{id}/publish/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_decision_records_publish_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/demo-scenarios/import",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_demo_scenarios_import_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/demo-scenarios/import/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_demo_scenarios_import_create_2",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/demo-scenarios/preview",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_demo_scenarios_preview_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/demo-scenarios/preview/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_demo_scenarios_preview_create_2",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/demo-scenarios/reset",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_demo_scenarios_reset_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/demo-scenarios/reset/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_demo_scenarios_reset_create_2",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/discussion-participant-roles/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_discussion_participant_roles_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/discussion-participant-roles/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_discussion_participant_roles_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/discussion-participant-roles/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_discussion_participant_roles_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/discussion-participant-roles/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_discussion_participant_roles_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/discussion-participant-roles/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_discussion_participant_roles_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/discussion-participant-roles/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_discussion_participant_roles_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/discussion-visibility-settings/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_discussion_visibility_settings_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/discussion-visibility-settings/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_discussion_visibility_settings_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/discussion-visibility-settings/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_discussion_visibility_settings_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/discussion-visibility-settings/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_discussion_visibility_settings_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/discussion-visibility-settings/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_discussion_visibility_settings_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/discussion-visibility-settings/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_discussion_visibility_settings_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/stances/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_stances_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/stances/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_stances_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/stances/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_stances_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/stances/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_stances_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/stances/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_stances_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/stances/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_stances_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/topics/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_topics_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/topics/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_topics_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/topics/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_topics_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/topics/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_topics_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/topics/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_topics_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/topics/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_topics_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/ethikos/topics/{id}/preview/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_ethikos_topics_preview_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/messages/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_messages_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/messages/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_messages_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/messages/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_messages_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/messages/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_messages_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/messages/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_messages_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/messages/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_messages_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/projects/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_projects_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/projects/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_projects_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/projects/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_projects_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/projects/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_projects_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/projects/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_projects_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/projects/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_projects_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/ratings/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_ratings_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/ratings/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_ratings_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/ratings/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_ratings_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/ratings/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_ratings_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/ratings/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_ratings_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/ratings/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_ratings_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/resources/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_resources_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/resources/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_resources_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/resources/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_resources_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/resources/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_resources_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/resources/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_resources_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/resources/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_resources_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/tags/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_tags_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/tags/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_tags_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/tags/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_tags_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/tags/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_tags_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/tags/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_tags_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/tags/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_tags_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/tasks/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_tasks_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/tasks/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_tasks_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/tasks/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_tasks_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/tasks/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_tasks_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/tasks/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_tasks_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/tasks/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_tasks_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/teams/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_teams_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/teams/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_teams_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/teams/my-teams/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_teams_my_teams_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/teams/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_teams_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/teams/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_teams_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/teams/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_teams_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/teams/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_teams_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/keenkonnect/teams/{id}/leave/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_keenkonnect_teams_leave_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kollective/vote-results/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kollective_vote_results_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kollective/vote-results/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kollective_vote_results_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kollective/votes/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kollective_votes_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kollective/votes/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kollective_votes_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kollective/votes/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kollective_votes_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kollective/votes/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kollective_votes_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kollective/votes/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kollective_votes_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kollective/votes/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kollective_votes_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/evaluations/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_evaluations_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/evaluations/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_evaluations_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/evaluations/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_evaluations_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/evaluations/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_evaluations_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/evaluations/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_evaluations_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/evaluations/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_evaluations_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/exam-attempts/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_exam_attempts_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/exam-attempts/me/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_exam_attempts_me_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/exam-attempts/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_exam_attempts_retrieve_2",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/exam-attempts/{id}/appeal/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_exam_attempts_appeal_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/exam-attempts/{id}/retry/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_exam_attempts_retry_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/paths/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_paths_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/paths/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_paths_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/paths/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_paths_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/paths/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_paths_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/paths/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_paths_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/paths/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_paths_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/paths/{id}/eligibility/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_paths_eligibility_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/paths/{id}/preparation-plan/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_paths_preparation_plan_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/paths/{id}/sessions/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_paths_sessions_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/peer-validations/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_peer_validations_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/peer-validations/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_peer_validations_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/peer-validations/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_peer_validations_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/peer-validations/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_peer_validations_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/peer-validations/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_peer_validations_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/certifications/peer-validations/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_certifications_peer_validations_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/co-creation-contributions/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_co_creation_contributions_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/co-creation-contributions/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_co_creation_contributions_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/co-creation-contributions/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_co_creation_contributions_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/co-creation-projects/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_co_creation_projects_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/co-creation-projects/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_co_creation_projects_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/forum-posts/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_forum_posts_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/forum-posts/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_forum_posts_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/forum-posts/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_forum_posts_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/forum-posts/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_forum_posts_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/forum-posts/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_forum_posts_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/forum-posts/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_forum_posts_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/forum-topics/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_forum_topics_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/forum-topics/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_forum_topics_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/forum-topics/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_forum_topics_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/forum-topics/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_forum_topics_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/forum-topics/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_forum_topics_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/forum-topics/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_forum_topics_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/mentors/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_mentors_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/mentors/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_mentors_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/mentorship-requests/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_mentorship_requests_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/mentorship-requests/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_mentorship_requests_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/mentorship-requests/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_mentorship_requests_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/offline-packages/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_offline_packages_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/offline-packages/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_offline_packages_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/offline-packages/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_offline_packages_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/offline-packages/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_offline_packages_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/offline-packages/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_offline_packages_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/offline-packages/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_offline_packages_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/offline-packages/{id}/sync/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_offline_packages_sync_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/portfolios/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_portfolios_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/portfolios/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_portfolios_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/portfolios/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_portfolios_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/portfolios/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_portfolios_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/portfolios/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_portfolios_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/portfolios/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_portfolios_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/progress/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_progress_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/progress/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_progress_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/progress/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_progress_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/progress/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_progress_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/progress/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_progress_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/progress/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_progress_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/recommendations/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_recommendations_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/recommendations/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_recommendations_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/resources/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_resources_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/resources/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_resources_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/resources/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_resources_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/resources/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_resources_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/resources/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_resources_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/konnected/resources/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_konnected_resources_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/artworks/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_artworks_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/artworks/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_artworks_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/artworks/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_artworks_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/artworks/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_artworks_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/artworks/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_artworks_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/artworks/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_artworks_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/collab-sessions/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_collab_sessions_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/collab-sessions/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_collab_sessions_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/collab-sessions/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_collab_sessions_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/collab-sessions/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_collab_sessions_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/collab-sessions/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_collab_sessions_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/collab-sessions/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_collab_sessions_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/galleries/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_galleries_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/galleries/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_galleries_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/galleries/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_galleries_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/galleries/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_galleries_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/galleries/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_galleries_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/galleries/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_galleries_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/tags/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_tags_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/tags/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_tags_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/tags/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_tags_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/tags/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_tags_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/tags/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_tags_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/tags/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_tags_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/traditions/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_traditions_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/traditions/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_traditions_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/traditions/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_traditions_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/traditions/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_traditions_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/traditions/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_traditions_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/kreative/traditions/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_kreative_traditions_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/projects/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_projects_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/projects/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_projects_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/projects/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_projects_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/projects/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_projects_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/projects/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_projects_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/projects/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_projects_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/reports/perf/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_reports_perf_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/reports/smart-vote/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_reports_smart_vote_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/reports/usage/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_reports_usage_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
     "path": "/api/u/[a-z0-9]/w/[a-z0-9]/runtime/",
     "method": "GET",
     "operationId": "u_[a_z0_9]_w_[a_z0_9]_runtime_retrieve",
@@ -3220,6 +5916,150 @@
     "path": "/api/u/[a-z0-9]/w/[a-z0-9]/runtime/view-as/",
     "method": "POST",
     "operationId": "u_[a_z0_9]_w_[a_z0_9]_runtime_view_as_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/teambuilder/problems/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_teambuilder_problems_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/teambuilder/problems/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_teambuilder_problems_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/teambuilder/problems/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_teambuilder_problems_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/teambuilder/problems/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_teambuilder_problems_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/teambuilder/problems/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_teambuilder_problems_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/teambuilder/problems/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_teambuilder_problems_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/teambuilder/sessions/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_teambuilder_sessions_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/teambuilder/sessions/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_teambuilder_sessions_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/teambuilder/sessions/{id}/",
+    "method": "DELETE",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_teambuilder_sessions_destroy",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/teambuilder/sessions/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_teambuilder_sessions_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/teambuilder/sessions/{id}/",
+    "method": "PATCH",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_teambuilder_sessions_partial_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/teambuilder/sessions/{id}/",
+    "method": "PUT",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_teambuilder_sessions_update",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/teambuilder/sessions/{id}/generate/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_teambuilder_sessions_generate_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/teambuilder/teams/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_teambuilder_teams_list",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/teambuilder/teams/{id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_teambuilder_teams_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/v1/ekoh/profile/{uid}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_v1_ekoh_profile_retrieve",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/v1/smart-vote/cast/",
+    "method": "POST",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_v1_smart_vote_cast_create",
+    "summary": "",
+    "tags": "u"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/u/[a-z0-9]/w/[a-z0-9]/v1/smart-vote/readings/ethikos-topic/{topic_id}/",
+    "method": "GET",
+    "operationId": "u_[a_z0_9]_w_[a_z0_9]_v1_smart_vote_readings_ethikos_topic_retrieve",
     "summary": "",
     "tags": "u"
   },
@@ -3289,6 +6129,2702 @@
   },
   {
     "source": "openapi",
+    "path": "/api/w/[a-z0-9]/admin/konsensus-config/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_admin_konsensus_config_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/admin/konsensus-config/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_admin_konsensus_config_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/admin/konsensus-config/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_admin_konsensus_config_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/admin/konsensus-config/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_admin_konsensus_config_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/admin/konsensus-config/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_admin_konsensus_config_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/admin/konsensus-config/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_admin_konsensus_config_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/admin/moderation/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_admin_moderation_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/admin/moderation/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_admin_moderation_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/admin/moderation/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_admin_moderation_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/admin/moderation/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_admin_moderation_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/admin/moderation/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_admin_moderation_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/admin/moderation/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_admin_moderation_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/arguments/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_arguments_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/arguments/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_arguments_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/arguments/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_deliberate_arguments_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/arguments/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_arguments_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/arguments/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_deliberate_arguments_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/arguments/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_deliberate_arguments_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/categories/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_categories_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/categories/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_categories_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/decision-protocols/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_decision_protocols_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/decision-protocols/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_decision_protocols_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/decision-protocols/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_deliberate_decision_protocols_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/decision-protocols/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_decision_protocols_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/decision-protocols/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_deliberate_decision_protocols_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/decision-protocols/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_deliberate_decision_protocols_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/decision-records/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_decision_records_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/decision-records/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_decision_records_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/decision-records/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_deliberate_decision_records_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/decision-records/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_decision_records_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/decision-records/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_deliberate_decision_records_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/decision-records/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_deliberate_decision_records_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/decision-records/{id}/execute/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_decision_records_execute_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/decision-records/{id}/export/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_decision_records_export_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/decision-records/{id}/publish/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_decision_records_publish_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/demo-scenarios/import",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_demo_scenarios_import_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/demo-scenarios/import/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_demo_scenarios_import_create_2",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/demo-scenarios/preview",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_demo_scenarios_preview_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/demo-scenarios/preview/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_demo_scenarios_preview_create_2",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/demo-scenarios/reset",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_demo_scenarios_reset_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/demo-scenarios/reset/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_demo_scenarios_reset_create_2",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/arguments/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_elite_arguments_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/arguments/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_elite_arguments_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/arguments/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_deliberate_elite_arguments_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/arguments/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_elite_arguments_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/arguments/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_deliberate_elite_arguments_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/arguments/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_deliberate_elite_arguments_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/categories/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_elite_categories_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/categories/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_elite_categories_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/decision-protocols/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_elite_decision_protocols_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/decision-protocols/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_elite_decision_protocols_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/decision-protocols/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_deliberate_elite_decision_protocols_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/decision-protocols/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_elite_decision_protocols_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/decision-protocols/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_deliberate_elite_decision_protocols_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/decision-protocols/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_deliberate_elite_decision_protocols_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/decision-records/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_elite_decision_records_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/decision-records/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_elite_decision_records_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/decision-records/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_deliberate_elite_decision_records_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/decision-records/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_elite_decision_records_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/decision-records/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_deliberate_elite_decision_records_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/decision-records/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_deliberate_elite_decision_records_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/decision-records/{id}/execute/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_elite_decision_records_execute_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/decision-records/{id}/export/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_elite_decision_records_export_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/decision-records/{id}/publish/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_elite_decision_records_publish_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/demo-scenarios/import",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_elite_demo_scenarios_import_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/demo-scenarios/import/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_elite_demo_scenarios_import_create_2",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/demo-scenarios/preview",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_elite_demo_scenarios_preview_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/demo-scenarios/preview/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_elite_demo_scenarios_preview_create_2",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/demo-scenarios/reset",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_elite_demo_scenarios_reset_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/demo-scenarios/reset/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_elite_demo_scenarios_reset_create_2",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/stances/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_elite_stances_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/stances/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_elite_stances_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/stances/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_deliberate_elite_stances_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/stances/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_elite_stances_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/stances/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_deliberate_elite_stances_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/stances/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_deliberate_elite_stances_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/topics/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_elite_topics_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/topics/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_elite_topics_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/topics/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_deliberate_elite_topics_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/topics/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_elite_topics_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/topics/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_deliberate_elite_topics_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/topics/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_deliberate_elite_topics_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/elite/topics/{id}/preview/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_elite_topics_preview_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/stances/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_stances_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/stances/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_stances_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/stances/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_deliberate_stances_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/stances/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_stances_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/stances/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_deliberate_stances_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/stances/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_deliberate_stances_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/topics/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_topics_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/topics/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_deliberate_topics_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/topics/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_deliberate_topics_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/topics/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_topics_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/topics/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_deliberate_topics_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/topics/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_deliberate_topics_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/deliberate/topics/{id}/preview/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_deliberate_topics_preview_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-impact-votes/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_argument_impact_votes_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-impact-votes/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_argument_impact_votes_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-impact-votes/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_ethikos_argument_impact_votes_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-impact-votes/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_argument_impact_votes_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-impact-votes/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_ethikos_argument_impact_votes_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-impact-votes/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_ethikos_argument_impact_votes_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-sources/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_argument_sources_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-sources/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_argument_sources_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-sources/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_ethikos_argument_sources_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-sources/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_argument_sources_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-sources/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_ethikos_argument_sources_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-sources/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_ethikos_argument_sources_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-suggestions/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_argument_suggestions_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-suggestions/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_argument_suggestions_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-suggestions/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_ethikos_argument_suggestions_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-suggestions/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_argument_suggestions_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-suggestions/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_ethikos_argument_suggestions_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-suggestions/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_ethikos_argument_suggestions_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-suggestions/{id}/accept/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_argument_suggestions_accept_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-suggestions/{id}/reject/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_argument_suggestions_reject_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/argument-suggestions/{id}/request-revision/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_argument_suggestions_request_revision_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/arguments/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_arguments_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/arguments/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_arguments_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/arguments/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_ethikos_arguments_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/arguments/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_arguments_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/arguments/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_ethikos_arguments_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/arguments/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_ethikos_arguments_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/categories/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_categories_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/categories/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_categories_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/decision-protocols/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_decision_protocols_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/decision-protocols/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_decision_protocols_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/decision-protocols/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_ethikos_decision_protocols_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/decision-protocols/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_decision_protocols_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/decision-protocols/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_ethikos_decision_protocols_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/decision-protocols/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_ethikos_decision_protocols_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/decision-records/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_decision_records_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/decision-records/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_decision_records_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/decision-records/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_ethikos_decision_records_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/decision-records/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_decision_records_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/decision-records/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_ethikos_decision_records_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/decision-records/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_ethikos_decision_records_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/decision-records/{id}/execute/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_decision_records_execute_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/decision-records/{id}/export/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_decision_records_export_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/decision-records/{id}/publish/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_decision_records_publish_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/demo-scenarios/import",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_demo_scenarios_import_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/demo-scenarios/import/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_demo_scenarios_import_create_2",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/demo-scenarios/preview",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_demo_scenarios_preview_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/demo-scenarios/preview/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_demo_scenarios_preview_create_2",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/demo-scenarios/reset",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_demo_scenarios_reset_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/demo-scenarios/reset/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_demo_scenarios_reset_create_2",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/discussion-participant-roles/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_discussion_participant_roles_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/discussion-participant-roles/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_discussion_participant_roles_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/discussion-participant-roles/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_ethikos_discussion_participant_roles_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/discussion-participant-roles/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_discussion_participant_roles_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/discussion-participant-roles/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_ethikos_discussion_participant_roles_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/discussion-participant-roles/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_ethikos_discussion_participant_roles_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/discussion-visibility-settings/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_discussion_visibility_settings_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/discussion-visibility-settings/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_discussion_visibility_settings_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/discussion-visibility-settings/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_ethikos_discussion_visibility_settings_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/discussion-visibility-settings/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_discussion_visibility_settings_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/discussion-visibility-settings/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_ethikos_discussion_visibility_settings_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/discussion-visibility-settings/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_ethikos_discussion_visibility_settings_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/stances/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_stances_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/stances/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_stances_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/stances/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_ethikos_stances_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/stances/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_stances_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/stances/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_ethikos_stances_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/stances/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_ethikos_stances_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/topics/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_topics_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/topics/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_ethikos_topics_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/topics/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_ethikos_topics_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/topics/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_topics_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/topics/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_ethikos_topics_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/topics/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_ethikos_topics_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/ethikos/topics/{id}/preview/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_ethikos_topics_preview_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/messages/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_keenkonnect_messages_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/messages/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_keenkonnect_messages_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/messages/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_keenkonnect_messages_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/messages/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_keenkonnect_messages_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/messages/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_keenkonnect_messages_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/messages/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_keenkonnect_messages_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/projects/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_keenkonnect_projects_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/projects/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_keenkonnect_projects_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/projects/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_keenkonnect_projects_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/projects/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_keenkonnect_projects_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/projects/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_keenkonnect_projects_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/projects/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_keenkonnect_projects_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/ratings/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_keenkonnect_ratings_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/ratings/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_keenkonnect_ratings_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/ratings/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_keenkonnect_ratings_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/ratings/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_keenkonnect_ratings_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/ratings/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_keenkonnect_ratings_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/ratings/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_keenkonnect_ratings_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/resources/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_keenkonnect_resources_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/resources/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_keenkonnect_resources_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/resources/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_keenkonnect_resources_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/resources/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_keenkonnect_resources_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/resources/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_keenkonnect_resources_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/resources/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_keenkonnect_resources_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/tags/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_keenkonnect_tags_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/tags/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_keenkonnect_tags_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/tags/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_keenkonnect_tags_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/tags/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_keenkonnect_tags_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/tags/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_keenkonnect_tags_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/tags/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_keenkonnect_tags_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/tasks/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_keenkonnect_tasks_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/tasks/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_keenkonnect_tasks_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/tasks/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_keenkonnect_tasks_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/tasks/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_keenkonnect_tasks_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/tasks/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_keenkonnect_tasks_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/tasks/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_keenkonnect_tasks_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/teams/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_keenkonnect_teams_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/teams/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_keenkonnect_teams_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/teams/my-teams/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_keenkonnect_teams_my_teams_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/teams/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_keenkonnect_teams_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/teams/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_keenkonnect_teams_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/teams/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_keenkonnect_teams_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/teams/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_keenkonnect_teams_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/keenkonnect/teams/{id}/leave/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_keenkonnect_teams_leave_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kollective/vote-results/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_kollective_vote_results_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kollective/vote-results/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_kollective_vote_results_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kollective/votes/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_kollective_votes_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kollective/votes/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_kollective_votes_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kollective/votes/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_kollective_votes_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kollective/votes/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_kollective_votes_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kollective/votes/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_kollective_votes_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kollective/votes/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_kollective_votes_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/evaluations/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_certifications_evaluations_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/evaluations/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_konnected_certifications_evaluations_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/evaluations/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_konnected_certifications_evaluations_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/evaluations/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_certifications_evaluations_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/evaluations/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_konnected_certifications_evaluations_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/evaluations/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_konnected_certifications_evaluations_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/exam-attempts/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_certifications_exam_attempts_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/exam-attempts/me/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_certifications_exam_attempts_me_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/exam-attempts/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_certifications_exam_attempts_retrieve_2",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/exam-attempts/{id}/appeal/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_konnected_certifications_exam_attempts_appeal_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/exam-attempts/{id}/retry/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_konnected_certifications_exam_attempts_retry_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/paths/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_certifications_paths_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/paths/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_konnected_certifications_paths_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/paths/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_konnected_certifications_paths_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/paths/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_certifications_paths_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/paths/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_konnected_certifications_paths_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/paths/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_konnected_certifications_paths_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/paths/{id}/eligibility/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_certifications_paths_eligibility_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/paths/{id}/preparation-plan/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_certifications_paths_preparation_plan_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/paths/{id}/sessions/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_certifications_paths_sessions_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/peer-validations/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_certifications_peer_validations_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/peer-validations/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_konnected_certifications_peer_validations_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/peer-validations/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_konnected_certifications_peer_validations_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/peer-validations/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_certifications_peer_validations_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/peer-validations/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_konnected_certifications_peer_validations_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/certifications/peer-validations/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_konnected_certifications_peer_validations_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/co-creation-contributions/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_co_creation_contributions_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/co-creation-contributions/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_konnected_co_creation_contributions_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/co-creation-contributions/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_co_creation_contributions_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/co-creation-projects/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_co_creation_projects_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/co-creation-projects/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_co_creation_projects_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/forum-posts/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_forum_posts_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/forum-posts/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_konnected_forum_posts_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/forum-posts/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_konnected_forum_posts_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/forum-posts/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_forum_posts_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/forum-posts/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_konnected_forum_posts_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/forum-posts/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_konnected_forum_posts_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/forum-topics/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_forum_topics_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/forum-topics/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_konnected_forum_topics_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/forum-topics/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_konnected_forum_topics_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/forum-topics/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_forum_topics_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/forum-topics/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_konnected_forum_topics_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/forum-topics/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_konnected_forum_topics_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/mentors/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_mentors_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/mentors/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_mentors_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/mentorship-requests/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_mentorship_requests_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/mentorship-requests/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_konnected_mentorship_requests_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/mentorship-requests/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_mentorship_requests_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/offline-packages/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_offline_packages_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/offline-packages/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_konnected_offline_packages_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/offline-packages/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_konnected_offline_packages_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/offline-packages/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_offline_packages_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/offline-packages/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_konnected_offline_packages_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/offline-packages/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_konnected_offline_packages_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/offline-packages/{id}/sync/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_konnected_offline_packages_sync_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/portfolios/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_portfolios_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/portfolios/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_konnected_portfolios_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/portfolios/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_konnected_portfolios_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/portfolios/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_portfolios_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/portfolios/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_konnected_portfolios_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/portfolios/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_konnected_portfolios_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/progress/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_progress_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/progress/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_konnected_progress_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/progress/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_konnected_progress_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/progress/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_progress_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/progress/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_konnected_progress_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/progress/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_konnected_progress_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/recommendations/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_recommendations_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/recommendations/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_recommendations_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/resources/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_resources_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/resources/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_konnected_resources_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/resources/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_konnected_resources_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/resources/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_konnected_resources_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/resources/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_konnected_resources_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/konnected/resources/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_konnected_resources_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/artworks/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_kreative_artworks_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/artworks/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_kreative_artworks_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/artworks/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_kreative_artworks_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/artworks/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_kreative_artworks_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/artworks/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_kreative_artworks_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/artworks/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_kreative_artworks_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/collab-sessions/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_kreative_collab_sessions_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/collab-sessions/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_kreative_collab_sessions_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/collab-sessions/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_kreative_collab_sessions_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/collab-sessions/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_kreative_collab_sessions_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/collab-sessions/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_kreative_collab_sessions_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/collab-sessions/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_kreative_collab_sessions_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/galleries/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_kreative_galleries_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/galleries/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_kreative_galleries_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/galleries/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_kreative_galleries_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/galleries/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_kreative_galleries_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/galleries/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_kreative_galleries_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/galleries/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_kreative_galleries_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/tags/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_kreative_tags_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/tags/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_kreative_tags_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/tags/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_kreative_tags_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/tags/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_kreative_tags_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/tags/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_kreative_tags_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/tags/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_kreative_tags_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/traditions/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_kreative_traditions_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/traditions/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_kreative_traditions_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/traditions/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_kreative_traditions_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/traditions/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_kreative_traditions_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/traditions/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_kreative_traditions_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/kreative/traditions/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_kreative_traditions_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/projects/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_projects_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/projects/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_projects_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/projects/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_projects_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/projects/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_projects_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/projects/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_projects_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/projects/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_projects_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/reports/perf/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_reports_perf_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/reports/smart-vote/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_reports_smart_vote_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/reports/usage/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_reports_usage_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
     "path": "/api/w/[a-z0-9]/runtime/",
     "method": "GET",
     "operationId": "w_[a_z0_9]_runtime_retrieve",
@@ -3308,6 +8844,150 @@
     "path": "/api/w/[a-z0-9]/runtime/view-as/",
     "method": "POST",
     "operationId": "w_[a_z0_9]_runtime_view_as_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/teambuilder/problems/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_teambuilder_problems_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/teambuilder/problems/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_teambuilder_problems_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/teambuilder/problems/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_teambuilder_problems_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/teambuilder/problems/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_teambuilder_problems_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/teambuilder/problems/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_teambuilder_problems_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/teambuilder/problems/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_teambuilder_problems_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/teambuilder/sessions/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_teambuilder_sessions_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/teambuilder/sessions/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_teambuilder_sessions_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/teambuilder/sessions/{id}/",
+    "method": "DELETE",
+    "operationId": "w_[a_z0_9]_teambuilder_sessions_destroy",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/teambuilder/sessions/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_teambuilder_sessions_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/teambuilder/sessions/{id}/",
+    "method": "PATCH",
+    "operationId": "w_[a_z0_9]_teambuilder_sessions_partial_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/teambuilder/sessions/{id}/",
+    "method": "PUT",
+    "operationId": "w_[a_z0_9]_teambuilder_sessions_update",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/teambuilder/sessions/{id}/generate/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_teambuilder_sessions_generate_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/teambuilder/teams/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_teambuilder_teams_list",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/teambuilder/teams/{id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_teambuilder_teams_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/v1/ekoh/profile/{uid}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_v1_ekoh_profile_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/v1/smart-vote/cast/",
+    "method": "POST",
+    "operationId": "w_[a_z0_9]_v1_smart_vote_cast_create",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/[a-z0-9]/v1/smart-vote/readings/ethikos-topic/{topic_id}/",
+    "method": "GET",
+    "operationId": "w_[a_z0_9]_v1_smart_vote_readings_ethikos_topic_retrieve",
     "summary": "",
     "tags": "w"
   }

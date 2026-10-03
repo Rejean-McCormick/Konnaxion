@@ -171,6 +171,7 @@
     "method": "GET",
     "url": "authorization",
     "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/%5Fapi/admin/moderation/route.ts",
       "C:/mycode/Konnaxion/Konnaxion/frontend/app/%5Fapi/search/route.ts"
     ]
   },
@@ -199,6 +200,7 @@
     "method": "GET",
     "url": "cookie",
     "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/%5Fapi/admin/moderation/route.ts",
       "C:/mycode/Konnaxion/Konnaxion/frontend/app/%5Fapi/search/route.ts"
     ]
   },

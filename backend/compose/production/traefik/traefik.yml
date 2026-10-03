@@ -23,6 +23,17 @@ certificatesResolvers:
 
 http:
   routers:
+    # Private World media and Trust credential documents must traverse Django
+    # authorization instead of nginx's direct filesystem alias.
+    web-protected-media-router:
+      rule: "(Host(`konnaxion.com`) || Host(`www.konnaxion.com`)) && (PathPrefix(`/media/worlds/`) || PathPrefix(`/media/trust/credentials/`))"
+      priority: 50
+      entryPoints:
+        - web-secure
+      service: django
+      tls:
+        certResolver: letsencrypt
+
     web-media-router:
       rule: "(Host(`konnaxion.com`) || Host(`www.konnaxion.com`)) && PathPrefix(`/media/`)"
       priority: 40

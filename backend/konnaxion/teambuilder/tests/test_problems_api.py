@@ -1,5 +1,6 @@
 # FILE: backend/konnaxion/teambuilder/tests/test_problems_api.py
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
@@ -14,6 +15,7 @@ from konnaxion.teambuilder.models import (
 User = get_user_model()
 
 
+@override_settings(KONNAXION_WORLDS_ENFORCE_SCOPED_API=False)
 class ProblemAPITests(APITestCase):
     def setUp(self) -> None:
         self.user = User.objects.create_user(

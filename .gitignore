@@ -181,3 +181,6 @@ _konnaxion_i18n_backups/
 *.backup
 *.backup-*
 *.backup_*
+
+# Local KonnaxionDiag evidence (may contain environment/topology metadata)
+.konnaxiondiag/

@@ -9,6 +9,7 @@ from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from config.koali_health import live as koali_live, ready as koali_ready
+from config.protected_media import protected_media
 
 urlpatterns = [
     path("health/live/", koali_live, name="health-live"),
@@ -20,7 +21,15 @@ urlpatterns = [
     # User management (non-API)
     path("users/", include(("konnaxion.users.urls", "users"), namespace="users")),
     path("accounts/", include("allauth.urls")),
-    # Media
+    # Security-sensitive media is always permission checked by Django. In
+    # production Traefik routes these two prefixes here with higher priority
+    # than the generic nginx /media/ service.
+    re_path(
+        r"^media/(?P<media_path>(?:worlds/|trust/credentials/).+)$",
+        protected_media,
+        name="protected-media",
+    ),
+    # Non-sensitive/public media can keep the normal development serving path.
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
 

@@ -3,6 +3,8 @@ from __future__ import annotations
 import asyncio
 import json
 
+from django.test import override_settings
+
 from config import websocket as websocket_config
 from konnaxion.worlds.runtime import WorldRuntime, get_world_runtime
 
@@ -20,6 +22,7 @@ def _runtime() -> WorldRuntime:
     )
 
 
+@override_settings(ALLOWED_HOSTS=["testserver"])
 def test_reports_websocket_rejects_legacy_unscoped_path():
     events = [{"type": "websocket.connect"}]
     sent = []
@@ -32,7 +35,7 @@ def test_reports_websocket_rejects_legacy_unscoped_path():
 
     asyncio.run(
         websocket_config.websocket_application(
-            {"path": "/ws/reports/custom", "headers": []},
+            {"path": "/ws/reports/custom", "headers": [(b"origin", b"http://testserver")]},
             receive,
             send,
         )
@@ -40,6 +43,7 @@ def test_reports_websocket_rejects_legacy_unscoped_path():
     assert sent == [{"type": "websocket.close", "code": 4404}]
 
 
+@override_settings(ALLOWED_HOSTS=["testserver"])
 def test_reports_websocket_pins_world_release_for_socket_lifetime(monkeypatch):
     runtime = _runtime()
     events = [
@@ -52,7 +56,7 @@ def test_reports_websocket_pins_world_release_for_socket_lifetime(monkeypatch):
     async def fake_resolve(*, world_key, universe_key=None, headers):
         assert universe_key is None
         assert world_key == runtime.world_key
-        assert headers == []
+        assert headers == [(b"origin", b"http://testserver")]
         return runtime
 
     async def receive():
@@ -71,7 +75,7 @@ def test_reports_websocket_pins_world_release_for_socket_lifetime(monkeypatch):
         websocket_config.websocket_application(
             {
                 "path": f"/ws/w/{runtime.world_key}/reports/custom",
-                "headers": [],
+                "headers": [(b"origin", b"http://testserver")],
             },
             receive,
             send,
@@ -95,6 +99,7 @@ def test_reports_websocket_pins_world_release_for_socket_lifetime(monkeypatch):
     assert get_world_runtime() is None
 
 
+@override_settings(ALLOWED_HOSTS=["testserver"])
 def test_reports_websocket_accepts_universe_scoped_path(monkeypatch):
     runtime = _runtime()
     events = [
@@ -106,7 +111,7 @@ def test_reports_websocket_accepts_universe_scoped_path(monkeypatch):
     async def fake_resolve(*, world_key, universe_key=None, headers):
         assert universe_key == runtime.universe_key
         assert world_key == runtime.world_key
-        assert headers == []
+        assert headers == [(b"origin", b"http://testserver")]
         return runtime
 
     async def receive():
@@ -128,7 +133,7 @@ def test_reports_websocket_accepts_universe_scoped_path(monkeypatch):
                     f"/ws/u/{runtime.universe_key}/w/{runtime.world_key}/"
                     "reports/custom"
                 ),
-                "headers": [],
+                "headers": [(b"origin", b"http://testserver")],
             },
             receive,
             send,

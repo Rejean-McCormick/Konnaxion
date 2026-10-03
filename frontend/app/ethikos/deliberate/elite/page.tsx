@@ -776,7 +776,7 @@ export default function EliteAgora(): JSX.Element {
                 pagination={{ pageSize: 10, showSizeChanger: false }}
                 options={false}
                 toolBarRender={false}
-                rowClassName={() => styles.topicRow}
+                rowClassName={styles.topicRow ?? ''}
                 scroll={tableMode === 'wide' ? { x: 980 } : undefined}
                 locale={{
                   emptyText: (

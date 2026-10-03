@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -17,6 +18,7 @@ from .models import (
 User = get_user_model()
 
 
+@override_settings(KONNAXION_WORLDS_ENFORCE_SCOPED_API=False)
 class KonnectedApiSurfaceTests(APITestCase):
     def setUp(self) -> None:
         self.user = User.objects.create_user(

@@ -5,6 +5,7 @@ import socket
 from dataclasses import dataclass
 from typing import Any, Mapping
 from urllib.error import HTTPError, URLError
+from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
 from django.conf import settings
@@ -64,14 +65,34 @@ def _error_semantics(status: int, payload: Mapping[str, Any]) -> tuple[bool, str
     return False, f"HTTP_{status}", "unexpected response", receipt
 
 
+def _validated_target_url(value: str) -> str:
+    url = str(value or "").strip()
+    if not url:
+        return ""
+    parsed = urlsplit(url)
+    hostname = (parsed.hostname or "").lower().rstrip(".")
+    if parsed.username or parsed.password or not hostname:
+        return ""
+    if parsed.scheme == "https":
+        return url
+    # Local developer binding only. Production must never send the bearer token
+    # over cleartext HTTP.
+    if getattr(settings, "DEBUG", False) and parsed.scheme == "http" and hostname in {"localhost", "127.0.0.1", "::1"}:
+        return url
+    return ""
+
+
 def deliver_to_orgo(envelope: Mapping[str, Any]) -> DeliveryResult:
     """Deliver one IK envelope using the configured Orgo HTTP binding."""
 
-    url = str(getattr(settings, "IK_ORGO_INTERACTIONS_URL", "") or "").strip()
+    configured_url = str(getattr(settings, "IK_ORGO_INTERACTIONS_URL", "") or "").strip()
+    url = _validated_target_url(configured_url)
     token = str(getattr(settings, "IK_ORGO_TOKEN", "") or "").strip()
     timeout = float(getattr(settings, "IK_HTTP_TIMEOUT_SECONDS", 10.0) or 10.0)
-    if not url:
+    if not configured_url:
         return DeliveryResult(False, False, "IK_TARGET_NOT_CONFIGURED", "IK_ORGO_INTERACTIONS_URL is empty", {})
+    if not url:
+        return DeliveryResult(False, False, "IK_TARGET_INVALID", "IK_ORGO_INTERACTIONS_URL must be HTTPS (HTTP is allowed only for localhost in DEBUG)", {})
     if not token:
         return DeliveryResult(False, False, "IK_TARGET_NOT_CONFIGURED", "IK_ORGO_TOKEN is empty", {})
 

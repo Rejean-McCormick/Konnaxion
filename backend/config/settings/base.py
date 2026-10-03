@@ -304,7 +304,7 @@ if USE_TZ:
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-broker_url
 CELERY_BROKER_URL = REDIS_URL
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#redis-backend-use-ssl
-CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE} if REDIS_SSL else None
+CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_REQUIRED} if REDIS_SSL else None
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-result_backend
 CELERY_RESULT_BACKEND = REDIS_URL
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#redis-backend-use-ssl
@@ -344,6 +344,10 @@ ACCOUNT_LOGIN_METHODS = {"username"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+# MFA secrets/recovery material should be treated as one-time security data.
+MFA_RECOVERY_CODES_SHOW_ONCE = True
+MFA_TRUST_ENABLED = False
+MFA_TOTP_ISSUER = "Konnaxion"
 
 # Do NOT auto-redirect authenticated users away from login/signup pages
 ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = False
