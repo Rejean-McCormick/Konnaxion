@@ -45,7 +45,10 @@ CREATE INDEX IF NOT EXISTS idx_ledger_vote ON {SCHEMA}.vote_ledger (vote_id);
 
 def create_parent_tables(apps, schema_editor):
     with schema_editor.connection.cursor() as cur:
-        cur.execute(f"SET search_path TO {SCHEMA}, public;")
+        # Keep the dedicated Smart Vote schema scoped to this migration
+        # transaction only. A session-level SET leaks into subsequent app
+        # migrations and can create unrelated Konnaxion tables outside public.
+        cur.execute(f"SET LOCAL search_path TO {SCHEMA}, public;")
         cur.execute(DDL)
 
 def make_current_month_partitions(apps, schema_editor):
