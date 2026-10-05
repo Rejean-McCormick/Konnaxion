@@ -109,7 +109,7 @@ jobs:
 
       - name: Backend tests
         working-directory: backend
-        run: python -m pytest -q --maxfail=1
+        run: python -m pytest -q --maxfail=1 --create-db
 
   frontend:
     name: Frontend fast
