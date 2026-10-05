@@ -1,10 +1,14 @@
 version: 2
 
+# Deliberately quiet for a solo, AI-assisted development loop.
+# Version updates stay small; no auto-merge is configured.
 updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+      day: monday
+    open-pull-requests-limit: 1
     groups:
       github-actions:
         patterns:
@@ -14,21 +18,15 @@ updates:
     directory: /backend
     schedule:
       interval: weekly
-    groups:
-      backend-python:
-        update-types:
-          - minor
-          - patch
+      day: monday
+    open-pull-requests-limit: 2
 
   - package-ecosystem: npm
     directory: /frontend
     schedule:
       interval: weekly
-    groups:
-      frontend-js:
-        update-types:
-          - minor
-          - patch
+      day: monday
+    open-pull-requests-limit: 2
 
   - package-ecosystem: docker
     directories:
@@ -39,4 +37,5 @@ updates:
       - /backend/compose/production/traefik
       - /backend/compose/production/nginx
     schedule:
-      interval: weekly
+      interval: monthly
+    open-pull-requests-limit: 1

@@ -184,3 +184,14 @@ _konnaxion_i18n_backups/
 
 # Local KonnaxionDiag evidence (may contain environment/topology metadata)
 .konnaxiondiag/
+
+# Local safety backups created by engineering overlay packs
+.konnaxion-overlay-backups/
+
+# Additional test/cache patterns
+.pytest-tmp/
+.coverage
+.coverage.*
+.uv-cache/
+*.temp
+*.bak.*

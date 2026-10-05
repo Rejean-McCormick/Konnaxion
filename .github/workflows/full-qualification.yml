@@ -1,4 +1,4 @@
-name: Konnaxion Full Local Qualification
+name: Konnaxion Deep Qualification
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: konnaxion-full-local-${{ github.ref }}
+  group: konnaxion-deep-${{ github.ref }}
   cancel-in-progress: false
 
 env:
@@ -168,7 +168,7 @@ jobs:
         with:
           name: kdiag-full-local-${{ github.sha }}
           if-no-files-found: warn
-          retention-days: 30
+          retention-days: 14
           path: |
             Konnaxion/.konnaxiondiag/current/
             Konnaxion/frontend/artifacts/

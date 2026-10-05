@@ -3,35 +3,35 @@ name: Konnaxion CI
 on:
   pull_request:
     branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - "cinematic/**"
   push:
     branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - "cinematic/**"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: konnaxion-ci-${{ github.workflow }}-${{ github.ref }}
+  group: konnaxion-ci-${{ github.ref }}
   cancel-in-progress: true
 
 env:
   PYTHON_VERSION: "3.12"
   NODE_VERSION: "20"
   PNPM_VERSION: "10.20.0"
-
-  # Companion repositories are intentionally pinned.
-  # Update these only as an explicit dependency change.
-  KONNAXION_WORLDS_REF: "ab2bea2a915a529c30fd69fb45386e1842861836"
-  KONNAXION_CAPSULE_MANAGER_REF: "790fb20ba041cf9ed7ed31f10be96ee2284c43a7"
-  KONNAXION_DIAG_REF: "97510540c14d69f7aedbb7e9c18eff3ce083250a"
-
   DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/konnaxion
   REDIS_URL: redis://127.0.0.1:6379/0
   DJANGO_SETTINGS_MODULE: config.settings.test
   DJANGO_SECRET_KEY: ci-ephemeral-only-not-a-production-secret
   USE_DOCKER: "no"
   COMMON_OIDC_ENABLED: "false"
-
   NEXT_PUBLIC_API_BASE: /api
   API_PROXY_BASE: http://127.0.0.1:8000/api
   BACKEND_BASE_URL: http://127.0.0.1:8000
@@ -39,161 +39,10 @@ env:
   CI: "1"
 
 jobs:
-  diag-integrity:
-    name: KonnaxionDiag self-test
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-
-    steps:
-      - name: Checkout KonnaxionDiag
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          repository: Rejean-McCormick/KonnaxionDiag
-          ref: ${{ env.KONNAXION_DIAG_REF }}
-          path: KonnaxionDiag
-          persist-credentials: false
-
-      - name: Setup Python
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Install diagnostic test dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -e "KonnaxionDiag[test,signing]"
-
-      - name: Test KonnaxionDiag before trusting it
-        run: python -m pytest KonnaxionDiag/tests -q
-
-  precommit:
-    name: KDiag precommit gate
-    needs: diag-integrity
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
-
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: konnaxion
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d konnaxion"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 20
-
-      redis:
-        image: redis:7
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 20
-
-    steps:
-      - name: Checkout Konnaxion event commit
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          path: Konnaxion
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Checkout pinned Konnaxion Worlds
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          repository: Rejean-McCormick/Konnaxion_Worlds
-          ref: ${{ env.KONNAXION_WORLDS_REF }}
-          path: Konnaxion_Worlds
-          persist-credentials: false
-
-      - name: Checkout pinned Capsule Manager
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          repository: Rejean-McCormick/Konnaxion_Capsule_Manager
-          ref: ${{ env.KONNAXION_CAPSULE_MANAGER_REF }}
-          path: Konnaxion_Capsule_Manager
-          persist-credentials: false
-
-      - name: Checkout pinned KonnaxionDiag
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          repository: Rejean-McCormick/KonnaxionDiag
-          ref: ${{ env.KONNAXION_DIAG_REF }}
-          path: KonnaxionDiag
-          persist-credentials: false
-
-      - name: Setup Python
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Activate pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@${PNPM_VERSION} --activate
-          pnpm --version
-
-      - name: Install backend and Worlds dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r Konnaxion/backend/requirements/local.txt
-          python -m pip install -e Konnaxion_Worlds/backend
-          python -m pip install -e "KonnaxionDiag[signing]"
-
-      - name: Install frontend dependencies from lockfile
-        working-directory: Konnaxion/frontend
-        run: pnpm install --frozen-lockfile
-
-      - name: Verify pinned Worlds source tree
-        run: python Konnaxion/scripts/check_worlds_dependency.py Konnaxion_Worlds
-
-      - name: Record exact component revisions
-        run: |
-          mkdir -p ci-metadata
-          {
-            echo "Konnaxion=$(git -C Konnaxion rev-parse HEAD)"
-            echo "Konnaxion_Worlds=$(git -C Konnaxion_Worlds rev-parse HEAD)"
-            echo "Konnaxion_Capsule_Manager=$(git -C Konnaxion_Capsule_Manager rev-parse HEAD)"
-            echo "KonnaxionDiag=$(git -C KonnaxionDiag rev-parse HEAD)"
-            echo "runner=${{ runner.os }}/${{ runner.arch }}"
-            python --version
-            node --version
-            pnpm --version
-          } | tee ci-metadata/components.txt
-
-      - name: Run KonnaxionDiag precommit campaign
-        run: >-
-          python KonnaxionDiag/kdiag.py run precommit
-          --target "$GITHUB_WORKSPACE/Konnaxion"
-
-      - name: Upload precommit evidence
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: kdiag-precommit-${{ github.sha }}
-          if-no-files-found: warn
-          retention-days: 30
-          path: |
-            Konnaxion/.konnaxiondiag/current/
-            ci-metadata/components.txt
-
   backend:
-    name: KDiag backend gate
-    needs: diag-integrity
+    name: Backend fast
     runs-on: ubuntu-24.04
-    timeout-minutes: 40
+    timeout-minutes: 25
 
     services:
       postgres:
@@ -221,41 +70,44 @@ jobs:
           --health-retries 20
 
     steps:
-      - name: Checkout Konnaxion event commit
+      - name: Checkout Konnaxion
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          path: Konnaxion
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Checkout pinned Konnaxion Worlds
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          repository: Rejean-McCormick/Konnaxion_Worlds
-          ref: ${{ env.KONNAXION_WORLDS_REF }}
-          path: Konnaxion_Worlds
-          persist-credentials: false
-
-      - name: Checkout pinned Capsule Manager
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          repository: Rejean-McCormick/Konnaxion_Capsule_Manager
-          ref: ${{ env.KONNAXION_CAPSULE_MANAGER_REF }}
-          path: Konnaxion_Capsule_Manager
-          persist-credentials: false
-
-      - name: Checkout pinned KonnaxionDiag
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          repository: Rejean-McCormick/KonnaxionDiag
-          ref: ${{ env.KONNAXION_DIAG_REF }}
-          path: KonnaxionDiag
           persist-credentials: false
 
       - name: Setup Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements/base.txt
+            backend/requirements/local.txt
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements/local.txt
+
+      - name: Django system check
+        working-directory: backend
+        run: python manage.py check
+
+      - name: Backend tests
+        working-directory: backend
+        run: python -m pytest -q --maxfail=1
+
+  frontend:
+    name: Frontend fast
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout Konnaxion
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -268,46 +120,18 @@ jobs:
           corepack prepare pnpm@${PNPM_VERSION} --activate
           pnpm --version
 
-      - name: Install backend and Worlds dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r Konnaxion/backend/requirements/local.txt
-          python -m pip install -e Konnaxion_Worlds/backend
-          python -m pip install -e "KonnaxionDiag[signing]"
-
       - name: Install frontend dependencies from lockfile
-        working-directory: Konnaxion/frontend
+        working-directory: frontend
         run: pnpm install --frozen-lockfile
 
-      - name: Verify pinned Worlds source tree
-        run: python Konnaxion/scripts/check_worlds_dependency.py Konnaxion_Worlds
+      - name: Typecheck
+        working-directory: frontend
+        run: pnpm typecheck
 
-      - name: Record exact component revisions
-        run: |
-          mkdir -p ci-metadata
-          {
-            echo "Konnaxion=$(git -C Konnaxion rev-parse HEAD)"
-            echo "Konnaxion_Worlds=$(git -C Konnaxion_Worlds rev-parse HEAD)"
-            echo "Konnaxion_Capsule_Manager=$(git -C Konnaxion_Capsule_Manager rev-parse HEAD)"
-            echo "KonnaxionDiag=$(git -C KonnaxionDiag rev-parse HEAD)"
-            echo "runner=${{ runner.os }}/${{ runner.arch }}"
-            python --version
-            node --version
-            pnpm --version
-          } | tee ci-metadata/components.txt
+      - name: Unit tests
+        working-directory: frontend
+        run: pnpm test -- --runInBand
 
-      - name: Run KonnaxionDiag backend campaign
-        run: >-
-          python KonnaxionDiag/kdiag.py run backend
-          --target "$GITHUB_WORKSPACE/Konnaxion"
-
-      - name: Upload backend evidence
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: kdiag-backend-${{ github.sha }}
-          if-no-files-found: warn
-          retention-days: 30
-          path: |
-            Konnaxion/.konnaxiondiag/current/
-            ci-metadata/components.txt
+      - name: Production build
+        working-directory: frontend
+        run: pnpm build
