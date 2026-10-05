@@ -19,7 +19,7 @@ django-model-utils==5.0.0  # https://github.com/jazzband/django-model-utils
 django-allauth[mfa,socialaccount]==65.19.7  # security/rate-limit/MFA fixes # https://github.com/pennersr/django-allauth
 django-crispy-forms==2.4  # https://github.com/django-crispy-forms/django-crispy-forms
 crispy-bootstrap5==2025.4  # https://github.com/django-crispy-forms/crispy-bootstrap5
-django-redis==5.4.0  # https://github.com/jazzband/django-redis
+django-redis==7.0.0  # https://github.com/jazzband/django-redis
 
 # Django REST Framework
 # ------------------------------------------------------------------------------
