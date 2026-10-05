@@ -15,7 +15,7 @@ worlds:
   seed_version: 0.3.0
   title: Cuba 2026 — Koali Offline
   description: ''
-  visibility: private
+  visibility: public
 relations: []
 subscriptions: []
 metadata:
