@@ -2,11 +2,11 @@
 
 Local Konnaxion settings deliberately remove PostgreSQL startup ``search_path``
 options because some pooled Postgres providers reject them. EkoH and Smart Vote
-nevertheless have legacy tables in the ``ekoh_smartvote`` schema.
+use the canonical ``ekoh_smartvote`` schema for EkoH and Smart Vote data.
 
 When a Konnaxion World runtime is active, these helpers MUST preserve the
-release-local auxiliary/domain search path. Falling back to the legacy global
-schema from inside a World request/import would leak cross-World data.
+release-local auxiliary/domain search path. Falling back to the global
+EkoH schema from inside a World request/import would leak cross-World data.
 """
 
 from __future__ import annotations
@@ -43,7 +43,7 @@ def set_local_ekoh_smartvote_search_path() -> None:
 
 @contextmanager
 def ekoh_smartvote_db_scope():
-    """Run ORM work in World-local scope when present, legacy scope otherwise."""
+    """Run ORM work in World-local scope when present, canonical EkoH scope otherwise."""
     with transaction.atomic():
         set_local_ekoh_smartvote_search_path()
         yield

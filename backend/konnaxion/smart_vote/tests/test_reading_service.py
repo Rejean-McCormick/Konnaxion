@@ -6,7 +6,6 @@ from django.contrib.auth import get_user_model
 from konnaxion.ekoh.db import ekoh_smartvote_db_scope
 from konnaxion.ekoh.models.access import RatingVisibilitySetting
 from konnaxion.ekoh.models.scores import UserEthicsScore, UserExpertiseScore
-from konnaxion.ekoh.models.taxonomy import ExpertiseCategory
 from konnaxion.ethikos.models import EthikosCategory, EthikosStance, EthikosTopic
 from konnaxion.smart_vote.models import (
     Consultation,
@@ -19,7 +18,7 @@ pytestmark = pytest.mark.django_db
 User = get_user_model()
 
 
-def test_ethikos_topic_reading_keeps_baseline_and_adds_expertise_lens():
+def test_ethikos_topic_reading_keeps_baseline_and_adds_expertise_lens(isced_profile):
     expert = User.objects.create_user(username="expert")
     citizen = User.objects.create_user(username="citizen")
     category = EthikosCategory.objects.create(name="Economy", description="")
@@ -34,12 +33,7 @@ def test_ethikos_topic_reading_keeps_baseline_and_adds_expertise_lens():
     EthikosStance.objects.create(topic=topic, user=citizen, value=-3)
 
     with ekoh_smartvote_db_scope():
-        domain = ExpertiseCategory.objects.create(
-            code="0311",
-            name="Economics",
-            depth=0,
-            path="0311",
-        )
+        domain = isced_profile["0311"]
         UserExpertiseScore.objects.create(
             user=expert,
             category=domain,
@@ -73,7 +67,7 @@ def test_ethikos_topic_reading_keeps_baseline_and_adds_expertise_lens():
     assert reading["snapshot_ref"].startswith("ekoh_snapshot:")
 
 
-def test_declared_recusal_keeps_baseline_but_excludes_advisory_weight():
+def test_declared_recusal_keeps_baseline_but_excludes_advisory_weight(isced_profile):
     expert = User.objects.create_user(username="recused_expert")
     citizen = User.objects.create_user(username="included_citizen")
     category = EthikosCategory.objects.create(name="Policy", description="")
@@ -88,12 +82,7 @@ def test_declared_recusal_keeps_baseline_but_excludes_advisory_weight():
     EthikosStance.objects.create(topic=topic, user=citizen, value=-1)
 
     with ekoh_smartvote_db_scope():
-        domain = ExpertiseCategory.objects.create(
-            code="0312",
-            name="Political sciences and civics",
-            depth=0,
-            path="0312",
-        )
+        domain = isced_profile["0312"]
         UserExpertiseScore.objects.create(
             user=expert,
             category=domain,
@@ -151,7 +140,7 @@ def test_declared_recusal_keeps_baseline_but_excludes_advisory_weight():
     assert participants[citizen.pk]["included_in_advisory"] is True
 
 
-def test_participant_breakdown_respects_ekoh_rating_disclosure():
+def test_participant_breakdown_respects_ekoh_rating_disclosure(isced_profile):
     hidden = User.objects.create_user(username="hidden_expert")
     visible = User.objects.create_user(username="visible_citizen")
     viewer = User.objects.create_user(username="viewer")
@@ -167,9 +156,7 @@ def test_participant_breakdown_respects_ekoh_rating_disclosure():
     EthikosStance.objects.create(topic=topic, user=visible, value=-1)
 
     with ekoh_smartvote_db_scope():
-        domain = ExpertiseCategory.objects.create(
-            code="0613", name="Software", depth=0, path="0613"
-        )
+        domain = isced_profile["0613"]
         for user, score in ((hidden, "1.0"), (visible, "0.5")):
             UserExpertiseScore.objects.create(
                 user=user, category=domain, raw_score=Decimal(score), weighted_score=Decimal(score)

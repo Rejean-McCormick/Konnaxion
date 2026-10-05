@@ -13,7 +13,6 @@ from konnaxion.ekoh.models.access import (
     RatingVisibilitySetting,
 )
 from konnaxion.ekoh.models.scores import UserEthicsScore, UserExpertiseScore
-from konnaxion.ekoh.models.taxonomy import ExpertiseCategory
 from konnaxion.ekoh.services.rating_access import resolve_rating_access
 
 User = get_user_model()
@@ -132,12 +131,12 @@ def test_private_policy_does_not_accept_scope_grant(org_graph):
 
 
 @pytest.mark.django_db
-def test_profile_payload_redacts_scores_without_access(api_client):
+def test_profile_payload_redacts_scores_without_access(api_client, isced_profile):
     viewer = User.objects.create(username="viewer")
     subject = User.objects.create(username="scoped_subject", name="Scoped Subject")
     with ekoh_smartvote_db_scope():
         RatingVisibilitySetting.objects.create(user=subject, visibility="scoped")
-        category = ExpertiseCategory.objects.create(code="0613", name="Software", depth=0, path="0613")
+        category = isced_profile["0613"]
         UserExpertiseScore.objects.create(
             user=subject,
             category=category,
@@ -156,7 +155,7 @@ def test_profile_payload_redacts_scores_without_access(api_client):
 
 
 @pytest.mark.django_db
-def test_profile_payload_exposes_public_scores(api_client):
+def test_profile_payload_exposes_public_scores(api_client, isced_profile):
     subject = User.objects.create(username="public_subject", name="Public Subject")
     with ekoh_smartvote_db_scope():
         RatingVisibilitySetting.objects.create(
@@ -164,7 +163,7 @@ def test_profile_payload_exposes_public_scores(api_client):
             visibility="public",
             publication_basis="Public accountability",
         )
-        category = ExpertiseCategory.objects.create(code="0312", name="Politics", depth=0, path="0312")
+        category = isced_profile["0312"]
         UserExpertiseScore.objects.create(
             user=subject,
             category=category,
