@@ -126,7 +126,7 @@
     "@vercel/otel": "^1.14.0",
     "all-contributors-cli": "^6.26.1",
     "autoprefixer": "^10.4.21",
-    "cross-env": "^7.0.3",
+    "cross-env": "^10.1.0",
     "eslint": "^9.26.0",
     "eslint-config-next": "15.5.24",
     "eslint-config-prettier": "^10.1.2",
