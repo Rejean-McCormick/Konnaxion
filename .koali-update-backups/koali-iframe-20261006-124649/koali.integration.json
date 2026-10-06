@@ -60,8 +60,7 @@
         "NEXT_PUBLIC_API_BASE": "http://127.0.0.1:${apiPort}/api",
         "NEXT_PUBLIC_BACKEND_BASE": "http://127.0.0.1:${apiPort}",
         "NEXT_PUBLIC_KONNAXION_API_ORIGIN": "http://127.0.0.1:${apiPort}",
-        "API_PROXY_BASE": "http://127.0.0.1:${apiPort}/api",
-        "KOALI_EMBED_ORIGIN": "http://127.0.0.1:4173"
+        "API_PROXY_BASE": "http://127.0.0.1:${apiPort}/api"
       },
       "probeId": "web"
     }

@@ -1,5 +1,5 @@
-param(
-    [int]$Port = 8301
+﻿param(
+    [int]$Port = 8302
 )
 
 $ErrorActionPreference = 'Stop'
@@ -38,8 +38,54 @@ if ($LASTEXITCODE -ne 0) {
     if ($LASTEXITCODE -ne 0) { throw 'Konnaxion dependency installation failed.' }
 }
 
+$worldsRepo = Join-Path (Split-Path -Parent $repo) 'Konnaxion_Worlds'
+$worldsBackend = Join-Path $worldsRepo 'backend'
+$worldsPyproject = Join-Path $worldsBackend 'pyproject.toml'
+$worldsChecker = Join-Path $repo 'scripts\check_worlds_dependency.py'
+$worldsLock = Join-Path $repo 'WORLD_ENGINE.lock.json'
+if (-not (Test-Path $worldsPyproject)) {
+    throw "Konnaxion_Worlds sibling repository missing: $worldsPyproject"
+}
+Write-Host '[Konnaxion/Koali] Verifying pinned Konnaxion_Worlds identity...'
+& $venvPython $worldsChecker $worldsRepo
+if ($LASTEXITCODE -ne 0) { throw 'Konnaxion_Worlds version/digest does not match WORLD_ENGINE.lock.json.' }
+
+$worldsInstalled = $false
+try {
+    & $venvPython -c 'import json, importlib.metadata, pathlib, sys; lock=json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")); assert importlib.metadata.version(lock["distribution"]) == lock["version"]; import konnaxion.worlds' $worldsLock 2>$null
+    $worldsInstalled = ($LASTEXITCODE -eq 0)
+} catch { $worldsInstalled = $false }
+if (-not $worldsInstalled) {
+    Write-Host '[Konnaxion/Koali] Installing canonical Konnaxion_Worlds engine into backend .venv...'
+    if ($uv) {
+        & $uv pip install --python $venvPython -e $worldsBackend
+    } else {
+        & $venvPython -m pip install -e $worldsBackend
+    }
+    if ($LASTEXITCODE -ne 0) { throw 'Konnaxion_Worlds package install failed.' }
+}
+
+$worldSeedRoot = Join-Path $worldsRepo 'seed-data\worlds'
+$universeSeedRoot = Join-Path $worldsRepo 'seed-data\universes'
+$universeManifest = Join-Path $universeSeedRoot 'konvergence-koali\universe.yaml'
+if (-not (Test-Path $worldSeedRoot)) {
+    throw "Konnaxion World seed root missing: $worldSeedRoot"
+}
+if (-not (Test-Path $universeManifest)) {
+    throw "Konvergence Koali Universe Pack missing: $universeManifest"
+}
+
 $env:DJANGO_SETTINGS_MODULE = 'config.settings.local'
+$env:KONNAXION_WORLDS_DATA_PLANE_ENABLED = 'true'
+$env:KONNAXION_WORLDS_ENFORCE_SCOPED_API = 'true'
+$env:KONNAXION_WORLD_SEED_ROOT = $worldSeedRoot
+$env:KONNAXION_UNIVERSE_SEED_ROOT = $universeSeedRoot
+$env:KONNAXION_WORLD_BUILD_CONCURRENCY = '2'
+
+Write-Host "[Konnaxion/Koali] World seeds: $worldSeedRoot"
+Write-Host "[Konnaxion/Koali] Universe seeds: $universeSeedRoot"
 Write-Host '[Konnaxion/Koali] Applying migrations...'
+
 & $venvPython manage.py migrate --noinput
 if ($LASTEXITCODE -ne 0) { throw 'Konnaxion migrations failed.' }
 
