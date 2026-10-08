@@ -4,14 +4,6 @@ from __future__ import annotations
 
 import json
 import os
-import sys
-from pathlib import Path
-
-# KOALI_KONNAXION_BACKEND_PATH_V1
-BACKEND = Path(__file__).resolve().parents[1] / "backend"
-if str(BACKEND) not in sys.path:
-    sys.path.insert(0, str(BACKEND))
-os.chdir(BACKEND)
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 
