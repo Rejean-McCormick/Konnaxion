@@ -1,0 +1,6 @@
+{
+  "FAKEPLANT_LIRE_MOI.md": "64a58aabbd614d71b1dc503ae60e33349301961a5514373703e21f83a0473093",
+  "FAKEPLANT_TEST.cmd": "be0f7a1cc39bcc52bd286f73e4397a4e9ef04f227ad31a2bdc3a083307a695d4",
+  "backend/konnaxion/ethikos/management/commands/fakeplant_people.py": "63213c18305d8245a2815c7acc290426be5ccbe36df73969d31e5a6c1533e2d9",
+  "tools/fakeplant/sync_from_worlds.py": "d07377c0518905942b942937577297f31f85a02efd436c8e74aa27f18a5308ac"
+}
