@@ -8,11 +8,82 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from collections import defaultdict
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-from konnaxion.worlds.models import Universe, UniverseMembership, World, WorldMembership
+from konnaxion.worlds.models import Universe, UniverseMembership, World, WorldMembership, WorldPersonaBridge
+
+
+def _validate_release_local_collision(user, person, bridges, universe_id, allowed_world_keys, username_max_length):
+    """Allow ONLY an existing non-login bridge of a FakePlant World release.
+
+    A release-local bridge is a separate technical User; it must NOT be renamed,
+    merged with the canonical account, or stripped of its email. An email match
+    alone is never sufficient to identify the same principal.
+    """
+    if not (user.is_klone and user.account_type == 'human'
+                and not user.is_staff and not user.is_superuser
+                and not user.can_interactive_login
+                and not user.has_usable_password()):
+        return 'existing account is not a protected non-login synthetic persona'
+    if user.email != person['email']:
+        return 'email does not match the fixture identity exactly'
+    if len(bridges) != 1:
+        return f'expected one release bridge, found {len(bridges)}'
+    bridge = bridges[0]
+    world = bridge.persona.world
+    release = bridge.release
+    if (world.universe_id != universe_id or world.key not in allowed_world_keys
+            or bridge.persona.world_id != world.pk or release.world_id != world.pk):
+        return 'bridge belongs outside FakePlant or has an inconsistent World/release'
+    requested = (bridge.metadata_json or {}).get('requested_username')
+    if requested and requested != person['username']:
+        return 'bridge metadata points to another persona username'
+
+    # Must match the exact algorithm in Konnaxion_Worlds/services/personas.py.
+    prefix = f'w{world.pk}r{release.pk}__'
+    digest = hashlib.sha256(
+        f"{bridge.persona.source_key}\0{person['username']}".encode('utf-8')
+    ).hexdigest()[:10]
+    suffix = f'__{digest}'
+    room = max(1, username_max_length - len(prefix) - len(suffix))
+    expected_username = f"{prefix}{person['username'][:room]}{suffix}"
+    if user.username != expected_username:
+        return 'username is not the deterministic World/release bridge username'
+    return None
+
+
+def _scan_email_collisions(User, people, usernames, universe, allowed_world_keys):
+    """Inspect existing emails; no queries write anything. Fail closed."""
+    by_email = {p['email']: p for p in people}
+    collisions = list(User.objects.filter(email__in=by_email).exclude(username__in=usernames))
+    if not collisions:
+        return 0, []
+    bridges_by_user = defaultdict(list)
+    bridge_rows = (WorldPersonaBridge.objects
+                   .filter(bridge_user_id__in=[u.pk for u in collisions])
+                   .select_related('persona__world', 'release'))
+    for bridge in bridge_rows:
+        bridges_by_user[bridge.bridge_user_id].append(bridge)
+    max_length = int(User._meta.get_field('username').max_length or 150)
+    refused = []
+    allowed = 0
+    for user in collisions:
+        person = by_email.get(user.email)
+        if universe is None or person is None:
+            reason = 'Universe absent or email absent from canonical fixture'
+        else:
+            reason = _validate_release_local_collision(
+                user, person, bridges_by_user.get(user.pk, []),
+                universe.pk, allowed_world_keys, max_length
+            )
+        if reason is None:
+            allowed += 1
+        else:
+            refused.append((user.username, reason))
+    return allowed, refused
 
 
 class Command(BaseCommand):
@@ -23,9 +94,9 @@ class Command(BaseCommand):
         parser.add_argument('--confirm-fakeplant', action='store_true', help='Required with --apply')
 
     def handle(self, *args, **options):
-        root = Path(settings.BASE_DIR).parent.parent / 'Konnaxion_Worlds' / 'fakeplant' / 'fixture'
+        root = Path(settings.BASE_DIR).parent.parent / 'Konnaxion_Worlds' / 'universes' / 'fakeplant' / 'fixture'
         if not root.is_dir():
-            raise CommandError('Konnaxion_Worlds/fakeplant/fixture introuvable; placer les dépôts côte à côte')
+            raise CommandError('Fixture canonique introuvable : Konnaxion_Worlds/universes/fakeplant/fixture')
         try:
             manifest = json.loads((root / 'MANIFEST.json').read_text(encoding='utf-8'))
             data = {}
@@ -61,13 +132,106 @@ class Command(BaseCommand):
                 raise ValueError('Duplicate memberships')
         except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
             raise CommandError(f'FakePlant seed invalid: {exc}') from exc
-        self.stdout.write(f'FAKEPLANT PREVIEW: {len(people)} synthetic people, {len(memberships)} memberships, 6 Worlds')
-        if not options['apply']:
-            self.stdout.write('Read-only. To write: --apply --confirm-fakeplant (after Worlds build).')
-            return
-        if not options['confirm_fakeplant']:
+        self.stdout.write(f'FAKEPLANT FIXTURE OK: {len(people)} synthetic people, {len(memberships)} memberships, 6 Worlds')
+        if options['apply'] and not options['confirm_fakeplant']:
             raise CommandError('Explicit --confirm-fakeplant required')
+
+        # Read-only preflight on the *active Django database* before any write.
+        # This is deliberately separate from the fixture's checksum validation.
         User = get_user_model()
+        usernames = [p['username'] for p in people]
+        emails = [p['email'] for p in people]
+        universe = Universe.objects.filter(key='fakeplant').first()
+        blockers = []
+        if universe is None:
+            blockers.append('Universe fakeplant absent dans la base Konnaxion')
+        elif universe.status != 'active':
+            blockers.append(f'Universe fakeplant non actif : {universe.status}')
+        world_map_preview = {}
+        for world_info in org['worlds']:
+            key = 'fp-' + world_info['key']
+            if universe is None:
+                continue
+            world = World.objects.filter(key=key, universe=universe).first()
+            if world is None:
+                blockers.append(f'World absent : {key}')
+            elif world.status != 'active' or not world.current_release_id:
+                blockers.append(f'World non actif ou sans release promue : {key}')
+            else:
+                world_map_preview[key] = world
+
+        found_preview = {u.username: u for u in User.objects.filter(username__in=usernames)}
+        for person in people:
+            user = found_preview.get(person['username'])
+            if user is not None and not (
+                user.is_klone and user.account_type == 'human'
+                and not user.is_staff and not user.is_superuser
+                and user.email == person['email']
+                and not user.has_usable_password()
+                and not user.can_interactive_login
+            ):
+                blockers.append(f'Collision de compte : {person["username"]}')
+        allowed_bridge_emails, rejected_email_collisions = _scan_email_collisions(
+            User, people, usernames, universe, {'fp-' + w['key'] for w in org['worlds']}
+        )
+        self.stdout.write(
+            f'COURRIELS FAKEPLANT : {allowed_bridge_emails} clones techniques de release '
+            f'verifies, {len(rejected_email_collisions)} collisions non autorisees.'
+        )
+        if rejected_email_collisions:
+            blockers.append(f'Collisions de courriels non autorisees : {len(rejected_email_collisions)}')
+            for name, reason in rejected_email_collisions[:5]:
+                blockers.append(f'{name} : {reason}')
+
+        um_count = 0
+        wm_count = 0
+        if universe is not None:
+            universe_memberships = UniverseMembership.objects.filter(
+                universe=universe, user__username__in=usernames
+            ).select_related('user')
+            um_count = universe_memberships.count()
+            for member in universe_memberships:
+                if member.role != 'member' or not member.is_active:
+                    blockers.append(f'Adhesion Universe divergente : {member.user.username}')
+            if world_map_preview:
+                expected_roles = {
+                    (people_by_id[relation['person_id']]['username'],
+                     'fp-' + relation['world_key']): relation['role']
+                    for relation in memberships
+                }
+                world_memberships = WorldMembership.objects.filter(
+                    world__in=list(world_map_preview.values()),
+                    user__username__in=usernames
+                ).select_related('user', 'world')
+                wm_count = world_memberships.count()
+                for member in world_memberships:
+                    role = expected_roles.get((member.user.username, member.world.key))
+                    if role is None or member.role != role or not member.is_active:
+                        blockers.append(
+                            f'Adhesion World divergente : {member.user.username}/{member.world.key}'
+                        )
+
+        self.stdout.write(
+            f'BASE KONNAXION (lecture seule) : '
+            f'{len(found_preview)}/900 comptes existants, '
+            f'{um_count} adhesions Universe, '
+            f'{wm_count} adhesions World; '
+            f'{len(world_map_preview)}/6 Worlds actifs avec release.'
+        )
+        self.stdout.write(
+            'Personas Konnaxion : is_klone=True, mot de passe inutilisable; '
+            'connexion interactive interdite par la politique applicative.'
+        )
+        if blockers:
+            for error in blockers[:20]:
+                self.stderr.write(f'[BLOQUE] {error}')
+            if len(blockers) > 20:
+                self.stderr.write(f'[BLOQUE] +{len(blockers)-20} autres problemes')
+            raise CommandError('Preflight FakePlant refuse; aucune ecriture de cet importeur')
+        if not options['apply']:
+            self.stdout.write('[OK] PREVIEW EN LECTURE SEULE. Aucun compte cree.')
+            self.stdout.write('Pour importer : sauvegarde Neon puis lanceur confirme seulement.')
+            return
         with transaction.atomic():
             universe = Universe.objects.select_for_update().filter(key='fakeplant').first()
             if not universe or universe.status != 'active':
@@ -88,8 +252,19 @@ class Command(BaseCommand):
                 u = found.get(person['username'])
                 if u and not (u.is_klone and u.account_type=='human' and not u.is_staff
                               and not u.is_superuser and u.email == person['email']
-                              and not u.has_usable_password()):
+                              and not u.has_usable_password()
+                              and not u.can_interactive_login):
                     raise CommandError(f'User collision: {person["username"]}')
+            # Recheck ALL foreign email overlaps in the write transaction,
+            # not only at preview, before inserting any user or membership.
+            allowed_again, refused_again = _scan_email_collisions(
+                User, people, usernames, universe, {'fp-' + w['key'] for w in org['worlds']}
+            )
+            if refused_again:
+                raise CommandError(
+                    f'Import refused: {len(refused_again)} unexpected email collisions '
+                    '(changed since preflight or not verified World/release bridges)'
+                )
             for p in people:
                 u = found.get(p['username'])
                 if u is None:
