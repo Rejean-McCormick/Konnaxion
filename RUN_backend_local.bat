@@ -56,10 +56,33 @@ if errorlevel 1 (
   exit /b 1
 )
 
+REM KX_NESTED_UNIVERSES_V3
+REM One Universe directory contains its Worlds, no seed-data sibling layout.
+set "KONNAXION_WORLD_SEED_ROOT=%~dp0..\Konnaxion_Worlds\universes"
+set "KONNAXION_UNIVERSE_SEED_ROOT=%~dp0..\Konnaxion_Worlds\universes"
+if not exist "%KONNAXION_UNIVERSE_SEED_ROOT%\fakeplant\universe.yaml" (
+  echo [ERROR] Canonical nested Universe catalog not found.
+  pause
+  exit /b 1
+)
+
 echo [INFO] Applying migrations...
 ".venv\Scripts\python.exe" manage.py migrate
 if errorlevel 1 (
   echo [ERROR] Migrations failed.
+  pause
+  exit /b 1
+)
+
+REM KX_NESTED_AUTOLOAD_V3: new keys only; set KX_AUTOLOAD_NEW_UNIVERSES=0 for preview.
+if not defined KX_AUTOLOAD_NEW_UNIVERSES set "KX_AUTOLOAD_NEW_UNIVERSES=1"
+if "%KX_AUTOLOAD_NEW_UNIVERSES%"=="1" (
+  ".venv\Scripts\python.exe" "%~dp0backend\tools\universe_autoload.py" --apply-new
+) else (
+  ".venv\Scripts\python.exe" "%~dp0backend\tools\universe_autoload.py"
+)
+if errorlevel 1 (
+  echo [ERROR] Nested Universe catalog validation/load failed; server not started.
   pause
   exit /b 1
 )

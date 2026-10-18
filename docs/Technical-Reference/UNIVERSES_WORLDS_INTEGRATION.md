@@ -2,7 +2,7 @@
 
 **Status:** canonical Konnaxion host-boundary document  
 **Engine/spec owner:** sibling repository/package `Konnaxion_Worlds`  
-**Current engine lock:** `KX-UNIVERSES-1` over `KX-WORLDS-1`; distribution `konnaxion-worlds==0.3.6` pinned by `WORLD_ENGINE.lock.json`
+**Current engine lock:** `KX-UNIVERSES-1` over `KX-WORLDS-1`; distribution `konnaxion-worlds==0.3.7` pinned by `WORLD_ENGINE.lock.json` (local nested-v3 target; compare runtime lock before launch)
 
 ## Purpose
 
@@ -50,6 +50,41 @@ The main product's `konnaxion` package uses `pkgutil.extend_path` so a separatel
 Local development expects `Konnaxion_Worlds` beside `Konnaxion`; `RUN_backend_local.bat` first verifies the sibling against `WORLD_ENGINE.lock.json` and then installs its `backend` package in editable mode before running Konnaxion migrations/server startup. The lock pins both package version and a deterministic content-tree digest over the canonical backend package.
 
 Production/capsule packaging must apply the same version/digest identity rather than accepting the first structurally valid sibling. The supplied Capsule Manager source was not part of this update, so its ReleaseSet binding remains a separate required handoff task; Konnaxion itself now exposes the exact expected identity in a machine-readable lock.
+
+## Local nested Universe catalogue and startup (v3)
+
+Canonical source for the Windows `uv` development tree:
+
+```text
+../Konnaxion_Worlds/universes/<universe_key>/universe.yaml
+../Konnaxion_Worlds/universes/<universe_key>/worlds/<world_key>/world.yaml
+```
+
+The same parent directory is configured for
+`KONNAXION_UNIVERSE_SEED_ROOT` and `KONNAXION_WORLD_SEED_ROOT` in
+`backend/config/settings/local.py` by `INSTALL_NESTED_UNIVERSES.ps1`.
+The sibling `Konnaxion_Worlds` engine resolves nested World Packs; Konnaxion
+must not reimplement that resolver. The v3 launcher checks its pinned tree
+digest and installs the sibling package before migrations and autoload.
+
+`backend/tools/universe_autoload.py` is a **local host bootstrap adapter**, not
+a second Universe manager. It validates the catalogue before starting the API
+and promotes **only Universe keys absent from the database**. Existing DB keys
+are not refreshed, reset, promoted or changed on startup. It is read-only
+without `--apply-new`; the launcher defaults to loading new keys unless
+`KX_AUTOLOAD_NEW_UNIVERSES=0`. No watcher or live reload of new directories is
+promised while the backend is already running.
+
+The live UI obtains Universes/Worlds through Django control-plane endpoints,
+with authentication, visibility and permissions. A private Universe/World can
+exist and be active in the database without appearing in the anonymous browser
+menu. The Manager lists filesystem packs and installed DB Universes **as
+separate inventories**.
+
+See `UNIVERSES_NESTED_LOCAL_V3.md` for the local operating procedure. The
+older host `backend/seed-data/universes` and `backend/seed-data/worlds` trees
+are migration sources/historical copies, not the nested-v3 runtime authority.
+Production and Capsule Manager migration require separate qualification.
 
 ## Host-domain adapters
 

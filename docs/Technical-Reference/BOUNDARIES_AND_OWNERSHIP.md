@@ -13,6 +13,8 @@ It owns Universe/World/WorldRelease models and migrations, request/task runtime 
 
 Main Konnaxion owns only host integration: route mounting, configured product-domain adapters, navigation/context UI and product tests. It MUST NOT contain a second `backend/konnaxion/worlds/` implementation or a copied `docs/Technical-Reference/Worlds/` specification tree. See `UNIVERSES_WORLDS_INTEGRATION.md`.
 
+For local v3, canonical Universe packs and nested World Packs are owned by `Konnaxion_Worlds/universes/`. Konnaxion may bootstrap **new keys only** during local startup but is not another authoritative pack store; installed records and permissions remain in Django. See `UNIVERSES_NESTED_LOCAL_V3.md`.
+
 This infrastructure ownership does not transfer ethiKos, EkoH, Smart Vote or other product-domain source-state ownership to `Konnaxion_Worlds`.
 
 ## 2. Internal ownership

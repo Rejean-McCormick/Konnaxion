@@ -131,6 +131,50 @@ For local development, keep `Konnaxion_Worlds` beside this repository.
 
 The backend development launcher installs the Worlds package in editable mode before Konnaxion starts.
 
+
+### Canonical Universe directory layout (local v3)
+
+In the local `uv` development setup, the canonical Universe packs live in the sibling
+`Konnaxion_Worlds` repository. Each Universe is one portable directory containing its Worlds:
+
+```text
+C:\mycode\Konnaxion\Konnaxion_Worlds\universes\
+    <universe-key>/
+        universe.yaml
+        worlds/
+            <world-key>/
+                world.yaml
+                scenario.json  # or scenarios/*.json, as declared by the pack
+```
+
+`Konnaxion/backend/seed-data/` contains legacy seed copies; it is **not** the
+canonical Universe/World directory for the v3 local launcher. Source manifest
+discovery differs from installed runtime state: the browser Universe menu is built
+from the database/API with visibility and access permissions, not from a filesystem
+scan. A private Universe can be installed yet invisible to anonymous visitors.
+
+After installing the matching `konnaxion-worlds==0.3.7` source package and host
+v3 overlay, `RUN_backend_local.bat` validates the sibling dependency, runs Django
+migrations, and executes the **new-Universe-only** loader before starting Uvicorn.
+Existing database Universe keys are skipped: edits to an already-installed pack
+are **not** automatically applied. A failed validation prevents server startup.
+For a first audit without database writes:
+
+```powershell
+$env:KX_AUTOLOAD_NEW_UNIVERSES='0'
+.\RUN_backend_local.bat
+```
+
+To inspect the canonical catalogue from `backend` after v3 installation:
+
+```powershell
+uv run --no-sync python tools\universe_autoload.py
+```
+
+**See [Universe layout, load policy and maintenance](docs/Technical-Reference/UNIVERSES_NESTED_LOCAL_V3.md)**
+for exact paths, verification, privacy, backups, and manager responsibilities.
+The v3 local autoload is not an automatic production deployment mechanism.
+
 This separation allows the World engine to evolve as a separately versioned subsystem without silently merging its authority into the Konnaxion host.
 
 ---

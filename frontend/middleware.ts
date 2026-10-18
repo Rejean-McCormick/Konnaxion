@@ -67,7 +67,7 @@ function buildContentSecurityPolicy(nonce: string, embedOrigin: string | null): 
     "base-uri 'self'",
     "form-action 'self'",
     embedOrigin ? `frame-ancestors 'self' ${embedOrigin}` : "frame-ancestors 'none'",
-    "upgrade-insecure-requests",
+    ...(process.env.NODE_ENV === "production" ? ["upgrade-insecure-requests"] : []),
   ].join('; ');
 }
 

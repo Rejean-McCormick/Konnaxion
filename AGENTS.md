@@ -42,7 +42,7 @@ Use active source instead.
 
 `.smartignore` identifies additional content that is normally irrelevant to AI/code-navigation work.
 
-Active `backend/seed-data/` Universe/World packs are executable runtime inputs, not generated inventory. Inspect them when diagnosing seeded World content, release composition, or runtime-data gaps.
+For **v3 local development**, the active canonical Universe and World seed source is the sibling `Konnaxion_Worlds/universes/<universe-key>/` tree (`universe.yaml` and `worlds/<world-key>/`). `backend/seed-data/` may retain historical copies or specialized fixtures, but is not the canonical Universe/World source for v3. Inspect source YAML, the configured Django seed roots, and installed DB Universe/World records separately; the UI lists authorized DB records, not all filesystem packs. See `docs/Technical-Reference/UNIVERSES_NESTED_LOCAL_V3.md`.
 
 Do not modify an archive, dump, generated inventory, or diagnostic artifact to change current application behavior.
 

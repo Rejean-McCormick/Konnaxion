@@ -109,3 +109,10 @@ DATABASES["default"]["OPTIONS"].pop("options", None)
 CSRF_COOKIE_HTTPONLY = False
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
+# KX_NESTED_UNIVERSES_V3
+# Runtime source for local uv and Django commands (independent of launcher).
+# Production configuration is not changed by this installer.
+_KX_UNIVERSE_ROOT_V3 = BASE_DIR.parent.parent / "Konnaxion_Worlds" / "universes"
+if _KX_UNIVERSE_ROOT_V3.is_dir():
+    KONNAXION_WORLD_SEED_ROOT = str(_KX_UNIVERSE_ROOT_V3)
+    KONNAXION_UNIVERSE_SEED_ROOT = str(_KX_UNIVERSE_ROOT_V3)
