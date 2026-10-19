@@ -1,0 +1,51 @@
+{
+  "version": "1.0",
+  "scope": "Konnaxion P1 security/identity/IK inbound tenant guard",
+  "files": [
+    {
+      "path": "backend/config/settings/base.py",
+      "before_sha256": "256a4d395506490ab555005dc38d6fd46a880208a57724899adf37c02255fd5b",
+      "after_sha256": "2bc33b67d650b5907a3046f189b58957f984657dbc0a9bc6926a03d5b126b667"
+    },
+    {
+      "path": "backend/konnaxion/users/adapters.py",
+      "before_sha256": "2b7ad1d0bf1069b372deee4797c924f23e9324a544b7ee8c89dc3819ba1a08d7",
+      "after_sha256": "d714b63213d9d8f1bb749e6f3ae55d173ecb87cc2e2298d03893642d8036bd76"
+    },
+    {
+      "path": "backend/konnaxion/integrations/interaction_kernel/organization_scope.py",
+      "before_sha256": null,
+      "after_sha256": "3dbd1cef3b7118a63b9de2fe7f57bf22f66b17074e538307e84e7ba6d4e2ab52"
+    },
+    {
+      "path": "backend/konnaxion/ethikos/ik_bridge_views.py",
+      "before_sha256": "48be90cafa8efa03db8f338fe43b33a7d6dfcc9b7f025924486a02c8a5d7356a",
+      "after_sha256": "5e5b4c7dd1e3b6c14ef536259556c51d6cb8b0fe6b387939c6dd0f7b55bdaee9"
+    },
+    {
+      "path": "backend/env.example",
+      "before_sha256": "c57a96f46066698f7e1ffc9710c8ec12227c06b169b0dc63d9abbb8644b48993",
+      "after_sha256": "669dd7832e8884477cbfa4b77cabe32ccedf8f6fdd748797510017bdac0b6ac7"
+    },
+    {
+      "path": "backend/konnaxion/users/tests/test_tandem_oidc_guard.py",
+      "before_sha256": null,
+      "after_sha256": "9014507b531a54923c069ee5026a0442a72846244f44f6662f85ba9f232a56ba"
+    },
+    {
+      "path": "backend/konnaxion/ethikos/tests/test_tandem_ik_organization_scope.py",
+      "before_sha256": null,
+      "after_sha256": "105150dd9d9fce32e9cb17e2620ec851dfbca0cc4c64892d6afe46f8b84f96c3"
+    },
+    {
+      "path": "docs/Technical-Reference/TANDEM_TOUR_KONNAXION_2026-10-18.md",
+      "before_sha256": null,
+      "after_sha256": "f8f8a9b243081553ebdbb9ddbb79a9460b0d3116ff94f751a95ec982391c161c"
+    },
+    {
+      "path": "tools/tandem_tour/tests/test_guard_contracts.py",
+      "before_sha256": null,
+      "after_sha256": "c264b7da5644caab34fdea50e5cc5f164a7bbec15f3d3801d01fe81e16aefb32"
+    }
+  ]
+}

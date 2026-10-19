@@ -14,6 +14,7 @@ from konnaxion.integrations.interaction_kernel.contracts import (
     IKContractError, error_receipt, impact_publish_to_publication, success_receipt,
 )
 from konnaxion.integrations.interaction_kernel.fingerprint import request_fingerprint
+from konnaxion.integrations.interaction_kernel.organization_scope import matches_expected_organization
 from .models import OrgoImpactPublication
 
 
@@ -42,6 +43,12 @@ def ik_interaction_ingress(request: HttpRequest) -> JsonResponse:
         if not isinstance(envelope, dict):
             raise IKContractError("IK_INVALID_ENVELOPE", "request body must be an object")
         mapped = impact_publish_to_publication(envelope)
+        expected_org = str(getattr(settings, "IK_ORGO_ALLOWED_ORGANIZATION", "") or "").strip()
+        if not matches_expected_organization(expected_org, mapped["organization_id"]):
+            raise IKContractError(
+                "IK_UNAUTHORIZED",
+                "Orgo organization does not match the inbound credential scope",
+            )
         fingerprint = request_fingerprint(envelope)
         key = mapped["idempotency_key"]
         header_key = request.headers.get("Idempotency-Key")
@@ -65,7 +72,7 @@ def ik_interaction_ingress(request: HttpRequest) -> JsonResponse:
             )
         return JsonResponse(success_receipt(envelope, external_reference=item.external_reference, data={"impact_publication_id": item.pk, "replayed": False}), status=200)
     except IKContractError as exc:
-        status = 409 if exc.code == "IK_IDEMPOTENCY_CONFLICT" else 400
+        status = 409 if exc.code == "IK_IDEMPOTENCY_CONFLICT" else 403 if exc.code == "IK_UNAUTHORIZED" else 400
         return JsonResponse(error_receipt(envelope if isinstance(envelope, dict) else None, status="rejected", code=exc.code, retryable=False, detail=exc.detail), status=status)
     except IntegrityError:
         return JsonResponse(error_receipt(envelope if isinstance(envelope, dict) else None, status="rejected", code="IK_IDEMPOTENCY_CONFLICT", retryable=False, detail="conflicting impact identity"), status=409)

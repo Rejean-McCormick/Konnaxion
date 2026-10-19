@@ -38,6 +38,13 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         request: HttpRequest,
         sociallogin: SocialLogin,
     ) -> bool:
+        # Do not silently create a human account from a federated identity.
+        # Existing, explicitly linked accounts may still log in via OIDC.
+        # Local signup remains governed by ACCOUNT_ALLOW_REGISTRATION.
+        if getattr(settings, "COMMON_OIDC_ENABLED", False) and not getattr(
+            settings, "COMMON_OIDC_ALLOW_AUTO_SIGNUP", False
+        ):
+            return False
         return getattr(settings, "ACCOUNT_ALLOW_REGISTRATION", False)
 
     def populate_user(

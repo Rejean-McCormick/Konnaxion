@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import socket
 from dataclasses import dataclass
 from typing import Any, Mapping
@@ -82,6 +83,34 @@ def _validated_target_url(value: str) -> str:
     return ""
 
 
+_ORGO_WORLD_KEY_RE = re.compile(r"^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$")
+
+
+def _outbound_headers(envelope: Mapping[str, Any], token: str) -> dict[str, str]:
+    """Bind the Orgo authenticated World context to the IK target World.
+
+    Orgo's HTTP boundary otherwise selects "main" by default and rejects a
+    FakePlant envelope whose target.world is e.g. fp-administration.
+    """
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Idempotency-Key": str(envelope.get("idempotency_key") or ""),
+        "X-Correlation-ID": str(envelope.get("correlation_id") or envelope.get("id") or ""),
+        "X-Interaction-Kernel-Version": str(envelope.get("specversion") or ""),
+    }
+    target = envelope.get("target")
+    if target is not None and not isinstance(target, Mapping):
+        raise ValueError("IK target must be an object")
+    world = target.get("world") if isinstance(target, Mapping) else None
+    if world is not None and world != "":
+        if not isinstance(world, str) or not _ORGO_WORLD_KEY_RE.fullmatch(world):
+            raise ValueError("IK target World key does not satisfy Orgo World routing syntax")
+        headers["X-Orgo-World-Key"] = world
+    return headers
+
+
 def deliver_to_orgo(envelope: Mapping[str, Any]) -> DeliveryResult:
     """Deliver one IK envelope using the configured Orgo HTTP binding."""
 
@@ -96,19 +125,16 @@ def deliver_to_orgo(envelope: Mapping[str, Any]) -> DeliveryResult:
     if not token:
         return DeliveryResult(False, False, "IK_TARGET_NOT_CONFIGURED", "IK_ORGO_TOKEN is empty", {})
 
+    try:
+        headers = _outbound_headers(envelope, token)
+    except ValueError as exc:
+        return DeliveryResult(False, False, "IK_TARGET_INVALID", str(exc), {})
     body = json.dumps(envelope, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     request = Request(
         url,
         data=body,
         method="POST",
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "Idempotency-Key": str(envelope.get("idempotency_key") or ""),
-            "X-Correlation-ID": str(envelope.get("correlation_id") or envelope.get("id") or ""),
-            "X-Interaction-Kernel-Version": str(envelope.get("specversion") or ""),
-        },
+        headers=headers,
     )
 
     try:

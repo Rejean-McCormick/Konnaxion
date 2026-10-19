@@ -367,6 +367,9 @@ SOCIALACCOUNT_FORMS = {"signup": "konnaxion.users.forms.UserSocialSignupForm"}
 # Common kOA identity federation (optional). Local accounts remain enabled.
 # The external identity key is the OIDC issuer + subject (sub); email is profile data only.
 COMMON_OIDC_ENABLED = env.bool("COMMON_OIDC_ENABLED", default=False)
+# Human identity linking must be explicit by default. This is independent of
+# DJANGO_ACCOUNT_ALLOW_REGISTRATION (local standalone signup).
+COMMON_OIDC_ALLOW_AUTO_SIGNUP = env.bool("COMMON_OIDC_ALLOW_AUTO_SIGNUP", default=False)
 SOCIALACCOUNT_ONLY = False
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = False
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = False
@@ -548,6 +551,9 @@ CORS_EXPOSE_HEADERS = [
 IK_ORGO_INTERACTIONS_URL = env("IK_ORGO_INTERACTIONS_URL", default="")
 IK_ORGO_TOKEN = env("IK_ORGO_TOKEN", default="")
 IK_ORGO_INBOUND_TOKEN = env("IK_ORGO_INBOUND_TOKEN", default="")
+# Bind this inbound credential to one expected Orgo organization for the
+# single-tenant FakePlant demo. Empty means legacy/unscoped: NOT qualified.
+IK_ORGO_ALLOWED_ORGANIZATION = env("IK_ORGO_ALLOWED_ORGANIZATION", default="")
 IK_ORGO_TARGET_ORGANIZATION = env("IK_ORGO_TARGET_ORGANIZATION", default="")
 IK_ORGO_TARGET_WORLD = env("IK_ORGO_TARGET_WORLD", default="")
 IK_KONNAXION_WORLD = env("IK_KONNAXION_WORLD", default="")
