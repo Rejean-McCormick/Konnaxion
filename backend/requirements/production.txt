@@ -2,7 +2,7 @@
 
 -r base.txt
 
-gunicorn==23.0.0  # https://github.com/benoitc/gunicorn
+gunicorn==26.2.0  # https://github.com/benoitc/gunicorn
 sentry-sdk==2.29.1  # https://github.com/getsentry/sentry-python
 
 # Django
