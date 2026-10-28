@@ -681,3 +681,8 @@ GitHub: https://github.com/Rejean-McCormick
 ## About
 
 Konnaxion is a modular civic-tech platform connecting people, knowledge, projects, deliberation, learning, culture, and collective decision-making, with optional domain- and ethics-aware interpretation through EkoH and Smart Vote.
+
+## Vérification des intégrations satellites (27 octobre 2026)
+
+Voir [le contrôle de compatibilité et les limites de qualification](docs/Integration-Verification-2026-10-27.md). Les versions et statuts externes doivent être vérifiés avant tout déploiement.
+

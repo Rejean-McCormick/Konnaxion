@@ -70,3 +70,7 @@ Konnaxion does not currently publish a single global engineering-maturity percen
 A stable source event or civic state may be interpreted through one or more explicitly declared readings. The reading identifies the method and context used to derive it; it does not mutate the source.
 
 In this Konnaxion phrase, **Truth** means the uniquely owned source/civic state inside a Konnaxion domain. It is not a Kristal epistemic status, a universal truth authority, or a claim that Konnaxion owns knowledge outside its domain.
+
+## Vérification des dépôts satellites
+
+- [Contrats, versions et limites de qualification (27 octobre 2026)](Integration-Verification-2026-10-27.md)
