@@ -4,6 +4,9 @@
 **Release line:** `v0.8.0`  
 **Qualification state:** remediation in progress; not all engineering qualification gates are green.
 
+> **Chronology notice (2026-10-27 snapshot review):** the PASS/WARN/FAIL matrix below is **historical diagnostic evidence from 2026-09-15**, not a fresh qualification of the supplied October code. The implementation includes additive Tandem security hardening documented on **2026-10-18** in [`TANDEM_TOUR_KONNAXION_2026-10-18.md`](TANDEM_TOUR_KONNAXION_2026-10-18.md): `COMMON_OIDC_ALLOW_AUTO_SIGNUP=false` blocks implicit OIDC registration, independently of local registration, and optional `IK_ORGO_ALLOWED_ORGANIZATION` restricts IK Org scope before persistence. Source/test locations include `backend/config/settings/base.py`, `backend/konnaxion/users/tests/test_tandem_oidc_guard.py`, `backend/konnaxion/ethikos/tests/test_tandem_ik_organization_scope.py`, and `tools/tandem_tour/tests/test_guard_contracts.py`. **These are code-presence findings, not rerun test results or deployment attestation.** Run a new isolated qualification campaign before changing the September FAIL/WARN/QUALIFIED verdicts.
+
+
 ## Purpose
 
 This document is the evidence ledger for current implementation and qualification status. It does not replace the architecture specification. Architecture documents define intended ownership, boundaries, contracts and invariants; this document records what the current code and diagnostics actually demonstrate.

@@ -16,6 +16,11 @@ Documents that call themselves “canonical”, “definitive” or “single so
 
 In particular, `Technical-Reference/EkoH Smart Vote/ekoh-smart-vote-definitive-module-documentation-set-v1-0.md` is retained as **historical / non-canonical** material. Its Kubernetes/Helm/Argo CD/Airflow/Dredd/k6/coverage-gate descriptions must not be read as current implementation or CI claims.
 
+## Maintenance and evidence recency (2026-10-27)
+
+- The [qualification ledger](Technical-Reference/QUALIFICATION_STATUS.md) retains diagnostic outcomes from **2026-09-15**. Later **2026-10-18** Tandem OIDC/IK hardening is documented separately in [`Technical-Reference/TANDEM_TOUR_KONNAXION_2026-10-18.md`](Technical-Reference/TANDEM_TOUR_KONNAXION_2026-10-18.md) and must not turn old WARN/FAIL into PASS without rerunning checks.
+- The [DocV14 duplicate-content audit](Technical-Reference/DocV14/DUPLICATE_CONTENT_AUDIT.md) identifies byte-identical historical file copies, including encoded-name variants. No deletion/renaming has been done. The current reading order still decides authority; that inventory is for safe cleanup only.
+
 ## Canonical reading order
 
 1. `Technical-Reference/QUALIFICATION_STATUS.md`
