@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import tomllib
 import sys
@@ -49,13 +50,27 @@ def main() -> int:
     project = meta.get("project") or {}
     if project.get("name") != lock["distribution"]:
         fail(f"distribution must be {lock['distribution']!r}")
-    if project.get("version") != lock["version"]:
+    # Développement local SEULEMENT : l'écart de version/digest peut être toléré.
+    # Le nom de la distribution, la présence du moteur et le TOML restent vérifiés.
+    allow_unpinned = os.environ.get("KX_LOCAL_DEV_UNPINNED_WORLDS") == "1"
+    settings_module = os.environ.get("DJANGO_SETTINGS_MODULE", "").lower()
+    if allow_unpinned and ("production" in settings_module or "prod" in settings_module):
+        fail("development override refused with production Django settings")
+    version_matches = project.get("version") == lock["version"]
+    if not version_matches and not allow_unpinned:
         fail(f"version {project.get('version')!r} does not match pinned {lock['version']!r}")
     digest, count = tree_digest(backend)
-    if digest != lock["tree_sha256"]:
+    digest_matches = digest == lock["tree_sha256"]
+    if not digest_matches and not allow_unpinned:
         fail(f"tree digest sha256:{digest} does not match pinned sha256:{lock['tree_sha256']}")
-    print("Konnaxion_Worlds dependency: PASS")
-    print(f"  version: {lock['version']}")
+    if allow_unpinned:
+        print("Konnaxion_Worlds dependency: DEV-UNPINNED (localhost only, NOT qualified)")
+        print("  WARNING: version/digest lock intentionally not enforced in local development")
+        print(f"  pinned version: {lock['version']}; observed version: {project.get('version')}")
+        print(f"  pinned digest: sha256:{lock['tree_sha256']}")
+    else:
+        print("Konnaxion_Worlds dependency: PASS")
+    print(f"  version: {project.get('version')}")
     print(f"  digest: sha256:{digest}")
     print(f"  files: {count}")
     return 0

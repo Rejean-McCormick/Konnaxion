@@ -13,6 +13,11 @@ from konnaxion.security_controls import (
     user_can_participate_project,
 )
 
+from .school_access import (
+    SCHOOL_CATEGORY, is_school_project, visible_projects, visible_project_children,
+)
+from konnaxion.security_controls import is_staff_or_superuser
+
 from .models import (
     Project,
     ProjectResource,
@@ -50,9 +55,20 @@ class ProjectViewSet(viewsets.ModelViewSet):
     # Use the model field name "creator" (DjangoFilterBackend will filter by ID)
     filterset_fields = ["status", "category", "creator"]
 
+    def get_queryset(self):
+        return visible_projects(super().get_queryset(), self.request.user)
+
     def perform_create(self, serializer):
-        # Set the project creator to the logged-in user
+        if str(serializer.validated_data.get("category", "")).casefold() == SCHOOL_CATEGORY and not is_staff_or_superuser(self.request.user):
+            raise PermissionDenied("School project creation requires staff authorization.")
         serializer.save(creator=self.request.user)
+
+    def perform_update(self, serializer):
+        current = self.get_object()
+        new_category = serializer.validated_data.get("category", current.category)
+        if (is_school_project(current) or str(new_category).casefold() == SCHOOL_CATEGORY) and new_category != current.category:
+            raise PermissionDenied("School project classification cannot be changed through the generic API.")
+        serializer.save()
 
 
 class ProjectResourceViewSet(viewsets.ModelViewSet):
@@ -68,6 +84,9 @@ class ProjectResourceViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectResourceSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, ProjectManagerWritePermission]
     filterset_fields = ["project", "file_type"]
+
+    def get_queryset(self):
+        return visible_project_children(super().get_queryset(), self.request.user)
 
     def perform_create(self, serializer):
         project = serializer.validated_data.get("project")
@@ -91,11 +110,26 @@ class ProjectTaskViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, ProjectManagerWritePermission]
     filterset_fields = ["project", "status", "assignee"]
 
+    def get_queryset(self):
+        return visible_project_children(super().get_queryset(), self.request.user)
+
     def perform_create(self, serializer):
         project = serializer.validated_data.get("project")
+        if is_school_project(project):
+            raise PermissionDenied("Orgo owns operational tasks for Ékole school projects.")
         if not user_can_manage_project(self.request.user, project):
             raise PermissionDenied("Project owner permission is required to add tasks.")
         serializer.save()
+
+    def perform_update(self, serializer):
+        if is_school_project(self.get_object().project):
+            raise PermissionDenied("School task state is owned by Orgo.")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if is_school_project(instance.project):
+            raise PermissionDenied("School task state is owned by Orgo.")
+        instance.delete()
 
 
 class ProjectMessageViewSet(viewsets.ModelViewSet):
@@ -113,6 +147,9 @@ class ProjectMessageViewSet(viewsets.ModelViewSet):
     # If you want messages to be fully private, switch this to IsAuthenticated.
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, OwnerOrStaffWritePermission]
     filterset_fields = ["project", "author"]
+
+    def get_queryset(self):
+        return visible_project_children(super().get_queryset(), self.request.user)
 
     owner_fields = ("author",)
 
@@ -138,9 +175,13 @@ class ProjectTeamViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, ProjectManagerWritePermission]
     filterset_fields = ["project", "user", "role"]
 
+    def get_queryset(self):
+        return visible_project_children(super().get_queryset(), self.request.user)
+
     def perform_create(self, serializer):
-        # If a user adds themselves to a project or an owner adds a team member.
-        # We ensure the joined_at is set automatically; user and project must be provided in request data.
+        project = serializer.validated_data.get("project")
+        if not user_can_manage_project(self.request.user, project):
+            raise PermissionDenied("Project manager authorization is required to add members.")
         serializer.save()
 
     @action(
@@ -172,6 +213,11 @@ class ProjectTeamViewSet(viewsets.ModelViewSet):
                 for item in project_memberships[:3]
             ]
 
+            # School memberships must not enumerate other children's usernames.
+            school_scope = is_school_project(membership.project)
+            if school_scope:
+                preview = []
+
             role = (
                 "owner"
                 if membership.role == ProjectTeam.Role.OWNER
@@ -186,7 +232,7 @@ class ProjectTeamViewSet(viewsets.ModelViewSet):
                     "membership_role": role,
                     "membership_status": "active",
                     "members_count": len(project_memberships),
-                    "is_restricted": False,
+                    "is_restricted": school_scope,
                     "recent_activity": [],
                     "members_preview": preview,
                 }
@@ -235,9 +281,24 @@ class ProjectRatingViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, SelfOrStaffWritePermission]
     filterset_fields = ["project", "user"]
 
+    def get_queryset(self):
+        return visible_project_children(super().get_queryset(), self.request.user)
+
     def perform_create(self, serializer):
-        # Assign the current user as the rater
+        project = serializer.validated_data.get("project")
+        if is_school_project(project):
+            raise PermissionDenied("School projects do not expose public popularity voting.")
         serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        if is_school_project(self.get_object().project):
+            raise PermissionDenied("School projects do not expose public popularity voting.")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if is_school_project(instance.project):
+            raise PermissionDenied("School projects do not expose public popularity voting.")
+        instance.delete()
 
 
 class TagViewSet(viewsets.ModelViewSet):

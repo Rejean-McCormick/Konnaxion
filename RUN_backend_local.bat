@@ -40,7 +40,11 @@ if not exist "%~dp0..\Konnaxion_Worlds\backend\pyproject.toml" (
   exit /b 1
 )
 
-echo [INFO] Verifying pinned Konnaxion_Worlds identity...
+if "%KX_LOCAL_DEV_UNPINNED_WORLDS%"=="1" (
+  echo [WARNING] DEV LOCAL: Konnaxion_Worlds version/digest pin relaxed. NOT FOR PUPILS OR PRODUCTION.
+  echo [WARNING] Package identity and server authorizations remain mandatory.
+)
+echo [INFO] Verifying Konnaxion_Worlds identity...
 ".venv\Scripts\python.exe" "%~dp0scripts\check_worlds_dependency.py" "%~dp0..\Konnaxion_Worlds"
 if errorlevel 1 (
   echo [ERROR] Konnaxion_Worlds version/digest does not match WORLD_ENGINE.lock.json.
@@ -87,8 +91,10 @@ if errorlevel 1 (
   exit /b 1
 )
 
-echo [INFO] Starting backend on http://127.0.0.1:8000 ...
-".venv\Scripts\python.exe" -m uvicorn config.asgi:application --host 0.0.0.0 --port 8000 --reload
+set "KX_LOCAL_BIND_HOST=0.0.0.0"
+if "%KX_LOCAL_DEV_UNPINNED_WORLDS%"=="1" set "KX_LOCAL_BIND_HOST=127.0.0.1"
+echo [INFO] Starting backend on http://%KX_LOCAL_BIND_HOST%:8000 ...
+".venv\Scripts\python.exe" -m uvicorn config.asgi:application --host %KX_LOCAL_BIND_HOST% --port 8000 --reload
 if errorlevel 1 (
   echo [ERROR] Backend server failed to start.
   pause
