@@ -11,6 +11,8 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCK = ROOT / "WORLD_ENGINE.lock.json"
+DEVELOPMENT_MARKER = ROOT / "backend" / ".venv" / "worlds-development.flag"
+DISTRIBUTION = "konnaxion-worlds"
 
 
 def fail(message: str) -> None:
@@ -38,39 +40,52 @@ def tree_digest(backend: Path) -> tuple[str, int]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("worlds_repo", type=Path, help="Path to sibling Konnaxion_Worlds repository")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--development", action="store_true",
+                      help="Check the local package metadata and defer release pin verification")
+    mode.add_argument("--qualification", action="store_true",
+                      help="Require the pinned version and SHA-256 even with a local development marker")
     args = parser.parse_args()
-    lock = json.loads(LOCK.read_text(encoding="utf-8"))
+    in_ci = any(os.environ.get(name, "").strip().lower() in {"true", "1"}
+                for name in ("CI", "GITHUB_ACTIONS"))
+    development = not (args.qualification or in_ci) and (
+        args.development or DEVELOPMENT_MARKER.is_file()
+    )
+
     backend = args.worlds_repo.resolve() / "backend"
     pyproject = backend / "pyproject.toml"
     if not pyproject.is_file():
         fail(f"missing {pyproject}")
     if not (backend / "konnaxion" / "worlds" / "apps.py").is_file():
         fail("candidate does not contain canonical konnaxion.worlds package")
-    meta = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+    try:
+        meta = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        fail(f"cannot read package metadata: {exc}")
     project = meta.get("project") or {}
+    if not isinstance(project, dict):
+        fail("project metadata must be a TOML table")
+
+    if development:
+        if project.get("name") != DISTRIBUTION:
+            fail(f"distribution must be {DISTRIBUTION!r}")
+        version = project.get("version")
+        if not isinstance(version, str) or not version.strip():
+            fail("candidate does not declare a package version")
+        print(f"Konnaxion_Worlds dependency: DEVELOPMENT ({version})")
+        print("  Pinned version and SHA-256 verification deferred to qualification.")
+        return 0
+
+    lock = json.loads(LOCK.read_text(encoding="utf-8-sig"))
     if project.get("name") != lock["distribution"]:
         fail(f"distribution must be {lock['distribution']!r}")
-    # Développement local SEULEMENT : l'écart de version/digest peut être toléré.
-    # Le nom de la distribution, la présence du moteur et le TOML restent vérifiés.
-    allow_unpinned = os.environ.get("KX_LOCAL_DEV_UNPINNED_WORLDS") == "1"
-    settings_module = os.environ.get("DJANGO_SETTINGS_MODULE", "").lower()
-    if allow_unpinned and ("production" in settings_module or "prod" in settings_module):
-        fail("development override refused with production Django settings")
-    version_matches = project.get("version") == lock["version"]
-    if not version_matches and not allow_unpinned:
+    if project.get("version") != lock["version"]:
         fail(f"version {project.get('version')!r} does not match pinned {lock['version']!r}")
     digest, count = tree_digest(backend)
-    digest_matches = digest == lock["tree_sha256"]
-    if not digest_matches and not allow_unpinned:
+    if digest != lock["tree_sha256"]:
         fail(f"tree digest sha256:{digest} does not match pinned sha256:{lock['tree_sha256']}")
-    if allow_unpinned:
-        print("Konnaxion_Worlds dependency: DEV-UNPINNED (localhost only, NOT qualified)")
-        print("  WARNING: version/digest lock intentionally not enforced in local development")
-        print(f"  pinned version: {lock['version']}; observed version: {project.get('version')}")
-        print(f"  pinned digest: sha256:{lock['tree_sha256']}")
-    else:
-        print("Konnaxion_Worlds dependency: PASS")
-    print(f"  version: {project.get('version')}")
+    print("Konnaxion_Worlds dependency: PASS")
+    print(f"  version: {lock['version']}")
     print(f"  digest: sha256:{digest}")
     print(f"  files: {count}")
     return 0

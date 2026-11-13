@@ -1,0 +1,28 @@
+# Local development only. Pair with docker-compose.local.yml.
+services:
+  django:
+    environment:
+      PYTHONPATH: /app:/opt/konnaxion-worlds
+    volumes:
+      - &worlds_source
+        type: bind
+        source: ../../Konnaxion_Worlds/backend/konnaxion/worlds
+        target: /opt/konnaxion-worlds/konnaxion/worlds
+        read_only: true
+        bind:
+          create_host_path: false
+  celeryworker:
+    environment:
+      PYTHONPATH: /app:/opt/konnaxion-worlds
+    volumes:
+      - *worlds_source
+  celerybeat:
+    environment:
+      PYTHONPATH: /app:/opt/konnaxion-worlds
+    volumes:
+      - *worlds_source
+  flower:
+    environment:
+      PYTHONPATH: /app:/opt/konnaxion-worlds
+    volumes:
+      - *worlds_source

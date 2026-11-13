@@ -1,0 +1,43 @@
+# Disposable local Konnaxion E2E database. No host port is published.
+x-e2e-environment: &e2e-environment
+  DATABASE_URL: postgresql://konnaxion_e2e:local_e2e_only@kx-e2e-postgres:5432/konnaxion_e2e
+  REDIS_URL: redis://kx-e2e-redis:6379/0
+  KX_IK_DOCKER_E2E: "1"
+  IK_ORGO_INTERACTIONS_URL: http://host.docker.internal:4000/api/v3/ik/interactions
+
+services:
+  kx-e2e-postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: konnaxion_e2e
+      POSTGRES_USER: konnaxion_e2e
+      POSTGRES_PASSWORD: local_e2e_only
+    volumes:
+      - konnaxion_e2e_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "konnaxion_e2e", "-d", "konnaxion_e2e"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  kx-e2e-redis:
+    image: redis:6
+
+  django:
+    environment: *e2e-environment
+    depends_on:
+      kx-e2e-postgres:
+        condition: service_healthy
+      kx-e2e-redis:
+        condition: service_started
+
+  celeryworker:
+    environment: *e2e-environment
+    depends_on:
+      kx-e2e-postgres:
+        condition: service_healthy
+      kx-e2e-redis:
+        condition: service_started
+
+volumes:
+  konnaxion_e2e_pgdata:
