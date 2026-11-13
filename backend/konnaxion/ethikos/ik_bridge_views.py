@@ -70,7 +70,13 @@ def ik_interaction_ingress(request: HttpRequest) -> JsonResponse:
                 demo_id=mapped["demo_id"], epistemic_status=mapped["epistemic_status"], payload_hash=payload_hash,
                 request_json=mapped["request_json"], receipt_json=receipt_data,
             )
-        return JsonResponse(success_receipt(envelope, external_reference=item.external_reference, data={"impact_publication_id": item.pk, "replayed": False}), status=200)
+            receipt = success_receipt(
+                envelope, external_reference=item.external_reference,
+                data={"impact_publication_id": item.pk, "replayed": False},
+            )
+            item.receipt_json = {**receipt_data, "issued_receipt": receipt}
+            item.save(update_fields=["receipt_json"])
+        return JsonResponse(receipt, status=200)
     except IKContractError as exc:
         status = 409 if exc.code == "IK_IDEMPOTENCY_CONFLICT" else 403 if exc.code == "IK_UNAUTHORIZED" else 400
         return JsonResponse(error_receipt(envelope if isinstance(envelope, dict) else None, status="rejected", code=exc.code, retryable=False, detail=exc.detail), status=status)
