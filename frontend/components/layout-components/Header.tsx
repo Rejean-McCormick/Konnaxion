@@ -31,6 +31,20 @@ import ActiveHeaderWidget from '@/widgets/header/ActiveHeaderWidget';
 
 const { Header } = Layout;
 
+const ResponsiveHeader = styled(Header)`
+  && {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: auto;
+    padding: 0;
+    line-height: normal;
+    container-type: inline-size;
+    background: var(--ant-color-bg-container);
+    box-shadow: var(--ant-box-shadow-secondary);
+  }
+`;
+
 const RAW_API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? '';
 const BACKEND_ROOT =
   RAW_API_BASE.replace(/\/+$/, '').replace(/\/api$/, '') || '';
@@ -43,8 +57,9 @@ function backendUrl(path: string): string {
 const NavBar = styled.div`
   display: flex;
   align-items: center;
-  height: 64px;
-  padding: 0 16px;
+  min-height: 64px;
+  padding: 8px 16px;
+  flex-wrap: wrap;
   gap: 12px;
   min-width: 0;
 `;
@@ -52,8 +67,8 @@ const NavBar = styled.div`
 const Crumb = styled(Breadcrumb)`
   margin-left: 4px;
   color: var(--ant-color-text);
-  max-width: min(30vw, 390px);
-  min-width: 90px;
+  max-width: min(22vw, 300px);
+  min-width: 0;
   overflow: hidden;
   white-space: nowrap;
 
@@ -67,13 +82,15 @@ const Crumb = styled(Breadcrumb)`
     max-width: 180px;
   }
 
-  @media (max-width: 820px) {
+  @container (max-width: 820px) {
     display: none;
   }
 `;
 
 const WorldSlot = styled.div`
   flex: 0 1 auto;
+  max-width: 100%;
+  flex-wrap: wrap;
   min-width: 0;
   display: flex;
   align-items: center;
@@ -100,7 +117,14 @@ const HeaderBlock = styled.div`
     box-shadow: 0 0 0 1px var(--ant-color-border-secondary);
   }
 
-  @media (max-width: 720px) {
+  .k-account-name {
+    max-width: 20ch;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  @container (max-width: 720px) {
     padding: 0 9px;
 
     .k-account-name {
@@ -112,20 +136,22 @@ const HeaderBlock = styled.div`
 const CenterRegion = styled.div`
   display: flex;
   align-items: center;
-  flex: 1;
+  flex: 1 1 160px;
   min-width: 0;
   gap: 12px;
+
+  @container (max-width: 1180px) {
+    order: 1;
+    flex-basis: 100%;
+  }
 `;
 
 const SearchWrapper = styled.div`
   flex: 1;
-  min-width: 120px;
+  min-width: 0;
   display: flex;
   justify-content: center;
 
-  @media (max-width: 900px) {
-    display: none;
-  }
 `;
 
 const WidgetSlot = styled.div`
@@ -143,7 +169,7 @@ const WidgetSlot = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
 
-  @media (max-width: 1180px) {
+  @container (max-width: 1180px) {
     display: none;
   }
 `;
@@ -329,16 +355,7 @@ export default function HeaderBar({
   );
 
   return (
-    <Header
-      style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        background: 'var(--ant-color-bg-container)',
-        padding: 0,
-        boxShadow: 'var(--ant-box-shadow-secondary)',
-      }}
-    >
+    <ResponsiveHeader>
       <NavBar>
         <div onClick={handleToggle} style={{ cursor: 'pointer', marginRight: 4 }}>
           {collapsed ? (
@@ -368,7 +385,7 @@ export default function HeaderBar({
           </WidgetSlot>
         </CenterRegion>
 
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginLeft: 'auto', flexShrink: 0 }}>
           <ThemeSwitcher />
           <Dropdown
             placement="bottomRight"
@@ -385,6 +402,6 @@ export default function HeaderBar({
           </Dropdown>
         </div>
       </NavBar>
-    </Header>
+    </ResponsiveHeader>
   );
 }

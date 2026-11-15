@@ -15,6 +15,7 @@ const StyledMain = styled(
 
   /* décalage = largeur réelle du sider (ouvert) */
   margin-left: 256px;
+  min-width: 0;
 
   background: var(--ant-color-bg-layout);
 

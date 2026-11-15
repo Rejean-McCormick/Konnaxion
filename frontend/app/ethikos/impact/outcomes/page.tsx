@@ -18,6 +18,8 @@ import { useRequest } from 'ahooks';
 import { Divider, Empty, Space, Tabs, Tag, Typography } from 'antd';
 import dayjs from 'dayjs';
 
+import styles from './outcomes.module.css';
+
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
   type DecisionResult,
@@ -33,7 +35,7 @@ type DecisionResultsData = Awaited<ReturnType<typeof fetchDecisionResults>>;
 type DecisionRow = DecisionResult & { key: string };
 
 export default function Outcomes(): JSX.Element {
-  const { t: i18nT } = useLanguage();
+  const { t: i18nT, language } = useLanguage();
   const { data: outcomesData, loading: loadingOutcomes } =
     useRequest<OutcomesData, []>(fetchImpactOutcomes);
 
@@ -43,7 +45,20 @@ export default function Outcomes(): JSX.Element {
   const loading = loadingOutcomes || loadingDecisions;
 
   const kpis = outcomesData?.kpis ?? [];
-  const charts = outcomesData?.charts ?? [];
+  const charts = (outcomesData?.charts ?? []).map((chart) => {
+    if (chart.key !== 'participation-timeline') return chart;
+
+    return {
+      ...chart,
+      config: {
+        ...chart.config,
+        data: chart.config.data.map((point) => ({
+          ...point,
+          date: point.date ? dayjs(point.date).locale(language).format('D MMM') : point.date,
+        })),
+      },
+    };
+  });
 
   const decisionsItems = decisionResults?.items ?? [];
 
@@ -149,10 +164,9 @@ export default function Outcomes(): JSX.Element {
       sectionLabel={i18nT("ui.ethikos.impact.outcomes.impact")}
       subtitle={i18nT("ui.ethikos.impact.outcomes.aggregatedDecisionOutcomesAgreementLevelsAndRegional")}
     >
-      <PageContainer ghost loading={loading}>
-        <ProCard gutter={[16, 16]} wrap>
+      <PageContainer ghost loading={loading} className={styles.outcomes}>
+        <div className={styles.summaryGrid}>
           <ProCard
-            colSpan={{ xs: 24, xl: 8 }}
             title={
               <Space>
                 <BarChartOutlined />
@@ -236,7 +250,6 @@ export default function Outcomes(): JSX.Element {
           </ProCard>
 
           <ProCard
-            colSpan={{ xs: 24, xl: 8 }}
             title={
               <Space>
                 <BarChartOutlined />
@@ -250,10 +263,10 @@ export default function Outcomes(): JSX.Element {
                   key: c.key,
                   label: impactChartTitle(i18nT, c.key, c.title),
                   children: (
-                    <ProCard ghost>
-                      {c.type === 'line' && <Line {...c.config} />}
-                      {c.type === 'bar' && <Bar {...c.config} />}
-                    </ProCard>
+                    <div className={styles.plot}>
+                      {c.type === 'line' && <Line {...c.config} autoFit />}
+                      {c.type === 'bar' && <Bar {...c.config} autoFit />}
+                    </div>
                   ),
                 }))}
               />
@@ -264,51 +277,44 @@ export default function Outcomes(): JSX.Element {
               />
             )}
           </ProCard>
+        </div>
 
-          <ProCard
-            colSpan={{ xs: 24, xl: 8 }}
-            title={i18nT("ui.ethikos.impact.outcomes.closedDecisionsOutcomesVsEngagement")}
-            extra={
-              <Text type="secondary">
-                {decisionRows.length
-                  ? i18nT("ui.ethikos.impact.outcomes.closedDecisions", { length: decisionRows.length })
-                  : i18nT("ui.ethikos.impact.outcomes.noClosedDecisionsYet")}
-              </Text>
-            }
-          >
-            <ProCard split="horizontal" ghost>
-              <ProCard title={i18nT("ui.ethikos.impact.outcomes.outcomesByRegion")}>
-                {decisionOutcomeData.length === 0 ? (
-                  <Empty
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description={i18nT("ui.ethikos.impact.outcomes.noRegionalOutcomeDataAvailable")}
-                  />
-                ) : (
-                  <Bar {...decisionOutcomeConfig} />
-                )}
-              </ProCard>
-
-              <ProCard title={i18nT("ui.ethikos.impact.outcomes.closedDecisions_f7bb51")}>
-                {decisionRows.length === 0 ? (
-                  <Empty
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description={i18nT("ui.ethikos.impact.outcomes.noClosedDecisionsYet")}
-                  />
-                ) : (
-                  <ProTable<DecisionRow>
-                    rowKey="key"
-                    size="small"
-                    columns={decisionsColumns}
-                    dataSource={decisionRows}
-                    pagination={{ pageSize: 8 }}
-                    search={false}
-                    options={false}
-                    toolBarRender={false}
-                  />
-                )}
-              </ProCard>
+        <ProCard title={i18nT("ui.ethikos.impact.outcomes.closedDecisionsOutcomesVsEngagement")}>
+          <div className={styles.detailGrid}>
+            <ProCard title={i18nT("ui.ethikos.impact.outcomes.outcomesByRegion")}>
+              {decisionOutcomeData.length === 0 ? (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description={i18nT("ui.ethikos.impact.outcomes.noRegionalOutcomeDataAvailable")}
+                />
+              ) : (
+                <div className={styles.plot}>
+                    <Bar {...decisionOutcomeConfig} autoFit />
+                  </div>
+              )}
             </ProCard>
-          </ProCard>
+
+            <ProCard title={i18nT("ui.ethikos.impact.outcomes.closedDecisions_f7bb51")}>
+              {decisionRows.length === 0 ? (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description={i18nT("ui.ethikos.impact.outcomes.noClosedDecisionsYet")}
+                />
+              ) : (
+                <ProTable<DecisionRow>
+                  rowKey="key"
+                  size="small"
+                  columns={decisionsColumns}
+                  dataSource={decisionRows}
+                  scroll={{ x: 720 }}
+                  pagination={{ pageSize: 8 }}
+                  search={false}
+                  options={false}
+                  toolBarRender={false}
+                />
+              )}
+            </ProCard>
+          </div>
         </ProCard>
       </PageContainer>
     </EthikosPageShell>

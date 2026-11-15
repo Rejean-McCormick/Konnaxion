@@ -1,0 +1,36 @@
+.outcomes {
+  container-type: inline-size;
+  min-width: 0;
+}
+
+.summaryGrid,
+.detailGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.summaryGrid {
+  margin-bottom: 16px;
+}
+
+.summaryGrid > *,
+.detailGrid > *,
+.plot {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.plot {
+  width: 100%;
+}
+
+@container (min-width: 760px) {
+  .summaryGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  }
+
+  .detailGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  }
+}
