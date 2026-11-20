@@ -29,10 +29,10 @@ if (-not (Test-Path (Join-Path $Frontend 'package.json'))) {
 # Canonical local origins: keep hostnames identical so Django session/CSRF cookies
 # work through the Next.js proxy.
 if ([string]::IsNullOrWhiteSpace($env:BACKEND_BASE_URL)) {
-  $env:BACKEND_BASE_URL = 'http://localhost:8000'
+  $env:BACKEND_BASE_URL = 'http://localhost:21131'
 }
 if ([string]::IsNullOrWhiteSpace($env:SMOKE_BASE_URL)) {
-  $env:SMOKE_BASE_URL = 'http://localhost:3000'
+  $env:SMOKE_BASE_URL = 'http://localhost:21130'
 }
 if ([string]::IsNullOrWhiteSpace($env:PLAYWRIGHT_AUTH_STATE)) {
   $env:PLAYWRIGHT_AUTH_STATE = 'storageState.delivery.json'

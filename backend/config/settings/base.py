@@ -18,9 +18,9 @@ env.read_env(str(BASE_DIR / ".env"))
 # ---------------------------------------------------------------------------
 # FRONTEND BASE URL (used for post-login redirects)
 # ---------------------------------------------------------------------------
-# In local dev, FRONTEND_BASE_URL defaults to http://localhost:3000
+# In local dev, FRONTEND_BASE_URL defaults to http://localhost:21130
 # In production, set FRONTEND_BASE_URL=https://konnaxion.com in .env
-FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:3000").rstrip("/")
+FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:21130").rstrip("/")
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -131,8 +131,8 @@ AUTHENTICATION_BACKENDS = [
 AUTH_USER_MODEL = "users.User"
 
 # Base URL of the frontend (used for login redirects)
-# Local default stays http://localhost:3000 so dev remains easy.
-FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:3000")
+# Local default stays http://localhost:21130 so dev remains easy.
+FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:21130")
 
 # After successful login, send the user to the frontend Ekoh dashboard
 LOGIN_REDIRECT_URL = f"{FRONTEND_BASE_URL.rstrip('/')}/ekoh/dashboard"

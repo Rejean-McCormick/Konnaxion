@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "cross-env FORCE_COLOR=1 next dev --turbo",
+    "dev": "cross-env FORCE_COLOR=1 next dev --turbo --hostname 127.0.0.1 --port 21130",
     "build": "next build",
-    "start": "next start",
+    "start": "next start --hostname 127.0.0.1 --port 21130",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "prettier": "prettier --check \"**/*.{js,jsx,ts,tsx}\"",

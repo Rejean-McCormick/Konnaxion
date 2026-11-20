@@ -12,7 +12,7 @@ const targetsPath = path.join(tourDir, 'targets.json')
 const authPath = path.join(tourDir, 'auth.json')
 const outputDir = path.join(tourDir, 'screenshots-fullpage')
 
-const baseURL = (process.env.ETHIKOS_BASE_URL || 'http://localhost:3000').replace(/\/$/, '')
+const baseURL = (process.env.ETHIKOS_BASE_URL || 'http://localhost:21130').replace(/\/$/, '')
 const headed = process.env.HEADED === '1'
 const keepExisting = process.env.KEEP_SCREENSHOTS === '1'
 

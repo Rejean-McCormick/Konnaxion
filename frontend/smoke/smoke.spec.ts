@@ -11,7 +11,7 @@ test.describe.configure({ mode: 'parallel' });
 
 for (const p of paths) {
   test(`GET ${p}`, async ({ page }) => {
-    const url = new URL(p, process.env.BASE_URL ?? 'http://localhost:3000').toString();
+    const url = new URL(p, process.env.BASE_URL ?? 'http://localhost:21130').toString();
 
     const start = Date.now();
     const resp = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 10000 });

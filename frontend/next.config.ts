@@ -7,7 +7,7 @@ import { env } from './env.mjs';
 const DEFAULT_API_PROXY_BASE =
   process.env.NODE_ENV === 'production'
     ? 'https://konnaxion.com/api'
-    : 'http://localhost:8000/api';
+    : 'http://localhost:21131/api';
 
 const API_PROXY_BASE = (
   process.env.API_PROXY_BASE ??
@@ -43,7 +43,7 @@ const baseConfig: NextConfig = {
       // Next rewrites /api/* to the server-only backend proxy base.
       //
       // Local:
-      //   API_PROXY_BASE=http://localhost:8000/api
+      //   API_PROXY_BASE=http://localhost:21131/api
       //
       // Capsule/runtime:
       //   API_PROXY_BASE=http://django-api:8000/api

@@ -4,7 +4,7 @@ import { expect, type Page, test } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
 
-const BASE_URL = process.env.SMOKE_BASE_URL ?? 'http://localhost:3000'
+const BASE_URL = process.env.SMOKE_BASE_URL ?? 'http://localhost:21130'
 const STRICT_UI = process.env.WAVE1_STRICT_UI === '1'
 const WAVE1_TOPIC_ID = process.env.WAVE1_TOPIC_ID
 const PAUSE_ON_ERROR = process.env.WAVE1_PAUSE_ON_ERROR === '1'

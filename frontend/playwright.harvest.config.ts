@@ -23,7 +23,7 @@ export default defineConfig({
   expect: { timeout: 10_000 },
   outputDir: 'artifacts/playwright-harvest-output',
   use: {
-    baseURL: process.env.SMOKE_BASE_URL || 'http://localhost:3000',
+    baseURL: process.env.SMOKE_BASE_URL || 'http://localhost:21130',
     headless: !!process.env.CI,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',

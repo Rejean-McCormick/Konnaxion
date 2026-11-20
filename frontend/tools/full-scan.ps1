@@ -18,7 +18,7 @@ $script:failedSteps = [System.Collections.Generic.List[string]]::new()
 
 # Local full-scan defaults. Existing explicit values are preserved.
 if ([string]::IsNullOrWhiteSpace($env:API_PROXY_BASE)) {
-  $env:API_PROXY_BASE = "http://localhost:8000/api"
+  $env:API_PROXY_BASE = "http://localhost:21131/api"
 }
 if ([string]::IsNullOrWhiteSpace($env:INTERNAL_API_BASE)) {
   $env:INTERNAL_API_BASE = $env:API_PROXY_BASE
@@ -73,49 +73,16 @@ function Stop-ProcessTree([int]$ProcessId) {
   }
 }
 
-function Stop-ExistingFrontend3000 {
+function Assert-FrontendPortAvailable {
   $listener = Get-NetTCPConnection `
-    -LocalPort 3000 `
+    -LocalPort 21130 `
     -State Listen `
     -ErrorAction SilentlyContinue |
     Select-Object -First 1
-
-  if (-not $listener) {
-    return $false
+  if ($listener) {
+    throw ("Port C0 21130 déjà occupé (PID {0}). Arrêtez manuellement le service concerné; aucun processus n'est tué automatiquement." -f $listener.OwningProcess)
   }
-
-  $pid3000 = $listener.OwningProcess
-  $processInfo = Get-CimInstance `
-    Win32_Process `
-    -Filter "ProcessId=$pid3000" `
-    -ErrorAction SilentlyContinue
-
-  $commandLine = [string]$processInfo.CommandLine
-
-  if (
-    $processInfo.Name -ne "node.exe" -or
-    $commandLine -notmatch '(?i)\bnext\b.*\bstart\b'
-  ) {
-    throw "Port 3000 occupé par un processus qui n'est pas Next start (PID $pid3000)."
-  }
-
-  Write-Host "▶ Arrêt du Next existant sur 3000 (PID $pid3000)"
-  Stop-ProcessTree $pid3000
-
-  for ($attempt = 1; $attempt -le 20; $attempt++) {
-    $stillListening = Get-NetTCPConnection `
-      -LocalPort 3000 `
-      -State Listen `
-      -ErrorAction SilentlyContinue
-
-    if (-not $stillListening) {
-      return $true
-    }
-
-    Start-Sleep -Milliseconds 250
-  }
-
-  throw "Le port 3000 est toujours occupé après l'arrêt de l'ancien Next."
+  return $false
 }
 
 function Start-SmokeServer([int]$port) {
@@ -200,7 +167,7 @@ if (-not $DeepOnly) {
   # 3) Next build
   # A running `next start` must be stopped before replacing .next; otherwise the
   # server can keep references to chunks from the previous build.
-  $frontendWasRunning = Stop-ExistingFrontend3000
+  $frontendWasRunning = Assert-FrontendPortAvailable
 
   $buildCode = Run-Step `
     "Next build" `
@@ -229,7 +196,7 @@ if (-not $DeepOnly) {
         Add-Content -Path $summaryFile -Value "[Playwright SMOKE] SKIPPED (Next build failed)"
       } else {
         Write-Host "▶ Playwright smoke server"
-        $smokeServer = Start-SmokeServer 3000
+        $smokeServer = Start-SmokeServer 21130
 
         $env:SMOKE_BASE_URL = $smokeServer.BaseUrl
         $env:SMOKE_GATE = "1"
@@ -254,9 +221,9 @@ if (-not $DeepOnly) {
       if ($null -ne $smokeServer -and $null -ne $smokeServer.Process) {
         $pidToStop = $smokeServer.Process.Id
 
-        if ($frontendWasRunning -and $KeepFrontend) {
+        if ($KeepFrontend) {
           Write-Host (
-            "Next frais conservé sur http://localhost:3000 (PID {0}) (-KeepFrontend)" -f $pidToStop
+            "Next frais conservé sur http://localhost:21130 (PID {0}) (-KeepFrontend)" -f $pidToStop
           )
         }
         elseif (Get-Process -Id $pidToStop -ErrorAction SilentlyContinue) {

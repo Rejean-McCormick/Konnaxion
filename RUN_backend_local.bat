@@ -93,8 +93,8 @@ if errorlevel 1 (
 
 set "KX_LOCAL_BIND_HOST=0.0.0.0"
 if "%KX_LOCAL_DEV_UNPINNED_WORLDS%"=="1" set "KX_LOCAL_BIND_HOST=127.0.0.1"
-echo [INFO] Starting backend on http://%KX_LOCAL_BIND_HOST%:8000 ...
-".venv\Scripts\python.exe" -m uvicorn config.asgi:application --host %KX_LOCAL_BIND_HOST% --port 8000 --reload
+echo [INFO] Starting backend on http://%KX_LOCAL_BIND_HOST%:21131 ...
+".venv\Scripts\python.exe" -m uvicorn config.asgi:application --host %KX_LOCAL_BIND_HOST% --port 21131 --reload
 if errorlevel 1 (
   echo [ERROR] Backend server failed to start.
   pause

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-const BASE_URL = process.env.SMOKE_BASE_URL ?? 'http://localhost:3000'
+const BASE_URL = process.env.SMOKE_BASE_URL ?? 'http://localhost:21130'
 
 const ROUTES = [
   '/ethikos/deliberate/elite',

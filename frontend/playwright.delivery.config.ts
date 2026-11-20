@@ -4,7 +4,7 @@ const AUTH_STATE =
   process.env.PLAYWRIGHT_AUTH_STATE ?? 'storageState.delivery.json'
 
 const BASE_URL =
-  process.env.SMOKE_BASE_URL ?? 'http://127.0.0.1:3000'
+  process.env.SMOKE_BASE_URL ?? 'http://127.0.0.1:21130'
 
 const frontendUrl = new URL(BASE_URL)
 const FRONTEND_HOST = frontendUrl.hostname

@@ -6,12 +6,12 @@
     "webPort": {
       "type": "port",
       "env": "KOALI_KONNAXION_PORT",
-      "default": 4301
+      "default": 21134
     },
     "apiPort": {
       "type": "port",
       "env": "KOALI_KONNAXION_BACKEND_PORT",
-      "default": 8302
+      "default": 21135
     }
   },
   "surface": {
@@ -61,7 +61,7 @@
         "NEXT_PUBLIC_BACKEND_BASE": "http://127.0.0.1:${apiPort}",
         "NEXT_PUBLIC_KONNAXION_API_ORIGIN": "http://127.0.0.1:${apiPort}",
         "API_PROXY_BASE": "http://127.0.0.1:${apiPort}/api",
-        "KOALI_EMBED_ORIGIN": "http://127.0.0.1:4173"
+        "KOALI_EMBED_ORIGIN": "http://127.0.0.1:21170"
       },
       "probeId": "web"
     }

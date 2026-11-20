@@ -23,7 +23,7 @@ type SmokeResult = {
 };
 
 const ROUTES_FILE = path.join(process.cwd(), 'routes.json');
-const BASE_URL = process.env.SMOKE_BASE_URL ?? 'http://localhost:3000';
+const BASE_URL = process.env.SMOKE_BASE_URL ?? 'http://localhost:21130';
 const GATE = process.env.SMOKE_GATE === '1';
 const NAV_TMO = Number(process.env.NAV_TMO ?? 45_000);
 const outDir = 'playwright-report';

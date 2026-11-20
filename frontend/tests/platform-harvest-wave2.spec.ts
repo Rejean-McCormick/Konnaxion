@@ -5,7 +5,7 @@ import path from 'node:path'
 const BACKEND_BASE_URL =
   process.env.BACKEND_BASE_URL ?? 'http://localhost:8000'
 const FRONTEND_BASE_URL =
-  process.env.SMOKE_BASE_URL ?? 'http://localhost:3000'
+  process.env.SMOKE_BASE_URL ?? 'http://localhost:21130'
 const PREWARM_TIMEOUT_MS = Number(
   process.env.HARVEST_ROUTE_PREWARM_TIMEOUT_MS ?? '120000',
 )
