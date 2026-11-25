@@ -34,7 +34,7 @@ small development commit.
 
 ### Pinned companion revisions
 
-- Konnaxion_Worlds: `ab2bea2a915a529c30fd69fb45386e1842861836`
+- Konnaxion_Worlds: `849fb65f6c23ec5fc77aebca77ab94a35729bab7`
 - Konnaxion_Capsule_Manager: `790fb20ba041cf9ed7ed31f10be96ee2284c43a7`
 - KonnaxionDiag: `97510540c14d69f7aedbb7e9c18eff3ce083250a`
 

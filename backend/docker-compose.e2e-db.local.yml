@@ -3,7 +3,7 @@ x-e2e-environment: &e2e-environment
   DATABASE_URL: postgresql://konnaxion_e2e:local_e2e_only@kx-e2e-postgres:5432/konnaxion_e2e
   REDIS_URL: redis://kx-e2e-redis:6379/0
   KX_IK_DOCKER_E2E: "1"
-  IK_ORGO_INTERACTIONS_URL: http://host.docker.internal:4000/api/v3/ik/interactions
+  IK_ORGO_INTERACTIONS_URL: http://host.docker.internal:21111/api/v3/ik/interactions
 
 services:
   kx-e2e-postgres:

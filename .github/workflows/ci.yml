@@ -26,7 +26,7 @@ env:
   PYTHON_VERSION: "3.12"
   NODE_VERSION: "20"
   PNPM_VERSION: "10.20.0"
-  KONNAXION_WORLDS_REF: "ab2bea2a915a529c30fd69fb45386e1842861836"
+  KONNAXION_WORLDS_REF: "849fb65f6c23ec5fc77aebca77ab94a35729bab7"
   DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/konnaxion
   REDIS_URL: redis://127.0.0.1:6379/0
   DJANGO_SETTINGS_MODULE: config.settings.test
