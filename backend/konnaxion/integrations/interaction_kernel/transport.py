@@ -84,7 +84,7 @@ def _validated_target_url(value: str) -> str:
     # The Docker E2E overlay opts in to this one endpoint on a dedicated test DB.
     if (getattr(settings, "DEBUG", False)
             and os.environ.get("KX_IK_DOCKER_E2E") == "1"
-            and url == "http://host.docker.internal:4000/api/v3/ik/interactions"):
+            and url == "http://host.docker.internal:21111/api/v3/ik/interactions"):
         database = settings.DATABASES.get("default", {})
         if database.get("HOST") == "kx-e2e-postgres" and database.get("NAME") == "konnaxion_e2e":
             return url
