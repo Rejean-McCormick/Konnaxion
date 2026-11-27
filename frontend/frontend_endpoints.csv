@@ -39,6 +39,7 @@ GET,ethikos/stances/?${topicQuery},"C:/mycode/Konnaxion/Konnaxion/frontend/modul
 PATCH,ethikos/topics/${encodeURIComponent(id)}/,"C:/mycode/Konnaxion/Konnaxion/frontend/services/impact.ts"
 GET,ethikos/topics/${topicId}/,"C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/hooks/useImpact.ts"
 GET,id,"C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/projects/project-workspace/page.tsx"
+POST,keenkonnect/messages/,"C:/mycode/Konnaxion/Konnaxion/frontend/app/kidaxion/page.tsx"
 GET,keenkonnect/projects/,"C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/teams-collaboration/project-workspaces/page.tsx"
 GET,kollective/votes/,"C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsensus/hooks/usePoll.ts"
 GET,konnected/certifications/paths/,"C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/certifications/certification-programs/page.tsx"

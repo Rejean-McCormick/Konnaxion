@@ -287,6 +287,13 @@
     ]
   },
   {
+    "method": "POST",
+    "url": "keenkonnect/messages/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/kidaxion/page.tsx"
+    ]
+  },
+  {
     "method": "GET",
     "url": "keenkonnect/projects/",
     "files": [
