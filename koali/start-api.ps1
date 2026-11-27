@@ -65,8 +65,8 @@ if (-not $worldsInstalled) {
     if ($LASTEXITCODE -ne 0) { throw 'Konnaxion_Worlds package install failed.' }
 }
 
-$worldSeedRoot = Join-Path $worldsRepo 'seed-data\worlds'
-$universeSeedRoot = Join-Path $worldsRepo 'seed-data\universes'
+$universeSeedRoot = Join-Path $worldsRepo 'universes'
+$worldSeedRoot = $universeSeedRoot
 $universeManifest = Join-Path $universeSeedRoot 'konvergence-koali\universe.yaml'
 if (-not (Test-Path $worldSeedRoot)) {
     throw "Konnaxion World seed root missing: $worldSeedRoot"
@@ -81,6 +81,11 @@ $env:KONNAXION_WORLDS_ENFORCE_SCOPED_API = 'true'
 $env:KONNAXION_WORLD_SEED_ROOT = $worldSeedRoot
 $env:KONNAXION_UNIVERSE_SEED_ROOT = $universeSeedRoot
 $env:KONNAXION_WORLD_BUILD_CONCURRENCY = '2'
+
+if ($env:KOALI_KX_TEST_PROFILE -ceq '1') {
+    . (Join-Path $PSScriptRoot 'Use-KoaliKonnaxionTest.ps1')
+    Set-KoaliKonnaxionTestEnvironment -Python $venvPython -Backend $backend
+}
 
 Write-Host "[Konnaxion/Koali] World seeds: $worldSeedRoot"
 Write-Host "[Konnaxion/Koali] Universe seeds: $universeSeedRoot"
